@@ -1,4 +1,4 @@
 - name: Restart service
   systemd:
-    name: "{{ service_name }}"
+    name: "{{ service.name }}"
     state: restarted

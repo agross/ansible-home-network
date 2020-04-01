@@ -1,8 +1,7 @@
-service_name: mqtt
+service:
+  name: mqtt
 
-root: /data/{{ service_name }}
-conf_dir: "{{ root }}/conf"
-data_dir: "{{ root }}/data"
-image_dir: "{{ root }}/image"
+root: /data/{{ service.name }}
 
-image_name: eclipse-mosquitto:with-clients
+mqtt:
+  image: eclipse-mosquitto:with-clients

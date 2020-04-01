@@ -1,12 +1,32 @@
-- name: Create directories
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-    - "{{ root }}"
-    - "{{ conf_dir }}"
-    - "{{ data_dir }}"
-    - "{{ image_dir }}"
+- include: copy-templates.yml
+  notify: Restart service
 
-- include: image.yml
-- include: service.yml
+- name: Build custom image
+  docker_image:
+    name: "{{ mqtt.image }}"
+    source: build
+    build:
+      path: "{{ root }}/mosquitto/docker"
+      pull: true
+  notify: Restart service
+
+- name: Set permissions on data directory
+  file:
+    dest: "{{ root }}/mosquitto/data"
+    owner: '1883'
+    recurse: true
+
+- name: Symlink systemd unit file
+  file:
+    state: link
+    src: "{{ root }}/mqtt.service"
+    path: /etc/systemd/system/{{ service.name }}.service
+    force: true
+  notify: Restart service
+
+- name: Start service
+  systemd:
+    state: started
+    enabled: true
+    name: "{{ service.name }}"
+    daemon_reload: true

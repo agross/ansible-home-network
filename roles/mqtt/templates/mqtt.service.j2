@@ -8,13 +8,12 @@ OnFailure=unit-status-mail@%n.service
 ExecStart=/usr/bin/docker run \
                           --name '%p' \
                           --rm \
-                          --env-file '{{ root }}/.env' \
+                          --env-file '{{ root }}/mosquitto/.env' \
                           --health-cmd 'mosquitto_pub --id docker-healthcheck --topic /docker-healthcheck --null-message' \
                           --publish 1883:1883 \
-                          --publish 9001:9001 \
-                          --volume '{{ conf_dir }}/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro' \
-                          --volume '{{ data_dir }}:/mosquitto/data' \
-                          '{{ image_name }}'
+                          --volume '{{ root }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro' \
+                          --volume '{{ root }}/mosquitto/data:/mosquitto/data' \
+                          '{{ mqtt.image }}'
 
 [Install]
 WantedBy=multi-user.target
