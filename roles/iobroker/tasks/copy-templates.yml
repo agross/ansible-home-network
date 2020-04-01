@@ -1,0 +1,19 @@
+- name: Create directories
+  file:
+    path: "{{ root }}/{{ item.path }}"
+    state: directory
+  when: item.state == 'directory'
+  with_filetree: ../templates
+  loop_control:
+    label: "{{ item.path }}"
+  notify: Restart service
+
+- name: Template files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ root }}/{{ item.path | dirname }}/{{ item.path | basename | regex_replace('\\.j2$', '') }}"
+  when: item.state == 'file' and (not item.path | basename == '.gitignore')
+  with_filetree: ../templates
+  loop_control:
+    label: "{{ item.path }}"
+  notify: Restart service

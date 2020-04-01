@@ -1,0 +1,25 @@
+- include: copy-templates.yml
+
+- name: Build custom image
+  docker_image:
+    name: "{{ iobroker.image }}"
+    source: build
+    build:
+      path: "{{ root }}/iobroker/docker"
+      pull: true
+  notify: Restart service
+
+- name: Symlink systemd unit file
+  file:
+    state: link
+    src: "{{ root }}/iobroker.service"
+    path: /etc/systemd/system/{{ service.name }}.service
+    force: true
+  notify: Restart service
+
+- name: Start service
+  systemd:
+    state: started
+    enabled: true
+    name: "{{ service.name }}"
+    daemon_reload: true
