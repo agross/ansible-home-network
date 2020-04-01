@@ -1,0 +1,12 @@
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ root }}"
+    - "{{ conf_dir }}"
+    - "{{ data_dir }}"
+    - "{{ image_dir }}"
+
+- include: image.yml
+- include: service.yml

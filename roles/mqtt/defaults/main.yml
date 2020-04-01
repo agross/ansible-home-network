@@ -1,0 +1,8 @@
+service_name: mqtt
+
+root: /data/{{ service_name }}
+conf_dir: "{{ root }}/conf"
+data_dir: "{{ root }}/data"
+image_dir: "{{ root }}/image"
+
+image_name: eclipse-mosquitto:with-clients
