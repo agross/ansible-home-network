@@ -1,0 +1,15 @@
+[Unit]
+Description=InfluxDB + Grafana Logger
+BindsTo=docker.service
+After=docker.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+WorkingDirectory={{ root }}
+
+ExecStartPre=/usr/local/bin/docker-compose config
+ExecStart=/usr/local/bin/docker-compose --project-name '%p' up
+ExecStop=/usr/local/bin/docker-compose --project-name '%p' stop
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+service:
+  name: logger
+
+root: /data/{{ service.name }}
+
+iobroker:
+  image: buanet/iobroker:custom
+  port: 8081
+  zigbee:
+    transceiver: /dev/ttyACM0

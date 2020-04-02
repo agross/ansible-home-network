@@ -1,0 +1,35 @@
+version: '2.4'
+
+volumes:
+  influxdb-data:
+  grafana-data:
+
+services:
+  influxdb:
+    image: influxdb
+
+    env_file: ./influxdb/.env
+    ports:
+      - "8086:8086"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - influxdb-data:/var/lib/influxdb
+    healthcheck:
+      test: ["CMD", "influx", "-execute", "SHOW databases"]
+      start_period: 5s
+
+  grafana:
+    image: grafana/grafana-arm32v7-linux
+
+    env_file: ./grafana/.env
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/conf.d:/etc/grafana:ro
+      - grafana-data:/var/lib/grafana
+    healthcheck:
+      test: ["CMD", "wget", "-S", "-O", "/dev/null", "http://localhost:3000"]
+      start_period: 5s
+    depends_on:
+      influxdb:
+        condition: service_healthy
