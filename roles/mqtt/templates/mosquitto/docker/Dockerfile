@@ -1,4 +1,5 @@
 FROM eclipse-mosquitto
-LABEL maintainer="Alexander Groß <agross@therightstuff.de>"
+LABEL maintainer="Alexander Groß <agross@therightstuff.de>" \
+      local=true
 
 RUN apk --no-cache --update add mosquitto-clients
