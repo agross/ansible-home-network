@@ -1,7 +1,7 @@
 version: '2.4'
 
 volumes:
-  iobrokerdata:
+  iobroker-data:
 
 services:
   redis:
@@ -34,7 +34,7 @@ services:
       - "{{ homematic.callback_ports.ip }}:{{ homematic.callback_ports.ip }}"
       - "{{ homematic.callback_ports.virtual_devices }}:{{ homematic.callback_ports.virtual_devices }}"
     volumes:
-      - iobrokerdata:/opt/iobroker
+      - iobroker-data:/opt/iobroker
     devices:
       - "{{ iobroker.zigbee.transceiver }}:{{ iobroker.zigbee.transceiver }}:rw"
     healthcheck:
