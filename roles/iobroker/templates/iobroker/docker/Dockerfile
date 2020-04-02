@@ -1,5 +1,6 @@
 FROM buanet/iobroker
-LABEL maintainer="Alexander Groß <agross@therightstuff.de>"
+LABEL maintainer="Alexander Groß <agross@therightstuff.de>" \
+      local=true
 
 RUN apt-get update \
     && apt-get install \

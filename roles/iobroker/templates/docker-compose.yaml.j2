@@ -21,9 +21,6 @@ services:
 
   app:
     image: {{ iobroker.image }}
-    build:
-      context: ./iobroker/docker
-      dockerfile: Dockerfile
 
     env_file: ./iobroker/.env
     hostname: iobroker
