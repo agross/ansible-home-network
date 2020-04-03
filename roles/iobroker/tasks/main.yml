@@ -1,4 +1,6 @@
-- include: copy-templates.yml
+- import_tasks: ../../common/tasks/copy-templates.yml
+  vars:
+    directory: ../templates
 
 - name: Build custom image
   docker_image:
