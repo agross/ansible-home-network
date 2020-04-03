@@ -1,0 +1,16 @@
+- name: Set locale
+  when: locale is defined and locale
+  block:
+    - name: Get locale
+      lineinfile:
+        path: /etc/default/locale
+        regexp: ^LANG={{ locale | regex_escape }}$
+        state: absent
+      changed_when: false
+      check_mode: true
+      register: different_locale
+
+    - name: Change locale
+      command:
+        raspi-config nonint do_change_locale '{{ locale }}'
+      when: not different_locale.found

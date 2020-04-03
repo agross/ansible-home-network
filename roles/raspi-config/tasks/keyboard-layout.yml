@@ -1,0 +1,16 @@
+- name: Set keyboard layout
+  when: keyboard_layout is defined and keyboard_layout
+  block:
+    - name: Get keyboard layout
+      lineinfile:
+        path: /etc/default/keyboard
+        regexp: ^XKBLAYOUT="{{ keyboard_layout | regex_escape }}"
+        state: absent
+      changed_when: false
+      check_mode: true
+      register: different_layout
+
+    - name: Change keyboard layout
+      command:
+        raspi-config nonint do_configure_keyboard '{{ keyboard_layout }}'
+      when: not different_layout.found

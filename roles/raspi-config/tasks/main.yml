@@ -1,0 +1,4 @@
+- include: password.yml
+- include: keyboard-layout.yml
+- include: locale.yml
+- include: timezone.yml

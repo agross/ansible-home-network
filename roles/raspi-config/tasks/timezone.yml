@@ -1,0 +1,16 @@
+- name: Set timezone
+  when: timezone is defined and timezone
+  block:
+    - name: Get timezone
+      lineinfile:
+        path: /etc/timezone
+        regexp: ^{{ timezone | regex_escape }}$
+        state: absent
+      changed_when: false
+      check_mode: true
+      register: different_timezone
+
+    - name: Change timezone
+      command:
+        raspi-config nonint do_change_timezone '{{ timezone }}'
+      when: not different_timezone.found
