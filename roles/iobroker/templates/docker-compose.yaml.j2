@@ -25,11 +25,12 @@ services:
     env_file: ./iobroker/.env
     hostname: iobroker
     ports:
-      - "{{ iobroker.port }}:8081"
-      - "{{ lovelace.port }}:{{ lovelace.port }}"
-      - "{{ homematic.callback_ports.rfd }}:{{ homematic.callback_ports.rfd }}"
-      - "{{ homematic.callback_ports.ip }}:{{ homematic.callback_ports.ip }}"
-      - "{{ homematic.callback_ports.virtual_devices }}:{{ homematic.callback_ports.virtual_devices }}"
+      {% for service, port in ports.items() %}
+      {% if port %}
+      # {{ service }}
+      - "{{ port }}:{{ port }}"
+      {% endif %}
+      {% endfor %}
     volumes:
       - iobroker-data:/opt/iobroker
     devices:

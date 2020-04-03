@@ -12,6 +12,7 @@
   template:
     src: "{{ item.src }}"
     dest: "{{ root }}/{{ item.path | dirname }}/{{ item.path | basename | regex_replace('\\.j2$', '') }}"
+    lstrip_blocks: true
   when: item.state == 'file' and (not item.path | basename == '.gitignore')
   with_filetree: ../templates
   loop_control:

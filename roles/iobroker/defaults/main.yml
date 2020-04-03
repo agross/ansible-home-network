@@ -5,15 +5,14 @@ root: /data/{{ service.name }}
 
 iobroker:
   image: buanet/iobroker:custom
-  port: 8081
   zigbee:
     transceiver: /dev/ttyACM0
 
-homematic:
-  callback_ports:
-    rfd: 42001
-    ip: 42010
-    virtual_devices: 49292
+ports:
+  iobroker: 8081
 
-lovelace:
-  port: 8091
+  # Comment as needed.
+  iobroker_lovelace: 8091
+  # homematic_rfd: 42001
+  homematic_ip: 42010
+  homematic_virtual_devices: 49292
