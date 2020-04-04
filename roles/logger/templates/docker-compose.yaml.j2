@@ -15,7 +15,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - influxdb-data:/var/lib/influxdb
     healthcheck:
-      test: ["CMD", "influx", "-execute", "SHOW databases"]
+      test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:8086/ping"]
       start_period: 5s
 
   grafana:
