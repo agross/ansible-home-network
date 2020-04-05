@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable heartbeat LED
+After=systemd-modules-load.service
+ConditionPathExists=/sys/class/leds/led0/trigger
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/echo heartbeat
+StandardOutput=file:/sys/class/leds/led0/trigger
+
+[Install]
+WantedBy=multi-user.target

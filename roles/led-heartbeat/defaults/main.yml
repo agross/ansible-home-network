@@ -1,0 +1,4 @@
+service:
+  name: led-heartbeat
+
+root: /data/{{ service.name }}
