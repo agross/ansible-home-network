@@ -2,17 +2,38 @@
   vars:
     directory: ../templates
 
-- name: Symlink systemd unit file
+- name: Get systemd unit files
+  find:
+    paths: "{{ root }}"
+    file_type: file
+    recurse: true
+    patterns: '*.service,*.timer'
+  register: systemd_units
+
+- name: Symlink systemd unit files
   file:
     state: link
-    src: "{{ root }}/logger.service"
-    path: /etc/systemd/system/{{ service.name }}.service
+    src: "{{ item.path }}"
+    path:
+      /etc/systemd/system/{{ item.path | basename | regex_replace('^logger', service.name) }}
     force: true
-  notify: Restart service
+  loop: "{{ systemd_units.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  notify:
+    - Restart service
+    - Restart backup timer
 
 - name: Start service
   systemd:
     state: started
     enabled: true
-    name: "{{ service.name }}"
+    name: "{{ service.name }}.service"
+    daemon_reload: true
+
+- name: Start backup timer
+  systemd:
+    state: started
+    enabled: true
+    name: "{{ service.name }}-backup.timer"
     daemon_reload: true

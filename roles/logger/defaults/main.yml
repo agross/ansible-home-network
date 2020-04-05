@@ -3,8 +3,14 @@ service:
 
 root: /data/{{ service.name }}
 
-iobroker:
-  image: buanet/iobroker:custom
-  port: 8081
-  zigbee:
-    transceiver: /dev/ttyACM0
+backup:
+  influxdb:
+    database: iobroker
+  grafana:
+    # The API key needs to have the "Admin" role.
+    api_key: "{{ grafana_api_key }}"
+  cleanup:
+    keep: 7
+  rsync:
+    # All but the last directory must exists on the target.
+    target: nas-backup::NetBackup/{{ ansible_hostname }}/{{ service.name }}

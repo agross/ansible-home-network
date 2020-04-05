@@ -1,0 +1,11 @@
+[Unit]
+Description=InfluxDB + Grafana Logger backup
+OnFailure=unit-status-mail@%n.service
+Wants=network-online.target
+
+[Service]
+ExecStart=/bin/systemd-inhibit --why '%n' \
+                               '{{ root }}/backup/backup'
+
+[Install]
+WantedBy=multi-user.target

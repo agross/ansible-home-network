@@ -1,0 +1,13 @@
+[Unit]
+Description=InfluxDB + Grafana Logger backup
+# Stop if main service is not running.
+Requires={{ service.name }}.service
+
+[Timer]
+OnCalendar=01:00
+# Catch up when an invocation was missed.
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target
