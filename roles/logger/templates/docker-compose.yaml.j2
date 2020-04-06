@@ -25,7 +25,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/conf.d:/etc/grafana:ro
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - grafana-data:/var/lib/grafana
     healthcheck:
       test: ["CMD", "wget", "-S", "-O", "/dev/null", "http://localhost:3000"]
