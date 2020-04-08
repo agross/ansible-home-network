@@ -1,4 +1,4 @@
-- import_tasks: ../../common/tasks/copy-templates.yml
+- import_tasks: copy-templates.yml
   vars:
     directory: ../templates
 
