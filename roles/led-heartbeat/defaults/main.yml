@@ -1,4 +1,3 @@
-service:
-  name: led-heartbeat
+service_name: led-heartbeat
 
-root: /data/{{ service.name }}
+root: /data/{{ service_name }}

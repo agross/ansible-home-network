@@ -11,7 +11,7 @@
   file:
     state: link
     src: "{{ root }}/led-heartbeat.service"
-    path: /etc/systemd/system/{{ service.name }}.service
+    path: /etc/systemd/system/{{ service_name }}.service
     force: true
   notify: Restart service
 
@@ -19,5 +19,5 @@
   systemd:
     state: started
     enabled: true
-    name: "{{ service.name }}"
+    name: "{{ service_name }}"
     daemon_reload: true
