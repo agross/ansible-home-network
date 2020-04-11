@@ -20,7 +20,7 @@ services:
       net.core.somaxconn: 512
 
   app:
-    image: {{ iobroker.image }}
+    image: {{ iobroker_image }}
 
     env_file: ./iobroker/.env
     hostname: iobroker
@@ -34,9 +34,9 @@ services:
     volumes:
       - iobroker-data:/opt/iobroker
     devices:
-      - "{{ iobroker.zigbee.transceiver }}:{{ iobroker.zigbee.transceiver }}:rw"
+      - "{{ iobroker_zigbee_transceiver }}:{{ iobroker_zigbee_transceiver }}:rw"
     healthcheck:
-      test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:8081"]
+      test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:{{ ports.iobroker }}"]
       start_period: 15s
     # Required for the backup adapter in combination with NFS or CIFS.
     privileged: true

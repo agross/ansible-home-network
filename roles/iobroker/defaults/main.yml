@@ -1,12 +1,9 @@
-service:
-  name: iobroker
+service_name: iobroker
 
-root: /data/{{ service.name }}
+root: /data/{{ service_name }}
 
-iobroker:
-  image: buanet/iobroker:custom
-  zigbee:
-    transceiver: /dev/ttyACM0
+iobroker_image: buanet/iobroker:custom
+iobroker_zigbee_transceiver: /dev/ttyACM0
 
 ports:
   iobroker: 8081
