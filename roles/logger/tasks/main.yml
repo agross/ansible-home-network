@@ -15,7 +15,7 @@
     state: link
     src: "{{ item.path }}"
     path:
-      /etc/systemd/system/{{ item.path | basename | regex_replace('^logger', service.name) }}
+      /etc/systemd/system/{{ item.path | basename | regex_replace('^logger', service_name) }}
     force: true
   loop: "{{ systemd_units.files }}"
   loop_control:
@@ -28,12 +28,12 @@
   systemd:
     state: started
     enabled: true
-    name: "{{ service.name }}.service"
+    name: "{{ service_name }}.service"
     daemon_reload: true
 
 - name: Start backup timer
   systemd:
     state: started
     enabled: true
-    name: "{{ service.name }}-backup.timer"
+    name: "{{ service_name }}-backup.timer"
     daemon_reload: true

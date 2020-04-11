@@ -1,7 +1,7 @@
 [Unit]
 Description=InfluxDB + Grafana Logger backup
 # Stop if main service is not running.
-Requires={{ service.name }}.service
+Requires={{ service_name }}.service
 
 [Timer]
 OnCalendar=01:00

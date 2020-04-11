@@ -1,9 +1,9 @@
 - name: Restart service
   systemd:
-    name: "{{ service.name }}.service"
+    name: "{{ service_name }}.service"
     state: restarted
 
 - name: Restart backup timer
   systemd:
-    name: "{{ service.name }}-backup.timer"
+    name: "{{ service_name }}-backup.timer"
     state: restarted

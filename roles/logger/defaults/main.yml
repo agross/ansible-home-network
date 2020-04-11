@@ -1,7 +1,6 @@
-service:
-  name: logger
+service_name: logger
 
-root: /data/{{ service.name }}
+root: /data/{{ service_name }}
 
 backup:
   influxdb:
@@ -13,4 +12,4 @@ backup:
     keep: 7
   rsync:
     # All but the last directory must exists on the target.
-    target: nas-backup::NetBackup/{{ ansible_hostname }}/{{ service.name }}
+    target: nas-backup::NetBackup/{{ ansible_hostname }}/{{ service_name }}

@@ -10,7 +10,7 @@ influxdb() {
   docker run \
          --rm \
          --name influxdb-backup \
-         --network 'container:{{ service.name }}_influxdb_1' \
+         --network 'container:{{ service_name }}_influxdb_1' \
          --volume "$temp:/backups"  \
          influxdb \
          influxd backup \
@@ -68,7 +68,7 @@ grafana() {
          --env 'GRAFANA_URL=http://grafana:3000' \
          --env 'GRAFANA_TOKEN={{ backup.grafana.api_key }}' \
          --env 'TZ=Europe/Berlin' \
-         --network 'container:{{ service.name }}_grafana_1' \
+         --network 'container:{{ service_name }}_grafana_1' \
          --volume "$temp:/opt/grafana-backup-tool/_OUTPUT_"  \
          "$image"
 
