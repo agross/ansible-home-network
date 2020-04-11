@@ -13,7 +13,7 @@ ExecStart=/usr/bin/docker run \
                           --publish 1883:1883 \
                           --volume '{{ root }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro' \
                           --volume '{{ root }}/mosquitto/data:/mosquitto/data' \
-                          '{{ mqtt.image }}'
+                          '{{ mqtt_image }}'
 
 [Install]
 WantedBy=multi-user.target

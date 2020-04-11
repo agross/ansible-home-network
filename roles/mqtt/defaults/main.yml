@@ -1,7 +1,5 @@
-service:
-  name: mqtt
+service_name: mqtt
 
-root: /data/{{ service.name }}
+root: /data/{{ service_name }}
 
-mqtt:
-  image: eclipse-mosquitto:with-clients
+mqtt_image: eclipse-mosquitto:with-clients
