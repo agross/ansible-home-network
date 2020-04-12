@@ -47,6 +47,9 @@
 # The full public facing url you use in browser, used for redirects and emails
 # If you use reverse proxy and sub path specify full url (with sub path)
 ;root_url = %(protocol)s://%(domain)s:%(http_port)s/
+{% if grafana.root_url is defined %}
+root_url = {{ grafana.root_url }}
+{% endif %}
 
 # Serve Grafana from subpath specified in `root_url` setting. By default it is set to `false` for compatibility reasons.
 ;serve_from_sub_path = false
@@ -320,6 +323,12 @@ allow_org_create = false
 ;allowed_domains =
 ;team_ids =
 ;allowed_organizations =
+{% if grafana.github is defined %}
+enabled = true
+allow_sign_up = false
+client_id = {{ grafana.github.client_id }}
+client_secret = {{ grafana.github.client_secret }}
+{% endif%}
 
 #################################### GitLab Auth #########################
 [auth.gitlab]
@@ -346,6 +355,12 @@ allow_org_create = false
 ;api_url = https://www.googleapis.com/oauth2/v1/userinfo
 ;allowed_domains =
 ;hosted_domain =
+{% if grafana.google is defined %}
+enabled = true
+allow_sign_up = false
+client_id = {{ grafana.google.client_id }}
+client_secret = {{ grafana.google.client_secret }}
+{% endif %}
 
 #################################### Grafana.com Auth ####################
 [auth.grafana_com]
@@ -464,6 +479,13 @@ allow_org_create = false
 ;from_name = Grafana
 # EHLO identity in SMTP dialog (defaults to instance_name)
 ;ehlo_identity = dashboard.example.com
+{% if grafana.smtp is defined %}
+enabled = true
+host = {{ grafana.smtp.host }}
+user = {{ grafana.smtp.user }}
+from_address = {{ grafana.smtp.user }}
+password = {{ grafana.smtp.password }}
+{% endif %}
 
 [emails]
 ;welcome_email_on_sign_up = false
