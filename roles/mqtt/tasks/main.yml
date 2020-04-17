@@ -1,6 +1,7 @@
 - import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    notify: Restart mqtt service
 
 - name: Build custom image
   docker_image:
@@ -9,7 +10,7 @@
     build:
       path: "{{ root }}/mosquitto/docker"
       pull: true
-  notify: Restart service
+  notify: Restart mqtt service
 
 - name: Set permissions on data directory
   file:
@@ -23,7 +24,7 @@
     src: "{{ root }}/mqtt.service"
     path: /etc/systemd/system/{{ service_name }}.service
     force: true
-  notify: Restart service
+  notify: Restart mqtt service
 
 - name: Start service
   systemd:

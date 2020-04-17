@@ -1,4 +1,4 @@
-- name: Restart service
+- name: Restart mqtt service
   systemd:
     name: "{{ service_name }}"
     state: restarted
