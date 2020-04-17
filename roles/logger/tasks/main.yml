@@ -1,6 +1,9 @@
 - import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    notify:
+      - Restart logger service
+      - Restart logger backup timer
 
 - name: Get systemd unit files
   find:
@@ -21,8 +24,8 @@
   loop_control:
     label: "{{ item.path }}"
   notify:
-    - Restart service
-    - Restart backup timer
+    - Restart logger service
+    - Restart logger backup timer
 
 - name: Start service
   systemd:
