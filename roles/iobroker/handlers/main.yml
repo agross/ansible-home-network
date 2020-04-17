@@ -1,4 +1,4 @@
-- name: Restart service
+- name: Restart iobroker service
   systemd:
     name: "{{ service_name }}"
     state: restarted

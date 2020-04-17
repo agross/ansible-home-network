@@ -1,6 +1,7 @@
 - import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    notify: Restart iobroker service
 
 - name: Build custom image
   docker_image:
@@ -9,7 +10,7 @@
     build:
       path: "{{ root }}/iobroker/docker"
       pull: true
-  notify: Restart service
+  notify: Restart iobroker service
 
 - name: Symlink systemd unit file
   file:
@@ -17,7 +18,7 @@
     src: "{{ root }}/iobroker.service"
     path: /etc/systemd/system/{{ service_name }}.service
     force: true
-  notify: Restart service
+  notify: Restart iobroker service
 
 - name: Start service
   systemd:
