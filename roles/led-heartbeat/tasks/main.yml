@@ -6,6 +6,7 @@
 - import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    notify: Restart led-heartbeat service
 
 - name: Symlink systemd unit file
   file:
@@ -13,7 +14,7 @@
     src: "{{ root }}/led-heartbeat.service"
     path: /etc/systemd/system/{{ service_name }}.service
     force: true
-  notify: Restart service
+  notify: Restart led-heartbeat service
 
 - name: Start service
   systemd:
