@@ -53,7 +53,7 @@ grafana-build-backup() {
 }
 
 grafana() {
-  local image='ysde/docker-grafana-backup-tool:latest'
+  local image='ysde/docker-grafana-backup-tool:armhf'
 
   if [[ -z "$(docker images --filter=reference="$image" --quiet)" ]]; then
     grafana-build-backup "$image"
