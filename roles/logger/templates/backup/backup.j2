@@ -46,6 +46,7 @@ grafana-build-backup() {
   # No armhf-based variant available.
   docker build \
          --tag "$image" \
+         --label local=true \
          .
 
   popd > /dev/null
