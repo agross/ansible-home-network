@@ -9,6 +9,10 @@ services:
 
     environment:
       TZ: Europe/Berlin
+    {% if iobroker_wake_on_lan | default(false) | bool == true %}
+    ports:
+      - "127.0.0.1:6379:6379"
+    {% endif %}
     command: /usr/local/etc/redis/redis.conf
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
@@ -26,6 +30,9 @@ services:
 
     env_file: ./iobroker/.env
     hostname: iobroker
+    {% if iobroker_wake_on_lan | default(false) | bool == true %}
+    network_mode: host
+    {% else %}
     ports:
       {% for service, port in ports.items() %}
       {% if port %}
@@ -33,6 +40,7 @@ services:
       - "{{ port }}:{{ port }}"
       {% endif %}
       {% endfor %}
+    {% endif %}
     volumes:
       - iobroker-data:/opt/iobroker
     devices:
