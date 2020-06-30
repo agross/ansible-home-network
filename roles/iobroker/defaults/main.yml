@@ -3,7 +3,7 @@ service_name: iobroker
 root: /data/{{ service_name }}
 
 iobroker_image: buanet/iobroker:custom
-iobroker_zigbee_transceiver: /dev/ttyACM0
+iobroker_zigbee_transceiver: /dev/ttyACM0;/dev/ttyUSB0
 
 iobroker_wake_on_lan: false
 

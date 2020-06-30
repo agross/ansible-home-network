@@ -44,7 +44,10 @@ services:
     volumes:
       - iobroker-data:/opt/iobroker
     devices:
-      - "{{ iobroker_zigbee_transceiver }}:{{ iobroker_zigbee_transceiver }}:rw"
+      {% set zigbees = iobroker_zigbee_transceiver.split(';') %}
+      {% for dev in zigbees %}
+      - "{{ dev }}:{{ dev }}:rw"
+      {% endfor %}
     healthcheck:
       test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:{{ ports.iobroker }}"]
       start_period: 15s
