@@ -3,6 +3,14 @@
     directory: ../templates
     notify: Restart iobroker service
 
+- name: Add sysctls for Redis
+  copy:
+    src: ../templates/redis/sysctl.conf
+    dest: /etc/sysctl.d/redis-vm.overcommit.conf
+    mode: '644'
+    # Overwrite existing files.
+    force: true
+
 - name: Build custom image
   docker_image:
     name: "{{ iobroker_image }}"
