@@ -63,6 +63,8 @@ grafana() {
   local temp
   temp="$(mktemp --directory)"
 
+  chown 1337:1337 "$temp"
+
   docker run \
          --rm \
          --name grafana-backup \
