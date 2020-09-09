@@ -1,0 +1,14 @@
+- name: Get firmware version
+  uri:
+    url: >-
+      http://{{ inventory_hostname }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+    return_content: true
+  delegate_to: localhost
+  register: firmware
+  changed_when: false
+
+- name: Remove host if no update is required
+  meta: end_host
+  when: >-
+    firmware.json.StatusFWR.Version | regex_replace('\(.*', '')
+    is version(latest_release_version, '>=')

@@ -1,0 +1,24 @@
+- name: Get OTA URL
+  uri:
+    url: >-
+      http://{{ inventory_hostname }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
+    return_content: true
+  delegate_to: localhost
+  register: original_ota_url
+  changed_when: false
+
+- name: Set upgrade URL
+  uri:
+    url: >-
+      http://{{ inventory_hostname }}/cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
+    return_content: true
+  delegate_to: localhost
+  register: ota_url
+  when: original_ota_url.json.OtaUrl != tasmota_upgrade_url
+
+- name: Show upgrade URL
+  debug:
+    msg: >-
+      OTA URL {{ tasmota_upgrade_url }}{% if original_ota_url.json.OtaUrl != tasmota_upgrade_url %}
+      (changed from {{ original_ota_url.json.OtaUrl }}){% endif %}
+  changed_when: false

@@ -1,0 +1,2 @@
+tasmota_user: admin
+tasmota_upgrade_url: http://ota.tasmota.com/tasmota/tasmota.bin.gz
