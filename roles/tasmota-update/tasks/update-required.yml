@@ -10,5 +10,7 @@
 - name: Remove host if no update is required
   meta: end_host
   when: >-
+    firmware is defined and
+    latest_release_version is defined and
     firmware.json.StatusFWR.Version | regex_replace('\(.*', '')
     is version(latest_release_version, '>=')
