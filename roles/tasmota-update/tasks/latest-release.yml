@@ -1,7 +1,6 @@
 - name: Get latest Tasmota release
   uri:
-    url: >-
-      https://api.github.com/repos/arendst/Tasmota/releases/latest
+    url: "{{ tasmota_version_info }}"
     return_content: true
   delegate_to: localhost
   run_once: true
@@ -11,5 +10,5 @@
 - name: Determine latest Tasmota release version
   set_fact:
     latest_release_version: >-
-      {{ latest_release.json.tag_name | regex_replace('^v', '') }}
+      {{ latest_release.json | list | first | regex_replace('^.*-', '') }}
   run_once: true
