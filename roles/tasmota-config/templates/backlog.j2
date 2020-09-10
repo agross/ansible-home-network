@@ -1,0 +1,43 @@
+{#
+One command per line. Lines will be trimmed, concatenated and each command
+separated by a semicolon. Empty lines are omitted. Limited to 30 commands as
+they are executed by Backlog.
+https://tasmota.github.io/docs/Commands/#backlog
+#}
+
+{# Set friendly device name (32 char limit). #}
+FriendlyName {{ friendly_name }}
+{# This one is displayed in the webUI and used for HA autodiscovery. #}
+DeviceName {{ friendly_name }}
+
+{# MQTT config. #}
+{% if mqtt_host %}
+  MqttHost {{ mqtt_host }}
+{% endif %}
+{% if mqtt_user %}
+  MqttUser {{ mqtt_user }}
+{% endif %}
+{% if mqtt_password %}
+  MqttPassword {{ mqtt_password }}
+{% endif %}
+MqttPort {{ mqtt_port | default(1883) }}
+MqttClient {{ mqtt_client }}
+
+Topic {{ inventory_hostname_short }}
+FullTopic {{ mqtt_topic }}
+
+{# Update telemetry every n seconds (e.g. state and power consumption). #}
+TelePeriod 10
+
+{% if module is defined %}
+{# Set predefined device template and activate. #}
+  Module {{ module }}
+{% elif template is defined %}
+  {# Set custom device template and activate. #}
+  Template {{ template }}
+  Module 0
+{% endif %}
+
+{% if custom_backlog is defined %}
+  {{ custom_backlog }}
+{% endif %}

@@ -1,0 +1,47 @@
+- name: Create backlog file
+  tempfile:
+    state: file
+    suffix: backlog
+  delegate_to: localhost
+  changed_when: false
+  register: backlog_file
+
+- name: Generate backlog
+  template:
+    src: ../templates/backlog.j2
+    dest: "{{ backlog_file.path }}"
+    trim_blocks: true
+    lstrip_blocks: true
+  delegate_to: localhost
+  changed_when: false
+
+- name: Read backlog
+  set_fact:
+    # The select filter removes empty strings.
+    backlog: >-
+      {{ lookup('file', backlog_file.path).splitlines() | map('trim') | select | join(';') }}
+  delegate_to: localhost
+
+- name: Remove backlog file
+  file:
+    path: "{{ backlog_file.path }}"
+    state: absent
+  delegate_to: localhost
+  changed_when: false
+
+- name: Print backlog
+  debug:
+    var: backlog
+
+- name: Execute backlog
+  uri:
+    url: >-
+      http://{{ inventory_hostname }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
+    return_content: true
+  delegate_to: localhost
+  register: backlog_result
+  changed_when: true
+
+- name: Print result
+  debug:
+    var: backlog_result
