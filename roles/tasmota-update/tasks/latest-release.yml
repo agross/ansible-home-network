@@ -9,6 +9,8 @@
 
 - name: Determine latest Tasmota release version
   set_fact:
+    latest_release_key: >-
+      {{ latest_release.json | list | first }}
     latest_release_version: >-
       {{ latest_release.json | list | first | regex_replace('^.*-', '') }}
   run_once: true
