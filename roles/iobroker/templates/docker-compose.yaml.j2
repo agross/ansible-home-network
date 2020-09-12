@@ -43,6 +43,9 @@ services:
     {% endif %}
     volumes:
       - iobroker-data:/opt/iobroker
+      # Enable mirroring in the iobroker.javascript adapter and edit scripts via
+      # SSH with e.g. VS Code.
+      - /data/iobroker/scripts:/opt/iobroker/mirrored-scripts
     devices:
       {% set zigbees = iobroker_zigbee_transceiver.split(';') %}
       {% for dev in zigbees %}
