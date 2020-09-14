@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+unhealthy="$(docker container ls \
+                    --format {% raw %}'{{ .Names }}'{% endraw %} \
+                    --filter health=unhealthy \
+                    --filter "name={{ service_name }}_")"
+
+if [[ -z "$unhealthy" ]]; then
+  printf 'No unhealthy {{ service_name }} containers\n'
+  exit 0
+fi
+
+printf 'Unhealthy {{ service_name }} containers:\n%s\n' "$unhealthy"
+
+if [[ "$unhealthy" == *_redis_* ]]; then
+  printf 'Redis is unhealthy, reboot.\n'
+  systemctl reboot
+fi
+
+exit 1

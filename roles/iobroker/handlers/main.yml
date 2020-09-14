@@ -2,3 +2,8 @@
   systemd:
     name: "{{ service_name }}"
     state: restarted
+
+- name: Restart iobroker healthcheck timer
+  systemd:
+    name: "{{ service_name }}-healthcheck.timer"
+    state: restarted

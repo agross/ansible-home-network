@@ -1,0 +1,10 @@
+[Unit]
+Description=ioBroker IoT platform healthcheck
+BindsTo={{ service_name }}.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+ExecStart={{ root }}/healthcheck
+
+[Install]
+WantedBy=multi-user.target

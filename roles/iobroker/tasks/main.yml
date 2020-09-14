@@ -1,11 +1,11 @@
 - import_tasks: copy-templates.yml
   vars:
-    directory: ../templates
+    directory: ../templates/app
     notify: Restart iobroker service
 
 - name: Add sysctls for Redis
   copy:
-    src: ../templates/redis/sysctl.conf
+    src: ../templates/app/redis/sysctl.conf
     dest: /etc/sysctl.d/redis-vm.overcommit.conf
     mode: '644'
     # Overwrite existing files.
@@ -34,4 +34,26 @@
     state: started
     enabled: true
     name: "{{ service_name }}"
+    daemon_reload: true
+
+- import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates/healthcheck
+    notify: Restart iobroker healthcheck timer
+
+- name: Symlink healthcheck systemd unit file
+  file:
+    state: link
+    src: "{{ root }}/iobroker-healthcheck.{{ item }}"
+    path: /etc/systemd/system/{{ service_name }}-healthcheck.{{ item }}
+    force: true
+  loop:
+    - service
+    - timer
+
+- name: Start healthcheck timer
+  systemd:
+    state: started
+    enabled: true
+    name: "{{ service_name }}-healthcheck.timer"
     daemon_reload: true
