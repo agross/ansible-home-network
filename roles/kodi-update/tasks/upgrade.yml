@@ -1,0 +1,26 @@
+- name: Show firmware version
+  debug:
+    msg: >-
+      Upgrading from {{ installed_version }} to {{ latest_release_version }}
+  changed_when: false
+
+- name: Create temporary file for package download
+  tempfile:
+    state: file
+    suffix: .apk
+  register: package
+  delegate_to: localhost
+  changed_when: false
+
+- name: Download package
+  get_url:
+    url: "{{ kodi_release_package_url }}"
+    dest: "{{ package.path }}"
+    force: true
+  delegate_to: localhost
+  changed_when: false
+
+- name: Install package via ADB
+  command: >-
+    adb install -r {{ package.path }}
+  delegate_to: localhost

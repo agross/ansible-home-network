@@ -1,0 +1,25 @@
+- name: Connect ADB
+  command: adb connect {{ inventory_hostname }}
+  delegate_to: localhost
+  changed_when: false
+
+- name: Get installed packages
+  shell: >-
+    adb shell dumpsys package packages |
+      grep -E 'Package \[|versionName' |
+      grep -A 1 org.xbmc.kodi
+  delegate_to: localhost
+  register: installed_packages
+  changed_when: false
+
+- name: Determine installed version
+  set_fact:
+    installed_version: "{{ installed_packages.stdout_lines[1] | regex_replace('.*versionName=', '')}}"
+
+- name: Remove host if no update is required
+  meta: end_host
+  when: >-
+    installed_version is defined and
+    latest_release_version is defined and
+    installed_version
+      is version(latest_release_version, '>=')

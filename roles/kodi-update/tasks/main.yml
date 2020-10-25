@@ -1,0 +1,3 @@
+- include: latest-release.yml
+- include: update-required.yml
+- include: upgrade.yml
