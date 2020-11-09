@@ -30,7 +30,7 @@ FullTopic {{ mqtt_topic }}
 TelePeriod 10
 
 {% if module is defined %}
-{# Set predefined device template and activate. #}
+  {# Set predefined device template and activate. #}
   Module {{ module }}
 {% elif template is defined %}
   {# Set custom device template and activate. #}
