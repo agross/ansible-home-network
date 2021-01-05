@@ -1,0 +1,10 @@
+- import_tasks: copy-templates.yml
+  vars:
+    root: /etc/udev/rules.d
+    directory: ../templates
+
+- name: Enable fstrim.timer
+  systemd:
+    state: started
+    enabled: true
+    name: fstrim.timer
