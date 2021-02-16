@@ -1,0 +1,62 @@
+providers:
+  docker:
+    # Need to configure label traefik.enable=true.
+    exposedByDefault: false
+    # All traefik-enabled containers must be on this network.
+    network: web
+
+api:
+  dashboard: true
+
+pilot:
+  token: dd1d9171-b4dc-4471-ae47-77054ea59bf7
+
+# docker exec traefik traefik healthcheck
+ping: {}
+
+log:
+  level: INFO
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+          permanent: true
+
+  https:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt-gw # -staging
+
+certificatesResolvers:
+  letsencrypt-gw:
+    acme:
+      email: agross@grossweber.com
+      storage: /etc/traefik/acme.json
+      dnsChallenge:
+        provider: inwx
+        # https://github.com/go-acme/lego/issues/1297
+        delayBeforeCheck: 420
+        resolvers:
+          - ns.inwx.de
+          - ns2.inwx.de
+          - ns3.inwx.eu
+
+  letsencrypt-gw-staging:
+    acme:
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      email: agross@grossweber.com
+      storage: /etc/traefik/acme-staging.json
+      dnsChallenge:
+        provider: inwx
+        # https://github.com/go-acme/lego/issues/1297
+        delayBeforeCheck: 420
+        resolvers:
+          - ns.inwx.de
+          - ns2.inwx.de
+          - ns3.inwx.eu

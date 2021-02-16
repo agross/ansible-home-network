@@ -1,0 +1,61 @@
+- import_tasks: htpasswd-users.yml
+  vars:
+    users: "{{ traefik_users.dashboard }}"
+    salt: NTAZ31Sa7ihGEWpka9ASYu
+    fact: dashboard_users
+
+- import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    notify: Restart Traefik
+
+- import_tasks: systemd-unit-file-contexts.yml
+  vars:
+    directory: "{{ root }}/systemd"
+
+- name: Set permissions on ACME files for Let's Encrypt
+  file:
+    path: "{{ item }}"
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    mode: '600'
+  loop:
+    - "{{ root }}/conf/acme.json"
+    - "{{ root }}/conf/acme-staging.json"
+
+- name: Get systemd unit names
+  set_fact:
+    units: >-
+      {{
+        lookup('fileglob', '../templates/systemd/*.service.j2', wantlist=True) |
+        map('basename') |
+        map('regex_replace', '\.j2$', '')
+      }}
+
+- name: Symlink systemd units
+  file:
+    state: link
+    src: "{{ root }}/systemd/{{ item }}"
+    path: "/etc/systemd/system/{{ item }}"
+    force: true
+  loop: "{{ units }}"
+
+- name: Start systemd units
+  systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ units }}"
+  register: traefik_started
+
+- name: Allow HTTP and HTTPS through firewall
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    - http
+    - https

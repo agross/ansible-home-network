@@ -1,0 +1,5 @@
+- name: Restart Traefik
+  when: traefik_started is not changed
+  systemd:
+    name: traefik
+    state: restarted

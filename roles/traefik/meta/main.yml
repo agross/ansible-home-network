@@ -1,0 +1,4 @@
+dependencies:
+  - docker
+  - firewalld
+  - unit-status-mail
