@@ -8,6 +8,9 @@ backup:
   grafana:
     # The API key needs to have the "Admin" role.
     api_key: "{{ grafana_api_key }}"
+    admin:
+      user: "{{ grafana_admin_user }}"
+      password: "{{ grafana_admin_password }}"
   cleanup:
     keep: 7
   rsync:

@@ -63,13 +63,15 @@ grafana() {
   local temp
   temp="$(mktemp --directory)"
 
-  chown 1337:1337 "$temp"
+  chown 1337:1337 -- "$temp"
 
   docker run \
          --rm \
          --name grafana-backup \
          --env 'GRAFANA_URL=http://grafana:3000' \
          --env 'GRAFANA_TOKEN={{ backup.grafana.api_key }}' \
+         --env 'GRAFANA_ADMIN_ACCOUNT={{ backup.grafana.admin.user }}' \
+         --env 'GRAFANA_ADMIN_PASSWORD={{ backup.grafana.admin.password }}' \
          --env 'TZ=Europe/Berlin' \
          --network 'container:{{ service_name }}_grafana_1' \
          --volume "$temp:/opt/grafana-backup-tool/_OUTPUT_"  \
