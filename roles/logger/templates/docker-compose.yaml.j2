@@ -12,7 +12,7 @@ networks:
 
 services:
   influxdb:
-    image: influxdb
+    image: influxdb:{{ influxdb_version }}
 
     env_file: ./influxdb/.env
     {% if iobroker_wake_on_lan | default(false) | bool == false %}

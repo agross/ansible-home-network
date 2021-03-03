@@ -12,7 +12,7 @@ influxdb() {
          --name influxdb-backup \
          --network 'container:{{ service_name }}_influxdb_1' \
          --volume "$temp:/backups"  \
-         influxdb \
+         influxdb:{{ influxdb_version }} \
          influxd backup \
                 -portable \
                 -host influxdb:8088 \

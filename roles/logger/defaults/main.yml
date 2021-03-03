@@ -2,6 +2,8 @@ service_name: logger
 
 root: /data/{{ service_name }}
 
+influxdb_version: 1.8
+
 backup:
   influxdb:
     database: iobroker
