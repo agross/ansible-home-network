@@ -40,10 +40,6 @@ grafana-build-backup() {
 
   git clone https://github.com/ysde/grafana-backup-tool.git .
 
-  # Alpine 3.13 has no network connectivity.
-  # https://github.com/alpinelinux/docker-alpine/issues/135
-  sed --in-place --expression 's/:latest/:3.12/' Dockerfile
-
   # No armhf-based variant available.
   docker build \
          --tag "$image" \
