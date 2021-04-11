@@ -1,0 +1,20 @@
+- name: Gather installed packages
+  ansible.builtin.package_facts:
+
+- name: Upgrade {{ package }} if older version than {{ install_version }} is installed
+  when: >-
+    ansible_facts.packages is defined and
+    package in ansible_facts.packages
+  block:
+    - name: Get package information
+      ansible.builtin.set_fact:
+        installed_package: "{{ ansible_facts.packages[package] | first }}"
+
+    - name: Install {{ package }} {{ install_version }} for {{ installed_package.arch }}
+      ansible.builtin.apt:
+        deb: >-
+          {{ repo }}/{{ package }}_{{ install_version }}_{{ installed_package.arch }}.deb
+      when: >-
+        installed_package.version is defined and
+        install_version is defined and
+        installed_package.version is version(install_version, '<')
