@@ -1,0 +1,9 @@
+KERNEL=="sda", \
+  SUBSYSTEM=="block", \
+  ATTR{queue/discard_max_bytes}="2147450880"
+
+ACTION=="add|change", \
+  ATTRS{idVendor}=="174c", \
+  ATTRS{idProduct}=="55aa", \
+  SUBSYSTEM=="scsi_disk", \
+  ATTR{provisioning_mode}="unmap"
