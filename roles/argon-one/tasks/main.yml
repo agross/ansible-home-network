@@ -1,0 +1,36 @@
+- name: Populate service facts
+  ansible.builtin.service_facts:
+  when: >-
+    case is defined and
+    case == 'argon-one'
+
+- name: Install Argon One fan and button service
+  when: >-
+    ansible_facts.services is defined and
+    argonone_service not in ansible_facts.services
+  block:
+    - name: Create temporary file to hold the script
+      ansible.builtin.tempfile:
+        state: file
+
+        prefix: argon-one-
+      register: script
+
+    - name: Download script
+      ansible.builtin.get_url:
+        url: "{{ argonone_script_url }}"
+        dest: "{{ script.path }}"
+        force: true
+        mode: '700'
+
+    - name: Install script
+      ansible.builtin.command:
+        cmd: "{{ script.path }}"
+        creates:
+      register: script_output
+
+    - name: Remove script
+      ansible.builtin.file:
+        path: "{{ script.path }}"
+        state: absent
+      when: script.path is defined
