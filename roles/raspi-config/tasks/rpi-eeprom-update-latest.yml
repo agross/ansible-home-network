@@ -1,0 +1,6 @@
+- name: Allow updates to latest EEPROM release
+  ansible.builtin.lineinfile:
+    path: /etc/default/rpi-eeprom-update
+    regexp: ^FIRMWARE_RELEASE_STATUS=
+    line: 'FIRMWARE_RELEASE_STATUS="{{ rpi_eeprom_version | default("latest") }}"'
+    state: present

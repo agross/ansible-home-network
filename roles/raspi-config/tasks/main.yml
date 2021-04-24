@@ -2,3 +2,4 @@
 - include: keyboard-layout.yml
 - include: locale.yml
 - include: timezone.yml
+- include: rpi-eeprom-update-latest.yml
