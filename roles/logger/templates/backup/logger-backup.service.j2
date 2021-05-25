@@ -1,10 +1,11 @@
 [Unit]
 Description=InfluxDB + Grafana Logger backup
 OnFailure=unit-status-mail@%n.service
+FailureAction=reboot-force
 Wants=network-online.target
 
 [Service]
-TimeoutSec=5min
+RuntimeMaxSec=15min
 ExecStart=/bin/systemd-inhibit --why '%n' \
                                '{{ root }}/backup/backup'
 
