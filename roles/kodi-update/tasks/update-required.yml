@@ -14,7 +14,7 @@
 
 - name: Determine installed version
   set_fact:
-    installed_version: "{{ installed_packages.stdout_lines[1] | regex_replace('.*versionName=', '')}}"
+    installed_version: "{{ installed_packages.stdout_lines[1] | regex_replace('.*versionName=', '') }}"
 
 - name: Remove host if no update is required
   meta: end_host
