@@ -8,10 +8,11 @@
 
 - name: Generate backlog
   template:
-    src: ../templates/backlog.j2
+    src: templates/backlog.j2
     dest: "{{ backlog_file.path }}"
     trim_blocks: true
     lstrip_blocks: true
+    mode: preserve
   delegate_to: localhost
   changed_when: false
 
