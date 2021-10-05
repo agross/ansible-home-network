@@ -1,7 +1,7 @@
 - name: Get firmware version
   uri:
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: firmware

@@ -7,7 +7,7 @@
 - name: Upgrade
   uri:
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=Upgrade%201{{ tasmota_credentials | default('') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Upgrade%201{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: status
@@ -15,7 +15,7 @@
 - name: Wait for reboot
   wait_for:
     port: 80
-    host: "{{ inventory_hostname }}"
+    host: "{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}"
     # Less delay may report old version.
     delay: 60
   delegate_to: localhost
@@ -23,7 +23,7 @@
 - name: Get new firmware version
   uri:
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: new_firmware

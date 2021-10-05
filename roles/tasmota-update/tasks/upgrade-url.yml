@@ -1,7 +1,7 @@
 - name: Get OTA URL
   uri:
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: original_ota_url
@@ -22,7 +22,7 @@
 - name: Set upgrade URL
   uri:
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: ota_url
