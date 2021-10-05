@@ -36,7 +36,7 @@
 - name: Execute backlog
   uri:
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
     return_content: true
   delegate_to: localhost
   register: backlog_result
