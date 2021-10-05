@@ -1,5 +1,5 @@
 - name: Connect ADB
-  command: adb connect {{ inventory_hostname }}
+  command: adb connect {{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}
   delegate_to: localhost
   changed_when: false
 
