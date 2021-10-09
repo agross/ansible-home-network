@@ -12,5 +12,5 @@
 
     - name: Change locale
       command:
-        raspi-config nonint do_change_locale '{{ locale }}'
+        raspi-config nonint do_change_locale {{ locale | quote }}
       when: not different_locale.found

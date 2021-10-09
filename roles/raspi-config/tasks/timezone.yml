@@ -12,5 +12,5 @@
 
     - name: Change timezone
       command:
-        raspi-config nonint do_change_timezone '{{ timezone }}'
+        raspi-config nonint do_change_timezone {{ timezone | quote }}
       when: not different_timezone.found

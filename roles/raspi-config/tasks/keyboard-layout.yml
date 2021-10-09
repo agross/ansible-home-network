@@ -12,5 +12,5 @@
 
     - name: Change keyboard layout
       command:
-        raspi-config nonint do_configure_keyboard '{{ keyboard_layout }}'
+        raspi-config nonint do_configure_keyboard {{ keyboard_layout | quote }}
       when: not different_layout.found
