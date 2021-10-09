@@ -12,7 +12,6 @@
     - name: Create temporary file to hold the script
       ansible.builtin.tempfile:
         state: file
-
         prefix: argon-one-
       register: script
 
@@ -25,9 +24,9 @@
 
     - name: Install script
       ansible.builtin.command:
-        cmd: "{{ script.path }}"
-        creates:
-      register: script_output
+        argv:
+          - "{{ script.path }}"
+      changed_when: true
 
     - name: Remove script
       ansible.builtin.file:
