@@ -22,5 +22,5 @@
 
 - name: Install package via ADB
   command: >-
-    adb install -r {{ package.path }}
+    adb install -r {{ package.path | quote }}
   delegate_to: localhost
