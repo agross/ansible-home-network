@@ -1,2 +1,3 @@
 - name: Shutdown
   command: systemctl poweroff
+  changed_when: true
