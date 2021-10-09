@@ -2,11 +2,13 @@
   file:
     state: directory
     path: "{{ journal_directory }}"
+    mode: '0755'
   notify: Restart systemd-journald
 
 - name: Create persisent log directory
-  command: >-
-    systemd-tmpfiles --create --prefix "{{ journal_directory }}"
+  command:
+    cmd: >-
+      systemd-tmpfiles --create --prefix {{ journal_directory | quote }}
 
 - name: Uninstall rsyslog
   apt:
