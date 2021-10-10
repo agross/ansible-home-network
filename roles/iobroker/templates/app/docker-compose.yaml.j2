@@ -9,7 +9,7 @@ services:
 
     environment:
       TZ: Europe/Berlin
-    {% if iobroker_wake_on_lan | default(false) | bool == true %}
+    {% if iobroker_support_wake_on_lan | default(false) | bool == true %}
     ports:
       - "127.0.0.1:6379:6379"
     {% endif %}
@@ -30,7 +30,7 @@ services:
 
     env_file: ./iobroker/.env
     hostname: iobroker
-    {% if iobroker_wake_on_lan | default(false) | bool == true %}
+    {% if iobroker_support_wake_on_lan | default(false) | bool == true %}
     network_mode: host
     {% else %}
     ports:

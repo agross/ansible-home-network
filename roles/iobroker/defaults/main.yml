@@ -5,7 +5,7 @@ root: /data/{{ service_name }}
 iobroker_image: buanet/iobroker:custom
 iobroker_zigbee_transceiver: /dev/ttyUSB0
 
-iobroker_wake_on_lan: false
+iobroker_support_wake_on_lan: false
 
 iobroker_support_backup_on_nfs_or_cifs: true
 
