@@ -4,7 +4,7 @@ volumes:
   influxdb-data:
   grafana-data:
 
-{% if iobroker_wake_on_lan | default(false) | bool == false %}
+{% if iobroker_support_wake_on_lan | default(false) | bool == false %}
 networks:
   iobroker_default:
     external: true
@@ -15,7 +15,7 @@ services:
     image: influxdb:{{ influxdb_version }}
 
     env_file: ./influxdb/.env
-    {% if iobroker_wake_on_lan | default(false) | bool == false %}
+    {% if iobroker_support_wake_on_lan | default(false) | bool == false %}
     # Run on own logger network and the iobroker network so ioBroker can log
     # data without the need to publish the InfluxDB port.
     networks:
