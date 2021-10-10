@@ -22,6 +22,8 @@ influxdb() {
   local timestamp
   timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
 
+  mkdir --parents -- "{{ root }}/backup/backups/influxdb"
+
   tar -czf \
       "{{ root }}/backup/backups/influxdb/$timestamp.tar.gz" \
       --directory "$temp" \
@@ -73,6 +75,8 @@ grafana() {
          --network 'container:{{ service_name }}_grafana_1' \
          --volume "$temp:/opt/grafana-backup-tool/_OUTPUT_"  \
          "$image"
+
+  mkdir --parents -- "{{ root }}/backup/backups/grafana"
 
   find "$temp" \
       -name "*.tar.gz" \
