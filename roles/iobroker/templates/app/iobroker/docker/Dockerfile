@@ -9,6 +9,7 @@ RUN apt-get update \
                --yes \
                android-tools-adb \
                cifs-utils \
+               iputils-ping \
                vim \
     && rm -rf /var/lib/apt/lists/* \
     && iobroker upgrade self
