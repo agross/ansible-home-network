@@ -3,6 +3,14 @@
     directory: ../templates/app
     notify: Restart iobroker service
 
+- name: Set permissions on backups directory
+  ansible.builtin.file:
+    path: "{{ root }}/backups"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: '0755'
+
 - name: Add sysctls for Redis
   copy:
     src: ../templates/app/redis/sysctl.conf

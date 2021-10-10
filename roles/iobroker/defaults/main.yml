@@ -7,11 +7,12 @@ iobroker_zigbee_transceiver: /dev/ttyUSB0
 
 iobroker_wake_on_lan: false
 
-ports:
-  iobroker: 8081
+iobroker_support_backup_on_nfs_or_cifs: true
 
-  # Comment as needed.
-  iobroker_lovelace: 8091
+ioboker_ports:
+  iobroker: 8081
+  lovelace: 8091
+
   # homematic_rfd: 42001
   homematic_ip: 42010
   homematic_virtual_devices: 49292
