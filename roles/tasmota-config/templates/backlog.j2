@@ -38,6 +38,10 @@ TelePeriod 10
   Module 0
 {% endif %}
 
+NtpServer1 pool.ntp.org
+NtpServer2 de.pool.ntp.org
+NtpServer3 0.de.pool.ntp.org
+
 {% if custom_backlog is defined %}
   {{ custom_backlog }}
 {% endif %}
