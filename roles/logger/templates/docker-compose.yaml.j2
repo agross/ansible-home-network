@@ -47,3 +47,26 @@ services:
     depends_on:
       influxdb:
         condition: service_healthy
+
+  {% if logger_include_telegraf | default(false) | bool == true %}
+  telegraf:
+    image: telegraf
+    privileged: true
+    environment:
+      HOST_ETC: /host/etc
+      HOST_PROC: /host/proc
+      HOST_SYS: /host/sys
+    volumes:
+      - {{ root }}/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - {{ root }}/telegraf/telegraf.d:/etc/telegraf/telegraf.d:ro
+      # For host monitoring.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc:/host/etc:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    command:
+      --config-directory /etc/telegraf/telegraf.d
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    {% endif %}

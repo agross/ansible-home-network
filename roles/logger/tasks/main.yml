@@ -45,3 +45,42 @@
     enabled: true
     name: "{{ service_name }}-backup.timer"
     daemon_reload: true
+
+- name: Enable memory cgroups if running Telegraf
+  when: logger_include_telegraf | default(false) | bool == true
+  block:
+    - name: Check if memory cgroups are enabled
+      command: grep -E '^memory\s+0' /proc/cgroups
+      changed_when: false
+      failed_when: false
+      register: memory_cgroups_enabled
+
+    - name: Create a backup of /boot/cmdline.txt
+      copy:
+        src: /boot/cmdline.txt
+        remote_src: true
+        dest: /boot/cmdline.txt.bak-cgroups-memory
+        mode: preserve
+        # Do not overwrite existing files.
+        force: false
+      when: memory_cgroups_enabled.rc == 0
+
+    - name: Enable memory cgroups (cgroup_enable)
+      include_tasks: boot-cmdline.yml
+      vars:
+        key: cgroup_enable
+        value: memory
+        update: false
+      when: memory_cgroups_enabled.rc == 0
+
+    - name: Enable memory cgroups (cgroup_memory)
+      include_tasks: boot-cmdline.yml
+      vars:
+        key: cgroup_memory
+        value: 1
+        update: true
+      when: memory_cgroups_enabled.rc == 0
+
+    - name: Reboot
+      reboot:
+      when: memory_cgroups_enabled.rc == 0
