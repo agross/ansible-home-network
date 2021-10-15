@@ -4,8 +4,12 @@ volumes:
   influxdb-data:
   grafana-data:
 
-{% if iobroker_support_wake_on_lan | default(false) | bool == false %}
 networks:
+{% if traefik_domain | default('', true) | length  %}
+  web:
+    external: true
+{% endif %}
+{% if iobroker_support_wake_on_lan | default(false) | bool == false %}
   iobroker_default:
     external: true
 {% endif %}
@@ -36,8 +40,18 @@ services:
     image: grafana/grafana
 
     env_file: ./grafana/.env
+    {% if traefik_domain | default('', true) | length  %}
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.grafana.rule: Host(`grafana.{{ traefik_domain }}`)
+      traefik.http.services.grafana.loadbalancer.server.port: 3000
+    networks:
+      - default
+      - web
+    {% else %}
     ports:
       - "3000:3000"
+    {% endif %}
     volumes:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - grafana-data:/var/lib/grafana
