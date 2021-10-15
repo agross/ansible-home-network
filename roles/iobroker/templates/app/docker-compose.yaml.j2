@@ -3,6 +3,12 @@ version: '2.4'
 volumes:
   iobroker-data:
 
+{% if traefik_domain | default('', true) | length  %}
+networks:
+  web:
+    external: true
+{% endif %}
+
 services:
   redis:
     image: redis:alpine
@@ -32,6 +38,18 @@ services:
     hostname: iobroker
     {% if iobroker_support_wake_on_lan | default(false) | bool == true %}
     network_mode: host
+    {% elif traefik_domain | default('', true) | length  %}
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.iobroker.rule: Host(`iobroker.{{ traefik_domain }}`)
+      traefik.http.routers.iobroker.service: iobroker
+      traefik.http.services.iobroker.loadbalancer.server.port: 8081
+      traefik.http.routers.iobroker-lovelace.rule: Host(`lovelace.{{ traefik_domain }}`)
+      traefik.http.routers.iobroker-lovelace.service: iobroker-lovelace
+      traefik.http.services.iobroker-lovelace.loadbalancer.server.port: 8091
+    networks:
+      - default
+      - web
     {% else %}
     ports:
       {% for service, port in iobroker_ports.items() %}
