@@ -360,6 +360,9 @@ enabled = true
 allow_sign_up = false
 client_id = {{ grafana.google.client_id }}
 client_secret = {{ grafana.google.client_secret }}
+{% if grafana.google.allowed_domains is defined %}
+allowed_domains = {{ grafana.google.allowed_domains }}
+{% endif %}
 {% endif %}
 
 #################################### Grafana.com Auth ####################
