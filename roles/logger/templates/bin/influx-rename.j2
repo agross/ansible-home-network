@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+set -ex
+
+from="${1?Need measurement that is copied from}"
+to="${2?Need measurement that is copied to}"
+
+docker exec \
+       '{{ service_name }}_influxdb_1' \
+       influx -database iobroker \
+              -execute "SELECT * INTO \"$to\" FROM \"$from\""
+
+docker exec \
+       '{{ service_name }}_influxdb_1' \
+       influx -database iobroker \
+              -execute "DROP MEASUREMENT \"$from\""
