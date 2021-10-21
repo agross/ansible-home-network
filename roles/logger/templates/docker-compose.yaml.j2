@@ -62,7 +62,6 @@ services:
       influxdb:
         condition: service_healthy
 
-  {% if logger_include_telegraf | default(false) | bool == true %}
   telegraf:
     image: telegraf
     privileged: true
@@ -83,4 +82,3 @@ services:
     depends_on:
       influxdb:
         condition: service_healthy
-    {% endif %}

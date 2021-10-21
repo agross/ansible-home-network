@@ -52,8 +52,7 @@
     name: "{{ service_name }}-backup.timer"
     daemon_reload: true
 
-- name: Enable memory cgroups if running Telegraf
-  when: logger_include_telegraf | default(false) | bool == true
+- name: Enable memory cgroups for running Telegraf
   block:
     - name: Check if memory cgroups are enabled
       command: grep -E '^memory\s+0' /proc/cgroups
