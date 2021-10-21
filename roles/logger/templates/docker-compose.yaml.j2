@@ -4,6 +4,8 @@ volumes:
   influxdb-data:
   grafana-data:
 
+{% if traefik_domain | default('', true) | length or
+      iobroker_support_wake_on_lan | default(false) | bool == false %}
 networks:
 {% if traefik_domain | default('', true) | length  %}
   web:
@@ -12,6 +14,7 @@ networks:
 {% if iobroker_support_wake_on_lan | default(false) | bool == false %}
   iobroker_default:
     external: true
+{% endif %}
 {% endif %}
 
 services:
