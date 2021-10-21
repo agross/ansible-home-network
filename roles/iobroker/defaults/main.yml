@@ -9,7 +9,7 @@ iobroker_support_wake_on_lan: false
 
 iobroker_support_backup_on_nfs_or_cifs: true
 
-ioboker_ports:
+iobroker_ports:
   iobroker: 8081
   lovelace: 8091
 
