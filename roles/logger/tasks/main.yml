@@ -5,6 +5,16 @@
       - Restart logger service
       - Restart logger backup timer
 
+# Enable update with: ansible-playbook --extra-vars docker_update=42
+- import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify:
+      - Restart logger service
+      - Restart logger backup timer
+
 - name: Change permissions on backup script
   file:
     mode: '700'
