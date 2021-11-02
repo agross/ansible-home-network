@@ -3,6 +3,14 @@
     directory: ../templates/app
     notify: Restart iobroker service
 
+# Enable update with: ansible-playbook --extra-vars docker_update=42
+- import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart iobroker service
+
 - name: Set permissions on backups directory
   ansible.builtin.file:
     path: "{{ root }}/backups"
@@ -18,16 +26,6 @@
     mode: '644'
     # Overwrite existing files.
     force: true
-
-- name: Build custom image
-  docker_image:
-    name: "{{ iobroker_image }}"
-    source: build
-    force_source: true
-    build:
-      path: "{{ root }}/iobroker/docker"
-      pull: true
-  notify: Restart iobroker service
 
 - name: Symlink systemd unit file
   file:
