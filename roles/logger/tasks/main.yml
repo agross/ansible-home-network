@@ -1,3 +1,13 @@
+- name: Stat docker socket
+  ansible.builtin.stat:
+    path: /var/run/docker.sock
+  register: stat_docker_socket
+  changed_when: false
+
+- name: Get group owning the docker socket
+  ansible.builtin.set_fact:
+    docker_group: "{{ stat_docker_socket.stat.gid }}"
+
 - import_tasks: copy-templates.yml
   vars:
     directory: ../templates

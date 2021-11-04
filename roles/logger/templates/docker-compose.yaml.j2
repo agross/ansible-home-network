@@ -68,6 +68,7 @@ services:
   telegraf:
     image: telegraf
     privileged: true
+    user: telegraf:{{ docker_group | mandatory }}
     environment:
       HOST_ETC: /host/etc
       HOST_PROC: /host/proc
