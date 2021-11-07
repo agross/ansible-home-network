@@ -4,32 +4,40 @@
 set -euo pipefail
 
 influxdb() {
-  local temp
-  temp="$(mktemp --directory)"
+  local temp db databases
 
-  docker run \
-         --rm \
-         --name influxdb-backup \
-         --network 'container:{{ service_name }}_influxdb_1' \
-         --volume "$temp:/backups"  \
-         'influxdb:{{ influxdb_version }}' \
-         influxd backup \
-                -portable \
-                -host influxdb:8088 \
-                -database '{{ logger_backup_influxdb_database }}' \
-                /backups
+  databases=({{ logger_backup_influxdb_databases |
+                  default([], true) |
+                  map('quote') |
+                  join(' ') }})
 
-  local timestamp
-  timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
+  for db in "${databases[@]}"; do
+    temp="$(mktemp --directory)"
 
-  mkdir --parents -- "{{ root }}/backup/backups/influxdb"
+    docker run \
+          --rm \
+          --name influxdb-backup \
+          --network 'container:{{ service_name }}_influxdb_1' \
+          --volume "$temp:/backups"  \
+          'influxdb:{{ influxdb_version }}' \
+          influxd backup \
+                  -portable \
+                  -host influxdb:8088 \
+                  -database "$db" \
+                  /backups
 
-  tar -czf \
-      "{{ root }}/backup/backups/influxdb/$timestamp.tar.gz" \
-      --directory "$temp" \
-      .
+    local timestamp
+    timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
 
-  rm -rf -- "$temp"
+    mkdir --parents -- "{{ root }}/backup/backups/influxdb"
+
+    tar -czf \
+        "{{ root }}/backup/backups/influxdb/$db-$timestamp.tar.gz" \
+        --directory "$temp" \
+        .
+
+    rm -rf -- "$temp"
+  done
 }
 
 grafana-build-backup() {
@@ -86,28 +94,12 @@ grafana() {
 }
 
 cleanup() {
-  local delete_old_backups
   # Delete files older than {{ logger_backup_cleanup_keep }} days.
-  # shellcheck disable=SC2016,SC1004
-  delete_old_backups='
-    find "{}" \
-        -type f \
-        -printf "%Ts\t%p\n" |
-      sort --numeric-sort --reverse |
-      tail --lines="+{{ logger_backup_cleanup_keep + 1}}" |
-      cut --fields=2- |
-      while IFS= read -r file; do
-        printf "Removing old backup %s\n" "$file"
-        rm -f -- "$file"
-      done
-  '
-
-  # Iterate each direct subdirectory of backups.
   find '{{ root }}/backup/backups' \
-      -mindepth 1 \
-      -maxdepth 1 \
-      -type d \
-      -execdir sh -c "$delete_old_backups" \;
+       -type f \
+       -mtime '+{{ logger_backup_cleanup_keep }}' \
+       -printf 'Deleting old backup %p (%t)\n' \
+       -delete
 }
 
 {% if logger_backup_rsync_target | default('', true) | length %}

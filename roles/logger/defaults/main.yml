@@ -4,7 +4,9 @@ root: /data/{{ service_name }}
 
 influxdb_version: 1.8
 
-logger_backup_influxdb_database: iobroker
+logger_backup_influxdb_databases:
+  - iobroker
+  - telegraf
 
 logger_backup_grafana:
   # The API key needs to have the "Admin" role.
