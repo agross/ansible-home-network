@@ -25,11 +25,6 @@
       - Restart logger service
       - Restart logger backup timer
 
-- name: Change permissions on backup script
-  file:
-    mode: '700'
-    path: "{{ root }}/backup/backup"
-
 - name: Get systemd unit files
   find:
     paths: "{{ root }}"
