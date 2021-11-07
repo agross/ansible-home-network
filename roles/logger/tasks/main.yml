@@ -59,18 +59,20 @@
     path: /usr/local/bin/influx-rename
 
 - name: Start service
-  systemd:
+  ansible.builtin.systemd:
     state: started
     enabled: true
     name: "{{ service_name }}.service"
     daemon_reload: true
+  register: logger_started
 
 - name: Start backup timer
-  systemd:
+  ansible.builtin.systemd:
     state: started
     enabled: true
     name: "{{ service_name }}-backup.timer"
     daemon_reload: true
+  register: logger_backup_started
 
 - name: Enable memory cgroups for running Telegraf
   block:
