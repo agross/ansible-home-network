@@ -40,6 +40,7 @@ influxdb() {
   done
 }
 
+{% if ansible_architecture != 'x86_64' %}
 grafana-build-backup() {
   local image="${1?Need image}"
 
@@ -50,7 +51,7 @@ grafana-build-backup() {
 
   git clone https://github.com/ysde/grafana-backup-tool.git .
 
-  # No armhf-based variant available.
+  # No ARM-based variant available.
   docker build \
          --tag "$image" \
          --label local=true \
@@ -59,13 +60,18 @@ grafana-build-backup() {
   popd > /dev/null
   rm -rf -- "$temp"
 }
+{% endif %}
 
 grafana() {
-  local image='ysde/docker-grafana-backup-tool:armhf'
+  {% if ansible_architecture != 'x86_64' %}
+  local image='ysde/docker-grafana-backup-tool:for-host-architecture'
 
   if [[ -z "$(docker images --filter=reference="$image" --quiet)" ]]; then
     grafana-build-backup "$image"
   fi
+  {% else %}
+  local image='ysde/docker-grafana-backup-tool'
+  {% endif %}
 
   local temp
   temp="$(mktemp --directory)"
