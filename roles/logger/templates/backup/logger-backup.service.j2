@@ -1,7 +1,6 @@
 [Unit]
 Description=InfluxDB + Grafana Logger backup
 OnFailure=unit-status-mail@%n.service
-FailureAction=reboot-force
 Wants=network-online.target
 
 [Service]

@@ -3,41 +3,33 @@
 
 set -euo pipefail
 
+cleanup-influxdb() {
+  printf 'Cleaning up InfluxDB backup directory.\n'
+
+  rm -rf --verbose -- "{{ root }}/backup/backups/influxdb/next/"*
+}
+
 influxdb() {
-  local temp db databases
+  local timestamp
+  timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
 
-  databases=({{ logger_backup_influxdb_databases |
-                  default([], true) |
-                  map('quote') |
-                  join(' ') }})
+  # Cleanup leftovers from last run.
+  cleanup-influxdb
 
-  for db in "${databases[@]}"; do
-    temp="$(mktemp --directory)"
+  # Cleanup on error or return.
+  trap cleanup-influxdb EXIT RETURN
 
-    docker run \
-          --rm \
-          --name influxdb-backup \
-          --network 'container:{{ service_name }}_influxdb_1' \
-          --volume "$temp:/backups"  \
-          'influxdb:{{ influxdb_version }}' \
-          influxd backup \
-                  -portable \
-                  -host influxdb:8088 \
-                  -database "$db" \
-                  /backups
+  docker exec \
+         --tty \
+         '{{ service_name }}_influxdb_1' \
+         influx backup --compression=none /backups
 
-    local timestamp
-    timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
+  mkdir --parents -- "{{ root }}/backup/backups/influxdb"
 
-    mkdir --parents -- "{{ root }}/backup/backups/influxdb"
-
-    tar -czf \
-        "{{ root }}/backup/backups/influxdb/$db-$timestamp.tar.gz" \
-        --directory "$temp" \
-        .
-
-    rm -rf -- "$temp"
-  done
+  tar -czf \
+      "{{ root }}/backup/backups/influxdb/$timestamp.tar.gz" \
+      --directory "{{ root }}/backup/backups/influxdb/next" \
+      .
 }
 
 {% if ansible_architecture != 'x86_64' %}
@@ -125,6 +117,8 @@ rsync() {
 {% endif %}
 
 influxdb
+trap - EXIT RETURN
+
 grafana
 cleanup
 {% if logger_backup_rsync_target | default('', true) | length %}

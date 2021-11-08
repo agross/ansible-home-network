@@ -1,0 +1,125 @@
+- name: Set InfluxDB container name
+  ansible.builtin.set_fact:
+    influxdb_container: "{{ service_name }}_influxdb_1"
+
+- name: Get version of the InfluxDB container
+  community.docker.docker_container_info:
+    name: "{{ influxdb_container }}"
+  register: influxdb_info
+
+- name: Get InfluxDB version entry from environment
+  when: influxdb_info.exists and 'Env' in influxdb_info.container.Config
+  ansible.builtin.set_fact:
+    version_env_entry: "{{ influxdb_info.container.Config.Env | select('match', 'INFLUXDB_VERSION=') }}"
+
+- name: Get InfluxDB version number from version entry
+  when: version_env_entry | default([], true) | length
+  ansible.builtin.set_fact:
+    version_number: "{{ version_env_entry | first | split('=') | last }}"
+
+- name: Run upgrade
+  when: not version_number is version('2', '>=')
+  block:
+    - name: Make sure InfluxDB 2 volumes do not exist yet
+      community.docker.docker_volume_info:
+        name: "{{ service_name }}_influxdb2-{{ item }}"
+      register: influxdb_volume_info
+      failed_when: influxdb_volume_info.exists
+      loop:
+        - config
+        - data
+
+    - name: Fix permissions on the InfluxDB data volume
+      community.docker.docker_container:
+        image: busybox
+        name: influxdb-1-upgrade-fix-perms
+        auto_remove: true
+        command_handling: correct
+        command:
+          - chown
+          - -R
+          - 1000:1000
+          - /var/lib/influxdb
+        detach: false
+        interactive: false
+        volumes_from: "{{ service_name }}_influxdb_1"
+
+    - name: Create temporary directory to hold the entrypoint from InfluxDB 2
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: influxdb-entrypoint
+      register: influxdb_entrypoint
+
+    - name: Extract entypoint from InfluxDB 2 image
+      community.docker.docker_container:
+        image: influxdb:alpine
+        name: influxdb-1-upgrade-extract-entrypoint
+        auto_remove: true
+        command_handling: correct
+        command:
+          - cp
+          - --
+          - /entrypoint.sh
+          - /extracted-entrypoint
+        detach: false
+        interactive: false
+        mounts:
+          - type: bind
+            source: "{{ influxdb_entrypoint.path }}"
+            target: /extracted-entrypoint
+
+    - name: Set entrypoint file name
+      ansible.builtin.set_fact:
+        influxdb_entrypoint_file: >-
+          {{ [influxdb_entrypoint.path, 'entrypoint.sh'] | join('/') }}
+
+    - name: Remove the requirement to run the InfluxDB 2 server after upgrading
+      ansible.builtin.lineinfile:
+        path: "{{ influxdb_entrypoint_file }}"
+        regexp: "{{ '^\\s*' ~ ('exec influxd \"${@}\"' | regex_escape) }}"
+        state: absent
+      register: entrypoint_patched
+
+    - name: Verify that the InfluxDB 2 entrypoint has been patched
+      ansible.builtin.fail:
+        msg: >-
+          Unable to modify the InfluxDB 2 entrypoint at {{ influxdb_entrypoint_file }}
+          to not run InfluxDB 2 after upgrading data.
+      when: entrypoint_patched is not changed
+
+    - name: Stop {{ service_name }} service
+      ansible.builtin.systemd:
+        name: "{{ service_name }}"
+        state: stopped
+
+    - name: Run migration
+      community.docker.docker_container:
+        image: influxdb:alpine
+        name: influxdb-1-upgrade
+        detach: false
+        interactive: false
+        env:
+          DOCKER_INFLUXDB_INIT_MODE: upgrade
+          DOCKER_INFLUXDB_INIT_USERNAME: "{{ influxdb_init_user }}"
+          DOCKER_INFLUXDB_INIT_PASSWORD: "{{ influxdb_init_password }}"
+          DOCKER_INFLUXDB_INIT_ORG: "{{ influxdb_init_org }}"
+          DOCKER_INFLUXDB_INIT_BUCKET: "{{ influxdb_init_bucket }}"
+          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "{{ influxdb_init_admin_token }}"
+        volumes_from: "{{ influxdb_container }}"
+        mounts:
+          - type: bind
+            source: "{{ influxdb_entrypoint_file }}"
+            target: /entrypoint.sh
+          - type: volume
+            source: "{{ service_name }}_influxdb2-config"
+            target: /etc/influxdb2
+          - type: volume
+            source: "{{ service_name }}_influxdb2-data"
+            target: /var/lib/influxdb2
+      register: migration
+      failed_when: "'Upgrade successfully completed' not in migration.container.Output"
+
+    - name: Remove migration container
+      community.docker.docker_container:
+        name: influxdb-1-upgrade
+        state: absent

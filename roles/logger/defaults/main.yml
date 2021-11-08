@@ -2,11 +2,11 @@ service_name: logger
 
 root: /data/{{ service_name }}
 
-influxdb_version: 1.8
-
-logger_backup_influxdb_databases:
-  - iobroker
-  - telegraf
+influxdb_init_user: admin
+influxdb_init_password:
+influxdb_init_org:
+influxdb_init_bucket: default
+influxdb_init_admin_token:
 
 logger_backup_grafana:
   # The API key needs to have the "Admin" role.

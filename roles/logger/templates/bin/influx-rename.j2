@@ -1,16 +1,73 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-set -ex
+set -euo pipefail
 
-from="${1?Need measurement that is copied from}"
-to="${2?Need measurement that is copied to}"
+create-swap() {
+  if (( EUID != 0 )); then
+    >&2 printf 'Please run as root in order to use temporary swap space.\n'
+    exit 1
+  fi
 
-docker exec \
-       '{{ service_name }}_influxdb_1' \
-       influx -database iobroker \
-              -execute "SELECT * INTO \"$to\" FROM \"$from\""
+  printf 'Creating swap...\n'
+  trap 'cleanup-swap $?' ERR INT EXIT TERM
 
-docker exec \
-       '{{ service_name }}_influxdb_1' \
-       influx -database iobroker \
-              -execute "DROP MEASUREMENT \"$from\""
+  swapfile="$(mktemp --suffix=influx-rename-swap)"
+
+  fallocate -l 5G -- "$swapfile"
+  chmod 600 -- "$swapfile"
+  mkswap -- "$swapfile"
+  swapon -- "$swapfile"
+}
+
+cleanup-swap() {
+  if [[ -f "$swapfile" ]]; then
+    printf 'Cleaning swap after receiving signal %s...\n' "$1"
+
+    swapoff -- "$swapfile"
+    rm -- "$swapfile"
+  fi
+}
+
+rename() {
+  bucket="${1?Need bucket}"
+  from="${2?Need measurement that is copied from}"
+  to="${3?Need measurement that is copied to}"
+
+  create-swap
+
+  copy=$(cat <<EOF
+    from(bucket: "$bucket")
+    |> range(start: 0, stop: now())
+    |> filter(fn: (r) => r["_measurement"] == "$from")
+    |> set(key: "_measurement", value: "$to")
+    |> to(bucket: "$bucket")
+    |> map(fn: (r) => ({ values_copied: string(v: r._value) }))
+    |> count(column: "values_copied")
+EOF
+)
+
+  printf 'Copying measurement "%s" to "%s" (bucket: %s)...\n' \
+         "$from" \
+         "$to" \
+         "$bucket"
+
+  docker exec \
+         --tty \
+         '{{ service_name }}_influxdb_1' \
+         influx query "$copy"
+
+  printf 'Dropping measurement "%s" (bucket: %s)...\n' \
+         "$from" \
+         "$bucket"
+
+  docker exec \
+         --tty \
+         '{{ service_name }}_influxdb_1' \
+         influx delete \
+               --bucket "$bucket" \
+               --start 1970-01-01T00:00:00Z \
+               --stop "$(date +'%Y-%m-%dT%H:%M:%SZ')" \
+               --predicate "_measurement=\"$from\""
+}
+
+rename "${@}"

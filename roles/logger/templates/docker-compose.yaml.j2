@@ -1,7 +1,8 @@
 version: '2.4'
 
 volumes:
-  influxdb-data:
+  influxdb2-config:
+  influxdb2-data:
   grafana-data:
 
 {% if traefik_domain | default('', true) | length or
@@ -19,7 +20,7 @@ networks:
 
 services:
   influxdb:
-    image: influxdb:{{ influxdb_version }}
+    image: influxdb:alpine
 
     env_file: ./influxdb/.env
     {% if iobroker_support_wake_on_lan | default(false) | bool == false %}
@@ -28,13 +29,14 @@ services:
     networks:
       - default
       - iobroker_default
-    {% else %}
-    ports:
-      - 127.0.0.1:8086:8086
     {% endif %}
+    ports:
+      - "8086:8086"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - influxdb-data:/var/lib/influxdb
+      - ./backup/backups/influxdb/next:/backups
+      - influxdb2-config:/etc/influxdb2
+      - influxdb2-data:/var/lib/influxdb2
     healthcheck:
       test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:8086/ping"]
       start_period: 5s
