@@ -47,8 +47,8 @@
 # The full public facing url you use in browser, used for redirects and emails
 # If you use reverse proxy and sub path specify full url (with sub path)
 ;root_url = %(protocol)s://%(domain)s:%(http_port)s/
-{% if grafana.root_url is defined %}
-root_url = {{ grafana.root_url }}
+{% if grafana_root_url is defined %}
+root_url = {{ grafana_root_url }}
 {% endif %}
 
 # Serve Grafana from subpath specified in `root_url` setting. By default it is set to `false` for compatibility reasons.
@@ -413,11 +413,11 @@ login_maximum_inactive_lifetime_duration = 30d
 ;allowed_domains =
 ;team_ids =
 ;allowed_organizations =
-{% if grafana.github is defined %}
+{% if grafana_github_client_id is defined %}
 enabled = true
 allow_sign_up = false
-client_id = {{ grafana.github.client_id }}
-client_secret = {{ grafana.github.client_secret }}
+client_id = {{ grafana_github_client_id }}
+client_secret = {{ grafana_github_client_secret | mandatory }}
 {% endif%}
 
 
@@ -446,13 +446,13 @@ client_secret = {{ grafana.github.client_secret }}
 ;api_url = https://www.googleapis.com/oauth2/v1/userinfo
 ;allowed_domains =
 ;hosted_domain =
-{% if grafana.google is defined %}
+{% if grafana_google_client_id is defined %}
 enabled = true
 allow_sign_up = false
-client_id = {{ grafana.google.client_id }}
-client_secret = {{ grafana.google.client_secret }}
-{% if grafana.google.allowed_domains is defined %}
-allowed_domains = {{ grafana.google.allowed_domains }}
+client_id = {{ grafana_google_client_id }}
+client_secret = {{ grafana_google_client_secret | mandatory }}
+{% if grafana_google_allowed_domains is defined %}
+allowed_domains = {{ grafana_google_allowed_domains }}
 {% endif %}
 {% endif %}
 
@@ -606,12 +606,12 @@ allowed_domains = {{ grafana.google.allowed_domains }}
 ;ehlo_identity = dashboard.example.com
 # SMTP startTLS policy (defaults to 'OpportunisticStartTLS')
 ;startTLS_policy = NoStartTLS
-{% if grafana.smtp is defined %}
+{% if grafana_smtp_host is defined %}
 enabled = true
-host = {{ grafana.smtp.host }}
-user = {{ grafana.smtp.user }}
-from_address = {{ grafana.smtp.user }}
-password = {{ grafana.smtp.password }}
+host = {{ grafana_smtp_host }}
+user = {{ grafana_smtp_user }}
+from_address = {{ grafana_smtp_user }}
+password = {{ grafana_smtp_password }}
 {% endif %}
 
 [emails]
