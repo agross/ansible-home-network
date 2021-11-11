@@ -4,7 +4,7 @@
     notify: Restart mqtt service
 
 - name: Build custom image
-  docker_image:
+  community.docker.docker_image:
     name: "{{ mqtt_image }}"
     source: build
     force_source: true
@@ -14,13 +14,13 @@
   notify: Restart mqtt service
 
 - name: Set permissions on data directory
-  file:
+  ansible.builtin.file:
     dest: "{{ root }}/mosquitto/data"
     owner: '1883'
     recurse: true
 
 - name: Symlink systemd unit file
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ root }}/mqtt.service"
     path: /etc/systemd/system/{{ service_name }}.service
@@ -28,8 +28,9 @@
   notify: Restart mqtt service
 
 - name: Start service
-  systemd:
+  ansible.builtin.systemd:
     state: started
     enabled: true
     name: "{{ service_name }}"
     daemon_reload: true
+  register: mqtt_started

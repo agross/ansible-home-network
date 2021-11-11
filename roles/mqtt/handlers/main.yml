@@ -1,4 +1,5 @@
 - name: Restart mqtt service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ service_name }}"
     state: restarted
+  when: mqtt_started is not changed
