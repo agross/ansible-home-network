@@ -2,7 +2,7 @@
   file:
     state: directory
     path: "{{ journal_directory }}"
-    mode: '0755'
+    mode: '755'
   notify: Restart systemd-journald
 
 - name: Create persisent log directory
