@@ -1,0 +1,4 @@
+- name: Recompute swap size
+  ansible.builtin.systemd:
+    name: dphys-swapfile.service
+    state: restarted
