@@ -1,0 +1,13 @@
+- name: Set hostname to match inventory_hostname
+  when: ansible_hostname != inventory_hostname
+  block:
+    - name: Set hostname to match inventory_hostname
+      ansible.builtin.command:
+        argv:
+          - raspi-config
+          - nonint
+          - do_hostname
+          - "{{ inventory_hostname }}"
+
+    - name: Reboot
+      ansible.builtin.reboot:

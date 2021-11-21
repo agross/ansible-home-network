@@ -3,3 +3,4 @@
 - include: locale.yml
 - include: timezone.yml
 - include: rpi-eeprom-update-latest.yml
+- include: hostname.yml
