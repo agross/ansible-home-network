@@ -1,3 +1,2 @@
 dependencies:
   - docker
-  - adb-server
