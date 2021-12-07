@@ -4,7 +4,7 @@ OnFailure=unit-status-mail@%n.service
 Wants=network-online.target
 
 [Service]
-RuntimeMaxSec=15min
+RuntimeMaxSec=30min
 ExecStart=/bin/systemd-inhibit --why '%n' \
                                '{{ root }}/backup/backup'
 
