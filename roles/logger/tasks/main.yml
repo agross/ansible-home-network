@@ -53,7 +53,7 @@
     src: "{{ root }}/bin/influx-rename"
     path: /usr/local/bin/influx-rename
 
-- include: influxdb-upgrade-1-to-2.yml
+- ansible.builtin.import_tasks: influxdb-upgrade-1-to-2.yml
 
 - name: Start service
   ansible.builtin.systemd:
