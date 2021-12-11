@@ -56,7 +56,7 @@ grafana-build-backup() {
 
 grafana() {
   {% if ansible_architecture != 'x86_64' %}
-  local image='ysde/docker-grafana-backup-tool:for-host-architecture'
+  local image='ysde/docker-grafana-backup-tool:for-host-architecture-{{ ansible_architecture }}'
 
   if [[ -z "$(docker images --filter=reference="$image" --quiet)" ]]; then
     grafana-build-backup "$image"
