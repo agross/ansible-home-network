@@ -71,14 +71,15 @@
     daemon_reload: true
   register: logger_backup_started
 
-- name: Enable memory cgroups for running Telegraf
-  block:
-    - name: Check if memory cgroups are enabled
-      command: grep -E '^memory\s+0' /proc/cgroups
-      changed_when: false
-      failed_when: false
-      register: memory_cgroups_enabled
+- name: Check if memory cgroups are enabled
+  command: grep -E '^memory\s+0' /proc/cgroups
+  changed_when: false
+  failed_when: false
+  register: memory_cgroups_enabled
 
+- name: Enable memory cgroups for running Telegraf
+  when: memory_cgroups_enabled.rc != 0
+  block:
     - name: Create a backup of /boot/cmdline.txt
       copy:
         src: /boot/cmdline.txt
@@ -87,7 +88,6 @@
         mode: preserve
         # Do not overwrite existing files.
         force: false
-      when: memory_cgroups_enabled.rc == 0
 
     - name: Enable memory cgroups (cgroup_enable)
       include_tasks: boot-cmdline.yml
@@ -95,7 +95,6 @@
         key: cgroup_enable
         value: memory
         update: false
-      when: memory_cgroups_enabled.rc == 0
 
     - name: Enable memory cgroups (cgroup_memory)
       include_tasks: boot-cmdline.yml
@@ -103,8 +102,6 @@
         key: cgroup_memory
         value: 1
         update: true
-      when: memory_cgroups_enabled.rc == 0
 
     - name: Reboot
       reboot:
-      when: memory_cgroups_enabled.rc == 0
