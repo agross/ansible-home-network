@@ -1,6 +1,6 @@
-- include: password.yml
-- include: keyboard-layout.yml
-- include: locale.yml
-- include: timezone.yml
-- include: rpi-eeprom-update-latest.yml
-- include: hostname.yml
+- ansible.builtin.import_tasks: password.yml
+- ansible.builtin.import_tasks: keyboard-layout.yml
+- ansible.builtin.import_tasks: locale.yml
+- ansible.builtin.import_tasks: timezone.yml
+- ansible.builtin.import_tasks: rpi-eeprom-update-latest.yml
+- ansible.builtin.import_tasks: hostname.yml
