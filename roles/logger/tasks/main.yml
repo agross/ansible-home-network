@@ -8,7 +8,7 @@
   ansible.builtin.set_fact:
     docker_group: "{{ stat_docker_socket.stat.gid }}"
 
-- import_tasks: copy-templates.yml
+- ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
     notify:
@@ -16,7 +16,7 @@
       - Restart logger backup timer
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
-- import_tasks: docker-compose-update.yml
+- ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
     directory: "{{ root }}"
     pull: "{{ docker_update is defined }}"
@@ -26,7 +26,7 @@
       - Restart logger backup timer
 
 - name: Get systemd unit files
-  find:
+  ansible.builtin.find:
     paths: "{{ root }}"
     file_type: file
     recurse: true
@@ -34,7 +34,7 @@
   register: systemd_units
 
 - name: Symlink systemd unit files
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ item.path }}"
     path:
@@ -48,7 +48,7 @@
     - Restart logger backup timer
 
 - name: Symlink InfluxDB rename script
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ root }}/bin/influx-rename"
     path: /usr/local/bin/influx-rename
@@ -72,7 +72,12 @@
   register: logger_backup_started
 
 - name: Check if memory cgroups are enabled
-  command: grep -E '^memory\s+0' /proc/cgroups
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -E
+      - ^memory\s+0
+      - /proc/cgroups
   changed_when: false
   failed_when: false
   register: memory_cgroups_enabled
@@ -81,7 +86,7 @@
   when: memory_cgroups_enabled.rc != 0
   block:
     - name: Create a backup of /boot/cmdline.txt
-      copy:
+      ansible.builtin.copy:
         src: /boot/cmdline.txt
         remote_src: true
         dest: /boot/cmdline.txt.bak-cgroups-memory
@@ -90,18 +95,18 @@
         force: false
 
     - name: Enable memory cgroups (cgroup_enable)
-      include_tasks: boot-cmdline.yml
+      ansible.builtin.include_tasks: boot-cmdline.yml
       vars:
         key: cgroup_enable
         value: memory
         update: false
 
     - name: Enable memory cgroups (cgroup_memory)
-      include_tasks: boot-cmdline.yml
+      ansible.builtin.include_tasks: boot-cmdline.yml
       vars:
         key: cgroup_memory
         value: 1
         update: true
 
     - name: Reboot
-      reboot:
+      ansible.builtin.reboot:
