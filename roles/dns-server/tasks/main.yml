@@ -1,0 +1,61 @@
+- ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    notify: Restart dns-server service
+
+- ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
+  vars:
+    directory: "{{ root }}/systemd"
+
+- name: Symlink systemd unit file
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/systemd/dns-server.service"
+    path: /etc/systemd/system/{{ service_name }}.service
+    force: true
+  notify: Restart dns-server service
+
+- name: Create dnsmasq.leases unless it exists
+  ansible.builtin.file:
+    path: "{{ root }}/dnsmasq/dnsmasq.leases"
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    owner: 10000
+    mode: '664'
+  notify: Restart dns-server service
+
+- name: Change ownership of dnscrypt-proxy directory to nobody:nogroup
+  ansible.builtin.file:
+    path: "{{ root }}/dnscrypt-proxy"
+    owner: 65534
+    group: 65533
+    recurse: true
+  notify: Restart dns-server service
+
+- name: Allow DHCP and DNS-related services from internal network
+  ansible.posix.firewalld:
+    zone: internal
+    service: "{{ item }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    - dhcp
+    - dhcpv6
+    - dhcpv6-client
+    - dns
+    - tftp
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ service_name }}"
+    daemon_reload: true
+  register: dns_server_started
+
+- name: Install DNS utils
+  ansible.builtin.package:
+    name: bind-utils
+    state: latest

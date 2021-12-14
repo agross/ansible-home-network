@@ -1,0 +1,17 @@
+- name: Install SELinux packages
+  package:
+    name:
+      - python3-policycoreutils
+    state: present
+
+- name: Allow systemd to read units below {{ directory }}
+  community.general.sefcontext:
+    target: "{{ directory }}/.*\\.(timer|service)$"
+    setype: systemd_unit_file_t
+    state: present
+
+- name: Apply SELinux file context to filesystem below {{ directory }}
+  command:
+    restorecon -irv "{{ directory }}"
+  register: restorecon_result
+  changed_when: restorecon_result.stdout | length > 0

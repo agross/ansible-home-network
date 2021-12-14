@@ -1,0 +1,3 @@
+# Extra logging for DHCP: log all the options sent to DHCP
+# clients and the tags used to determine them.
+log-dhcp

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+FILE=/opt/adguardhome/conf/AdGuardHome.yaml
+
+if [ ! -f $FILE ]; then
+  printf 'Waiting for config to be finished'
+
+  wget -S -O /dev/null localhost
+  nslookup localhost localhost
+  exit 0
+fi
+
+HTTP_PORT="$(grep ^bind_port: "$FILE" | cut -f 2 -d ' ')"
+DNS_PORT="$(grep '^  port:' "$FILE" | cut -f 4 -d ' ')"
+
+wget -S -O /dev/null "localhost:$HTTP_PORT"
+nslookup localhost "localhost:$DNS_PORT"

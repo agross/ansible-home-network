@@ -1,0 +1,2 @@
+# Log the results of DNS queries handled by dnsmasq.
+log-queries

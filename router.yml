@@ -1,0 +1,5 @@
+- hosts: router
+  become: true
+  roles:
+    - name: dns-server
+      tags: dns-server

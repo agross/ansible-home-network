@@ -1,0 +1,30 @@
+[Unit]
+Description=dnsmasq + AdGuard Home + dnscrypt-proxy DHCP and DNS Server
+BindsTo=docker.service
+After=docker.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+WorkingDirectory={{ root }}
+
+ExecStartPre=/usr/bin/docker-compose --file systemd/docker-compose.yaml \
+                                     --project-directory . \
+                                     config
+ExecStart=/usr/bin/docker-compose --project-name '%p' \
+                                  --file systemd/docker-compose.yaml \
+                                  --project-directory . \
+                                  up
+ExecStop=/usr/bin/docker-compose --project-name '%p' \
+                                 --file systemd/docker-compose.yaml \
+                                 --project-directory . \
+                                 stop
+
+ExecReload=/usr/bin/docker-compose --project-name '%p' \
+                                   --file systemd/docker-compose.yaml \
+                                   --project-directory . \
+                                   up \
+                                   --detach
+
+
+[Install]
+WantedBy=multi-user.target

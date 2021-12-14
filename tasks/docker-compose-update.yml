@@ -1,0 +1,21 @@
+- name: Pull docker images
+  when: pull is defined and pull | bool
+  ansible.builtin.command:
+    chdir: "{{ directory }}"
+    argv:
+      - docker-compose
+      - pull
+  register: docker_compose_pull
+  changed_when: "'... pull complete' in docker_compose_pull.stderr"
+  notify: "{{ notify | default(omit) }}"
+
+- name: Build docker images
+  when: build is defined and build | bool
+  ansible.builtin.command:
+    chdir: "{{ directory }}"
+    argv:
+      - docker-compose
+      - build
+  register: docker_compose_build
+  changed_when: "'Removing intermediate container' in docker_compose_build.stdout"
+  notify: "{{ notify | default(omit) }}"
