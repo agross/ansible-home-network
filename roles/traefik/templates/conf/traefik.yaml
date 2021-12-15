@@ -9,7 +9,7 @@ api:
   dashboard: true
 
 pilot:
-  token: dd1d9171-b4dc-4471-ae47-77054ea59bf7
+  token: c2cba910-03ae-4828-a602-6b0e4fdeac6f
 
 # docker exec traefik traefik healthcheck
 ping: {}
