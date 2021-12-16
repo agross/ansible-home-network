@@ -49,4 +49,5 @@ services:
     ports:
       - '127.0.0.1:53001:5053/udp'
     volumes:
+      - /etc/localtime:/etc/localtime
       - ./dnscrypt-proxy:/config
