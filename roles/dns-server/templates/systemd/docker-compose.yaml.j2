@@ -10,6 +10,7 @@ services:
     # Host networking follows firewalld rules and enables IPv4 and IPv6.
     network_mode: host
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./adguard/work:/opt/adguardhome/work
       - ./adguard/conf:/opt/adguardhome/conf
       - ./adguard/healthcheck:/opt/adguardhome/healthcheck:ro
@@ -49,5 +50,5 @@ services:
     ports:
       - '127.0.0.1:53001:5053/udp'
     volumes:
-      - /etc/localtime:/etc/localtime
-      - ./dnscrypt-proxy:/config
+      - /etc/localtime:/etc/localtime:ro
+      - ./dnscrypt-proxy:/config:ro
