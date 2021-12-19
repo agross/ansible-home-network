@@ -1,17 +1,17 @@
 - name: Create root directory
   ansible.builtin.file:
-    path: "{{ root }}"
+    path: "{{ target | default(root) }}"
     state: directory
     mode: '755'
   notify: "{{ notify | default(omit) }}"
 
 - name: Create directories
   ansible.builtin.file:
-    path: "{{ root }}/{{ item.path }}"
+    path: "{{ target | default(root) }}/{{ item.path }}"
     state: directory
     mode: '755'
   when: item.state == 'directory'
-  with_filetree: "{{ directory }}"
+  with_community.general.filetree: "{{ directory }}"
   loop_control:
     label: "{{ item.path }}"
   notify: "{{ notify | default(omit) }}"
@@ -19,13 +19,13 @@
 - name: Copy non-template files
   ansible.builtin.copy:
     src: "{{ item.src }}"
-    dest: "{{ root }}/{{ item.path }}"
+    dest: "{{ target | default(root) }}/{{ item.path }}"
     mode: preserve
   when:
     item.state == 'file' and
       (not item.path.endswith('.j2')) and
       (not item.path | basename == '.gitignore')
-  with_filetree: "{{ directory }}"
+  with_community.general.filetree: "{{ directory }}"
   loop_control:
     label: "{{ item.path }}"
   notify: "{{ notify | default(omit) }}"
@@ -33,14 +33,14 @@
 - name: Copy template files
   ansible.builtin.template:
     src: "{{ item.src }}"
-    dest: "{{ root }}/{{ item.path | regex_replace('\\.j2$', '') }}"
+    dest: "{{ target | default(root) }}/{{ item.path | regex_replace('\\.j2$', '') }}"
     mode: preserve
     lstrip_blocks: true
   when:
     item.state == 'file' and
       item.path.endswith('.j2') and
       (not item.path | basename == '.gitignore')
-  with_filetree: "{{ directory }}"
+  with_community.general.filetree: "{{ directory }}"
   loop_control:
     label: "{{ item.path }}"
   notify: "{{ notify | default(omit) }}"

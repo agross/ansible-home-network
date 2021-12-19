@@ -3,3 +3,9 @@
   ansible.builtin.systemd:
     name: "{{ service_name }}"
     state: reloaded
+
+- name: Restart systemd-resolved service
+  when: systemd_resolved_started is not changed
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted

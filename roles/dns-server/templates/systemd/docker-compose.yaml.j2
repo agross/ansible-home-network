@@ -3,7 +3,7 @@ version: '2.4'
 services:
   # Primary, ad-blocking DNS with a nice UI. Uses dnsmasq as the only upstream.
   adguard:
-    image: adguard/adguardhome:latest
+    image: adguard/adguardhome:edge
     restart: unless-stopped
     # Publishing ports would publish them globally via docker's firewalld support,
     # but only on IPv4.
