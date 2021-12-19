@@ -4,7 +4,18 @@ beta_bind_port: 0
 users:
 {% for user, password in adguard_users.items() %}
 - name: {{ user }}
-  password: {{ password | password_hash('bcrypt') }}
+  {# https://github.com/ansible/ansible/issues/36129#issuecomment-658832705 #}
+  password: {{ password |
+    password_hash('bcrypt',
+                  ('./abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890' |
+                    shuffle(seed = inventory_hostname) |
+                    join)[:21]
+                  +
+                  ('.Oeu' |
+                    shuffle(seed = inventory_hostname) |
+                    join)[1]
+                 )
+   }}
 {% endfor %}
 auth_attempts: 5
 block_auth_min: 15
