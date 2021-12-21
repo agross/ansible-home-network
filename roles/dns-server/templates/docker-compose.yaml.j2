@@ -24,8 +24,6 @@ services:
     image: ricardbejarano/dnsmasq:custom
     build:
       context: ./dnsmasq
-      labels:
-        local: "true"
     command: --no-daemon --conf-file=/etc/dnsmasq.conf
     # Required for DHCP.
     network_mode: host
