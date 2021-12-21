@@ -15,10 +15,10 @@ bc:cf:4f:d9:97:d3,                       nwa210ax-1, 12h
 bc:cf:4f:e9:c5:e3,                       nwa210ax-2, 12h
 
 bc:a5:11:c4:5c:c5,                       kubeswitch, 12h
-dc:a6:32:44:18:22,                       kube1, 12h
-dc:a6:32:44:19:ed,                       kube2, 12h
-dc:a6:32:44:18:a6,                       kube3, 12h
-dc:a6:32:44:18:0d,                       kube4, 12h
+dc:a6:32:44:18:22,                       kube-1, 12h
+dc:a6:32:44:19:ed,                       kube-2, 12h
+dc:a6:32:44:18:a6,                       kube-3, 12h
+dc:a6:32:44:18:0d,                       kube-4, 12h
 
 08:12:a5:a7:56:12,                       firetv, 12h
 64:95:6c:78:07:c6,                       lg, 12h
