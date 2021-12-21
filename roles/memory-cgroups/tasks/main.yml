@@ -1,0 +1,39 @@
+- name: Check if memory cgroups are enabled
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -E
+      - ^memory\s+0
+      - /proc/cgroups
+  changed_when: false
+  failed_when: false
+  register: memory_cgroups_enabled
+
+- name: Enable memory cgroups
+  when: memory_cgroups_enabled.rc != 0
+  block:
+    - name: Create a backup of /boot/cmdline.txt
+      ansible.builtin.copy:
+        src: /boot/cmdline.txt
+        remote_src: true
+        dest: /boot/cmdline.txt.bak-cgroups-memory
+        mode: preserve
+        # Do not overwrite existing files.
+        force: false
+
+    - name: Enable memory cgroups (cgroup_enable)
+      ansible.builtin.include_tasks: boot-cmdline.yml
+      vars:
+        key: cgroup_enable
+        value: memory
+        update: false
+
+    - name: Enable memory cgroups (cgroup_memory)
+      ansible.builtin.include_tasks: boot-cmdline.yml
+      vars:
+        key: cgroup_memory
+        value: 1
+        update: true
+
+    - name: Reboot
+      ansible.builtin.reboot:
