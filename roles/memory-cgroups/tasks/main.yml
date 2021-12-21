@@ -3,7 +3,7 @@
     argv:
       - grep
       - -E
-      - ^memory\s+0
+      - ^memory\s+.*\s+1$
       - /proc/cgroups
   changed_when: false
   failed_when: false
