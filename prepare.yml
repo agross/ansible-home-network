@@ -1,0 +1,25 @@
+# Run this as follows to add yourself to the ansible group for
+# passwordless sudo.
+#
+# ansible-playbook prepare.yml --ask-become-pass
+#
+# Then enter your own password as the "BECOME password".
+
+- hosts: localhost
+  gather_facts: false
+  vars_prompt:
+    - name: target_hosts
+      prompt: Please enter the target host IPs, separated by comma
+      private: no
+  tasks:
+    - name: Add host to the playbook
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups: dynamic_target_hosts
+      with_items: "{{ target_hosts.split(',') }}"
+      changed_when: false
+
+- hosts: dynamic_target_hosts
+  become: true
+  roles:
+    - name: passwordless-sudo
