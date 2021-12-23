@@ -1,0 +1,19 @@
+# https://rancher.com/docs/k3s/latest/en/advanced/#enabling-legacy-iptables-on-raspbian-buster
+- name: Install iptables
+  ansible.builtin.package:
+    name: iptables
+    state: present
+
+- name: Deploy k3s
+  ansible.builtin.include_role:
+    name: xanmanning.k3s
+  vars:
+    k3s_become_for_all: true
+
+- name: Apply Traefik customizations
+  ansible.builtin.template:
+    src: templates/traefik-config.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+    mode: '600'
+  when: k3s_control_node | default(false)
+  notify: Restart k3s

@@ -1,0 +1,58 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    ports:
+      traefik:
+        expose: true
+
+      websecure:
+        tls:
+          enabled: true
+          certResolver: le-gw-staging
+          domains:
+            - main: beta.grossweber.com
+              sans:
+                - '*.beta.grossweber.com'
+
+    logs:
+      general:
+        level: INFO
+
+    persistence:
+      # Makes /data available.
+      enabled: true
+
+    {# env:
+      - name: INWX_USER
+        valueFrom:
+          secretKeyRef:
+            name: le-acme
+            key: INWX_USER
+
+      - name: INWX_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: le-acme
+            key: INWX_PASSWORD #}
+
+    additionalArguments:
+      - --certificatesresolvers.le-gw.acme.email=agross@grossweber.com
+      - --certificatesresolvers.le-gw.acme.storage=/data/le-gw.json
+      - --certificatesresolvers.le-gw.acme.dnsChallenge=true
+      - --certificatesresolvers.le-gw.acme.dnsChallenge.provider=inwx
+      # https://github.com/go-acme/lego/issues/1297
+      - --certificatesresolvers.le-gw.acme.dnsChallenge.delayBeforeCheck=420
+      - --certificatesresolvers.le-gw.acme.dnsChallenge.resolvers=ns.inwx.de,ns2.inwx.de,ns3.inwx.eu
+
+      - --certificatesresolvers.le-gw-staging.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.le-gw-staging.acme.email=agross@grossweber.com
+      - --certificatesresolvers.le-gw-staging.acme.storage=/data/le-gw-staging.json
+      - --certificatesresolvers.le-gw-staging.acme.dnsChallenge=true
+      - --certificatesresolvers.le-gw-staging.acme.dnsChallenge.provider=inwx
+      # https://github.com/go-acme/lego/issues/1297
+      - --certificatesresolvers.le-gw-staging.acme.dnsChallenge.delayBeforeCheck=420
+      - --certificatesresolvers.le-gw-staging.acme.dnsChallenge.resolvers=ns.inwx.de,ns2.inwx.de,ns3.inwx.eu
