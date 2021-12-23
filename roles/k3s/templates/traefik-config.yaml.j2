@@ -1,22 +1,77 @@
+---
+# https://kubernetes.io/docs/concepts/configuration/secret/
+apiVersion: v1
+kind: Secret
+metadata:
+  name: inwx-secret
+  namespace: kube-system
+type: kubernetes.io/basic-auth
+data:
+  username: {{ inwx_username | b64encode | to_yaml(width=1337) }}
+  password: {{ inwx_password | b64encode | to_yaml(width=1337) }}
+---
+# https://doc.traefik.io/traefik/middlewares/http/basicauth/#users
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-dashboard-basic-auth-secret
+  namespace: kube-system
+data:
+  users: {{ traefik_dashboard_users | b64encode | to_yaml(width=1337) }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-dashboard-basic-auth-middleware
+  namespace: kube-system
+spec:
+  basicAuth:
+    secret: traefik-dashboard-basic-auth-secret
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard-public
+  namespace: kube-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: >-
+        Host(`traefik.testing.grossweber.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+      middlewares:
+        - name: traefik-dashboard-basic-auth-middleware
+  tls:
+    certResolver: le-gw
+    domains:
+      - main: testing.grossweber.com
+        sans:
+          - '*.testing.grossweber.com'
+---
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
 metadata:
   name: traefik
   namespace: kube-system
 spec:
+  # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
   valuesContent: |-
     ports:
       traefik:
-        expose: true
+        # Exposed as traefik.testing.grossweber.com with auth.
+        expose: false
+
+      web:
+        redirectTo: websecure
 
       websecure:
         tls:
           enabled: true
-          certResolver: le-gw-staging
-          domains:
-            - main: beta.grossweber.com
-              sans:
-                - '*.beta.grossweber.com'
+          certResolver: le-gw
 
     logs:
       general:
@@ -26,18 +81,18 @@ spec:
       # Makes /data available.
       enabled: true
 
-    {# env:
-      - name: INWX_USER
+    env:
+      - name: INWX_USERNAME
         valueFrom:
           secretKeyRef:
-            name: le-acme
-            key: INWX_USER
+            name: inwx-secret
+            key: username
 
       - name: INWX_PASSWORD
         valueFrom:
           secretKeyRef:
-            name: le-acme
-            key: INWX_PASSWORD #}
+            name: inwx-secret
+            key: password
 
     additionalArguments:
       - --certificatesresolvers.le-gw.acme.email=agross@grossweber.com
