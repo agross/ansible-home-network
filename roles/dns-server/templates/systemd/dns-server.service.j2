@@ -7,23 +7,11 @@ OnFailure=unit-status-mail@%n.service
 [Service]
 WorkingDirectory={{ root }}
 
-ExecStartPre=/usr/bin/docker-compose --file docker-compose.yaml \
-                                     --project-directory . \
-                                     config
-ExecStart=/usr/bin/docker-compose --project-name '%p' \
-                                  --file docker-compose.yaml \
-                                  --project-directory . \
-                                  up
-ExecStop=/usr/bin/docker-compose --project-name '%p' \
-                                 --file docker-compose.yaml \
-                                 --project-directory . \
-                                 stop
+ExecStartPre=/usr/bin/docker-compose config
+ExecStart=/usr/bin/docker-compose up
+ExecStop=/usr/bin/docker-compose stop
 
-ExecReload=/usr/bin/docker-compose --project-name '%p' \
-                                   --file docker-compose.yaml \
-                                   --project-directory . \
-                                   up \
-                                   --detach
+ExecReload=/usr/bin/docker-compose up --detach
 
 
 [Install]
