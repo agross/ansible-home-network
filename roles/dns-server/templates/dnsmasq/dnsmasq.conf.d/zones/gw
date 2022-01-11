@@ -3,3 +3,5 @@ address=/playground.grossweber.com/172.16.0.85
 address=/kessler.playground.grossweber.com/172.16.0.232
 
 address=/kibana.grossweber.com/172.16.0.3
+
+address=/testing.grossweber.com/172.16.0.205
