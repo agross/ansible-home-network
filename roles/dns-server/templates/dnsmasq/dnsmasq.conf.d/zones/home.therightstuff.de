@@ -21,6 +21,7 @@ cname=lovelace.home.therightstuff.de, router.home.therightstuff.de
 cname=netdata.home.therightstuff.de,  router.home.therightstuff.de
 cname=pxe.home.therightstuff.de,      router.home.therightstuff.de
 cname=upsource.home.therightstuff.de, router.home.therightstuff.de
+cname=vault.home.therightstuff.de,    router.home.therightstuff.de
 cname=youtrack.home.therightstuff.de, router.home.therightstuff.de
 
 cname=mqtt, mqtt.home.therightstuff.de, raspberrypi.home.therightstuff.de

@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# vim: set ft=bash ts=2 sw=2 et:
+
+set -euo pipefail
+
+db() {
+  local container_name mysql_root_password backup_file
+
+  container_name="${1:?Need database container name}"
+  db_root_password="${2:?Need database root password}"
+  backup_file="${3:?Need backup file}"
+
+  if ! docker container\
+              exec \
+              "$container_name" \
+              mysqldump \
+              --all-databases \
+              --user=root \
+              "--password=$db_root_password" | \
+         gzip -9 > "$backup_file"; then
+    >&2 printf 'Database backup failed, removing %s\n' "$backup_file"
+    rm -f "$backup_file" > /dev/null
+    exit 1
+  fi
+
+  if ! docker container\
+              exec \
+              "$container_name" \
+              mysqloptimize \
+              --all-databases \
+              --user=root \
+              "--password=$db_root_password"; then
+    >&2 printf 'Database optimization failed\n'
+  else
+    printf 'Database optimization succeeded\n'
+  fi
+}
+
+data() {
+  local source_dir backup_file
+
+  source_dir="${1:?Need source directory}"
+  backup_file="${2:?Need backup file}"
+
+  tar czf "$backup_file" "$source_dir"
+}
+
+cleanup() {
+  local directory keep_days
+
+  directory="${1:?Need directory to clean up}"
+  keep_days="${2:?Need days to keep}"
+
+  # Delete files older than keep_days days.
+  find "$directory" \
+       -maxdepth 1 \
+       -type f \
+       -mtime "+$keep_days" \
+       -printf 'Deleting old backup %p (%t)\n' \
+       -delete
+}
+
+rsync() {
+  local source target
+
+  source="${1:?Need rsync source}"
+  target="${2:?Need rsync target}"
+
+  command rsync --rsh ssh \
+                --numeric-ids \
+                --archive \
+                --verbose \
+                --progress \
+                --partial \
+                --compress \
+                --human-readable \
+                --delete \
+                "$source" \
+                "$target"
+}
+
+target_dir={{ root | quote }}/backup/backups
+timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
+
+mkdir --parents "$target_dir"
+
+db {{ service_name | quote }}_db_1 \
+   "$MYSQL_ROOT_PASSWORD" \
+   "$target_dir/$timestamp-db.gz"
+
+data {{ root | quote }}/app \
+     "$target_dir/$timestamp-data.gz"
+
+cleanup "$target_dir" 14
+
+rsync "$target_dir" "$RSYNC_TARGET"

@@ -1,0 +1,11 @@
+- name: Restart vaultwarden service
+  when: vaultwarden_started is not changed
+  ansible.builtin.systemd:
+    name: "{{ service_name }}"
+    state: restarted
+
+- name: Restart vaultwarden backup timer
+  when: vaultwarden_backup_timer_started is not changed
+  ansible.builtin.systemd:
+    name: "{{ service_name }}-backup.timer"
+    state: restarted

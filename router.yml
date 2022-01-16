@@ -3,3 +3,5 @@
   roles:
     - name: dns-server
       tags: dns-server
+    - name: vaultwarden
+      tags: vaultwarden

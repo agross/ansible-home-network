@@ -1,0 +1,34 @@
+version: '2.4'
+
+volumes:
+ vaultwarden:
+ mariadb:
+
+services:
+  db:
+    image: mariadb
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - mariadb:/var/lib/mysql
+    env_file:
+      - ./.env.db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "--user", "root", "--password=$MYSQL_ROOT_PASSWORD", "ping"]
+      start_period: 15s
+
+  app:
+    image: vaultwarden/server:latest
+    user: {{ uid_gid }}:{{ uid_gid }}
+    ports:
+      - 127.0.0.1:3011:3011
+      - 127.0.0.1:3012:3012
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./app:/data/
+    env_file:
+      - ./.env.vaultwarden
+    environment:
+      RUST_BACKTRACE: 1
+    depends_on:
+      - db

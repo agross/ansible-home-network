@@ -1,0 +1,5 @@
+service_name: vaultwarden
+
+root: /data/{{ service_name }}
+
+uid_gid: 1000

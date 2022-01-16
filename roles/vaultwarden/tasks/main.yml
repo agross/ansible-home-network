@@ -1,0 +1,79 @@
+- ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    notify: Restart vaultwarden service
+
+- ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
+  vars:
+    directory: "{{ root }}/systemd"
+
+- name: Symlink systemd unit file
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/systemd/vaultwarden.service"
+    path: /etc/systemd/system/{{ service_name }}.service
+    force: true
+  notify: Restart vaultwarden service
+
+- name: Symlink backup systemd unit file
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/systemd/vaultwarden-backup.service"
+    path: /etc/systemd/system/{{ service_name }}-backup.service
+    force: true
+
+- name: Symlink backup timer systemd unit file
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/systemd/vaultwarden-backup.timer"
+    path: /etc/systemd/system/{{ service_name }}-backup.timer
+    force: true
+  notify: Restart vaultwarden backup timer
+
+- ansible.builtin.import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify:
+      - Restart vaultwarden service
+
+- name: Ensure the app data directory exists and is accessible by Vaultwarden
+  ansible.builtin.file:
+    path: "{{ root }}/app"
+    state: directory
+    mode: ug-x,ug=rwX,o-rwx
+    owner: "{{ uid_gid }}"
+    group: "{{ uid_gid }}"
+    recurse: true
+
+- name: Ensure environment files can be read by systemd
+  community.general.sefcontext:
+    target: "{{ root }}/(.*\\/)?\\.env.*"
+    setype: systemd_unit_file_t
+    state: present
+
+- name: Apply file context to environment files
+  ansible.builtin.command:
+    argv:
+      - restorecon
+      - -iRv
+      - "{{ root }}"
+  register: restorecon_result
+  changed_when: restorecon_result.stdout | length > 0
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ service_name }}"
+    daemon_reload: true
+  register: vaultwarden_started
+
+- name: Start backup timer
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ service_name }}-backup.timer"
+    daemon_reload: true
+  register: vaultwarden_backup_timer_started
