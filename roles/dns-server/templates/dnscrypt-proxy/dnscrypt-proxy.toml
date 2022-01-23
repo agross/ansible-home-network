@@ -163,7 +163,7 @@ keepalive = 30
 ## This file is different from other log files, and will not be
 ## automatically rotated by the application.
 
-# log_file = 'dnscrypt-proxy.log'
+log_file = '/dev/stdout'
 
 
 ## When using a log file, only keep logs from the most recent launch.
@@ -454,7 +454,7 @@ cache_neg_max_ttl = 600
   ## Path to the query log file (absolute, or relative to the same directory as the config file)
   ## Can be set to /dev/stdout in order to log to the standard output.
 
-  # file = 'query.log'
+  file = '/dev/stdout'
 
 
   ## Query log format (currently supported: tsv and ltsv)
@@ -480,7 +480,7 @@ cache_neg_max_ttl = 600
 
   ## Path to the query log file (absolute, or relative to the same directory as the config file)
 
-  # file = 'nx.log'
+  file = '/dev/stdout'
 
 
   ## Query log format (currently supported: tsv and ltsv)
@@ -515,7 +515,7 @@ cache_neg_max_ttl = 600
 
   ## Optional path to a file logging blocked queries
 
-  # log_file = 'blocked-names.log'
+  log_file = '/dev/stdout'
 
 
   ## Optional log format: tsv or ltsv (default: tsv)
@@ -543,7 +543,7 @@ cache_neg_max_ttl = 600
 
   ## Optional path to a file logging blocked queries
 
-  # log_file = 'blocked-ips.log'
+  log_file = '/dev/stdout'
 
 
   ## Optional log format: tsv or ltsv (default: tsv)
@@ -571,7 +571,7 @@ cache_neg_max_ttl = 600
 
   ## Optional path to a file logging allowed queries
 
-  # log_file = 'allowed-names.log'
+  log_file = '/dev/stdout'
 
 
   ## Optional log format: tsv or ltsv (default: tsv)
@@ -599,7 +599,7 @@ cache_neg_max_ttl = 600
 
   ## Optional path to a file logging allowed queries
 
-  # log_file = 'allowed-ips.log'
+  log_file = '/dev/stdout'
 
   ## Optional log format: tsv or ltsv (default: tsv)
 
