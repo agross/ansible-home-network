@@ -454,7 +454,7 @@ cache_neg_max_ttl = 600
   ## Path to the query log file (absolute, or relative to the same directory as the config file)
   ## Can be set to /dev/stdout in order to log to the standard output.
 
-  file = '/dev/stdout'
+  file = '/dev/null'
 
 
   ## Query log format (currently supported: tsv and ltsv)
