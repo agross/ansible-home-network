@@ -19,6 +19,7 @@ cname=iobroker.home.therightstuff.de, router.home.therightstuff.de
 cname=ldap.home.therightstuff.de,     arwen.home.therightstuff.de
 cname=lovelace.home.therightstuff.de, router.home.therightstuff.de
 cname=netdata.home.therightstuff.de,  router.home.therightstuff.de
+cname=photos.home.therightstuff.de,   router.home.therightstuff.de
 cname=pxe.home.therightstuff.de,      router.home.therightstuff.de
 cname=upsource.home.therightstuff.de, router.home.therightstuff.de
 cname=vault.home.therightstuff.de,    router.home.therightstuff.de

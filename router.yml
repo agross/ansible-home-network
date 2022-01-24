@@ -5,3 +5,5 @@
       tags: dns-server
     - name: vaultwarden
       tags: vaultwarden
+    - name: photoprism
+      tags: photoprism

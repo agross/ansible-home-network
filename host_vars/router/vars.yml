@@ -3,3 +3,7 @@ adguard_users: "{{ vault_adguard_users }}"
 vaultwarden_mariadb_root_password: "{{ vault_vaultwarden_mariadb_root_password }}"
 vaultwarden_mariadb_password: "{{ vault_vaultwarden_mariadb_password }}"
 vaultwarden_admin_token: "{{ vault_vaultwarden_admin_token }}"
+
+photoprism_mariadb_root_password: "{{ vault_photoprism_mariadb_root_password }}"
+photoprism_mariadb_password: "{{ vault_photoprism_mariadb_password }}"
+photoprism_admin_password: "{{ vault_photoprism_admin_password }}"

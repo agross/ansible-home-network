@@ -6,7 +6,7 @@
 
 - name: Allow systemd to read units below {{ directory }}
   community.general.sefcontext:
-    target: "{{ directory }}/.*\\.(timer|service)$"
+    target: "{{ directory }}/.*\\.(timer|service|mount)$"
     setype: systemd_unit_file_t
     state: present
 

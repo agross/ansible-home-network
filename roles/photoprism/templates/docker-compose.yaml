@@ -1,0 +1,55 @@
+version: '3.5'
+
+volumes:
+  db:
+
+services:
+  db:
+    image: mariadb
+    restart: unless-stopped
+    command:
+      - --lower-case-table-names=1
+      - --innodb-buffer-pool-size=128M
+      - --transaction-isolation=READ-COMMITTED
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max-connections=512
+      - --innodb-rollback-on-timeout=OFF
+      - --innodb-lock-wait-timeout=120
+    env_file:
+      - ./.env.db
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - --user
+        - root
+        - --password=$MYSQL_ROOT_PASSWORD
+        - ping
+      start_period: 15s
+
+  app:
+    image: photoprism/photoprism:latest
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:2342:2342
+    env_file:
+      - ./.env.photoprism
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /fs/data/nextcloud/app/data/agross/files/Camera Uploads:/photoprism/originals/Camera Uploads
+      - /fs/data/nextcloud/app/data/agross/files/Funstuff/Photos:/photoprism/originals/Photos
+      - ./app/storage:/photoprism/storage
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - --dump-header
+        - /dev/stderr
+        - http://localhost:2342/
+      start_period: 10s
+    depends_on:
+      - db
