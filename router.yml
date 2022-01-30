@@ -7,3 +7,5 @@
       tags: vaultwarden
     - name: photoprism
       tags: photoprism
+    - name: harbor
+      tags: harbor
