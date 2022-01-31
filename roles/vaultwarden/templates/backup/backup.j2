@@ -89,7 +89,7 @@ db {{ service_name | quote }}_db_1 \
    "$target_dir/$timestamp-db.gz"
 
 data {{ root | quote }}/app \
-     "$target_dir/$timestamp-data.gz"
+     "$target_dir/$timestamp-data.tar.gz"
 
 cleanup "$target_dir" 14
 
