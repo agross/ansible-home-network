@@ -4,7 +4,7 @@
 set -euo pipefail
 
 db() {
-  local container_name mysql_root_password backup_file
+  local container_name db_root_password backup_file
 
   container_name="${1:?Need database container name}"
   db_root_password="${2:?Need database root password}"
