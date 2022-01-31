@@ -23,6 +23,21 @@
     force: true
   notify: Restart harbor service
 
+- name: Symlink backup systemd unit file
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/systemd/harbor-backup.service"
+    path: /etc/systemd/system/{{ service_name }}-backup.service
+    force: true
+
+- name: Symlink backup timer systemd unit file
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/systemd/harbor-backup.timer"
+    path: /etc/systemd/system/{{ service_name }}-backup.timer
+    force: true
+  notify: Restart harbor backup timer
+
 - name: Download Harbor online installer {{ harbor_installer_version }}
   ansible.builtin.get_url:
     url: "{{ harbor_installer_url }}"
@@ -133,6 +148,21 @@
     backup: true
   notify: Restart harbor service
 
+- name: Ensure environment files can be read by systemd
+  community.general.sefcontext:
+    target: "{{ root }}/(.*\\/)?\\.env.*"
+    setype: systemd_unit_file_t
+    state: present
+
+- name: Apply file context to environment files
+  ansible.builtin.command:
+    argv:
+      - restorecon
+      - -iRv
+      - "{{ root }}"
+  register: restorecon_result
+  changed_when: restorecon_result.stdout | length > 0
+
 - name: Start service
   ansible.builtin.systemd:
     state: started
@@ -140,3 +170,11 @@
     name: "{{ service_name }}"
     daemon_reload: true
   register: harbor_started
+
+- name: Start backup timer
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ service_name }}-backup.timer"
+    daemon_reload: true
+  register: harbor_backup_timer_started

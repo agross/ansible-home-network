@@ -1,0 +1,12 @@
+[Unit]
+Description=Harbor backup
+OnFailure=unit-status-mail@%n.service
+Wants=network-online.target
+
+[Service]
+EnvironmentFile={{ root }}/backup/.env
+ExecStart=/usr/bin/systemd-inhibit --why '%n' \
+                                   '{{ root }}/backup/backup'
+
+[Install]
+WantedBy=multi-user.target
