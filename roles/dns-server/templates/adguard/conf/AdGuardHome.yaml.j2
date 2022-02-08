@@ -88,7 +88,6 @@ dns:
   rewrites: []
   blocked_services: []
   upstream_timeout: 10s
-  local_domain_name: lan
   resolve_clients: true
   use_private_ptr_resolvers: true
   local_ptr_upstreams:
@@ -134,6 +133,7 @@ user_rules: []
 dhcp:
   enabled: false
   interface_name: ""
+  local_domain_name: lan
   dhcpv4:
     gateway_ip: ""
     subnet_mask: ""
@@ -159,4 +159,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 12
+schema_version: 13
