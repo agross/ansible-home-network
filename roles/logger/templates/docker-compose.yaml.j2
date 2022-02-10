@@ -40,6 +40,7 @@ services:
     healthcheck:
       test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:8086/ping"]
       start_period: 5s
+      interval: 5s
 
   grafana:
     image: grafana/grafana
@@ -63,6 +64,7 @@ services:
     healthcheck:
       test: ["CMD", "wget", "-S", "-O", "/dev/null", "http://localhost:3000"]
       start_period: 5s
+      interval: 5s
     depends_on:
       influxdb:
         condition: service_healthy
