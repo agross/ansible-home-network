@@ -26,6 +26,7 @@ services:
     healthcheck:
       test: redis-cli -h localhost ping | grep -xq PONG || exit 1
       start_period: 5s
+      interval: 5s
     sysctls:
       net.core.somaxconn: 512
 
