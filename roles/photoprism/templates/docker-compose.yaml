@@ -29,6 +29,7 @@ services:
         - --password=$MYSQL_ROOT_PASSWORD
         - ping
       start_period: 15s
+      interval: 5s
 
   app:
     image: photoprism/photoprism:latest
