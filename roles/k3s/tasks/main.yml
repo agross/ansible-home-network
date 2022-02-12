@@ -10,13 +10,6 @@
   vars:
     k3s_become_for_all: true
 
-- name: Build Traefik dashboard users
-  ansible.builtin.import_tasks: htpasswd-users.yml
-  vars:
-    users: "{{ traefik_users.dashboard }}"
-    salt: NT0I31Sa7ihGEWpka9ASYu
-    fact: traefik_dashboard_users
-
 - name: Apply Traefik customizations
   ansible.builtin.template:
     src: templates/traefik-config.yaml.j2
