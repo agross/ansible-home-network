@@ -4,6 +4,11 @@
     name: iptables
     state: present
 
+- name: Uninstall firewalld
+  ansible.builtin.package:
+    name: firewalld
+    state: absent
+
 - name: Deploy k3s
   ansible.builtin.include_role:
     name: xanmanning.k3s
