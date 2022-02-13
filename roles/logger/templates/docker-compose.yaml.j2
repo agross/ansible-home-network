@@ -59,6 +59,7 @@ services:
       - "3000:3000"
     {% endif %}
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - grafana-data:/var/lib/grafana
     healthcheck:
@@ -81,6 +82,7 @@ services:
       HOST_RUN: /host/run
       HOST_MOUNT_PREFIX: /host
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - ./telegraf/telegraf.d:/etc/telegraf/telegraf.d:ro
       # For host monitoring.
