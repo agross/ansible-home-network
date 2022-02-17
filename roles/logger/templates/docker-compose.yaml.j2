@@ -39,7 +39,7 @@ services:
       - influxdb2-data:/var/lib/influxdb2
     healthcheck:
       test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:8086/ping"]
-      start_period: 5s
+      start_period: 30s
       interval: 5s
 
   grafana:
