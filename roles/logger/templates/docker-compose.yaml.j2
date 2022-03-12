@@ -22,6 +22,7 @@ services:
   influxdb:
     image: influxdb:alpine
 
+    restart: unless-stopped
     env_file: ./influxdb/.env
     {% if iobroker_support_wake_on_lan | default(false) | bool == false %}
     # Run on own logger network and the iobroker network so ioBroker can log
@@ -45,6 +46,7 @@ services:
   grafana:
     image: grafana/grafana
 
+    restart: unless-stopped
     env_file: ./grafana/.env
     {% if traefik_domain | default('', true) | length  %}
     labels:
@@ -72,6 +74,7 @@ services:
 
   telegraf:
     image: telegraf
+    restart: unless-stopped
     privileged: true
     user: telegraf:{{ docker_group | mandatory }}
     environment:
