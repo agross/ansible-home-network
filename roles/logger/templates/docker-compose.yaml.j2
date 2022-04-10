@@ -51,6 +51,7 @@ services:
     {% if traefik_domain | default('', true) | length  %}
     labels:
       traefik.enable: 'true'
+      traefik.http.routers.grafana.entrypoints: https
       traefik.http.routers.grafana.rule: Host(`grafana.{{ traefik_domain }}`)
       traefik.http.services.grafana.loadbalancer.server.port: 3000
     networks:
