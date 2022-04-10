@@ -42,9 +42,11 @@ services:
     {% elif traefik_domain | default('', true) | length  %}
     labels:
       traefik.enable: 'true'
+      traefik.http.routers.iobroker.entrypoints: https
       traefik.http.routers.iobroker.rule: Host(`iobroker.{{ traefik_domain }}`)
       traefik.http.routers.iobroker.service: iobroker
       traefik.http.services.iobroker.loadbalancer.server.port: 8081
+      traefik.http.routers.iobroker-lovelace.entrypoints: https
       traefik.http.routers.iobroker-lovelace.rule: Host(`lovelace.{{ traefik_domain }}`)
       traefik.http.routers.iobroker-lovelace.service: iobroker-lovelace
       traefik.http.services.iobroker-lovelace.loadbalancer.server.port: 8091
