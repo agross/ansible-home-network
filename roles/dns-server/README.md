@@ -12,7 +12,7 @@ DNS lookups work like this:
    * ARWEN (Windows Server DC, if *.wghoch4.local was requested), or
    * dnscrypt-proxy otherwise.
 1. dnscrypt-proxy is required because I want DNS traffic leaving my network to
-   be encrrypted and dnsmasq does not handle e.g. DNS over HTTPS (only plain
+   be encrypted and dnsmasq does not handle e.g. DNS over HTTPS (only plain
    UDP-based DNS).
 1. dnscrypt-proxy listens on 127.0.0.1:53001 and picks a fast, public and
    encrypted DNS server to resolve the request.
