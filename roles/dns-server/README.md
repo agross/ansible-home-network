@@ -24,10 +24,9 @@ addresses. For these cases, systemd-resolved is used which supports upstream DNS
 servers as well as NDP. AdGuard uses systemd-resolved's stub resolver only for
 PTR queries of IPv6 addresses and resolves PTR IPv4 addresses using dnsmasq.
 
-The only port accessible from the LAN is 53/udp (= AdGuard). The host listens on
-the following ports:
+The host listens on the following ports:
 
 * AdGuard: 0.0.0.0:53 and :::53 (allowed by firewalld)
-* dnsmasq: 0.0.0.0:53000 and :::53000
-* dnscrypt-proxy: 127.0.0.0:53001
+* dnsmasq: 0.0.0.0:53000 and :::53000 (not allowed by firewalld)
+* dnscrypt-proxy: 127.0.0.1:53001
 * systemd-resolved stub resolver: 127.0.0.1:53002
