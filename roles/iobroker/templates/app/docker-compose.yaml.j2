@@ -50,6 +50,12 @@ services:
       traefik.http.routers.iobroker-lovelace.rule: Host(`lovelace.{{ traefik_domain }}`)
       traefik.http.routers.iobroker-lovelace.service: iobroker-lovelace
       traefik.http.services.iobroker-lovelace.loadbalancer.server.port: 8091
+      {% if iobroker_guest_access | default(false) | bool == true %}
+      traefik.http.routers.iobroker-lovelace-guests.entrypoints: https
+      traefik.http.routers.iobroker-lovelace-guests.rule: Host(`gast.{{ traefik_domain }}`)
+      traefik.http.routers.iobroker-lovelace-guests.service: iobroker-lovelace-guests
+      traefik.http.services.iobroker-lovelace-guests.loadbalancer.server.port: 8092
+      {% endif %}
     networks:
       - default
       - web

@@ -16,3 +16,5 @@ iobroker_ports:
   # homematic_rfd: 42001
   homematic_ip: 42010
   homematic_virtual_devices: 49292
+
+iobroker_guest_access: false
