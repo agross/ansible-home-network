@@ -13,6 +13,7 @@ services:
   redis:
     image: redis:alpine
 
+    restart: unless-stopped
     environment:
       TZ: Europe/Berlin
     {% if iobroker_support_wake_on_lan | default(false) | bool == true %}
@@ -35,6 +36,7 @@ services:
     build:
       context: ./iobroker/docker
 
+    restart: unless-stopped
     env_file: ./iobroker/.env
     hostname: iobroker
     {% if iobroker_support_wake_on_lan | default(false) | bool == true %}
