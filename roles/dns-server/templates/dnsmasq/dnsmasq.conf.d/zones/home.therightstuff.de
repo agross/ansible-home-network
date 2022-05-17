@@ -25,7 +25,7 @@ cname=upsource.home.therightstuff.de, router.home.therightstuff.de
 cname=vault.home.therightstuff.de,    router.home.therightstuff.de
 cname=youtrack.home.therightstuff.de, router.home.therightstuff.de
 
-cname=mqtt, mqtt.home.therightstuff.de, raspberrypi.home.therightstuff.de
-cname=influxdb, influxdb.home.therightstuff.de, raspberrypi.home.therightstuff.de
+cname=mqtt, mqtt.home.therightstuff.de, pi.home.therightstuff.de
+cname=influxdb, influxdb.home.therightstuff.de, pi.home.therightstuff.de
 
 address=/generic.home.therightstuff.de/172.16.0.3

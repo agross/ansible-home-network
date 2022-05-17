@@ -1,5 +1,5 @@
 # Requires a static IP because of Homematic callbacks.
-dc:a6:32:2d:7d:b1,  172.16.0.4,  [::4],  raspberrypi, 12h
+dc:a6:32:2d:7d:b1,  172.16.0.4,  [::4],  pi, 12h
 
 a0:d3:c1:dc:30:87,  172.16.0.6,  [::6],  hp8620, 12h
 00:11:32:6a:cb:35,  172.16.0.10, [::10], nas, 12h
