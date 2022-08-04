@@ -608,10 +608,11 @@ allowed_domains = {{ grafana_google_allowed_domains }}
 ;startTLS_policy = NoStartTLS
 {% if grafana_smtp_host is defined %}
 enabled = true
-host = {{ grafana_smtp_host }}
-user = {{ grafana_smtp_user }}
-from_address = {{ grafana_smtp_user }}
-password = {{ grafana_smtp_password }}
+host = {{ grafana_smtp_host | mandatory }}
+user = {{ grafana_smtp_user | mandatory }}
+password = {{ grafana_smtp_password | mandatory }}
+ehlo_identity = {{ grafana_root_url | urlsplit('hostname') }}
+from_address = grafana@{{ grafana_smtp_user | split('@', 1) | last }}
 {% endif %}
 
 [emails]
