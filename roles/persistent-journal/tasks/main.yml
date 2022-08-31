@@ -1,17 +1,20 @@
 - name: Create persisent log directory
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ journal_directory }}"
     mode: '755'
   notify: Restart systemd-journald
 
 - name: Create persisent log directory
-  command:
-    cmd: >-
-      systemd-tmpfiles --create --prefix {{ journal_directory | quote }}
+  ansible.builtin.command:
+    argv:
+      - systemd-tmpfiles
+      - --create
+      - --prefix
+      - "{{ journal_directory }}"
 
 - name: Uninstall rsyslog
-  apt:
+  ansible.builtin.apt:
     name: rsyslog
     state: absent
     purge: true
