@@ -11,10 +11,10 @@ no-resolv
 
 # Listen on <port> instead of the standard DNS port (53). Changing the default
 # port will no longer set the DNS server option for DHCP clients.
-port=53000
+port={{ ports.dnsmasq | mandatory }}
 
 # Define upstream DNS server (dnscrypt-proxy).
-server=127.0.0.1#53001
+server=127.0.0.1#{{ ports.dnscrypt | mandatory }}
 
 server=/wghoch4.local/172.16.0.1
 

@@ -1,3 +1,8 @@
 service_name: dns-server
 
 root: /data/{{ service_name }}
+
+ports:
+  dnsmasq: 53003
+  dnscrypt: 53001
+  resolved: 53002

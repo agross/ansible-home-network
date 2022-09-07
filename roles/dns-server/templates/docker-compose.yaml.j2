@@ -18,7 +18,7 @@ services:
       test: ["CMD", "/opt/adguardhome/healthcheck"]
       start_period: 5s
 
-  # DHCP + DNS (127.0.0.1:53000/udp) with information about DHCP hosts. Uses
+  # DHCP + DNS (127.0.0.1:{{ ports.dnsmasq | mandatory }}/udp) with information about DHCP hosts. Uses
   # dnscrypt-proxy as the only upstream.
   dnsmasq:
     image: ricardbejarano/dnsmasq:custom
@@ -41,12 +41,12 @@ services:
       - adguard
       - dnscrypt-proxy
 
-  # Outbound DNS server (127.0.0.1:53001/udp).
+  # Outbound DNS server (127.0.0.1:{{ ports.dnscrypt | mandatory }}/udp).
   dnscrypt-proxy:
     image: klutchell/dnscrypt-proxy
     restart: unless-stopped
     ports:
-      - '127.0.0.1:53001:5053/udp'
+      - '127.0.0.1:{{ ports.dnscrypt | mandatory }}:5053/udp'
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./dnscrypt-proxy:/config
