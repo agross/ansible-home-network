@@ -1,3 +1,4 @@
+cname=cloud.grossweber.com, router
 cname=kibana.grossweber.com, router
 
 # Kubernetes services.
