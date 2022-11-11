@@ -1,0 +1,12 @@
+- name: Configure /etc/network/interfaces
+  ansible.builtin.template:
+    src: "{{ pve_interfaces_template }}"
+    dest: /etc/network/interfaces
+    mode: '644'
+    owner: 0
+    group: 0
+    lstrip_blocks: true
+  notify: Reboot because networking changed
+
+- name: Reboot now, if required
+  ansible.builtin.meta: flush_handlers

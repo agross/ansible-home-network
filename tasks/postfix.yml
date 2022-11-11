@@ -1,0 +1,67 @@
+- name: Build postfix config items
+  ansible.builtin.set_fact:
+    postfix_config: >-
+      {{
+        postfix_config |
+        default([]) +
+        [{ 'name': item.name, 'value': item.value }]
+      }}
+  with_items:
+    - name: relayhost
+      value: '[smtp-relay.gmail.com]:587'
+    - name: smtp_use_tls
+      value: 'yes'
+    - name: smtp_tls_CAfile
+      value: /etc/ssl/certs/ca-certificates.crt
+    - name: mydomain
+      value: "{{ network.domain }}"
+    - name: append_dot_mydomain
+      value: 'yes'
+    - name: local_header_rewrite_clients
+      value: static:all
+
+- name: Support authentication
+  when: google_smtp_user is defined
+  block:
+    - name: Install SASL authentication package
+      ansible.builtin.package:
+        name: libsasl2-modules
+        state: present
+
+    - name: Extend postfix config items if authentication is required
+      ansible.builtin.set_fact:
+        postfix_config: >-
+          {{
+            postfix_config +
+            [{ 'name': item.name, 'value': item.value }]
+          }}
+      with_items:
+        - name: smtp_sasl_auth_enable
+          value: 'yes'
+        - name: smtp_sasl_password_maps
+          value: hash:/etc/postfix/sasl_passwd
+        - name: smtp_sasl_security_options
+          value: noanonymous
+
+    - name: Create SMTP auth file
+      ansible.builtin.copy:
+        dest: /etc/postfix/sasl_passwd
+        mode: '600'
+        content: |
+          [smtp-relay.gmail.com]:587 {{ google_smtp_user }}:{{ google_smtp_password }}
+      register: sasl_passwd
+
+    - name: Create SMTP auth hash file
+      when: sasl_passwd is changed
+      ansible.builtin.command:
+        argv:
+          - postmap
+          - /etc/postfix/sasl_passwd
+
+- name: Configure postfix to relay via Gmail
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    line: "{{ item.name }} = {{ item.value }}"
+    regexp: "^{{ item.name }} ="
+  with_items: "{{ postfix_config }}"
+  notify: Restart postfix

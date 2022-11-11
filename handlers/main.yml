@@ -1,0 +1,13 @@
+- name: Reload firewall
+  ansible.builtin.systemd:
+    name: pve-firewall
+    state: reloaded
+
+- name: Reboot because networking changed
+  ansible.builtin.reboot:
+    msg: Networking changed, rebooting
+
+- name: Restart postfix
+  ansible.builtin.systemd:
+    name: postfix.service
+    state: restarted
