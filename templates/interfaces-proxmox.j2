@@ -4,36 +4,36 @@
 auto lo
 iface lo inet loopback
 
-iface {{ network.lan.device | mandatory }} inet manual
-  {% if network.lan.mtu is defined %}
-  mtu {{ network.lan.mtu }}
+iface {{ interfaces.lan.device | mandatory }} inet manual
+  {% if interfaces.lan.mtu is defined %}
+  mtu {{ interfaces.lan.mtu }}
   {% endif %}
 #LAN
 
-iface {{ network.wan.device | mandatory }} inet manual
+iface {{ interfaces.wan.device | mandatory }} inet manual
 #WAN
 
 auto vmbr0
 iface vmbr0 inet static
   address 172.16.0.91/24
-  # TODO address {{ network.lan.ipv4.address | mandatory }}
+  # TODO address {{ interfaces.lan.ipv4.address | mandatory }}
   gateway 172.16.0.3
-  # TODO gateway {{ network.lan.ipv4.gateway | mandatory }}
-  bridge-ports {{ network.lan.device | mandatory }}
+  # TODO gateway {{ interfaces.lan.ipv4.gateway | mandatory }}
+  bridge-ports {{ interfaces.lan.device | mandatory }}
   bridge-stp off
   bridge-fd 0
-  {% if network.lan.mtu is defined %}
-  mtu {{ network.lan.mtu }}
+  {% if interfaces.lan.mtu is defined %}
+  mtu {{ interfaces.lan.mtu }}
   {% endif %}
 #LAN
 
 iface vmbr0 inet6 static
-  address {{ network.lan.ipv6.address | mandatory }}
-  gateway {{ network.lan.ipv6.gateway | mandatory }}
+  address {{ interfaces.lan.ipv6.address | mandatory }}
+  gateway {{ interfaces.lan.ipv6.gateway | mandatory }}
 
 auto vmbr1
 iface vmbr1 inet manual
-  bridge-ports {{ network.wan.device | mandatory }}
+  bridge-ports {{ interfaces.wan.device | mandatory }}
   bridge-stp off
   bridge-fd 0
 #WAN
