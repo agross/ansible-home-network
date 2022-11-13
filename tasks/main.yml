@@ -1,3 +1,6 @@
+- name: Configure DNS
+  ansible.builtin.import_tasks: dns.yml
+
 - name: Configure network interfaces
   ansible.builtin.import_tasks: network-interfaces.yml
 
