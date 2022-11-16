@@ -4,9 +4,6 @@
 - name: Configure network interfaces
   ansible.builtin.import_tasks: network-interfaces.yml
 
-- name: Configure postfix
-  ansible.builtin.import_tasks: postfix.yml
-
 - name: Configure firewall for the Proxmox host
   ansible.builtin.import_tasks: firewall.yml
 
