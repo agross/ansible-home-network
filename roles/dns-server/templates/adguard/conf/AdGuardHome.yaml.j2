@@ -93,7 +93,7 @@ dns:
   local_ptr_upstreams:
   - '# Resolve IPv4 PTR using dnsmasq...'
   - '[/in-addr.arpa/]127.0.0.1:{{ ports.dnsmasq | mandatory }}'
-  - '# ...and IPv6 PTR using systemd-networkd which supports NDP to resolve link-local
+  - '# ...and IPv6 PTR using systemd-resolved which supports NDP to resolve link-local
     addresses.'
   - '[/ip6.arpa/]127.0.0.1:{{ ports.resolved | mandatory }}'
 tls:
