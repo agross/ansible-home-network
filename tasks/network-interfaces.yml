@@ -8,5 +8,15 @@
     lstrip_blocks: true
   notify: Reboot because networking changed
 
+- name: Ensure host IP is included in /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    search_string: "{{ inventory_hostname }}"
+    line: "172.16.0.91 {{ pve_fqdn }} {{ inventory_hostname }}"
+    # TODO
+    # line: "{{ interfaces.lan.ipv4.address | ansible.utils.ipaddr('address') }} {{ pve_fqdn }} {{ inventory_hostname }}"
+    state: present
+    backup: true
+
 - name: Reboot now, if required
   ansible.builtin.meta: flush_handlers
