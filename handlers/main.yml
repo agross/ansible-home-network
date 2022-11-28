@@ -14,3 +14,24 @@
 - name: Reboot because networking changed
   ansible.builtin.reboot:
     msg: Networking changed, rebooting
+
+- name: Install guest OS manually
+  ansible.builtin.fail:
+    msg: >-
+      One or more VMs were created. Please install the guest OS manually and
+      then rerun the playbook. This is not an error, but there is no other way
+      to end a playbook in Ansible.
+
+      Guest VMs created:
+
+      {{
+        guest_vms_created.results |
+          selectattr('changed') |
+          map(attribute = 'guest.kvm.id') |
+          zip(
+            guest_vms_created.results |
+            selectattr('changed') |
+            map(attribute = 'guest.inventory_hostname_short'),
+            strict = true
+          )
+      }}

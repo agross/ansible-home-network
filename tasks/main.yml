@@ -12,3 +12,6 @@
 
 - name: Configure ACME account
   ansible.builtin.import_tasks: acme-account.yml
+
+- name: Create VMs
+  ansible.builtin.import_tasks: create-vms.yml
