@@ -1,11 +1,21 @@
-- ansible.builtin.import_tasks: latest-release.yml
+- name: Get latest release
+  ansible.builtin.import_tasks:
+    file: latest-release.yml
 
 - name: Build username and password for API calls
-  set_fact:
+  ansible.builtin.set_fact:
     tasmota_credentials: >-
       &user={{ tasmota_user | urlencode | replace('/', '%2F') }}&password={{ tasmota_password | urlencode | replace('/', '%2F') }}
   when: tasmota_password is defined and tasmota_password
 
-- ansible.builtin.import_tasks: update-required.yml
-- ansible.builtin.import_tasks: upgrade-url.yml
-- ansible.builtin.import_tasks: upgrade.yml
+- name: Check if an update is required
+  ansible.builtin.import_tasks:
+    file: update-required.yml
+
+- name: Determine upgrade URL
+  ansible.builtin.import_tasks:
+    file: upgrade-url.yml
+
+- name: Perform upgrade
+  ansible.builtin.import_tasks:
+    file: upgrade.yml

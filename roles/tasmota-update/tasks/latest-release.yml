@@ -1,5 +1,5 @@
 - name: Get latest Tasmota release
-  uri:
+  ansible.builtin.uri:
     url: "{{ tasmota_version_info }}"
     return_content: true
   delegate_to: localhost
@@ -8,7 +8,7 @@
   changed_when: false
 
 - name: Determine latest Tasmota release version
-  set_fact:
+  ansible.builtin.set_fact:
     latest_release_key: >-
       {{ latest_release.json | list | first }}
     latest_release_version: >-

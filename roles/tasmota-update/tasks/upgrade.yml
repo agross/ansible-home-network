@@ -1,11 +1,11 @@
 - name: Show firmware version
-  debug:
+  ansible.builtin.debug:
     msg: >-
       Upgrading from {{ firmware.json.StatusFWR.Version }} to {{ latest_release_version }}
   changed_when: false
 
 - name: Upgrade
-  uri:
+  ansible.builtin.uri:
     url: >-
       http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Upgrade%201{{ tasmota_credentials | default('') }}
     return_content: true
@@ -13,7 +13,7 @@
   register: status
 
 - name: Wait for reboot
-  wait_for:
+  ansible.builtin.wait_for:
     port: 80
     host: "{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}"
     # Less delay may report old version.
@@ -21,7 +21,7 @@
   delegate_to: localhost
 
 - name: Get new firmware version
-  uri:
+  ansible.builtin.uri:
     url: >-
       http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
     return_content: true
@@ -30,7 +30,7 @@
   changed_when: false
 
 - name: Show new firmware version
-  debug:
+  ansible.builtin.debug:
     msg: >-
       Upgraded from {{ firmware.json.StatusFWR.Version }} to {{ new_firmware.json.StatusFWR.Version }}
   changed_when: >-

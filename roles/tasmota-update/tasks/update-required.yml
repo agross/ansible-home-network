@@ -1,5 +1,5 @@
 - name: Get firmware version
-  uri:
+  ansible.builtin.uri:
     url: >-
       http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
     return_content: true
@@ -8,7 +8,7 @@
   changed_when: false
 
 - name: Remove host if no update is required
-  meta: end_host
+  ansible.builtin.meta: end_host
   when: >-
     firmware is defined and
     latest_release_version is defined and

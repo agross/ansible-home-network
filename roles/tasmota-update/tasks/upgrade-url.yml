@@ -1,35 +1,39 @@
 - name: Get OTA URL
-  uri:
+  ansible.builtin.uri:
     url: >-
-      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
+      http://
+      {{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/
+      cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: original_ota_url
   changed_when: false
 
 - name: Determine Tasmota variant
-  set_fact:
+  ansible.builtin.set_fact:
     tasmota_variant: >-
       {{ firmware.json.StatusFWR.Version | regex_replace('.*\((.*)\)$', '\1') }}
 
 - name: Determine OTA URL for variant
-  set_fact:
+  ansible.builtin.set_fact:
     tasmota_upgrade_url: "{{ latest_release.json | json_query(query) }}"
   vars:
     query: >-
       "{{ latest_release_key }}"[?variant=='{{ tasmota_variant }}'].otaurl | [0]
 
 - name: Set upgrade URL
-  uri:
+  ansible.builtin.uri:
     url: >-
-      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
+      http://
+      {{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/
+      cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: ota_url
   when: original_ota_url.json.OtaUrl != tasmota_upgrade_url
 
 - name: Show upgrade URL
-  debug:
+  ansible.builtin.debug:
     msg: >-
       OTA URL {{ tasmota_upgrade_url }}{% if original_ota_url.json.OtaUrl != tasmota_upgrade_url %}
       (changed from {{ original_ota_url.json.OtaUrl }}){% endif %}
