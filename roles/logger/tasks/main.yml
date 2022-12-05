@@ -8,7 +8,9 @@
   ansible.builtin.set_fact:
     docker_group: "{{ stat_docker_socket.stat.gid }}"
 
-- ansible.builtin.import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: ../templates
     notify:
@@ -16,7 +18,9 @@
       - Restart logger backup timer
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
-- ansible.builtin.import_tasks: docker-compose-update.yml
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
   vars:
     directory: "{{ root }}"
     pull: "{{ docker_update is defined }}"
@@ -53,7 +57,9 @@
     src: "{{ root }}/bin/influx-rename"
     path: /usr/local/bin/influx-rename
 
-- ansible.builtin.import_tasks: influxdb-upgrade-1-to-2.yml
+- name: Update InfluxDB 1 to 2
+  ansible.builtin.import_tasks:
+    file: influxdb-upgrade-1-to-2.yml
 
 - name: Start service
   ansible.builtin.systemd:
