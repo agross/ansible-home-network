@@ -2,7 +2,7 @@
   when: timezone is defined and timezone
   block:
     - name: Get timezone
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/timezone
         regexp: ^{{ timezone | regex_escape }}$
         state: absent
@@ -11,6 +11,10 @@
       register: different_timezone
 
     - name: Change timezone
-      command:
-        raspi-config nonint do_change_timezone {{ timezone | quote }}
+      ansible.builtin.command:
+        argv:
+          - raspi-config
+          - nonint
+          - do_change_timezone
+          - "{{ timezone }}"
       when: not different_timezone.found

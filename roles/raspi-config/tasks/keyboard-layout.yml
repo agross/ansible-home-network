@@ -2,7 +2,7 @@
   when: keyboard_layout is defined and keyboard_layout
   block:
     - name: Get keyboard layout
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/default/keyboard
         regexp: ^XKBLAYOUT="{{ keyboard_layout | regex_escape }}"
         state: absent
@@ -11,6 +11,10 @@
       register: different_layout
 
     - name: Change keyboard layout
-      command:
-        raspi-config nonint do_configure_keyboard {{ keyboard_layout | quote }}
+      ansible.builtin.command:
+        argv:
+          - raspi-config
+          - nonint
+          - do_configure_keyboard
+          - "{{ keyboard_layout }}"
       when: not different_layout.found
