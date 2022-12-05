@@ -1,15 +1,17 @@
 - name: Load ledtrig_heartbeat kernel module
-  modprobe:
+  community.general.modprobe:
     name: ledtrig_heartbeat
     state: present
 
-- import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: ../templates
     notify: Restart led-heartbeat service
 
 - name: Symlink systemd unit file
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ root }}/led-heartbeat.service"
     path: /etc/systemd/system/{{ service_name }}.service
@@ -17,7 +19,7 @@
   notify: Restart led-heartbeat service
 
 - name: Start service
-  systemd:
+  ansible.builtin.systemd:
     state: started
     enabled: true
     name: "{{ service_name }}"
