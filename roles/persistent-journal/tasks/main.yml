@@ -21,7 +21,7 @@
     autoremove: true
 
 - name: Configure journal max size of 1G (larger becomes slow on a Raspberry Pi)
-  ansible.builtin.ini_file:
+  community.general.ini_file:
     path: /etc/systemd/journald.conf
     section: Journal
     option: SystemMaxUse
