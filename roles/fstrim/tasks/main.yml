@@ -1,10 +1,12 @@
-- import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     root: /etc/udev/rules.d
     directory: ../templates
 
 - name: Enable fstrim.timer
-  systemd:
+  ansible.builtin.systemd:
     state: started
     enabled: true
     name: fstrim.timer
