@@ -1,4 +1,6 @@
-- import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: ../templates
     notify: Restart mqtt service
