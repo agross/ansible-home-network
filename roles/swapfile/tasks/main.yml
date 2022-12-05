@@ -4,7 +4,7 @@
     regexp: (CONF_SWAPSIZE=\d+)
     line: '#\1'
     backrefs: true
-    backup: yes
+    backup: true
     state: present
   notify: Recompute swap size
 
@@ -12,6 +12,6 @@
   ansible.builtin.lineinfile:
     path: /etc/dphys-swapfile
     line: "CONF_MAXSWAP={{ ansible_memtotal_mb * 2 }}"
-    backup: yes
+    backup: true
     state: present
   notify: Recompute swap size
