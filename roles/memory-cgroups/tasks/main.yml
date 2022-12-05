@@ -22,14 +22,16 @@
         force: false
 
     - name: Enable memory cgroups (cgroup_enable)
-      ansible.builtin.include_tasks: boot-cmdline.yml
+      ansible.builtin.import_tasks:
+        file: boot-cmdline.yml
       vars:
         key: cgroup_enable
         value: memory
         update: false
 
     - name: Enable memory cgroups (cgroup_memory)
-      ansible.builtin.include_tasks: boot-cmdline.yml
+      ansible.builtin.import_tasks:
+        file: boot-cmdline.yml
       vars:
         key: cgroup_memory
         value: 1
