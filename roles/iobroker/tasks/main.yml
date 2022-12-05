@@ -1,10 +1,14 @@
-- import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: ../templates/app
     notify: Restart iobroker service
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
-- import_tasks: docker-compose-update.yml
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
   vars:
     directory: "{{ root }}"
     pull: "{{ docker_update is defined }}"
@@ -20,7 +24,7 @@
     mode: '755'
 
 - name: Add sysctls for Redis
-  copy:
+  ansible.builtin.copy:
     src: ../templates/app/redis/sysctl.conf
     dest: /etc/sysctl.d/redis-vm.overcommit.conf
     mode: '644'
@@ -28,7 +32,7 @@
     force: true
 
 - name: Symlink systemd unit file
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ root }}/iobroker.service"
     path: /etc/systemd/system/{{ service_name }}.service
@@ -43,13 +47,15 @@
     daemon_reload: true
   register: iobroker_started
 
-- import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: ../templates/healthcheck
     notify: Restart iobroker healthcheck timer
 
 - name: Symlink healthcheck systemd unit file
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ root }}/iobroker-healthcheck.{{ item }}"
     path: /etc/systemd/system/{{ service_name }}-healthcheck.{{ item }}
