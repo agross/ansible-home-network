@@ -1,3 +1,11 @@
-- ansible.builtin.import_tasks: latest-release.yml
-- ansible.builtin.import_tasks: update-required.yml
-- ansible.builtin.import_tasks: upgrade.yml
+- name: Get latest release
+  ansible.builtin.import_tasks:
+    file: latest-release.yml
+
+- name: Check if an update is required
+  ansible.builtin.import_tasks:
+    file: update-required.yml
+
+- name: Perform upgrade
+  ansible.builtin.import_tasks:
+    file: upgrade.yml
