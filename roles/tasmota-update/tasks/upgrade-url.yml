@@ -1,9 +1,7 @@
 - name: Get OTA URL
   ansible.builtin.uri:
     url: >-
-      http://
-      {{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/
-      cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: original_ota_url
@@ -22,11 +20,9 @@
       "{{ latest_release_key }}"[?variant=='{{ tasmota_variant }}'].otaurl | [0]
 
 - name: Set upgrade URL
-  ansible.builtin.uri:
+  ansible.builtin.uri: # noqa: yaml[line-length]
     url: >-
-      http://
-      {{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/
-      cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
+      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
     return_content: true
   delegate_to: localhost
   register: ota_url
