@@ -16,7 +16,7 @@
 
 - name: Determine OTA URL for variant
   ansible.builtin.set_fact:
-    tasmota_upgrade_url: "{{ latest_release.json | json_query(query) }}"
+    tasmota_upgrade_url: "{{ latest_release.json | json_query(query) }}.gz"
   vars:
     query: >-
       "{{ latest_release_key }}"[?variant=='{{ tasmota_variant }}'].otaurl | [0]
