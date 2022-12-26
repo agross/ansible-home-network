@@ -33,6 +33,7 @@ services:
 
   app:
     image: {{ iobroker_image }}
+    pull_policy: never
     build:
       context: ./iobroker/docker
 
