@@ -1,6 +1,17 @@
-- ansible.builtin.import_tasks: password.yml
-- ansible.builtin.import_tasks: keyboard-layout.yml
-- ansible.builtin.import_tasks: locale.yml
-- ansible.builtin.import_tasks: timezone.yml
-- ansible.builtin.import_tasks: rpi-eeprom-update-latest.yml
-- ansible.builtin.import_tasks: hostname.yml
+- name: Set password
+  ansible.builtin.import_tasks: password.yml
+
+- name: Set keyboard layout
+  ansible.builtin.import_tasks: keyboard-layout.yml
+
+- name: Set locale
+  ansible.builtin.import_tasks: locale.yml
+
+- name: Set timezone
+  ansible.builtin.import_tasks: timezone.yml
+
+- name: Allow updates to latest EEPROM release
+  ansible.builtin.import_tasks: rpi-eeprom-update-latest.yml
+
+- name: Set hostname
+  ansible.builtin.import_tasks: hostname.yml
