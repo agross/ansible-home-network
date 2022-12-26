@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:s
 
 set -euo pipefail
 
@@ -51,18 +52,20 @@ EOF
          "$to" \
          "$bucket"
 
-  docker exec \
-         --tty \
-         '{{ service_name }}_influxdb_1' \
+  docker compose \
+         --project-name {{ service_name | quote }} \
+         exec \
+         influxdb \
          influx query "$copy"
 
   printf 'Dropping measurement "%s" (bucket: %s)...\n' \
          "$from" \
          "$bucket"
 
-  docker exec \
-         --tty \
-         '{{ service_name }}_influxdb_1' \
+  docker compose \
+         --project-name {{ service_name | quote }} \
+         exec \
+         influxdb \
          influx delete \
                --bucket "$bucket" \
                --start 1970-01-01T00:00:00Z \

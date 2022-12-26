@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vim: set ft=bash ts=2 sw=2 et:
+# vim: set ft=jinja-shell ts=2 sw=2 et:
 
 set -euo pipefail
 
@@ -19,9 +19,10 @@ influxdb() {
   # Cleanup on error or return.
   trap cleanup-influxdb EXIT RETURN
 
-  docker exec \
-         --tty \
-         '{{ service_name }}_influxdb_1' \
+  docker compose \
+         --project-name {{ service_name | quote }} \
+         exec \
+         influxdb \
          influx backup --compression=none /backups
 
   mkdir --parents -- "{{ root }}/backup/backups/influxdb"
@@ -78,7 +79,7 @@ grafana() {
          --env 'GRAFANA_ADMIN_ACCOUNT={{ logger_backup_grafana.admin.user }}' \
          --env 'GRAFANA_ADMIN_PASSWORD={{ logger_backup_grafana.admin.password }}' \
          --env 'TZ=Europe/Berlin' \
-         --network 'container:{{ service_name }}_grafana_1' \
+         --network 'container:{{ service_name }}-grafana-1' \
          --volume "$temp:/opt/grafana-backup-tool/_OUTPUT_"  \
          "$image"
 
