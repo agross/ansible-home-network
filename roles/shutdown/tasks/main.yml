@@ -1,3 +1,6 @@
 - name: Shutdown
-  command: systemctl poweroff
+  ansible.builtin.command:
+    argv: # noqa command-instead-of-module
+      - systemctl
+      - poweroff
   changed_when: true
