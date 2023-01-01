@@ -3,94 +3,117 @@
 
 set -euo pipefail
 
-db() {
-  local container_name db_root_password backup_file
+mariadb() {
+  local -a exec=(
+    docker compose \
+           --project-name {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }} \
+           exec \
+           db
+  )
 
-  container_name="${1:?Need database container name}"
-  db_root_password="${2:?Need database root password}"
-  backup_file="${3:?Need backup file}"
+  local backup=$(cat << BACKUP
+    target=/backups/$timestamp-db.tar.gz
+    backup=/tmp/backup
 
-  if ! docker container\
-              exec \
-              "$container_name" \
-              mysqldump \
-              --all-databases \
-              --user=root \
-              "--password=$db_root_password" | \
-         gzip -9 > "$backup_file"; then
-    >&2 printf 'Database backup failed, removing %s\n' "$backup_file"
-    rm -f "$backup_file" > /dev/null
-    exit 1
-  fi
+    rm -rf -- "\$backup"
+    mkdir -- "\$backup"
 
-  if ! docker container\
-              exec \
-              "$container_name" \
-              mysqloptimize \
-              --all-databases \
-              --user=root \
-              "--password=$db_root_password"; then
-    >&2 printf 'Database optimization failed\n'
-  else
-    printf 'Database optimization succeeded\n'
-  fi
+    dbs=(\$(mysql --user=root \
+                  --password="\$MYSQL_ROOT_PASSWORD" \
+                  --execute 'show databases' \
+                  --silent \
+                  --skip-column-names))
+
+    for db in "\${dbs[@]}"; do
+      if [[ "\$db" == information_schema ]] || \
+         [[ "\$db" == performance_schema ]] || \
+         [[ "\$db" == sys ]]; then
+        continue
+      fi
+
+      # https://serversforhackers.com/c/mysqldump-with-modern-mysql
+      mysqldump --user=root \
+                --password="\$MYSQL_ROOT_PASSWORD" \
+                --skip-lock-tables \
+                --single-transaction \
+                "\$db" > "\$backup/\$db.sql";
+    done
+
+    tar --create \
+        --gzip \
+        --verbose \
+        --file "\$target" \
+        --directory "\$backup" \
+        -- \
+        .
+BACKUP
+)
+
+  # Need to wrap those invocations in bash because otherwise $MYSQL_ROOT_PASSWORD
+  # is not available.
+
+  "${exec[@]}" bash -euo pipefail \
+                    -c "$backup"
+
+  "${exec[@]}" bash -euo pipefail \
+                    -c 'mysqloptimize --user=root \
+                                      "--password=$MYSQL_ROOT_PASSWORD" \
+                                      --all-databases'
 }
 
 data() {
-  local source_dir backup_file
+  local backup_file
 
-  source_dir="${1:?Need source directory}"
-  backup_file="${2:?Need backup file}"
+  backup_file="${1:?Need backup file}"
 
-  tar czf "$backup_file" "$source_dir"
+  tar --create \
+      --gzip \
+      --verbose \
+      --file "$backup_file" \
+      --directory {{ root | ansible.builtin.mandatory | ansible.builtin.quote }}/app \
+      -- \
+      .
 }
 
 cleanup() {
-  local directory keep_days
+  local directory
 
   directory="${1:?Need directory to clean up}"
-  keep_days="${2:?Need days to keep}"
 
-  # Delete files older than keep_days days.
+  # Delete files older than {{ vaultwarden_backup_keep_days }} days.
   find "$directory" \
-       -maxdepth 1 \
        -type f \
-       -mtime "+$keep_days" \
+       -mtime '+{{ vaultwarden_backup_keep_days | mandatory }}' \
        -printf 'Deleting old backup %p (%t)\n' \
        -delete
 }
 
-rsync() {
+sync() {
   local source target
 
   source="${1:?Need rsync source}"
-  target="${2:?Need rsync target}"
 
-  command rsync --rsh ssh \
-                --numeric-ids \
-                --archive \
-                --verbose \
-                --progress \
-                --partial \
-                --compress \
-                --human-readable \
-                --delete \
-                "$source" \
-                "$target"
+  rsync --rsh 'ssh -i backup/key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' \
+        --rsync-path='sudo /usr/local/bin/rsync' \
+        --super \
+        --numeric-ids \
+        --archive \
+        --verbose \
+        --progress \
+        --partial \
+        --compress \
+        --human-readable \
+        --delete \
+        "$source/" \
+        {{ backup_ssh_target | ansible.builtin.mandatory | ansible.builtin.quote }}/vaultwarden
 }
 
-target_dir={{ root | ansible.builtin.quote }}/backup/backups
 timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
 
+target_dir="$PWD/backup/backups"
 mkdir --parents "$target_dir"
 
-db {{ service_name | quote }}_db_1 \
-   "$MYSQL_ROOT_PASSWORD" \
-   "$target_dir/$timestamp-db.gz"
-
-data {{ root | ansible.builtin.quote }}/app \
-     "$target_dir/$timestamp-data.tar.gz"
-
-cleanup "$target_dir" 14
-
-rsync "$target_dir" "$RSYNC_TARGET"
+mariadb
+data "$target_dir/$timestamp-data.tar.gz"
+cleanup "$target_dir"
+sync "$target_dir"

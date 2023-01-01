@@ -3,3 +3,4 @@ service_name: vaultwarden
 root: /data/{{ service_name }}
 
 uid_gid: 1000
+vaultwarden_backup_keep_days: 7

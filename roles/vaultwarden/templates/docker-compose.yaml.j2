@@ -7,20 +7,28 @@ volumes:
 services:
   db:
     image: mariadb
-    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - mariadb:/var/lib/mysql
+      - ./backup/backups:/backups:z
     env_file:
       - ./.env.db
     healthcheck:
-      test: ["CMD", "mysqladmin", "--user", "root", "--password=$MYSQL_ROOT_PASSWORD", "ping"]
-      start_period: 15s
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - --user=$MYSQL_USER
+        - --password=$MYSQL_PASSWORD
+      start_period: 5s
       interval: 5s
 
   app:
     image: vaultwarden/server:alpine
-    user: {{ uid_gid }}:{{ uid_gid }}
+    user: {{ uid_gid | ansible.builtin.mandatory }}:{{ uid_gid }}
     ports:
       - 127.0.0.1:3011:3011
       - 127.0.0.1:3012:3012
