@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vim: set ft=bash ts=2 sw=2 et:
+# vim: set ft=jinja-shell ts=2 sw=2 et:
 
 set -euo pipefail
 
@@ -79,7 +79,7 @@ rsync() {
                 "$target"
 }
 
-target_dir={{ root | quote }}/backup/backups
+target_dir={{ root | ansible.builtin.quote }}/backup/backups
 timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
 
 mkdir --parents "$target_dir"
@@ -88,7 +88,7 @@ db {{ service_name | quote }}_db_1 \
    "$MYSQL_ROOT_PASSWORD" \
    "$target_dir/$timestamp-db.gz"
 
-data {{ root | quote }}/app \
+data {{ root | ansible.builtin.quote }}/app \
      "$target_dir/$timestamp-data.tar.gz"
 
 cleanup "$target_dir" 14
