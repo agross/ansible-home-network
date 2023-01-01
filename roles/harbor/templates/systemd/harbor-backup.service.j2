@@ -4,9 +4,12 @@ OnFailure=unit-status-mail@%n.service
 Wants=network-online.target
 
 [Service]
-EnvironmentFile={{ root }}/backup/.env
+WorkingDirectory={{ root }}
+
+RuntimeMaxSec=1h
+
 ExecStart=/usr/bin/systemd-inhibit --why '%n' \
-                                   '{{ root }}/backup/backup'
+                                   {{ root | ansible.builtin.quote }}/backup/backup
 
 [Install]
 WantedBy=multi-user.target

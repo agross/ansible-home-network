@@ -113,7 +113,8 @@
     - name: Validate docker-compose.yml
       ansible.builtin.command:
         argv:
-          - docker-compose
+          - docker
+          - compose
           - --file
           - "{{ harbor_installer_directory }}/harbor/docker-compose.yml"
           - config
@@ -162,6 +163,26 @@
       - "{{ root }}"
   register: restorecon_result
   changed_when: restorecon_result.stdout | length > 0
+
+- name: Save SSH keyfile for backup
+  ansible.builtin.copy:
+    content: "{{ backup_ssh_key }}"
+    dest: "{{ root }}/backup/key"
+    mode: '600'
+
+- name: Ensure rsync is installed
+  ansible.builtin.package:
+    name: rsync
+    state: present
+
+- name: Enable SELinux booleans for rsync backup
+  ansible.posix.seboolean:
+    name: "{{ item }}"
+    state: true
+    persistent: true
+  loop:
+    - rsync_client
+    - rsync_export_all_ro
 
 - name: Start service
   ansible.builtin.systemd:
