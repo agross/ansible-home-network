@@ -19,7 +19,7 @@ services:
       interval: 5s
 
   app:
-    image: vaultwarden/server:latest
+    image: vaultwarden/server:alpine
     user: {{ uid_gid }}:{{ uid_gid }}
     ports:
       - 127.0.0.1:3011:3011
