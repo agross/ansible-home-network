@@ -27,7 +27,7 @@ services:
     pull_policy: never
     build:
       context: ./dnsmasq
-    command: --no-daemon --conf-file=/etc/dnsmasq.conf
+    command: --keep-in-foreground --pid-file --log-facility=- --conf-file=/etc/dnsmasq.conf
     # Required for DHCP.
     network_mode: host
     restart: unless-stopped
