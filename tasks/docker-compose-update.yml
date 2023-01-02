@@ -3,10 +3,11 @@
   ansible.builtin.command:
     chdir: "{{ directory }}"
     argv:
-      - docker-compose
+      - docker
+      - compose
       - pull
   register: docker_compose_pull
-  changed_when: "'... pull complete' in docker_compose_pull.stderr"
+  changed_when: "'Pull complete' in docker_compose_pull.stderr"
   notify: "{{ notify | default(omit) }}"
 
 - name: Build docker images
@@ -14,8 +15,14 @@
   ansible.builtin.command:
     chdir: "{{ directory }}"
     argv:
-      - docker-compose
+      - docker
+      - compose
       - build
+      - --pull
   register: docker_compose_build
-  changed_when: "'Removing intermediate container' in docker_compose_build.stdout"
+  # Cached build: exporting layers done
+  # Uncached build: exporting layers 1.2s done
+  changed_when: >-
+    docker_compose_build.stdout_lines | length > 0 and
+    not 'exporting layers done' in docker_compose_build.stdout
   notify: "{{ notify | default(omit) }}"

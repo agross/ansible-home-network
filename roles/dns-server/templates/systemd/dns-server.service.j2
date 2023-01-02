@@ -7,12 +7,11 @@ OnFailure=unit-status-mail@%n.service
 [Service]
 WorkingDirectory={{ root }}
 
-ExecStartPre=/usr/bin/docker-compose config
-ExecStart=/usr/bin/docker-compose up
-ExecStop=/usr/bin/docker-compose stop
+ExecStartPre=/usr/bin/docker compose config
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose stop
 
-ExecReload=/usr/bin/docker-compose up --detach
-
+ExecReload=/usr/bin/docker compose up --detach
 
 [Install]
 WantedBy=multi-user.target

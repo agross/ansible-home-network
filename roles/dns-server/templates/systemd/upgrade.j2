@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 >&2 printf '%bBuilding...%b\n' \
            "$yellow" \
            "$reset"
-docker-compose build --pull
+docker compose build --pull
 
 >&2 printf '%bRestarting%b %b%s%b...\n' \
            "$yellow" \

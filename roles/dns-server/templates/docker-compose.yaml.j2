@@ -3,7 +3,7 @@ version: '2.4'
 services:
   # Primary, ad-blocking DNS with a nice UI. Uses dnsmasq as the only upstream.
   adguard:
-    image: adguard/adguardhome:edge
+    image: adguard/adguardhome:latest
     restart: unless-stopped
     # Publishing ports would publish them globally via docker's firewalld support,
     # but only on IPv4.
@@ -15,13 +15,16 @@ services:
       - ./adguard/conf:/opt/adguardhome/conf
       - ./adguard/healthcheck:/opt/adguardhome/healthcheck:ro
     healthcheck:
-      test: ["CMD", "/opt/adguardhome/healthcheck"]
+      test:
+        - CMD
+        - /opt/adguardhome/healthcheck
       start_period: 5s
 
   # DHCP + DNS (127.0.0.1:{{ ports.dnsmasq | mandatory }}/udp) with information about DHCP hosts. Uses
   # dnscrypt-proxy as the only upstream.
   dnsmasq:
     image: ricardbejarano/dnsmasq:custom
+    pull_policy: never
     build:
       context: ./dnsmasq
     command: --no-daemon --conf-file=/etc/dnsmasq.conf
