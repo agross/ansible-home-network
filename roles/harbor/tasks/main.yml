@@ -1,9 +1,11 @@
-- ansible.builtin.import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
     notify: Restart harbor service
 
-- ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
+- name: Set SELinux file contexts
+  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
   vars:
     directory: "{{ root }}/systemd"
 
@@ -42,6 +44,7 @@
   ansible.builtin.get_url:
     url: "{{ harbor_installer_url }}"
     dest: "{{ harbor_installer_directory }}.tgz"
+    mode: '644'
 
 - name: Ensure directory for extracted installer exists
   ansible.builtin.file:
@@ -78,18 +81,21 @@
 
 - name: Write combined config to harbor.yml
   ansible.builtin.copy:
-    content: "{{ harbor_yml_patched | to_nice_yaml(indent = 2) }}"
+    content: "{{ harbor_yml_patched | to_nice_yaml(indent=2) }}"
     dest: "{{ harbor_installer_directory }}/harbor/harbor.yml"
     mode: '644'
   register: harbor_yml_patched_templated
   notify: Restart harbor service
 
-- block:
+- name: Regenerate docker-compose.yml  # noqa no-handler
+  when: harbor_yml_patched_templated is changed
+  block:
     - name: Run Harbor prepare script to generate docker-compose.yml
       ansible.builtin.command:
         argv: "{{ ['./prepare'] + harbor_installer_arguments }}"
       args:
         chdir: "{{ harbor_installer_directory }}/harbor"
+      changed_when: true
 
     - name: >-
         Remove "container_name: <name>" from generated docker-compose.yml
@@ -120,8 +126,6 @@
           - config
           - --quiet
       changed_when: false
-
-  when: harbor_yml_patched_templated is changed
 
   rescue:
     - name: Restore backup file because validation failed
