@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
 
 set -euo pipefail
 
@@ -17,9 +18,9 @@ docker-compose build --pull
            "$yellow" \
            "$reset" \
            "$green" \
-           {{ service_name | quote }} \
+           {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }} \
            "$reset"
 
-systemctl restart {{ service_name | quote }}
+systemctl restart {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }}
 
 sleep 5
