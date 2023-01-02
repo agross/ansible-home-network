@@ -13,5 +13,9 @@
 - name: Configure ACME account
   ansible.builtin.import_tasks: acme-account.yml
 
+- name: Install dark theme
+  ansible.builtin.include_role:
+    name: mirceanton.proxmox_dark_theme
+
 - name: Create VMs
   ansible.builtin.import_tasks: create-vms.yml
