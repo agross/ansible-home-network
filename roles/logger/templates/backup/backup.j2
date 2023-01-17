@@ -19,11 +19,16 @@ influxdb() {
   # Cleanup on error or return.
   trap cleanup-influxdb EXIT RETURN
 
-  docker compose \
-         --project-name {{ service_name | quote }} \
-         exec \
-         influxdb \
-         influx backup --compression=none /backups
+  for bucket in {{ influxdb_backup_buckets | map('ansible.builtin.quote') | join(' ') }}; do
+    docker compose \
+           --project-name {{ service_name | ansible.builtin.quote }} \
+           exec \
+           influxdb \
+           influx backup \
+                  --compression=none \
+                  "--bucket=$bucket" \
+                  "/backups/$bucket"
+  done
 
   mkdir --parents -- "{{ root }}/backup/backups/influxdb"
 
