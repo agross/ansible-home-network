@@ -1,1 +1,3 @@
 root: "{{ root_directory | mandatory }}/traefik"
+
+traefik_image: traefik:latest

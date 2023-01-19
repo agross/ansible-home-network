@@ -4,6 +4,9 @@ providers:
     exposedByDefault: false
     # All traefik-enabled containers must be on this network.
     network: web
+  file:
+    # Required to define default TLS options.
+    filename: /etc/traefik/traefik-tls.yaml
 
 api:
   dashboard: true
@@ -31,13 +34,20 @@ entryPoints:
     address: ":443"
     http:
       tls:
-        certResolver: letsencrypt-gw # -staging
+        certResolver: letsencrypt-gw-dns
 
 certificatesResolvers:
-  letsencrypt-gw:
+  letsencrypt-http:
     acme:
       email: agross@grossweber.com
-      storage: /etc/traefik/acme.json
+      storage: /etc/traefik/acme/http.json
+      httpChallenge:
+        entryPoint: http
+
+  letsencrypt-gw-dns:
+    acme:
+      email: agross@grossweber.com
+      storage: /etc/traefik/acme/gw-dns.json
       dnsChallenge:
         provider: inwx
         # https://github.com/go-acme/lego/issues/1297
@@ -47,11 +57,11 @@ certificatesResolvers:
           - ns2.inwx.de
           - ns3.inwx.eu
 
-  letsencrypt-gw-staging:
+  letsencrypt-gw-dns-staging:
     acme:
       caServer: https://acme-staging-v02.api.letsencrypt.org/directory
       email: agross@grossweber.com
-      storage: /etc/traefik/acme-staging.json
+      storage: /etc/traefik/acme/gw-dns-staging.json
       dnsChallenge:
         provider: inwx
         # https://github.com/go-acme/lego/issues/1297

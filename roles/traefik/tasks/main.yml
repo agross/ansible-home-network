@@ -1,31 +1,30 @@
-- import_tasks: htpasswd-users.yml
+- name: Generate htpasswd-compatible Traefik dashboard users
+  ansible.builtin.import_tasks: htpasswd-users.yml
   vars:
     users: "{{ traefik_users.dashboard }}"
-    salt: NTAZ31Sa7ihGEWpka9ASYu
+    salt: "{{ traefik_users.password_salt }}"
     fact: dashboard_users
 
-- import_tasks: copy-templates.yml
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
     notify: Restart Traefik
 
-- import_tasks: systemd-unit-file-contexts.yml
+- name: Pull Traefik image
+  community.docker.docker_image:
+    name: "{{ traefik_image | mandatory }}"
+    source: pull
+    force_source: "{{ docker_update is defined }}"
+  notify: Restart Traefik
+
+- name: Set SELinux file contexts
+  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
   vars:
     directory: "{{ root }}/systemd"
 
-- name: Set permissions on ACME files for Let's Encrypt
-  file:
-    path: "{{ item }}"
-    state: touch
-    access_time: preserve
-    modification_time: preserve
-    mode: '600'
-  loop:
-    - "{{ root }}/conf/acme.json"
-    - "{{ root }}/conf/acme-staging.json"
-
 - name: Get systemd unit names
-  set_fact:
+  ansible.builtin.set_fact:
     units: >-
       {{
         lookup('fileglob', '../templates/systemd/*.service.j2', wantlist=True) |
@@ -34,7 +33,7 @@
       }}
 
 - name: Symlink systemd units
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ root }}/systemd/{{ item }}"
     path: "/etc/systemd/system/{{ item }}"
@@ -42,7 +41,7 @@
   loop: "{{ units }}"
 
 - name: Start systemd units
-  systemd:
+  ansible.builtin.systemd:
     state: started
     enabled: true
     name: "{{ item }}"

@@ -10,7 +10,11 @@ ExecStartPre=-/usr/bin/docker container stop '%p'
 ExecStartPre=-/usr/bin/docker container rm '%p'
 
 # May fail when the network already exists.
-ExecStartPre=-/usr/bin/docker network create web
+ExecStartPre=-/usr/bin/docker network \
+                              create \
+                              --ipv6 \
+                              --subnet fd00:dead:beef::/48 \
+                              web
 
 ExecStart=/usr/bin/docker container \
                           run \
@@ -22,26 +26,23 @@ ExecStart=/usr/bin/docker container \
                           --volume /var/run/docker.sock:/var/run/docker.sock:z \
                           --privileged \
                           --volume '/etc/localtime:/etc/localtime:ro' \
-                          --volume '{{ root }}/conf/acme.json:/etc/traefik/acme.json' \
-                          --volume '{{ root }}/conf/acme-staging.json:/etc/traefik/acme-staging.json' \
+                          --volume '{{ root }}/conf/acme/:/etc/traefik/acme/' \
                           --volume '{{ root }}/conf/traefik.yaml:/etc/traefik/traefik.yaml:ro' \
+                          --volume '{{ root }}/conf/traefik-tls.yaml:/etc/traefik/traefik-tls.yaml:ro' \
                           --env 'INWX_USERNAME={{ inwx_username | mandatory }}' \
                           --env 'INWX_PASSWORD={{ inwx_password | mandatory }}' \
                           --label traefik.enable=true \
-                          --label 'traefik.http.routers.dashboard.entrypoints=http' \
-                          --label 'traefik.http.routers.dashboard.rule=Host(`traefik.{{ inventory_hostname }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))' \
+                          --label 'traefik.http.routers.dashboard.entrypoints=https' \
+                          --label 'traefik.http.routers.dashboard.rule=Host(`traefik.{{ traefik_domain | mandatory }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))' \
                           --label 'traefik.http.routers.dashboard.service=api@internal' \
-                          --label 'traefik.http.routers.https-dashboard.entrypoints=https' \
-                          --label 'traefik.http.routers.https-dashboard.rule=Host(`traefik.{{ inventory_hostname }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))' \
-                          --label 'traefik.http.routers.https-dashboard.service=api@internal' \
-                          --label 'traefik.http.routers.https-dashboard.middlewares=traefik-auth' \
-                          --label 'traefik.http.routers.https-dashboard.tls.certresolver=letsencrypt-gw' \
-                          --label 'traefik.http.routers.https-dashboard.tls.domains[0].main={{ inventory_hostname }}' \
-                          --label 'traefik.http.routers.https-dashboard.tls.domains[0].sans=*.{{ inventory_hostname }}' \
+                          --label 'traefik.http.routers.dashboard.middlewares=traefik-auth' \
+                          --label 'traefik.http.routers.dashboard.tls.certresolver=letsencrypt-gw-dns' \
+                          --label 'traefik.http.routers.dashboard.tls.domains[0].main={{ traefik_domain }}' \
+                          --label 'traefik.http.routers.dashboard.tls.domains[0].sans=*.{{ traefik_domain }}' \
                           --label 'traefik.http.middlewares.traefik-auth.basicauth.realm=Traefik' \
                           --label 'traefik.http.middlewares.traefik-auth.basicauth.users={{ dashboard_users }}' \
                           --health-cmd 'traefik healthcheck' \
-                          traefik:latest
+                          {{ traefik_image | mandatory | quote }}
 
 ExecStop=/usr/bin/docker container stop '%p'
 
