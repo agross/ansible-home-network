@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: Europe/Berlin
-    {% if iobroker_support_wake_on_lan | default(false) | bool == true %}
+    {% if iobroker_support_wake_on_lan | default(false) | bool %}
     ports:
       - "127.0.0.1:6379:6379"
     {% endif %}
@@ -40,7 +40,7 @@ services:
     restart: unless-stopped
     env_file: ./iobroker/.env
     hostname: iobroker
-    {% if iobroker_support_wake_on_lan | default(false) | bool == true %}
+    {% if iobroker_support_wake_on_lan | default(false) | bool %}
     network_mode: host
     {% elif traefik_domain | default('', true) | length  %}
     labels:
@@ -89,3 +89,20 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+
+  {% if iobroker_needs_crunchfit | default(false) | bool %}
+  crunchfit:
+    image: crunchfit
+    pull_policy: never
+    build:
+      context: ./crunchfit/docker
+
+    restart: unless-stopped
+    env_file: ./crunchfit/.env
+    {% if iobroker_support_wake_on_lan | default(false) | bool %}
+    ports:
+      - "127.0.0.1:50000:5000"
+    {% endif %}
+    volumes:
+      - /etc/localtime:/etc/localtime
+  {% endif %}
