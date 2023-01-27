@@ -9,6 +9,21 @@
   vars:
     directory: "{{ root }}/systemd"
 
+- name: Allow execution of binaries
+  community.general.sefcontext:
+    target: "{{ root }}/bin/.*"
+    setype: bin_t
+    state: present
+
+- name: Apply SELinux file context for binaries
+  ansible.builtin.command:
+    argv:
+      - restorecon
+      - -irv
+      - "{{ root }}/bin"
+  register: restorecon_result
+  changed_when: restorecon_result.stdout | length > 0
+
 - name: Copy systemd-resolved config files
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
@@ -23,13 +38,21 @@
     name: systemd-resolved
   register: systemd_resolved_started
 
-- name: Symlink systemd unit file
+- name: Symlink dns-server systemd unit file
   ansible.builtin.file:
     state: link
     src: "{{ root }}/systemd/dns-server.service"
     path: /etc/systemd/system/{{ service_name }}.service
     force: true
   notify: Restart dns-server service
+
+- name: Symlink dns-server-available systemd unit file
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/systemd/dns-server-available.service"
+    path: /etc/systemd/system/{{ service_name }}-available.service
+    force: true
+  notify: Restart dns-server-available service
 
 - name: Create dnsmasq.leases unless it exists
   ansible.builtin.file:
@@ -72,13 +95,21 @@
     notify:
       - Restart dns-server service
 
-- name: Start service
+- name: Start dns-server service
   ansible.builtin.systemd:
     state: started
     enabled: true
     name: "{{ service_name }}"
     daemon_reload: true
   register: dns_server_started
+
+- name: Start dns-server-available service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ service_name }}-available"
+    daemon_reload: true
+  register: dns_server_available_started
 
 - name: Install DNS utils
   ansible.builtin.package:
