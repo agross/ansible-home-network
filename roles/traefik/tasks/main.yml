@@ -13,32 +13,16 @@
 
 - name: Pull Traefik image
   community.docker.docker_image:
-    name: "{{ traefik_image | mandatory }}"
+    name: "{{ traefik_image | ansible.builtin.mandatory }}"
     source: pull
     force_source: "{{ docker_update is defined }}"
   notify: Restart Traefik
 
-- name: Set SELinux file contexts
-  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
-    directory: "{{ root }}/systemd"
-
-- name: Get systemd unit names
-  ansible.builtin.set_fact:
-    units: >-
-      {{
-        lookup('fileglob', '../templates/systemd/*.service.j2', wantlist=True) |
-        map('basename') |
-        map('regex_replace', '\.j2$', '')
-      }}
-
-- name: Symlink systemd units
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/systemd/{{ item }}"
-    path: "/etc/systemd/system/{{ item }}"
-    force: true
-  loop: "{{ units }}"
+    target_dir: "{{ root }}"
+    templates: templates
 
 - name: Start systemd units
   ansible.builtin.systemd:
@@ -46,7 +30,7 @@
     enabled: true
     name: "{{ item }}"
     daemon_reload: true
-  loop: "{{ units }}"
+  loop: "{{ systemd_units_autostart }}"
   register: traefik_started
 
 - name: Allow HTTP and HTTPS through firewall
