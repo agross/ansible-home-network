@@ -1,6 +1,7 @@
 - name: Get host PCI devices of guest {{ guest.inventory_hostname }}
   ansible.builtin.shell:
     cmd: >-
+      set -o pipefail &&
       qm config {{ guest.kvm.id | quote }} |
         grep --quiet '^{{ device.key }}: {{ device.value }}'
   loop: "{{ guest.kvm.hostpci | default({}) | dict2items }}"
@@ -25,3 +26,4 @@
     loop_var: device
     index_var: index
     label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }} device={{ device }}"
+  changed_when: true

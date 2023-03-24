@@ -105,6 +105,7 @@
         loop_var: guest
         index_var: index
         label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
+      changed_when: true
 
 - name: Install guest OS manually, if a VM was created
   ansible.builtin.meta: flush_handlers
