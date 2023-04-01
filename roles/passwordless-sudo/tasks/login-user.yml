@@ -1,9 +1,0 @@
-- name: Run whoami without become
-  command: whoami
-  changed_when: false
-  become: false
-  register: whoami
-
-- name: Set login_user fact with the user name
-  set_fact:
-    login_user: "{{ whoami.stdout }}"
