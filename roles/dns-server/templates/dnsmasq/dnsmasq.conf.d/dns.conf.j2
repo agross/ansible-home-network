@@ -16,8 +16,6 @@ port={{ ports.dnsmasq | mandatory }}
 # Define upstream DNS server (dnscrypt-proxy).
 server=127.0.0.1#{{ ports.dnscrypt | mandatory }}
 
-server=/wghoch4.local/172.16.0.1
-
 server=/mirrors.fedoraproject.org/1.1.1.1
 
 # Reject (and log) addresses from upstream nameservers which are in the private
