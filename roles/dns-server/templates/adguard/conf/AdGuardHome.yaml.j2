@@ -1,6 +1,5 @@
 bind_host: 0.0.0.0
 bind_port: 30000
-beta_bind_port: 0
 users:
 {% for user, password in adguard_users.items() %}
   - name: {{ user }}
@@ -21,17 +20,13 @@ auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
 language: ""
+theme: auto
 debug_pprof: false
 web_session_ttl: 720
 dns:
   bind_hosts:
     - 0.0.0.0
   port: 53
-  statistics_interval: 90
-  querylog_enabled: true
-  querylog_file_enabled: true
-  querylog_interval: 24h
-  querylog_size_memory: 1000
   anonymize_client_ip: false
   protection_enabled: true
   blocking_mode: default
@@ -73,7 +68,10 @@ dns:
   bogus_nxdomain: []
   aaaa_disabled: false
   enable_dnssec: false
-  edns_client_subnet: false
+  edns_client_subnet:
+    custom_ip: ""
+    enabled: false
+    use_custom: false
   max_goroutines: 300
   handle_ddr: true
   ipset: []
@@ -97,6 +95,8 @@ dns:
     - '[/in-addr.arpa/]127.0.0.1:{{ ports.dnsmasq | mandatory }}'
     - '# ...and IPv6 PTR using systemd-resolved which supports NDP to resolve link-local addresses.'
     - '[/ip6.arpa/]127.0.0.1:{{ ports.resolved | mandatory }}'
+  use_dns64: false
+  dns64_prefixes: []
   serve_http3: false
   use_http3_upstreams: false
 tls:
@@ -114,6 +114,16 @@ tls:
   certificate_path: ""
   private_key_path: ""
   strict_sni_check: false
+querylog:
+  enabled: true
+  file_enabled: true
+  interval: 24h
+  size_memory: 1000
+  ignored: []
+statistics:
+  enabled: true
+  interval: 90
+  ignored: []
 filters:
   - enabled: true
     url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
@@ -169,4 +179,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 14
+schema_version: 17
