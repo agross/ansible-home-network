@@ -1,0 +1,5 @@
+- hosts: build_agents
+  become: true
+  roles:
+    - name: build-agent
+      tags: build-agent

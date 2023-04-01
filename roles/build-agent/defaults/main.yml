@@ -1,0 +1,2 @@
+teamcity_server_url: https://build.home.therightstuff.de/
+xvfb_display: :99

@@ -1,0 +1,25 @@
+[Unit]
+Description=TeamCity Build Agent
+After=network.target
+
+[Service]
+Type=oneshot
+
+# rbenv prepended to the default, otherwise Command Line Runners won't find the
+# executables.
+Environment=PATH=/home/build-agent/.rbenv/shims:/home/build-agent/.rbenv/bin:/home/build-agent/.local/bin:/home/build-agent/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+
+User=build-agent
+Group=build-agent
+ExecStart=/home/build-agent/agent/bin/agent.sh start
+ExecStop=-/home/build-agent/agent/bin/agent.sh stop
+
+# Support agent upgrade as the main process starts a child and exits then.
+RemainAfterExit=yes
+
+# Support agent upgrade as the main process gets SIGTERM during upgrade and
+# that maps to exit code 143.
+SuccessExitStatus=0 143
+
+[Install]
+WantedBy=default.target

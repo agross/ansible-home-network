@@ -1,0 +1,2 @@
+teamcity_agent_properties:
+  - system.has.chrome=true

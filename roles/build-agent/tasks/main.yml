@@ -1,0 +1,113 @@
+- name: Ensure python3-libselinux is installed
+  ansible.builtin.package:
+    name: python3-libselinux
+    state: present
+
+- name: Permamently disable SELinux
+  ansible.posix.selinux:
+    state: permissive
+    policy: targeted
+    update_kernel_param: true
+
+- name: Add user to run build agent
+  ansible.builtin.user:
+    name: build-agent
+
+- name: Install build tools
+  ansible.builtin.import_tasks:
+    file: tools.yml
+
+- name: Ensure Java is installed
+  ansible.builtin.package:
+    name: java-1.8.0-openjdk
+    state: present
+
+- name: Download minimal agent ZIP file distribution
+  ansible.builtin.get_url:
+    url: "{{ teamcity_server_url }}/update/buildAgent.zip"
+    dest: /home/build-agent/agent.zip
+    owner: build-agent
+    group: build-agent
+    mode: '644'
+
+- name: Create agent directory
+  ansible.builtin.file:
+    path: /home/build-agent/agent
+    state: directory
+    owner: build-agent
+    group: build-agent
+    mode: '755'
+
+- name: Extract agent
+  ansible.builtin.unarchive:
+    src: /home/build-agent/agent.zip
+    remote_src: true
+    dest: /home/build-agent/agent
+    owner: build-agent
+    group: build-agent
+
+- name: Check if config file exists
+  ansible.builtin.stat:
+    path: /home/build-agent/agent/conf/buildAgent.properties
+  register: config_file
+
+- name: Copy default build agent config file
+  when: not config_file.stat.exists
+  ansible.builtin.copy:
+    src: /home/build-agent/agent/conf/buildAgent.dist.properties
+    dest: /home/build-agent/agent/conf/buildAgent.properties
+    remote_src: true
+    force: true
+    owner: build-agent
+    group: build-agent
+    mode: '644'
+
+- name: Set TeamCity server URL in build agent config file
+  ansible.builtin.replace:
+    path: /home/build-agent/agent/conf/buildAgent.properties
+    regexp: ^serverUrl=.*$
+    replace: "serverUrl={{ teamcity_server_url }}"
+
+- name: Add xvfb DISPLAY for build agent environment
+  ansible.builtin.lineinfile:
+    path: /home/build-agent/agent/conf/buildAgent.properties
+    line: "{{ item }}"
+  loop:
+    - env.DISPLAY={{ xvfb_display | ansible.builtin.mandatory }}.0
+
+- name: Add build agent properties
+  ansible.builtin.lineinfile:
+    path: /home/build-agent/agent/conf/buildAgent.properties
+    line: "{{ item }}"
+  loop:
+    "{{ teamcity_agent_properties | default([]) }}"
+
+- name: Copy build-agent systemd service
+  ansible.builtin.template:
+    src: build-agent.service
+    dest: /etc/systemd/system/build-agent.service
+    owner: 0
+    group: 0
+    mode: '644'
+
+- name: Enable and start build-agent systemd service
+  ansible.builtin.systemd:
+    name: build-agent.service
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Copy xvfb systemd service
+  ansible.builtin.template:
+    src: xvfb.service.j2
+    dest: /etc/systemd/system/xvfb.service
+    owner: 0
+    group: 0
+    mode: '644'
+
+- name: Enable and start xvfb systemd service
+  ansible.builtin.systemd:
+    name: xvfb.service
+    state: started
+    enabled: true
+    daemon_reload: true

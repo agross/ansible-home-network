@@ -1,0 +1,17 @@
+[Unit]
+Description=X Virtual Frame Buffer for browsers running headful
+After=network.target
+
+[Service]
+Environment=DISPLAY={{ xvfb_display | ansible.builtin.mandatory }}
+
+# Start X virtual frame buffer and a window manager that allows to maximize the
+# browser.
+ExecStart=/usr/bin/bash -eo pipefail -c "Xvfb {{ xvfb_display | ansible.builtin.mandatory }} -screen 0 1920x1080x16 & icewm"
+
+# Restart 1 second after exiting with an error status.
+Restart=always
+RestartSec=1s
+
+[Install]
+WantedBy=default.target
