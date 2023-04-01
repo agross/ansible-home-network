@@ -1,5 +1,5 @@
 - name: Install SELinux packages
-  package:
+  ansible.builtin.package:
     name:
       - python3-policycoreutils
     state: present
@@ -11,7 +11,10 @@
     state: present
 
 - name: Apply SELinux file context to filesystem below {{ directory }}
-  command:
-    restorecon -irv "{{ directory }}"
+  ansible.builtin.command:
+    argv:
+      - restorecon
+      - -irv
+      - "{{ directory }}"
   register: restorecon_result
   changed_when: restorecon_result.stdout | length > 0
