@@ -1,2 +1,3 @@
 teamcity_agent_properties:
   - system.has.chrome=true
+  - system.network={{ ansible_dns.search | first }}

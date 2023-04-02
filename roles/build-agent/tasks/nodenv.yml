@@ -1,0 +1,39 @@
+- name: Download nodenv installer
+  ansible.builtin.uri:
+    url: https://github.com/nodenv/nodenv-installer/raw/master/bin/nodenv-installer
+    return_content: true
+  register: nodenv_installer
+
+- name: Run nodenv installer # noqa: command-instead-of-shell
+  become_user: build-agent
+  ansible.builtin.shell:
+    cmd: bash
+    stdin: "{{ nodenv_installer.content }}"
+  changed_when: true
+
+- name: Add nodenv shell support
+  become_user: build-agent
+  ansible.builtin.lineinfile:
+    path: "{{ item }}"
+    create: true
+    line: eval "$(~/.nodenv/bin/nodenv init - bash)"
+    owner: build-agent
+    group: build-agent
+    mode: '644'
+  loop:
+    - ~/.profile
+    - ~/.bashrc
+
+- name: Install nodenv-update # noqa: latest
+  become_user: build-agent
+  ansible.builtin.git:
+    repo: https://github.com/nodenv/nodenv-update.git
+    force: true
+    dest: /home/build-agent/.nodenv/plugins/nodenv-update
+
+- name: Install nodenv-package-rehash # noqa: latest
+  become_user: build-agent
+  ansible.builtin.git:
+    repo: https://github.com/nodenv/nodenv-package-rehash.git
+    force: true
+    dest: /home/build-agent/.nodenv/plugins/nodenv-package-rehash

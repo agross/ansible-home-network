@@ -5,9 +5,9 @@ After=network.target
 [Service]
 Type=oneshot
 
-# rbenv prepended to the default, otherwise Command Line Runners won't find the
-# executables.
-Environment=PATH=/home/build-agent/.rbenv/shims:/home/build-agent/.rbenv/bin:/home/build-agent/.local/bin:/home/build-agent/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+# nodenv and rbenv prepended to the default, otherwise Command Line Runners
+# won't find theexecutables.
+Environment=PATH=/home/build-agent/.nodenv/shims:/home/build-agent/.nodenv/bin:/home/build-agent/.rbenv/shims:/home/build-agent/.rbenv/bin:/home/build-agent/.local/bin:/home/build-agent/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 
 User=build-agent
 Group=build-agent

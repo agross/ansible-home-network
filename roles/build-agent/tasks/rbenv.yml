@@ -1,0 +1,54 @@
+- name: Ensure ruby-build dependencies are installed
+  ansible.builtin.package:
+    name:
+      # https://github.com/rbenv/ruby-build/wiki#fedora
+      - git
+      - perl
+      - gcc
+      - rust
+      - patch
+      - make
+      - bzip2
+      - openssl-devel
+      - libyaml-devel
+      - libffi-devel
+      - readline-devel
+      - zlib-devel
+      - gdbm-devel
+      - ncurses-devel
+    state: present
+
+- name: Download rbenv installer
+  ansible.builtin.uri:
+    url: https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer
+    return_content: true
+  register: rbenv_installer
+
+- name: Run rbenv installer # noqa: command-instead-of-shell
+  become_user: build-agent
+  ansible.builtin.shell:
+    cmd: bash
+    stdin: "{{ rbenv_installer.content }}"
+  changed_when: true
+
+- name: Add rbenv shell support
+  become_user: build-agent
+  ansible.builtin.lineinfile:
+    path: "{{ item }}"
+    create: true
+    line: eval "$(~/.rbenv/bin/rbenv init - bash)"
+    owner: build-agent
+    group: build-agent
+    mode: '644'
+  loop:
+    - ~/.profile
+    - ~/.bashrc
+
+- name: Skip installing gem documentation
+  ansible.builtin.lineinfile:
+    path: /home/build-agent/.gemrc
+    create: true
+    line: 'gem: --no-document'
+    owner: build-agent
+    group: build-agent
+    mode: '644'
