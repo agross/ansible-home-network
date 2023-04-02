@@ -1,5 +1,7 @@
 - hosts: build_agents
   become: true
+  collections:
+    - devsec.hardening
   roles:
     - name: build-agent
       tags: build-agent
@@ -7,3 +9,19 @@
       tags: docker
       vars:
         docker_user: build-agent
+    - name: ssh_hardening
+      vars:
+        network_ipv6_enable: true
+        ssh_listen_to:
+          - '0.0.0.0'
+          - '::'
+        ssh_allow_tcp_forwarding: 'yes'
+        ssh_allow_agent_forwarding: true
+        sftp_enabled: true
+      tags: ssh
+    - name: exploide.dnf-automatic
+      vars:
+        dnf_automatic_upgrade_type: default
+        dnf_automatic_emit_via: stdio, email
+        dnf_automatic_email_to: "{{ dnf_automatic_recipient | default('root') }}"
+      tags: dnf-automatic
