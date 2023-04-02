@@ -1,0 +1,16 @@
+- name: Install docker
+  ansible.builtin.include_role:
+    name: geerlingguy.docker
+  vars:
+    docker_install_compose_plugin: true
+    docker_install_compose: false
+    docker_users:
+      - "{{ ansible_env.SUDO_USER }}"
+      - "{{ docker_user }}"
+
+- name: Support docker management via ansible
+  ansible.builtin.include_role:
+    name: geerlingguy.pip
+  vars:
+    pip_install_packages:
+      - name: docker

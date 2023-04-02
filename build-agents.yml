@@ -3,3 +3,7 @@
   roles:
     - name: build-agent
       tags: build-agent
+    - name: docker
+      tags: docker
+      vars:
+        docker_user: build-agent
