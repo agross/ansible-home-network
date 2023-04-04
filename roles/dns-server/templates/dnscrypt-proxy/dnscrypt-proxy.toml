@@ -379,7 +379,7 @@ cache_size = 4096
 
 ## Minimum TTL for cached entries
 
-cache_min_ttl = 2400
+cache_min_ttl = 0
 
 
 ## Maximum TTL for cached entries
