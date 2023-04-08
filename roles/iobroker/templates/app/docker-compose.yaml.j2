@@ -76,9 +76,8 @@ services:
       # SSH with e.g. VS Code.
       - {{ root }}/scripts:/opt/iobroker/mirrored-scripts
     devices:
-      {% set zigbees = iobroker_zigbee_transceiver.split(';') %}
-      {% for dev in zigbees %}
-      - "{{ dev }}:{{ dev }}:rw"
+      {% for dev in iobroker_devices | default([]) %}
+      - {{ dev.host }}:{{ dev.container }}:rw
       {% endfor %}
     {% if iobroker_support_backup_on_nfs_or_cifs | default(true) %}
     # Required for the backup adapter in combination with NFS or CIFS.
