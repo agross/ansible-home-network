@@ -11,10 +11,11 @@
       register: different_layout
 
     - name: Change keyboard layout
+      when: not different_layout.found | default(true)
       ansible.builtin.command:
         argv:
           - raspi-config
           - nonint
           - do_configure_keyboard
           - "{{ keyboard_layout }}"
-      when: not different_layout.found
+      changed_when: true

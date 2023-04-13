@@ -1,4 +1,10 @@
+- name: Get EEPROM config file
+  ansible.builtin.stat:
+    path: /etc/default/rpi-eeprom-update
+  register: rpi_eeprom_update
+
 - name: Allow updates to latest EEPROM release
+  when: rpi_eeprom_update.stat.exists
   ansible.builtin.lineinfile:
     path: /etc/default/rpi-eeprom-update
     regexp: ^FIRMWARE_RELEASE_STATUS=

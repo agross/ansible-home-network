@@ -11,10 +11,11 @@
       register: different_timezone
 
     - name: Change timezone
+      when: not different_timezone.found | default(true)
       ansible.builtin.command:
         argv:
           - raspi-config
           - nonint
           - do_change_timezone
           - "{{ timezone }}"
-      when: not different_timezone.found
+      changed_when: true

@@ -11,10 +11,11 @@
       register: different_locale
 
     - name: Change locale
+      when: not different_locale.found | default(true)
       ansible.builtin.command:
         argv:
           - raspi-config
           - nonint
           - do_change_locale
           - "{{ locale }}"
-      when: not different_locale.found
+      changed_when: true
