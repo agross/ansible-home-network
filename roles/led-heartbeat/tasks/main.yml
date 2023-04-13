@@ -2,20 +2,16 @@
   community.general.modprobe:
     name: ledtrig_heartbeat
     state: present
+  # Fails when the kernel was updated during the same playbook run.
+  failed_when: false
 
-- name: Copy templates
-  ansible.builtin.import_tasks:
-    file: copy-templates.yml
-  vars:
-    directory: ../templates
-    notify: Restart led-heartbeat service
-
-- name: Symlink systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/led-heartbeat.service"
-    path: /etc/systemd/system/{{ service_name }}.service
-    force: true
+- name: Copy systemd service unit
+  ansible.builtin.template:
+    src: led-heartbeat.service
+    dest: /etc/systemd/system/{{ service_name }}.service
+    owner: 0
+    group: 0
+    mode: '644'
   notify: Restart led-heartbeat service
 
 - name: Start service
