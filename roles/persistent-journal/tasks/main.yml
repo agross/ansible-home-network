@@ -2,6 +2,8 @@
   ansible.builtin.file:
     state: directory
     path: "{{ journal_directory }}"
+    owner: 0
+    group: systemd-journal
     mode: '755'
   notify: Restart systemd-journald
 
@@ -12,12 +14,12 @@
       - --create
       - --prefix
       - "{{ journal_directory }}"
+  changed_when: true
 
 - name: Uninstall rsyslog
-  ansible.builtin.apt:
+  ansible.builtin.package:
     name: rsyslog
     state: absent
-    purge: true
     autoremove: true
 
 - name: Configure journal max size of 1G (larger becomes slow on a Raspberry Pi)
@@ -27,3 +29,6 @@
     option: SystemMaxUse
     value: 1G
     no_extra_spaces: true
+    owner: 0
+    group: 0
+    mode: '644'
