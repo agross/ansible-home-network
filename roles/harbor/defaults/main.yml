@@ -2,7 +2,7 @@ service_name: harbor
 
 root: /data/{{ service_name }}
 
-harbor_backup_keep_days: 7
+harbor_backup_keep_days: 1
 
 harbor_installer_version: 2.7.0
 harbor_installer_url: >-
