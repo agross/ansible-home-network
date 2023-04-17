@@ -81,7 +81,9 @@ services:
       {% endfor %}
     {% if iobroker_support_backup_on_nfs_or_cifs | default(true) %}
     # Required for the backup adapter in combination with NFS or CIFS.
-    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
     {% endif %}
     depends_on:
       redis:
