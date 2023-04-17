@@ -21,20 +21,21 @@ db() {
 }
 
 data() {
-  local backup_file
+  local backup_dir
 
-  backup_file="${1:?Need backup file}"
+  backup_dir="${1:?Need backup directory}"
 
-  tar --create \
-      --gzip \
-      --verbose \
-      --file "$backup_file" \
-      --directory {{ root | ansible.builtin.mandatory | ansible.builtin.quote }}/app \
-      --exclude=database \
-      --exclude=job_logs \
-      --exclude=trivy-adapter \
-      -- \
-      .
+  rsync --numeric-ids \
+        --archive \
+        --progress \
+        --human-readable \
+        --exclude=database \
+        --exclude=job_logs \
+        --exclude=trivy-adapter \
+        --delete \
+        --delete-excluded \
+        {{ root | ansible.builtin.mandatory | ansible.builtin.quote }}/app/ \
+        "$backup_dir"
 }
 
 cleanup() {
@@ -42,8 +43,9 @@ cleanup() {
 
   directory="${1:?Need directory to clean up}"
 
-  # Delete files older than {{ harbor_backup_keep_days }} days.
+  # Delete database backups older than {{ harbor_backup_keep_days }} days.
   find "$directory" \
+       -maxdepth 1 \
        -type f \
        -mtime '+{{ harbor_backup_keep_days | mandatory }}' \
        -printf 'Deleting old backup %p (%t)\n' \
@@ -76,6 +78,6 @@ target_dir="$PWD/backup/backups"
 mkdir --parents "$target_dir"
 
 db "$target_dir/$timestamp-db.gz"
-data "$target_dir/$timestamp-data.tar.gz"
+data "$target_dir/data"
 cleanup "$target_dir"
 sync "$target_dir"
