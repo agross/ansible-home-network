@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+set -e
+
+docker compose config
+docker compose run --rm ti-cc-tool
+docker compose down
