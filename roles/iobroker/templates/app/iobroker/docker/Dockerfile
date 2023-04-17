@@ -1,4 +1,4 @@
-FROM buanet/iobroker:latest-v7
+FROM buanet/iobroker:latest-v8
 LABEL maintainer="Alexander Groß <agross@therightstuff.de>" \
       local=true
 
