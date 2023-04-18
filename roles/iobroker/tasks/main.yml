@@ -31,6 +31,12 @@
     # Overwrite existing files.
     force: true
 
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
+
 - name: Symlink systemd unit file
   ansible.builtin.file:
     state: link

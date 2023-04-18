@@ -8,7 +8,6 @@ RUN apt-get update \
     && apt-get install \
                --yes \
                android-tools-adb \
-               cifs-utils \
                iputils-ping \
                vim \
     && rm -rf /var/lib/apt/lists/* \

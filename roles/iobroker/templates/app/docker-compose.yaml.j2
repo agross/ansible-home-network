@@ -79,12 +79,6 @@ services:
       {% for dev in iobroker_devices | default([]) %}
       - {{ dev.host }}:{{ dev.container }}:rw
       {% endfor %}
-    {% if iobroker_support_backup_on_nfs_or_cifs | default(true) %}
-    # Required for the backup adapter in combination with NFS or CIFS.
-    cap_add:
-      - SYS_ADMIN
-      - DAC_READ_SEARCH
-    {% endif %}
     depends_on:
       redis:
         condition: service_healthy

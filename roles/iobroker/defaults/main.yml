@@ -6,8 +6,6 @@ iobroker_image: buanet/iobroker:custom
 
 iobroker_support_wake_on_lan: false
 
-iobroker_support_backup_on_nfs_or_cifs: true
-
 iobroker_ports:
   iobroker: 8081
   lovelace: 8091
