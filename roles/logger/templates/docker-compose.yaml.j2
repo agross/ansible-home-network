@@ -33,7 +33,7 @@ services:
       - "8086:8086"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./backup/backups/influxdb/next:/backups
+      - ./backups/influxdb:/backups
       - influxdb2-config:/etc/influxdb2
       - influxdb2-data:/var/lib/influxdb2
     healthcheck:

@@ -14,9 +14,3 @@ logger_backup_grafana:
   admin:
     user: "{{ grafana_admin_user }}"
     password: "{{ grafana_admin_password }}"
-
-logger_backup_cleanup_keep: 7
-
-# All but the last directory must exists on the target.
-logger_backup_rsync_target: >-
-  nas-backup::NetBackup/{{ ansible_hostname }}/{{ service_name }}

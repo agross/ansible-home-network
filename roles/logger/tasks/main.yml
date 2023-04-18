@@ -13,9 +13,7 @@
     file: copy-templates.yml
   vars:
     directory: ../templates
-    notify:
-      - Restart logger service
-      - Restart logger backup timer
+    notify: Restart logger service
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
@@ -25,9 +23,7 @@
     directory: "{{ root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify:
-      - Restart logger service
-      - Restart logger backup timer
+    notify: Restart logger service
 
 - name: Get systemd unit files
   ansible.builtin.find:
@@ -47,15 +43,19 @@
   loop: "{{ systemd_units.files }}"
   loop_control:
     label: "{{ item.path }}"
-  notify:
-    - Restart logger service
-    - Restart logger backup timer
+  notify: Restart logger service
 
 - name: Symlink InfluxDB rename script
   ansible.builtin.file:
     state: link
     src: "{{ root }}/bin/influx-rename"
     path: /usr/local/bin/influx-rename
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
 
 - name: Update InfluxDB 1 to 2
   ansible.builtin.import_tasks:
@@ -68,11 +68,3 @@
     name: "{{ service_name }}.service"
     daemon_reload: true
   register: logger_started
-
-- name: Start backup timer
-  ansible.builtin.systemd:
-    state: started
-    enabled: true
-    name: "{{ service_name }}-backup.timer"
-    daemon_reload: true
-  register: logger_backup_started

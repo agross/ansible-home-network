@@ -3,22 +3,16 @@
 
 set -euo pipefail
 
-cleanup-influxdb() {
+cleanup() {
   printf 'Cleaning up InfluxDB backup directory.\n'
+  # Directory needs to be kept because it is mounted on the InfluxDB container.
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups/influxdb/*
 
-  rm -rf --verbose -- "{{ root }}/backup/backups/influxdb/next/"*
+  printf 'Cleaning up Grafana backup directory.\n'
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups/grafana
 }
 
 influxdb() {
-  local timestamp
-  timestamp="$(date +'%Y-%m-%dT%H-%M-%S')"
-
-  # Cleanup leftovers from last run.
-  cleanup-influxdb
-
-  # Cleanup on error or return.
-  trap cleanup-influxdb EXIT RETURN
-
   for bucket in {{ influxdb_backup_buckets | map('ansible.builtin.quote') | join(' ') }}; do
     docker compose \
            --project-name {{ service_name | ansible.builtin.quote }} \
@@ -29,13 +23,6 @@ influxdb() {
                   "--bucket=$bucket" \
                   "/backups/$bucket"
   done
-
-  mkdir --parents -- "{{ root }}/backup/backups/influxdb"
-
-  tar -czf \
-      "{{ root }}/backup/backups/influxdb/$timestamp.tar.gz" \
-      --directory "{{ root }}/backup/backups/influxdb/next" \
-      .
 }
 
 {% if ansible_architecture != 'x86_64' %}
@@ -71,10 +58,10 @@ grafana() {
   local image='ysde/docker-grafana-backup-tool'
   {% endif %}
 
-  local temp
-  temp="$(mktemp --directory)"
+  local target={{ root | ansible.builtin.quote }}/backups/grafana
 
-  chown 1337:1337 -- "$temp"
+  mkdir --parents -- "$target"
+  chown 1337:1337 -- "$target"
 
   docker run \
          --rm \
@@ -85,48 +72,12 @@ grafana() {
          --env 'GRAFANA_ADMIN_PASSWORD={{ logger_backup_grafana.admin.password }}' \
          --env 'TZ=Europe/Berlin' \
          --network 'container:{{ service_name }}-grafana-1' \
-         --volume "$temp:/opt/grafana-backup-tool/_OUTPUT_"  \
+         --volume "$target:/opt/grafana-backup-tool/_OUTPUT_"  \
          "$image"
-
-  mkdir --parents -- "{{ root }}/backup/backups/grafana"
-
-  find "$temp" \
-      -name "*.tar.gz" \
-      -execdir mv '{}' '{{ root }}/backup/backups/grafana' \;
-
-  rm -rf -- "$temp"
 }
 
-cleanup() {
-  # Delete files older than {{ logger_backup_cleanup_keep }} days.
-  find '{{ root }}/backup/backups' \
-       -type f \
-       -mtime '+{{ logger_backup_cleanup_keep }}' \
-       -printf 'Deleting old backup %p (%t)\n' \
-       -delete
-}
+trap cleanup ERR SIGINT SIGTERM
 
-{% if logger_backup_rsync_target | default('', true) | length %}
-rsync() {
-  command rsync --rsh ssh \
-                --numeric-ids \
-                --archive \
-                --verbose \
-                --progress \
-                --partial \
-                --compress \
-                --human-readable \
-                --delete \
-                '{{ root }}/backup/backups/' \
-                '{{ logger_backup_rsync_target }}'
-}
-{% endif %}
-
-influxdb
-trap - EXIT RETURN
-
-grafana
 cleanup
-{% if logger_backup_rsync_target | default('', true) | length %}
-rsync
-{% endif %}
+influxdb
+grafana

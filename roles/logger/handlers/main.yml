@@ -3,9 +3,3 @@
   ansible.builtin.systemd:
     name: "{{ service_name }}.service"
     state: reloaded
-
-- name: Restart logger backup timer
-  when: logger_backup_started is not changed
-  ansible.builtin.systemd:
-    name: "{{ service_name }}-backup.timer"
-    state: restarted
