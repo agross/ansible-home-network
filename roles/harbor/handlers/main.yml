@@ -3,9 +3,3 @@
   ansible.builtin.systemd:
     name: "{{ service_name }}"
     state: restarted
-
-- name: Restart harbor backup timer
-  when: harbor_backup_timer_started is not changed
-  ansible.builtin.systemd:
-    name: "{{ service_name }}-backup.timer"
-    state: restarted

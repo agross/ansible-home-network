@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups
+  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
+}
+
+db() {
+  docker compose \
+         --project-name {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }} \
+         exec \
+         postgresql \
+         pg_dumpall \
+    > {{ root | ansible.builtin.quote }}/backups/db.sql
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+db

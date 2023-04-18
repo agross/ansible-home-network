@@ -2,8 +2,6 @@ service_name: harbor
 
 root: /data/{{ service_name }}
 
-harbor_backup_keep_days: 1
-
 harbor_installer_version: 2.7.0
 harbor_installer_url: >-
   https://github.com/goharbor/harbor/releases/download/v{{ harbor_installer_version }}/harbor-online-installer-v{{ harbor_installer_version }}.tgz
