@@ -3,6 +3,8 @@
   roles:
     - name: dns-server
       tags: dns-server
+    - name: borgmatic
+      tags: borgmatic
     - name: vaultwarden
       tags: vaultwarden
     - name: photoprism

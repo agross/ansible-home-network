@@ -1,0 +1,5 @@
+- name: Restart borgmatic timer
+  when: borgmatic_timer_started is not changed
+  ansible.builtin.systemd:
+    name: borgmatic.timer
+    state: restarted

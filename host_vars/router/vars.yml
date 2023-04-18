@@ -10,3 +10,5 @@ photoprism_admin_password: "{{ vault_photoprism_admin_password }}"
 
 harbor_admin_password: "{{ vault_harbor_admin_password }}"
 harbor_database_password: "{{ vault_harbor_database_password }}"
+
+borgmatic_healthchecks_etc: "{{ vault_borgmatic_healthchecks_etc }}"

@@ -1,0 +1,17 @@
+[Service]
+# May interfere with running external programs within borgmatic hooks.
+# Indeed, it does, reset.
+# CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_NET_RAW
+CapabilityBoundingSet=~
+
+# No sleep at before running the backup.
+ExecStartPre=
+
+# More verbose output.
+ExecStart=
+ExecStart=/usr/bin/systemd-inhibit --who=borgmatic \
+                                   --what=sleep:shutdown \
+                                   --why="Prevent interrupting scheduled backup" \
+                                   /usr/bin/borgmatic --verbosity -1 \
+                                                      --syslog-verbosity 1 \
+                                                      --stats

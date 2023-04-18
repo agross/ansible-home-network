@@ -1,0 +1,72 @@
+- name: Install borgmatic
+  ansible.builtin.include_role:
+    name: m3nu.ansible_role_borgbackup
+  vars:
+    borg_install_method: package
+
+    borg_repository: ssh://nas/volume2/NetBackup/{{ ansible_hostname }}.borg
+    borg_remote_path: /usr/local/bin/borg
+
+    borg_ssh_key_name: borg-backup
+    borg_ssh_command: >-
+      ssh -o User=backup -i "{{ borg_ssh_key_file_path }}" -o StrictHostKeyChecking=accept-new
+
+    # Timer is installed by the package.
+    borgmatic_timer: ''
+
+    borg_source_directories:
+      - /etc
+
+    borgmatic_hooks:
+      healthchecks:
+        ping_url: "{{ borgmatic_healthchecks_etc }}"
+
+    borgmatic_store_atime: false
+
+- name: Ensure /etc/borgmatic.d exists
+  ansible.builtin.file:
+    path: /etc/borgmatic.d
+    state: directory
+    owner: 0
+    group: 0
+    mode: '700'
+
+- name: Ensure /root/.borgmatic exists
+  ansible.builtin.file:
+    path: /root/.borgmatic
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Ensure borgmatic service and timer override directories exists
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}.d/"
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+  loop:
+    - borgmatic.timer
+    - borgmatic.service
+
+- name: Install borgmatic service and timer overrides
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}.d/override.conf"
+    owner: 0
+    group: 0
+    mode: '644'
+    lstrip_blocks: true
+  loop:
+    - borgmatic.timer
+    - borgmatic.service
+  notify: Restart borgmatic timer
+
+- name: Start borgmatic timer
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: borgmatic.timer
+    daemon_reload: true
+  register: borgmatic_timer_started

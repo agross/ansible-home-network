@@ -1,0 +1,2 @@
+backup_ssh_key: "{{ vault_backup_ssh_key }}"
+backup_ssh_target: backup@nas:/volume2/NetBackup
