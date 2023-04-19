@@ -28,7 +28,7 @@ services:
 
   app:
     image: vaultwarden/server:alpine
-    user: {{ uid_gid | ansible.builtin.mandatory }}:{{ uid_gid }}
+    user: {{ vaultwarden_uid_gid | ansible.builtin.mandatory }}:{{ vaultwarden_uid_gid }}
     ports:
       - 127.0.0.1:3011:3011
       - 127.0.0.1:3012:3012

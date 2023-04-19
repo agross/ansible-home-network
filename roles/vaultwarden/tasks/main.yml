@@ -46,8 +46,8 @@
     path: "{{ root }}/app"
     state: directory
     mode: ug-x,ug=rwX,o-rwx
-    owner: "{{ uid_gid }}"
-    group: "{{ uid_gid }}"
+    owner: "{{ vaultwarden_uid_gid }}"
+    group: "{{ vaultwarden_uid_gid }}"
     recurse: true
 
 - name: Ensure environment files can be read by systemd
