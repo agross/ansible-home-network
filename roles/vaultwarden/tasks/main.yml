@@ -17,21 +17,6 @@
     force: true
   notify: Restart vaultwarden service
 
-- name: Symlink backup systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/systemd/vaultwarden-backup.service"
-    path: /etc/systemd/system/{{ service_name }}-backup.service
-    force: true
-
-- name: Symlink backup timer systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/systemd/vaultwarden-backup.timer"
-    path: /etc/systemd/system/{{ service_name }}-backup.timer
-    force: true
-  notify: Restart vaultwarden backup timer
-
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
@@ -65,25 +50,11 @@
   register: restorecon_result
   changed_when: restorecon_result.stdout | length > 0
 
-- name: Save SSH keyfile for backup
-  ansible.builtin.copy:
-    content: "{{ backup_ssh_key }}"
-    dest: "{{ root }}/backup/key"
-    mode: '600'
-
-- name: Ensure rsync is installed
-  ansible.builtin.package:
-    name: rsync
-    state: present
-
-- name: Enable SELinux booleans for rsync backup
-  ansible.posix.seboolean:
-    name: "{{ item }}"
-    state: true
-    persistent: true
-  loop:
-    - rsync_client
-    - rsync_export_all_ro
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
 
 - name: Start service
   ansible.builtin.systemd:
@@ -92,11 +63,3 @@
     name: "{{ service_name }}"
     daemon_reload: true
   register: vaultwarden_started
-
-- name: Start backup timer
-  ansible.builtin.systemd:
-    state: started
-    enabled: true
-    name: "{{ service_name }}-backup.timer"
-    daemon_reload: true
-  register: vaultwarden_backup_timer_started

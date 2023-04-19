@@ -13,7 +13,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - mariadb:/var/lib/mysql
-      - ./backup/backups:/backups:z
+      - ./backups:/backups:z
     env_file:
       - ./.env.db
     healthcheck:
