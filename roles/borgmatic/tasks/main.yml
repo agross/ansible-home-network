@@ -23,6 +23,13 @@
 
     borgmatic_store_atime: false
 
+- name: Install borgmatic from Fedora's testing repo
+  ansible.builtin.dnf:
+    enablerepo:
+      - updates-testing
+    name: borgmatic
+    state: latest
+
 - name: Ensure /etc/borgmatic.d exists
   ansible.builtin.file:
     path: /etc/borgmatic.d

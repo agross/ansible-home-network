@@ -14,7 +14,7 @@ constants:
 location:
   # List of source directories to backup. Globs and tildes are expanded. Do not
   # backslash spaces in path names.
-  source_directories: # Not supported with 1.7.11: !retain
+  source_directories: !retain
     - {{ root }}/backups
     - {{ root }}/app
 
