@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+export COMPOSE_PROJECT_NAME={{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }}
+
+occ=(docker compose exec --user www-data app php occ)
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+  # Directory needs to be kept because it is mounted on the MariaDB container.
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups/*.sql
+}
+
+mariadb() {
+  local -a exec=(docker compose exec db)
+
+  local backup=$(cat << BACKUP
+    target=/backups/
+
+    dbs=(\$(mysql --user=root \
+                  --password="\$MYSQL_ROOT_PASSWORD" \
+                  --execute 'show databases' \
+                  --silent \
+                  --skip-column-names))
+
+    for db in "\${dbs[@]}"; do
+      if [[ "\$db" == information_schema ]] || \
+         [[ "\$db" == performance_schema ]] || \
+         [[ "\$db" == sys ]]; then
+        continue
+      fi
+
+      printf 'Backing up database: %s\n' "\$db"
+
+      # https://serversforhackers.com/c/mysqldump-with-modern-mysql
+      mysqldump --user=root \
+                --password="\$MYSQL_ROOT_PASSWORD" \
+                --skip-lock-tables \
+                --single-transaction \
+                "\$db" > "\$target/\$db.sql";
+    done
+BACKUP
+)
+
+  # Need to wrap those invocations in bash because otherwise $MYSQL_ROOT_PASSWORD
+  # is not available.
+
+  "${exec[@]}" bash -euo pipefail \
+                    -c "$backup"
+
+  "${exec[@]}" bash -euo pipefail \
+                    -c 'mysqloptimize --user=root \
+                                      "--password=$MYSQL_ROOT_PASSWORD" \
+                                      --all-databases'
+}
+
+elastic() {
+  local -a elastic=(docker compose exec search01)
+
+  local elastic_repo=http://localhost:9200/_snapshot/nextcloud
+  local snapshot_date="$(date +%Y-%m-%d-%H:%M:%S)"
+  local keep_snapshots=7
+
+  printf 'Creating Elastic Search snapshot %s\n' "$snapshot_date"
+
+  "${elastic[@]}" \
+    curl \
+    --silent \
+    --fail \
+    --request PUT \
+    --header 'Content-Type: application/json' \
+    --data '{ "metadata": { "taken_by": "borgmatic", "taken_because": "backup" } }' \
+    "$elastic_repo/snapshot-$snapshot_date?wait_for_completion=true&pretty=true"
+
+  "${elastic[@]}" \
+    curl \
+    --silent \
+    --fail \
+    --request GET \
+    "$elastic_repo/snapshot-$snapshot_date?pretty=true"
+
+  mapfile -t snapshots < <("${elastic[@]}" \
+                              curl \
+                              --silent \
+                              --request GET \
+                              "$elastic_repo/_all" |
+                               jq --raw-output ".snapshots[:-${keep_snapshots}][].snapshot")
+
+  for snapshot in "${snapshots[@]}"; do
+    printf 'Deleting snapshot %s\n' "$snapshot"
+    "${elastic[@]}" \
+      curl \
+      --silent \
+      --request DELETE \
+      "$elastic_repo/$snapshot?pretty=true"
+  done
+}
+
+case "${1-}" in
+  start)
+    "${occ[@]}" maintenance:mode --on
+
+    cleanup
+    mariadb
+    elastic
+    ;;
+
+  stop|error)
+    "${occ[@]}" maintenance:mode --off
+    ;;
+
+  *)
+    printf 'Either the "start", "stop" or "error" action is supported.\n'
+    exit 1
+    ;;
+esac

@@ -1,0 +1,127 @@
+<<: !include /etc/borgmatic/config.yaml
+
+# Constants to use in the configuration file. All occurrences of the constant
+# name within culy braces will be replaced with the value. For example, if you
+# have a constant named "hostname" with the value "myhostname", then the string
+# "{hostname}" will be replaced with "myhostname" in the configuration file.
+constants:
+  name: {{ service_name }}
+
+# Where to look for files to backup, and where to store those backups.
+# See https://borgbackup.readthedocs.io/en/stable/quickstart.html and
+# https://borgbackup.readthedocs.io/en/stable/usage/create.html
+# for details.
+location:
+  # List of source directories to backup. Globs and tildes are expanded. Do not
+  # backslash spaces in path names.
+  source_directories: !retain
+    - {{ root }}
+
+  # Stay in same file system: do not cross mount points beyond the given source
+  # directories. Defaults to false. But when a database hook is used, the
+  # setting here is ignored and one_file_system is considered true.
+  one_file_system: false
+
+  # Only store/extract numeric user and group identifiers. Defaults to false.
+  numeric_ids: true
+
+  # Store birthtime (creation date) into archive. Defaults to true.
+  birthtime: true
+
+  # Any paths matching these patterns are included/excluded from backups. Globs
+  # are expanded. (Tildes are not.) See the output of "borg help patterns" for
+  # more details. Quote any value if it contains leading punctuation, so it
+  # parses correctly. Note that only one of "patterns" and "source_directories"
+  # may be used.
+  # patterns:
+
+  # Any paths matching these patterns are excluded from backups. Globs and
+  # tildes are expanded. Note that a glob pattern must either start with a glob
+  # or be an absolute path. Do not backslash spaces in path names. See the
+  # output of "borg help patterns" for more details.
+  exclude_patterns:
+    # Exclude logs.
+    - {{ root }}/app/data/*.log
+    - {{ root }}/app/data/*.log.*
+
+    # No trashbins and versions.
+    - {{ root }}/app/data/*/files_trashbin
+    - {{ root }}/app/data/*/files_versions
+
+    # No previews.
+    - {{ root }}/app/data/appdata*/preview
+
+    # Big user data.
+    - {{ root }}/app/data/agross/files/Music/_Queue
+    - {{ root }}/app/data/agross/files/Funstuff/Marcis Fotos
+
+    - {{ root }}/app/data/amay/
+
+    - {{ root }}/app/data/kfochtmann/files/_SHARED
+
+    - {{ root }}/app/data/grossweber/*/Aufzeichnungen/*.m4v
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Dokumente und Post/2017/2017-02-06 Cubeware GmbH
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2018-02 colima
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2020-03 Keßler, F.X
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2022-04 Schleupen, EA
+
+    # Databases.
+    - {{ root }}/mariadb/
+    - {{ root }}/search/
+
+  # If true, the exclude_if_present filename is included in backups. Defaults to
+  # false, meaning that the exclude_if_present filename is omitted from backups.
+  keep_exclude_tags: true
+
+  # Exclude files with the NODUMP flag. Defaults to false.
+  # exclude_nodump: true
+
+  # If true, then source directories must exist, otherwise an error is raised.
+  # Defaults to false.
+  source_directories_must_exist: true
+
+storage:
+  # Name of the archive. Borg placeholders can be used. See the output of "borg
+  # help placeholders" for details. Defaults to
+  # "{hostname}-{now:%Y-%m-%dT%H:%M:%S.%f}". When running actions like rlist,
+  # info, or check, borgmatic automatically tries to match only archives created
+  # with this name format.
+  archive_name_format: '{hostname}-{name}-{now}'
+
+  # A Borg pattern for filtering down the archives used by borgmatic actions
+  # that operate on multiple archives. For Borg 1.x, use a shell pattern here
+  # and see the output of "borg help placeholders" for details. For Borg 2.x,
+  # see the output of "borg help match-archives". If match_archives is not
+  # specified, borgmatic defaults to deriving the match_archives value from
+  # archive_name_format.
+  match_archives: sh:{hostname}-{name}-*
+
+# Shell commands, scripts, or integrations to execute at various points during a
+# borgmatic run. IMPORTANT: All provided commands and scripts are executed with
+# user permissions of borgmatic. Do not forget to set secure permissions on this
+# configuration file (chmod 0600) as well as on any script called from a hook
+# (chmod 0700) to prevent potential shell injection or privilege escalation.
+hooks:
+  # List of one or more shell commands or scripts to execute before creating a
+  # backup, run once per repository.
+  before_backup:
+    - {{ root }}/backup start
+
+  # List of one or more shell commands or scripts to execute after creating a
+  # backup, run once per repository.
+  after_backup:
+    - {{ root }}/backup stop
+
+  # List of one or more shell commands or scripts to execute when an exception
+  # occurs during a "create", "prune", "compact", or "check" action or an
+  # associated before/after hook.
+  on_error:
+    - {{ root }}/backup error
+
+  # Configuration for a monitoring integration with Healthchecks. Create an
+  # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
+  # to use this service. See borgmatic monitoring documentation for details.
+  healthchecks:
+    # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors
+    # or just to send logs.
+    ping_url: "{{ borgmatic_healthchecks_nextcloud }}"

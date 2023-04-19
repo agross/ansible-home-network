@@ -11,3 +11,5 @@
       tags: photoprism
     - name: harbor
       tags: harbor
+    - name: nextcloud
+      tags: nextcloud
