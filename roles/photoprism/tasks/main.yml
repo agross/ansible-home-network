@@ -25,22 +25,8 @@
     force: true
   notify: Restart photoprism service
 
-# - name: Symlink backup systemd unit file
-#   ansible.builtin.file:
-#     state: link
-#     src: "{{ root }}/systemd/photoprism-backup.service"
-#     path: /etc/systemd/system/{{ service_name }}-backup.service
-#     force: true
-
-# - name: Symlink backup timer systemd unit file
-#   ansible.builtin.file:
-#     state: link
-#     src: "{{ root }}/systemd/photoprism-backup.timer"
-#     path: /etc/systemd/system/{{ service_name }}-backup.timer
-#     force: true
-#   notify: Restart photoprism backup timer
-
-- ansible.builtin.import_tasks: docker-compose-update.yml
+- name: Update docker-compose images
+  ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
     directory: "{{ root }}"
     pull: "{{ docker_update is defined }}"
@@ -50,7 +36,7 @@
 
 - name: Ensure environment files can be read by systemd
   community.general.sefcontext:
-    target: "{{ root }}/(.*\\/)?\\.env.*"
+    target: "{{ root }}/\\.env.*"
     setype: systemd_unit_file_t
     state: present
 
@@ -58,7 +44,7 @@
   ansible.builtin.command:
     argv:
       - restorecon
-      - -iRv
+      - -iv
       - "{{ root }}"
   register: restorecon_result
   changed_when: restorecon_result.stdout | length > 0
@@ -70,11 +56,3 @@
     name: "{{ service_name }}"
     daemon_reload: true
   register: photoprism_started
-
-# - name: Start backup timer
-#   ansible.builtin.systemd:
-#     state: started
-#     enabled: true
-#     name: "{{ service_name }}-backup.timer"
-#     daemon_reload: true
-#   register: photoprism_backup_timer_started
