@@ -1,1 +1,0 @@
-borg_encryption_passphrase: "{{ vault_borg_encryption_passphrase }}"

@@ -4,6 +4,9 @@
   vars:
     borg_install_method: package
 
+    borg_encryption_passphrase: >-
+      {{ borgmatic_encryption_passphrase | ansible.builtin.mandatory }}
+
     borg_repository: ssh://nas/volume2/NetBackup/{{ ansible_hostname }}.borg
     borg_remote_path: /usr/local/bin/borg
 
