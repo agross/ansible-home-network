@@ -1,2 +1,1 @@
-smtp_no_reply_at_therightstuff_de_password: >-
-  {{ vault_smtp_no_reply_at_therightstuff_de_password }}
+google_smtp_user: "{{ vault_google_smtp_user }}"

@@ -1,3 +1,4 @@
 vaultwarden_mariadb_root_password: "{{ vault_vaultwarden_mariadb_root_password }}"
 vaultwarden_mariadb_password: "{{ vault_vaultwarden_mariadb_password }}"
 vaultwarden_admin_token: "{{ vault_vaultwarden_admin_token }}"
+vaultwarden_google_smtp_password: "{{ vault_vaultwarden_google_smtp_password }}"
