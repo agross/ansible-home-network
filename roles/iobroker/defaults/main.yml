@@ -15,3 +15,5 @@ iobroker_ports:
   homematic_virtual_devices: 49292
 
 iobroker_guest_access: false
+
+google_maps_api_key:
