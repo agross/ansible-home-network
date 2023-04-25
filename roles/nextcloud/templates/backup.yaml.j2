@@ -45,25 +45,25 @@ location:
     - {{ root }}/app/data/*.log.*
 
     # No trashbins and versions.
-    - {{ root }}/app/data/*/files_trashbin
-    - {{ root }}/app/data/*/files_versions
+    - {{ root }}/app/data/*/files_trashbin/
+    - {{ root }}/app/data/*/files_versions/
 
     # No previews.
-    - {{ root }}/app/data/appdata*/preview
+    - {{ root }}/app/data/appdata*/preview/
 
     # Big user data.
-    - {{ root }}/app/data/agross/files/Music/_Queue
-    - {{ root }}/app/data/agross/files/Funstuff/Marcis Fotos
+    - {{ root }}/app/data/agross/files/Music/_Queue/
+    - {{ root }}/app/data/agross/files/Funstuff/Marcis Fotos/
 
     - {{ root }}/app/data/amay/
 
-    - {{ root }}/app/data/kfochtmann/files/_SHARED
+    - {{ root }}/app/data/kfochtmann/files/_SHARED/
 
     - {{ root }}/app/data/grossweber/*/Aufzeichnungen/*.m4v
-    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Dokumente und Post/2017/2017-02-06 Cubeware GmbH
-    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2018-02 colima
-    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2020-03 Keßler, F.X
-    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2022-04 Schleupen, EA
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Dokumente und Post/2017/2017-02-06 Cubeware GmbH/
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2018-02 colima/
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2020-03 Keßler, F.X/
+    - {{ root }}/app/data/grossweber/files/GROSSWEBER/Projekte/2022-04 Schleupen, EA/
 
     # Databases.
     - {{ root }}/mariadb/
