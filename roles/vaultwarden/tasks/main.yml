@@ -26,6 +26,16 @@
     notify:
       - Restart vaultwarden service
 
+- name: Ensure environment files are accessible to root only
+  ansible.builtin.file:
+    path: "{{ root }}/{{ item }}"
+    owner: 0
+    group: 0
+    mode: '600'
+  loop:
+    - .env.db
+    - .env.vaultwarden
+
 - name: Ensure the app data directory exists and is accessible by Vaultwarden
   ansible.builtin.file:
     path: "{{ root }}/app"
