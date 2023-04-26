@@ -1,0 +1,52 @@
+- name: Raspberry Pi needs a boot config paramater
+  ansible.builtin.import_tasks: raspberry-pi.yml
+
+# https://forum.proxmox.com/threads/hardware-watchdog-at-a-per-vm-level.104051/
+# http://0pointer.de/blog/projects/watchdog.html
+#
+# Each VM that should support a watchdog timer needs to have hardware that is
+# currently not configurable on the Proxmox UI.
+# Reference: https://pve.proxmox.com/wiki/Manual:_qm.conf
+# Edit /etc/pve/qemu-server/<vmid>.conf and add:
+#
+# watchdog: model=i6300esb,action=reset
+#
+# Then stop and start the VM.
+#
+# It is possible to change the per-VM watchdog action on the Proxmox UI.
+# Under VM / Monitor enter:
+#
+# watchdog_action debug
+#
+# To stop reporting to the watchdog and cause a reset, run this inside the VM
+# (as root):
+#
+# echo c > /proc/sysrq-trigger
+#
+# To monitor watchdog timers being fired (the debug action above), run this on
+# the Proxmox host:
+#
+# journalctl --follow | grep watch
+#
+# To check whether a VM has access to /dev/watchdog hardware, run wdctl.
+- name: Ensure /etc/systemd/system.conf.d exists
+  ansible.builtin.file:
+    path: /etc/systemd/system.conf.d
+    state: directory
+    mode: '755'
+
+- name: Enable watchdog timer run by systemd
+  ansible.builtin.copy:
+    dest: /etc/systemd/system.conf.d/watchdog.conf
+    content: |
+      [Manager]
+      # Raspberry Pi only supports <= 15 seconds.
+      # https://forums.raspberrypi.com/viewtopic.php?t=9526#p110042
+      RuntimeWatchdogSec=15s
+    owner: 0
+    group: 0
+    mode: '644'
+  notify: Reexecute systemd
+
+- name: Reexecute systemd, if required
+  ansible.builtin.meta: flush_handlers

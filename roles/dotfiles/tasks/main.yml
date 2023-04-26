@@ -1,0 +1,25 @@
+- name: Install requirements
+  ansible.builtin.package:
+    name: "{{ requirements }}"
+    state: present
+
+- name: Clone dotfiles
+  become: false
+  ansible.builtin.git:
+    repo: https://github.com/agross/dotfiles.git
+    version: master
+    dest: "/home/{{ ansible_env.SUDO_USER }}/.dotfiles"
+
+- name: Bootstrap dotfiles
+  become: false
+  ansible.builtin.command:
+    argv:
+      - "/home/{{ ansible_env.SUDO_USER }}/.dotfiles/bootstrap"
+      - --force
+  register: bootstrapper
+  changed_when: "'] Linked' in bootstrapper.stdout"
+
+- name: Change shell to zsh
+  ansible.builtin.user:
+    name: "{{ ansible_env.SUDO_USER }}"
+    shell: /bin/zsh

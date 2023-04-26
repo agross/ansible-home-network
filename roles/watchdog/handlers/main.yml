@@ -1,0 +1,6 @@
+- name: Reboot
+  ansible.builtin.reboot:
+
+- name: Reexecute systemd
+  ansible.builtin.systemd:
+    daemon_reexec: true

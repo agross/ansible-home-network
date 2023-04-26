@@ -1,0 +1,7 @@
+requirements:
+  - fd-find
+  - fzf
+  - git
+  - screen
+  - tar
+  - zsh

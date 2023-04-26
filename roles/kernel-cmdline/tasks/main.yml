@@ -1,0 +1,21 @@
+- name: Remove "rhgb" kernel command line argument
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: Check if "rhgb" is currently used
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: ^GRUB_CMDLINE_LINUX=.*rhgb
+        state: absent
+      changed_when: false
+      check_mode: true
+      register: rhgb_enabled
+
+    - name: Remove "rhgb" kernel command line argument
+      when: rhgb_enabled.found
+      # Does not work with ansible.builtin.command.
+      ansible.builtin.shell: # noqa: command-instead-of-shell
+        cmd: >-
+          grubby
+          --update-kernel=ALL
+          --remove-args="rhgb"
+      changed_when: true
