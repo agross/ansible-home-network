@@ -1,0 +1,17 @@
+- name: Create SMTP auth hash file
+  ansible.builtin.command:
+    argv:
+      - postmap
+      - /etc/postfix/sasl_passwd
+  changed_when: true
+
+- name: Update /etc/aliases.db
+  ansible.builtin.command:
+    argv:
+      - newaliases
+  changed_when: true
+
+- name: Restart postfix
+  ansible.builtin.systemd:
+    name: postfix.service
+    state: restarted
