@@ -1,0 +1,25 @@
+debug
+
+user '{{ pppoe.username }}'
+password '{{ pppoe.password }}'
+hide-password
+
+# Peer does not need to authenticate itself.
+noauth
+
+# The peer will have to supply the local IP address.
+noipdefault
+
+# Disable protocol field compression negotiation.
+nopcomp
+noaccomp
+default-asyncmap
+
+# Enable the IPv6CP and IPv6 protocols, disable with: noipv6.
++ipv6
+
+# Add a default IPv4 route to the system routing tables.
+defaultroute
+
+lcp-echo-failure 3
+lcp-echo-interval 20

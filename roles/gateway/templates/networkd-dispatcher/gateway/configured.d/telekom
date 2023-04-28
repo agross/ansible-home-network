@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+# Log outputs with:
+#
+# journalctl --follow --unit networkd-dispatcher.service
+
+set -euo pipefail
+
+[[ "$IFACE" == {{ interfaces.telekom.device | mandatory | quote }} ]] || exit  0
+
+sudo --user=ddclient -- ddclient -daemon=0 -debug -use=if -if="$IFACE"

@@ -1,0 +1,35 @@
+- name: Ensure ddclient is installed
+  ansible.builtin.package:
+    name: ddclient
+    state: present
+
+- name: Ensure service override directory exists
+  ansible.builtin.file:
+    state: directory
+    path: /etc/systemd/system/ddclient.service.d/
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Enable unit-status-mail override for ddclient
+  ansible.builtin.template:
+    src: unit-status-mail.conf
+    dest: /etc/systemd/system/ddclient.service.d/unit-status-mail.conf
+    owner: 0
+    group: 0
+    mode: '644'
+
+- name: Enable ddclient service
+  ansible.builtin.systemd:
+    name: ddclient.service
+    enabled: true
+    daemon_reload: true
+
+- name: Copy ddclient config file
+  ansible.builtin.template:
+    src: ddclient.conf.j2
+    dest: /etc/ddclient.conf
+    owner: ddclient
+    group: ddclient
+    mode: '600'
+  notify: Restart ddclient

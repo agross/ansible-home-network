@@ -1,0 +1,37 @@
+firewalld:
+  services:
+    external:
+      - dhcpv6-client
+      - wireguard
+
+  forward_ports:
+    external:
+      # HTTP.
+      - proto: tcp
+        port: 80
+        toaddr: 172.16.0.3
+        toport: 80
+      # HTTPS.
+      - proto: tcp
+        port: 443
+        toaddr: 172.16.0.3
+        toport: 443
+      # GitLab SSH.
+      - proto: tcp
+        port: 10022
+        toaddr: 172.16.0.3
+        toport: 10022
+      # Gitea SSH.
+      - proto: tcp
+        port: 10222
+        toaddr: 172.16.0.3
+        toport: 10222
+      # FTP
+      - proto: tcp
+        port: 21
+        toaddr: 172.16.0.10
+        toport: 21
+      - proto: tcp
+        port: 10021
+        toaddr: 172.16.0.10
+        toport: 10021

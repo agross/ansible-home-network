@@ -1,0 +1,13 @@
+- hosts: gateway
+  become: true
+  roles:
+    - name: dotfiles
+      tags: dotfiles
+    - name: kernel-cmdline
+      tags: kernel-cmdline
+    - name: watchdog
+      tags: watchdog
+    - name: postfix
+      tags: postfix
+    - name: gateway
+      tags: gateway

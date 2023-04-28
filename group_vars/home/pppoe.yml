@@ -1,0 +1,6 @@
+pppoe:
+  username: "{{ vault_pppoe_username }}"
+  password: "{{ vault_pppoe_password }}"
+  bandwidth:
+    ingress: 250M
+    egress: 40M

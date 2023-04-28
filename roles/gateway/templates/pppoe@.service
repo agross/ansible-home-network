@@ -1,0 +1,57 @@
+# https://github.com/jimdigriz/debian-clearfog-gt-8k#etcsystemdsystempppd-vlan101wanservice
+#
+# %j, %J escaped and unescaped component after last dash
+#   used for the rp-pppoe connection file.
+# %i, %I escaped and unescaped instance name,
+#   used for the network interface the connection is attempted on.
+[Unit]
+Description=PPPoE connection to %J on interface %I
+Documentation=man:pppd(8)
+BindsTo=sys-subsystem-net-devices-%i.device
+After=sys-subsystem-net-devices-%i.device
+After=network.target
+Before=default.target
+
+[Service]
+# https://github.com/ppp-project/ppp/commit/d34159f417620eb7c481bf53f29fe04c86ccd223
+# Otherwise you can use 'forking' and replace 'up_sdnotify' with 'updetach'.
+# Fedora 37's pppd is not compiled with systemd support, hence up_sdnotify is
+# not available.
+# Type=notify
+Type=forking
+# Avoid race waiting for systemd-networkd to configure interface.
+# https://github.com/systemd/systemd/issues/481#issuecomment-1010092917
+# systemd guarantees MTU is set before activating (carrier) link.
+# https://github.com/systemd/systemd/issues/481#issuecomment-1010159176
+ExecStartPre=/lib/systemd/systemd-networkd-wait-online --interface=%i \
+                                                       --operational-state=carrier
+# Fedora 37's pppd is not compiled with systemd support, hence up_sdnotify is
+# not available.
+ExecStart=/usr/sbin/pppd plugin rp-pppoe.so %i \
+                         call %j \
+                         linkname %i \
+                         ifname %j \
+                         updetach
+ExecStop=/bin/kill $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
+StandardOutput=null
+# https://github.com/systemd/systemd/issues/481#issuecomment-544341423
+Restart=always
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+# Allow /etc/ppp/resolv.conf to be written when using 'usepeerdns'
+# ReadWritePaths=/run/ /etc/ppp/
+# https://github.com/systemd/systemd/issues/481#issuecomment-610951209
+# ProtectKernelTunables=yes
+ProtectControlGroups=yes
+SystemCallFilter=~@mount
+SystemCallArchitectures=native
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictRealtime=yes
+
+[Install]
+WantedBy=sys-devices-virtual-net-%j.device
+# Needed to start on boot.
+WantedBy=default.target

@@ -1,0 +1,26 @@
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+daemon=5m                           # Check every 5 minutes.
+min-error-interval=1s               # After errors, allow new attempts after 1s.
+syslog=yes                          # Log update messages to syslog.
+mail=root                           # Mail all messages to root.
+mail-failure=root                   # Mail failed update messages to root.
+pid=/run/ddclient/ddclient.pid      # Record PID in file.
+ssl=yes                             # Use TLS support. Works withssl-library.
+
+use=if, if={{ interfaces.telekom.device }}
+# use=web, web=https://checkip.dynu.com/, web-skip='IP Address'
+
+# Tunnelbroker he-ipv6.
+protocol=dyndns2, \
+server=ipv4.tunnelbroker.net, \
+login={{ he_ipv6.username | mandatory }}, \
+password={{ he_ipv6.update_key | mandatory }} \
+{{ he_ipv6.tunnel_id | mandatory }}
+
+# INWX.
+protocol=dyndns2, \
+server=dyndns.inwx.com, \
+login={{ inwx.dyndns.username | mandatory }}, \
+password={{ inwx.dyndns.password | mandatory }} \
+{{ network.domain | mandatory }}

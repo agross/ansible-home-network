@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+interface="${1:-telekom}"
+speed=(grep --max-count 1 --perl-regexp "^\s*$interface:" /proc/net/dev)
+
+if [[ -t 1 ]]; then
+  red='\033[1;31m'
+  green='\033[1;32m'
+  blue='\033[1;34m'
+  reset='\033[0m'
+else
+  red=
+  green=
+  blue=
+  reset=
+fi
+
+# shellcheck disable=SC2016
+expr='{
+        if (rx) {
+          interface=$1; rx2=$2; tx2=$10;
+
+          printf "Interface %s%s%s\ndown %s%.2f kB/s%s\nup %s%.2f kB/s%s\n",
+                 blue,
+                 interface,
+                 reset,
+                 green,
+                 (rx2 - rx) / 1024,
+                 reset,
+                 red,
+                 (tx2 - tx) / 1024,
+                 reset;
+        }
+        else {
+          rx=$2; tx=$10;
+        }
+      }'
+
+awk -v red="$red" -v green="$green" -v blue="$blue" -v reset="$reset" "$expr" \
+    <("${speed[@]}") \
+    <(sleep 1; "${speed[@]}")

@@ -1,0 +1,38 @@
+- name: Ensure rp-pppoe is installed
+  ansible.builtin.package:
+    name: rp-pppoe
+    state: present
+
+- name: Ensure pppd configuration directory exists
+  ansible.builtin.file:
+    path: /etc/ppp/peers
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+# https://forum.vyos.io/t/pppoe-client-with-vlan7-deutsche-telekom-viperoptic/6502/6
+- name: Copy PPPoE connection config file
+  ansible.builtin.template:
+    src: templates/pppd/telekom.j2
+    dest: /etc/ppp/peers/telekom
+    owner: 0
+    group: 0
+    mode: '640'
+
+- name: Copy PPPoE connection service
+  ansible.builtin.copy:
+    src: templates/pppoe@.service
+    dest: >-
+      /etc/systemd/system/pppoe-{{ interfaces.telekom.device }}@{{ interfaces.wan.device }}.service
+    owner: 0
+    group: 0
+    mode: '644'
+
+- name: Enable and start PPPoE connection service
+  ansible.builtin.systemd:
+    name: pppoe-{{ interfaces.telekom.device }}@{{ interfaces.wan.device }}.service
+    state: started
+    no_block: true
+    enabled: true
+    daemon_reload: true

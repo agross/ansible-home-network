@@ -1,0 +1,20 @@
+- name: Install networkd-dispatcher
+  ansible.builtin.import_tasks: networkd-dispatcher.yml
+
+- name: Configure systemd-networkd
+  ansible.builtin.import_tasks: systemd-networkd-config.yml
+
+- name: Configure PPPoE
+  ansible.builtin.import_tasks: pppoe.yml
+
+- name: Configure firewalld
+  ansible.builtin.import_tasks: firewalld.yml
+
+- name: Configure ddclient
+  ansible.builtin.import_tasks: ddclient.yml
+
+- name: Install speed monitoring script
+  ansible.builtin.copy:
+    src: templates/speed
+    dest: /usr/local/bin/speed
+    mode: '755'

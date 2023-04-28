@@ -1,0 +1,54 @@
+- name: Ensure systemd-networkd is installed
+  ansible.builtin.package:
+    name: systemd-networkd
+    state: present
+
+- name: Ensure NetworkManager is not installed
+  ansible.builtin.package:
+    name: NetworkManager
+    state: absent
+
+- name: Delete NetworkManager config files
+  ansible.builtin.file:
+    path: /etc/NetworkManager
+    state: absent
+
+- name: Ensure directory for systemd-networkd overrides exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/systemd-networkd.service.d
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Enable systemd-networkd debug logging
+  ansible.builtin.copy:
+    content: |
+      [Service]
+      Environment=SYSTEMD_LOG_LEVEL=debug
+    dest: /etc/systemd/system/systemd-networkd.service.d/debug-logging.conf
+    owner: 0
+    group: 0
+    mode: '644'
+
+- name: Ensure directory for systemd-resolved overrides exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Disable DNSSEC
+  ansible.builtin.copy:
+    content: |
+      [Resolve]
+      DNSSEC=false
+    dest: /etc/systemd/resolved.conf.d/no-dnssec.conf
+    owner: 0
+    group: 0
+    mode: '644'
+
+- name: Configure systemd-networkd
+  ansible.builtin.include_role:
+    name: aruhier.systemd_networkd

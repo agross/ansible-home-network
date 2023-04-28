@@ -1,0 +1,10 @@
+he_ipv6:
+  username: "{{ vault_he_ipv6_username }}"
+  update_key: "{{ vault_he_ipv6_update_key }}"
+  tunnel_id: 279064
+  network64: 2001:470:1f0b:c9a::/64
+  network48: 2001:470:98df::/48
+  tunnel:
+    server4: 216.66.80.30
+    server6: 2001:470:1f0a:c99::1/64
+    client6: 2001:470:1f0a:c99::2/64

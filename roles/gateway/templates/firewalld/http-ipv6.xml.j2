@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policy priority="1" target="CONTINUE">
+  <service name="http"/>
+  <service name="https"/>
+  <ingress-zone name="{{ interfaces['he-ipv6'].zone }}"/>
+  <egress-zone name="{{ interfaces.lan.zone }}"/>
+</policy>
