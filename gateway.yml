@@ -3,6 +3,8 @@
   roles:
     - name: dotfiles
       tags: dotfiles
+    - name: borgmatic
+      tags: borgmatic
     - name: kernel-cmdline
       tags: kernel-cmdline
     - name: watchdog
