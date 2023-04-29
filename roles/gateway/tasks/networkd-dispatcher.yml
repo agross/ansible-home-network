@@ -69,12 +69,21 @@
     - 'off'
     - routable
 
+- name: Ensure dispatcher script dependencies are available
+  ansible.builtin.package:
+    name:
+      - curl
+      - bind-utils
+    state: present
+
 - name: Copy dispatcher scripts
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "/etc/networkd-dispatcher/{{ item.path }}"
     owner: 0
     group: 0
+    # https://gitlab.com/craftyguy/networkd-dispatcher/-/issues/66
+    # mode: '750'
     mode: '755'
   when: item.state == 'file'
   with_community.general.filetree: "templates/networkd-dispatcher/{{ ansible_hostname }}"

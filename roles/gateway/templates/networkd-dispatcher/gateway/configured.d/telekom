@@ -9,4 +9,82 @@ set -euo pipefail
 
 [[ "$IFACE" == {{ interfaces.telekom.device | mandatory | quote }} ]] || exit  0
 
-sudo --user=ddclient -- ddclient -daemon=0 -debug -use=if -if="$IFACE"
+if sudo --user=ddclient -- ddclient -daemon=0 -debug -use=if -if="$IFACE"; then
+  printf 'ddclient succeeded\n'
+  exit
+fi
+
+printf 'ddclient failed, attempting manual DynDNS update\n'
+
+resolve() {
+  local host="${1?Need host to resolve}"
+
+  ip="$(dig +short @8.8.8.8 A "$host")"
+
+  if [[ -z "$ip" ]]; then
+    >&2 printf 'Could not resolve %s\n' "$host"
+    return 1
+  fi
+
+  printf '%s' "$ip"
+}
+
+inwx() {
+  local host ip
+
+  printf 'Updating INWX...\n'
+
+  host=dyndns.inwx.com
+  ip="$(resolve "$host")"
+
+  output="$(curl --resolve "$host:443:$ip" \
+                 --fail \
+                 --connect-timeout 15 \
+                 --user {{ inwx.dyndns.username | mandatory | quote }}:{{ inwx.dyndns.password | mandatory | quote }} \
+                 "https://$host/nic/update?hostname={{ network.domain | mandatory }}")"
+
+  printf '%s\n' "$output"
+
+  if [[ "$output" == good || "$output" == nochg ]]; then
+    printf 'Successfully updated INWX IP\n'
+  else
+    printf 'Failed to update INWX IP\n'
+    return 1
+  fi
+}
+
+tunnelbroker() {
+  local host ip
+
+  printf 'Updating Tunnelbroker...\n'
+
+  host=ipv4.tunnelbroker.net
+  ip="$(resolve "$host")"
+
+  output="$(curl --resolve "$host:443:$ip" \
+                 --fail \
+                 --connect-timeout 15 \
+                 --user {{ he_ipv6.username | mandatory | quote }}:{{ he_ipv6.update_key | mandatory | quote }} \
+                 "https://$host/ipv4_end.php?tid={{ he_ipv6.tunnel_id | mandatory }}")"
+
+  printf '%s\n' "$output"
+
+  if [[ "$output" == +OK* ]] || \
+     [[ "$output" == '-ERROR: This tunnel is already associated with this IP address'* ]]; then
+    printf 'Successfully updated Tunnelbroker IP\n'
+  else
+    printf 'Failed to update Tunnelbroker IP\n'
+    return 1
+  fi
+}
+
+for provider in inwx tunnelbroker; do
+  while ((1)); do
+    if $provider; then
+      break
+    else
+      printf 'Sleeping...\n'
+      sleep 5
+    fi
+  done
+done
