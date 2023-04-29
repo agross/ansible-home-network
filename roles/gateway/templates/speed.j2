@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
 
 set -euo pipefail
 
-interface="${1:-telekom}"
+interface="${1:-{{ interfaces.telekom.device }}}"
 speed=(grep --max-count 1 --perl-regexp "^\s*$interface:" /proc/net/dev)
 
 if [[ -t 1 ]]; then
