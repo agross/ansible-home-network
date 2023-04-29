@@ -1,4 +1,4 @@
-- hosts: gateway
+- hosts: gateway-home
   become: true
   roles:
     - name: dotfiles

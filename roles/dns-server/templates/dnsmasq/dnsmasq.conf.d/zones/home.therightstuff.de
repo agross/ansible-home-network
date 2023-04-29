@@ -1,8 +1,8 @@
-host-record=gateway,    gateway.home.therightstuff.de,   172.16.0.1,   2001:470:1f0b:c9a::1
-host-record=router,     router.home.therightstuff.de,    172.16.0.3,   2001:470:1f0b:c9a::3
-host-record=modem,      modem.home.therightstuff.de,     172.16.0.250
-host-record=esxi-bmc,   esxi-bmc.home.therightstuff.de,  172.16.0.253, 2001:470:1f0b:c9a::253
-host-record=esxi,       esxi.home.therightstuff.de,      172.16.0.254, 2001:470:1f0b:c9a::254
+host-record=gateway-home, gateway-home.home.therightstuff.de, 172.16.0.1,   2001:470:1f0b:c9a::1
+host-record=router,       router.home.therightstuff.de,       172.16.0.3,   2001:470:1f0b:c9a::3
+host-record=modem,        modem.home.therightstuff.de,        172.16.0.250
+host-record=esxi-bmc,     esxi-bmc.home.therightstuff.de,     172.16.0.253, 2001:470:1f0b:c9a::253
+host-record=esxi,         esxi.home.therightstuff.de,         172.16.0.254, 2001:470:1f0b:c9a::254
 
 # Provide stable IPs for services.
 
