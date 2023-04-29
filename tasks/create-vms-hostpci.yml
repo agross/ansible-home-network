@@ -1,7 +1,7 @@
-- name: Get host PCI devices of guest {{ guest.inventory_hostname }}
+# /bin/sh does not support pipefail option.
+- name: Get host PCI devices of guest {{ guest.inventory_hostname }} # noqa risky-shell-pipe
   ansible.builtin.shell:
     cmd: >-
-      set -o pipefail &&
       qm config {{ guest.kvm.id | quote }} |
         grep --quiet '^{{ device.key }}: {{ device.value }}'
   loop: "{{ guest.kvm.hostpci | default({}) | dict2items }}"

@@ -79,7 +79,8 @@
 - name: Passthrough hardware RNG to guest
   when: not host_has_no_hwrng.found
   block:
-    - name: Check if the guest has a RNG device configured
+    # /bin/sh does not support pipefail option.
+    - name: Check if the guest has a RNG device configured # noqa risky-shell-pipe
       ansible.builtin.shell:
         cmd: >-
           qm config {{ guest.kvm.id | quote }} | grep --quiet ^rng0:
