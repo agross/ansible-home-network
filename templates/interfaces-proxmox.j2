@@ -15,10 +15,9 @@ iface {{ interfaces.wan.device | mandatory }} inet manual
 
 auto vmbr0
 iface vmbr0 inet static
-  address 172.16.0.91/24
-  # TODO address {{ interfaces.lan.ipv4.address | mandatory }}
-  gateway 172.16.0.3
+  address {{ interfaces.lan.ipv4.address | mandatory }}
   # TODO gateway {{ interfaces.lan.ipv4.gateway | mandatory }}
+  gateway 172.16.1.102
   bridge-ports {{ interfaces.lan.device | mandatory }}
   bridge-stp off
   bridge-fd 0

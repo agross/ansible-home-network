@@ -12,9 +12,10 @@
   ansible.builtin.lineinfile:
     path: /etc/hosts
     search_string: "{{ inventory_hostname }}"
-    line: "172.16.0.91 {{ pve_fqdn }} {{ inventory_hostname }}"
-    # TODO
-    # line: "{{ interfaces.lan.ipv4.address | ansible.utils.ipaddr('address') }} {{ pve_fqdn }} {{ inventory_hostname }}"
+    line: >-
+      {{ interfaces.lan.ipv4.address | ansible.utils.ipaddr('address') }}
+      {{ pve_fqdn }}
+      {{ inventory_hostname }}
     state: present
     backup: true
 
