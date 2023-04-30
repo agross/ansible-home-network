@@ -1,0 +1,4 @@
+firewalld:
+  services:
+    external:
+      - dhcpv6-client

@@ -60,8 +60,8 @@
   loop: >-
     {{
       lookup('ansible.builtin.fileglob',
-             '../templates/firewalld/' ~ ansible_hostname ~ '*',
-             wantlist=true)
+             '../templates/firewalld/' ~ inventory_hostname ~ '/*',
+             wantlist = true)
     }}
   notify: Reload firewalld
 

@@ -22,5 +22,5 @@ wireguard:
       allowed_ips:
         - "{{ network.wireguard.ip4 | ansible.utils.nthhost('4') }}"
         - "{{ network.wireguard.ip6 | ansible.utils.nthhost('4') }}"
-        - 172.16.1.0/24
-        - 2001:470:1f0b:fd4::/64
+        - "{{ hostvars['gateway-ogd'].network.ipv4 }}"
+        - "{{ hostvars['gateway-ogd'].network.ipv6 }}"

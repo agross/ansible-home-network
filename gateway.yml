@@ -1,6 +1,7 @@
 - name: Configure host as a gateway
   hosts: gateway
   become: true
+  gather_facts: false
   roles:
     - name: networking
       tags: networking

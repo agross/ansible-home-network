@@ -1,0 +1,12 @@
+wireguard:
+  private_key: "{{ vault_wireguard_private_key }}"
+
+  peers:
+    home:
+      public_key: 9iS9RiBbsLChuL2hMp5/dUtXjPlui67h6FYHvyCvOCQ=
+      psk: "{{ vault_wireguard_peer_home_psk }}"
+      endpoint: "{{ hostvars['gateway-home'].network.domain }}:51820"
+      persistent_keepalive: 25
+      allowed_ips:
+        - "{{ hostvars['gateway-home'].network.ipv4 }}"
+        - "{{ hostvars['gateway-home'].network.ipv6 }}"

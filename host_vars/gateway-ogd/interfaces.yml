@@ -1,0 +1,27 @@
+interfaces:
+  lan:
+    device: enp6s18
+    ip4: "{{ network.ipv4 | ansible.utils.ipaddr('2') }}"
+    dns4: "{{ dns.servers | ansible.utils.ipv4 }}"
+    dns4_search: "{{ dns.search_domains }}"
+    ip6: "{{ network.ipv6 | ansible.utils.ipaddr('2') }}"
+    dns6: "{{ dns.servers | ansible.utils.ipv6 }}"
+    dns6_search: "{{ dns.search_domains }}"
+    zone: internal
+
+  wan:
+    device: enp6s19
+
+  telekom:
+    device: telekom
+    zone: external
+
+  he-ipv6:
+    device: he-ipv6
+    zone: external
+
+  wireguard:
+    device: wg0
+    ip4: "{{ network.wireguard.ip4 | ansible.utils.ipaddr('4') }}"
+    ip6: "{{ network.wireguard.ip6 | ansible.utils.ipaddr('4') }}"
+    zone: trusted

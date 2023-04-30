@@ -1,0 +1,138 @@
+systemd_networkd_enable_resolved: true
+systemd_networkd_symlink_resolv_conf: true
+systemd_networkd_apply_config: true
+
+systemd_networkd_netdev:
+  he-ipv6:
+    - Match: ''
+    - NetDev:
+        - Description: Hurricane Electric Tunnelbroker
+        - Name: "{{ interfaces['he-ipv6'].device }}"
+        - Kind: sit
+        - MTUBytes: 1472
+    - Tunnel:
+        - Independent: true
+        - Local: "{{ interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
+        - Remote: "{{ he_ipv6.tunnel.server4 }}"
+        - TTL: 255
+        - DiscoverPathMTU: true
+
+  wireguard:
+    - NetDev:
+        - Name: "{{ interfaces.wireguard.device }}"
+        - Kind: wireguard
+    - WireGuard:
+        - ListenPort: 51820
+        - PrivateKey: "{{ wireguard.private_key }}"
+    - WireGuardPeer:
+        - PublicKey: "{{ wireguard.peers.home.public_key }}"
+        - PresharedKey: "{{ wireguard.peers.home.psk }}"
+        - AllowedIPs: "{{ wireguard.peers.home.allowed_ips | default([]) | join(',') }}"
+        - Endpoint: "{{ wireguard.peers.home.endpoint }}"
+        - PersistentKeepalive: "{{ wireguard.peers.home.persistent_keepalive }}"
+
+systemd_networkd_network:
+  lan:
+    - Match:
+        - Name: "{{ interfaces.lan.device }}"
+    - Link:
+        - RequiredForOnline: true
+        - RequiredFamilyForOnline: ipv4
+        - ActivationPolicy: always-up
+    - Network:
+        - Address: "{{ interfaces.lan.ip4 }}"
+        - Address: "{{ interfaces.lan.ip6 }}"
+        - DNS: "{{ interfaces.lan.dns4 }}"
+        - DNS: "{{ interfaces.lan.dns6 }}"
+        - DNSDefaultRoute: true
+        - Domains: "{{ dns.search_domains | join(' ') }}"
+        - MulticastDNS: true
+
+        - IPForward: true
+        - IPMasquerade: ipv4
+
+        - LinkLocalAddressing: ipv6
+        - IPv6LinkLocalAddressGenerationMode: stable-privacy
+
+        # Send RAs with the delegated prefix from the "telekom" interface.
+        # Issues with ingress packets on he-ipv6 with replies egressing on telekom.
+        # - DHCPPrefixDelegation: true
+        - IPv6SendRA: true
+        - IPv6AcceptRA: false
+    - IPv6SendRA:
+        # Use stateful DHCPv6 by dnsmasq.
+        - Managed: true
+        - OtherInformation: true
+
+        # Announced by dnsmasq.
+        - EmitDNS: false
+        - EmitDomains: false
+
+    - DHCPPrefixDelegation:
+        - UplinkInterface: "{{ interfaces.telekom.device }}"
+        - SubnetId: 1
+
+    # TODO
+    - Route:
+        - Gateway: 172.16.1.102
+        - GatewayOnLink: true
+
+  he-ipv6:
+    - Match:
+        - Name: "{{ interfaces['he-ipv6'].device }}"
+    - Network:
+        - Description: Hurricane Electric Tunnelbroker
+        - Address: "{{ he_ipv6.tunnel.client6 }}"
+        - Gateway: "{{ he_ipv6.tunnel.server6 | ansible.utils.ipaddr('address') }}"
+
+  wan:
+    - Match:
+        - Name: "{{ interfaces.wan.device }}"
+    - Network:
+        # Disable auto-configuration via DHCPv4 and DHCPv6.
+        - DHCP: false
+        - LinkLocalAddressing: false
+        - LLMNR: false
+        - IPv6AcceptRA: false
+
+  wireguard:
+    - Match:
+        - Name: "{{ interfaces.wireguard.device }}"
+    - Network:
+        - Address: "{{ interfaces.wireguard.ip4 }}"
+        - Address: "{{ interfaces.wireguard.ip6 }}"
+
+  telekom:
+    - Match:
+        - Name: "{{ interfaces.telekom.device }}"
+        - Type: ppp
+    - Link:
+        - RequiredForOnline: false
+    - Network:
+        - LLMNR: false
+        # Do not drop IP and routes on networkctl reload.
+        - KeepConfiguration: true
+
+        # To receive public IPv6 address.
+        # Issues with ingress packets on he-ipv6 with replies egressing on telekom.
+        - DHCP: 'no' # ipv6
+        - IPv6AcceptRA: false # true
+    - IPv6AcceptRA:
+        # Request delegated prefix.
+        - DHCPv6Client: always
+        - UseDNS: false
+        - UseDomains: false
+    - DHCPv6:
+        # Explicitly ask for router advertisement as the delegated IPv6 prefix is
+        # not provided when the PPPoE connection is established.
+        - WithoutRA: solicit
+        - UseDNS: false
+        - UseDomains: false
+    - CAKE:
+        - Bandwidth: "{{ pppoe.bandwidth.ingress }}"
+        - OverheadBytes: 38
+        - MPUBytes: 84
+        - UseRawPacketSize: true
+        - FlowIsolationMode: triple
+        - NAT: true
+        - PriorityQueueingPreset: diffserv8

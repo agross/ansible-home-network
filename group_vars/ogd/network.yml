@@ -1,0 +1,17 @@
+network:
+  domain: ogd.therightstuff.de
+  ipv4: 172.16.1.0/24
+  ipv6: "{{ he_ipv6.network64 }}"
+  wireguard:
+    ip4: 192.168.168.0/24
+    ip6: "{{ he_ipv6.network48 | ansible.utils.ipaddr(0xC0DE0000000000000000) | ansible.utils.ipaddr('address') }}/64"
+
+dns:
+  search_domains:
+    - "{{ network.domain | mandatory }}"
+  servers:
+    # TODO
+    - "{{ network.ipv4 | ansible.utils.nthhost(102) | mandatory }}"
+
+    - "{{ network.ipv4 | ansible.utils.nthhost(3) | mandatory }}"
+    - "{{ network.ipv6 | ansible.utils.nthhost(3) | mandatory }}"
