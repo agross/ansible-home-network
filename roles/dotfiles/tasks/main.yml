@@ -8,18 +8,18 @@
   ansible.builtin.git:
     repo: https://github.com/agross/dotfiles.git
     version: master
-    dest: "/home/{{ ansible_env.SUDO_USER }}/.dotfiles"
+    dest: "{{ ansible_user_dir }}/.dotfiles"
 
 - name: Bootstrap dotfiles
   become: false
   ansible.builtin.command:
     argv:
-      - "/home/{{ ansible_env.SUDO_USER }}/.dotfiles/bootstrap"
+      - "{{ ansible_user_dir }}/.dotfiles/bootstrap"
       - --force
   register: bootstrapper
   changed_when: "'] Linked' in bootstrapper.stdout"
 
 - name: Change shell to zsh
   ansible.builtin.user:
-    name: "{{ ansible_env.SUDO_USER }}"
+    name: "{{ ansible_user_id }}"
     shell: /bin/zsh
