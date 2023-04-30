@@ -5,7 +5,7 @@
     docker_install_compose_plugin: true
     docker_install_compose: false
     docker_users:
-      - "{{ ansible_env.SUDO_USER }}"
+      - "{{ ansible_user_id }}"
       - "{{ docker_user }}"
 
 - name: Support docker management via ansible
