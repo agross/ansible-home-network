@@ -59,6 +59,8 @@
     - name: Create SMTP auth file
       ansible.builtin.copy:
         dest: /etc/postfix/sasl_passwd
+        owner: 0
+        group: 0
         mode: '600'
         content: |
           [smtp-relay.gmail.com]:587 {{ google_smtp_user }}:{{ google_smtp_password }}
@@ -78,9 +80,9 @@
     dest: /etc/aliases
     regexp: "^{{ item.user | ansible.builtin.regex_escape }}:"
     line: "{{ item.user }}: {{ item.alias }}"
-    mode: '644'
     owner: 0
     group: 0
+    mode: '644'
   with_items:
     - user: root
       alias: "{{ google_smtp_user }}"
