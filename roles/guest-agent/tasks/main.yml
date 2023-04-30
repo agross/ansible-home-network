@@ -1,0 +1,15 @@
+- name: Install and enable QEMU guest agent
+  when: >-
+    ansible_virtualization_role == 'guest' and
+    ansible_virtualization_type == 'kvm'
+  block:
+    - name: Ensure QEMU guest agent is installed
+      ansible.builtin.package:
+        name: qemu-guest-agent
+        state: present
+
+    - name: Enable and start QEMU guest agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        enabled: true
+        state: started

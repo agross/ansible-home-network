@@ -31,8 +31,8 @@
   become: true
   gather_facts: false
   roles:
-    # - name: guest-agent
-    #   tags: guest-agent
+    - name: guest-agent
+      tags: guest-agent
     - name: watchdog
       tags: watchdog
 
