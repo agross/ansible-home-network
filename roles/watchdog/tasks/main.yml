@@ -33,6 +33,8 @@
   ansible.builtin.file:
     path: /etc/systemd/system.conf.d
     state: directory
+    owner: 0
+    group: 0
     mode: '755'
 
 - name: Enable watchdog timer run by systemd
