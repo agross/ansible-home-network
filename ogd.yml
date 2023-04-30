@@ -1,0 +1,94 @@
+- name: Linux configuration
+  hosts: ogd:&linux
+  become: true
+  gather_facts: false
+  roles:
+    - name: devsec.hardening.ssh_hardening
+      vars:
+        network_ipv6_enable: true
+        ssh_listen_to:
+          - '0.0.0.0'
+          - '::'
+        ssh_allow_tcp_forwarding: 'yes'
+        ssh_allow_agent_forwarding: true
+        sftp_enabled: true
+      tags: ssh
+    - name: networking
+      tags: [network, networking]
+    - name: kernel-cmdline
+      tags: kernel-cmdline
+    - name: postfix
+      tags: postfix
+    - name: dotfiles
+      tags: dotfiles
+    # - name: unit-status-mail
+    #   tags: unit-status-mail
+    - name: borgmatic
+      tags: borgmatic
+
+- name: Virtualizaton guest configuration
+  hosts: ogd:&guest
+  become: true
+  gather_facts: false
+  roles:
+    # - name: guest-agent
+    #   tags: guest-agent
+    - name: watchdog
+      tags: watchdog
+
+- name: Configure host as a gateway
+  hosts: gateway-ogd
+  become: true
+  gather_facts: false
+  roles:
+    - name: gateway
+      tags: gateway
+
+# - name: Hosted services
+#   hosts: finn
+#   become: true
+#   roles:
+#     - name: dns-server
+#       tags:
+#         - dns-server
+#         - container
+#     - name: mqtt
+#       tags:
+#         - mqtt
+#         - container
+#     - name: iobroker
+#       tags:
+#         - iobroker
+#         - container
+#     - name: logger
+#       tags:
+#         - logger
+#         - container
+#     - name: traefik
+#       tags:
+#         - traefik
+#         - container
+#     - name: vscode-remote-ssh
+#       tags: vscode-remote-ssh
+#     - name: vladgh.samba.server
+#       vars:
+#         samba_shares_root: /tmp/unused
+#         samba_shares:
+#           - name: Time Machine
+#             comment: Time Machine Backups
+#             path: /time-machine
+#             write_list: agross
+#             include_file: samba-share-timemachine.conf
+
+#         samba_users: "{{ vault_samba_users }}"
+
+#         # See "templates" directory.
+#         samba_global_include: samba-global.conf
+#         samba_homes_include: samba-homes.conf
+
+#         samba_load_homes: true
+#         samba_wins_support: false
+#         # Bullseye has 4.13.13, fix is required up to 4.6.4 as per docs, but
+#         # the version comparison fails for some reason.
+#         samba_mitigate_cve_2017_7494: false
+#       tags: samba
