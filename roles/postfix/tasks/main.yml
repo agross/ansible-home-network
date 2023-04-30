@@ -27,18 +27,16 @@
 - name: Support authentication
   when: google_smtp_user is defined
   block:
-    - name: Determine SASL authentication package name
-      ansible.builtin.set_fact:
-        sasl_package: >-
-          {% if ansible_facts['pkg_mgr'] == 'apt' %}
-            libsasl2-modules
-          {% elif ansible_facts['pkg_mgr'] == 'dnf' %}
-            cyrus-sasl-plain
-          {% endif %}
-
-    - name: Install SASL authentication package
+    - name: Install SASL authentication package (apt)
+      when: ansible_pkg_mgr == 'apt'
       ansible.builtin.package:
-        name: "{{ sasl_package }}"
+        name: libsasl2-modules
+        state: present
+
+    - name: Install SASL authentication package (dnf)
+      when: ansible_pkg_mgr == 'dnf'
+      ansible.builtin.package:
+        name: cyrus-sasl-plain
         state: present
 
     - name: Extend postfix config items if authentication is required
