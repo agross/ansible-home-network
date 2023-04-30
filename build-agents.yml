@@ -1,7 +1,6 @@
-- hosts: build_agents
+- name: Install TeamCity build agent
+  hosts: build_agents
   become: true
-  collections:
-    - devsec.hardening
   roles:
     - name: build-agent
       tags: build-agent
@@ -9,7 +8,7 @@
       tags: docker
       vars:
         docker_user: build-agent
-    - name: ssh_hardening
+    - name: devsec.hardening.ssh_hardening
       vars:
         network_ipv6_enable: true
         ssh_listen_to:
