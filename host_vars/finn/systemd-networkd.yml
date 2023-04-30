@@ -1,0 +1,26 @@
+systemd_networkd_enable_resolved: true
+systemd_networkd_symlink_resolv_conf: true
+systemd_networkd_apply_config: true
+
+systemd_networkd_network:
+  lan:
+    - Match:
+        - Name: "{{ interfaces.lan.device }}"
+    - Network:
+        - Address: "{{ interfaces.lan.ip4 }}"
+        - Address: "{{ interfaces.lan.ip6 }}"
+        # TODO
+        # - DNS: "{{ interfaces.lan.dns4 }}"
+        # - DNS: "{{ interfaces.lan.dns6 }}"
+        - DNS: 172.16.1.102
+        - DNSDefaultRoute: true
+        - Domains: "{{ dns.search_domains | join(' ') }}"
+        - MulticastDNS: true
+
+        - IPv6LinkLocalAddressGenerationMode: stable-privacy
+
+    - Route:
+        # TODO
+        # - Gateway: "{{ hostvars['gateway-ogd'].interfaces.lan.ipv4 }}"
+        - Gateway: 172.16.1.102
+        - GatewayOnLink: true
