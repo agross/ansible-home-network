@@ -5,3 +5,10 @@ requirements:
   - screen
   - tar
   - zsh
+
+  # Technically not required but useful.
+  - bind-utils
+  - mc
+  - tcpdump
+  - tree
+  - vim
