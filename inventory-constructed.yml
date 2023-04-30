@@ -1,0 +1,30 @@
+plugin: ansible.builtin.constructed
+
+# Skip instead of producing an error if a variable is not defined.
+# strict: false
+
+# Dynamic group assignment based on facts.
+#
+# To see the list of hosts in a specific groups:
+#
+# ansible-inventory --list | jq .gateways
+groups:
+  hypervisor: >-
+    ansible_virtualization_role == 'host' and
+    ansible_virtualization_type == 'kvm' and
+
+  guest: >-
+    ansible_virtualization_role == 'guest' and
+    ansible_virtualization_type == 'kvm'
+
+  linux: >-
+    ansible_system == 'Linux'
+
+  fedora: >-
+    ansible_distribution == 'Fedora'
+
+  build_agents: >-
+    inventory_hostname is match("agent-*")
+
+  gateway: >-
+    inventory_hostname is match("gateway-*")

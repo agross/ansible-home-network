@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+ansible --module-name ansible.builtin.setup "${1:-all}"
