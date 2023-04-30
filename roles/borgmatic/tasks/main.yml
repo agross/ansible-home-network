@@ -40,7 +40,7 @@
     firstmatch: true
     line: "    match_archives: 'sh:{hostname}-system-*'"
 
-- name: Install borgmatic from Fedora's testing repo
+- name: Install borgmatic from Fedora's testing repo # noqa package-latest
   ansible.builtin.dnf:
     enablerepo:
       - updates-testing
