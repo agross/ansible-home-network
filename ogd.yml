@@ -1,3 +1,19 @@
+- name: Proxmox configuration
+  hosts: ogd:&hypervisor
+  become: true
+  gather_facts: false
+  roles:
+    # - name: lae.proxmox
+    #   vars:
+    #     # Would remove Proxmox completely.
+    #     # https://github.com/lae/ansible-role-proxmox/issues/223
+    #     pve_remove_old_kernels: false
+    #   tags: proxmox
+    # - name: proxmox
+    #   tags: proxmox
+    - name: smartmontools
+      tags: smartmontools
+
 - name: Linux configuration
   hosts: ogd:&linux
   become: true

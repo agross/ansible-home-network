@@ -11,7 +11,7 @@ plugin: ansible.builtin.constructed
 groups:
   hypervisor: >-
     ansible_virtualization_role == 'host' and
-    ansible_virtualization_type == 'kvm' and
+    ansible_virtualization_type == 'kvm'
 
   guest: >-
     ansible_virtualization_role == 'guest' and

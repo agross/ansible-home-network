@@ -1,0 +1,73 @@
+- name: Ensure smartmontools is installed
+  ansible.builtin.package:
+    name: smartmontools
+    state: present
+
+- name: Create smartmontools.service.d directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/smartmontools.service.d
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Ensure smartmontools service errors generate notifications
+  ansible.builtin.template:
+    src: unit-status-mail.conf
+    dest: /etc/systemd/system/smartmontools.service.d/unit-status-mail.conf
+    owner: 0
+    group: 0
+    mode: '644'
+  notify: Restart smartmontools
+
+- name: Ensure notifications are sent using sendmail
+  ansible.builtin.copy:
+    # https://www.smartmontools.org/browser/trunk/smartmontools/examplescripts/Example8
+    content: |
+      #! /bin/sh
+      #
+      # This is a script from the smartmontools examplescripts/ directory.
+      # It can be used as an argument to the -M exec Directive in
+      # /etc/smartd.conf, in a line like
+      # ... -m root@localhost -M exec /path/to/this/file
+      #
+      # See also: smartd.conf(5), smartd(8).
+      #
+      # $Id: Example8 5404 2022-08-06 17:15:49Z chrfranke $
+      # Skip if '-m <nomailer>' is set
+      test -n "$SMARTD_ADDRESS" || exit 0
+      # Try mail[x]
+      # Note: The 'command -v' builtin requires a POSIX >= 2008 conforming shell
+      for mailer in \
+        $(command -v mail 2>/dev/null) \
+        $(command -v mailx 2>/dev/null) \
+        /usr/bin/mail \
+        /usr/bin/mailx
+      do
+        test -f "$mailer" || continue
+        test -x "$mailer" || continue
+        exec "$mailer" -s "${SMARTD_SUBJECT-[SMARTD_SUBJECT]}" $SMARTD_ADDRESS <<EOF
+      ${SMARTD_FULLMESSAGE-[SMARTD_FULLMESSAGE]}
+      EOF
+        exit $?
+      done
+      # Try sendmail
+      for sendmail in \
+        /usr/sbin/sendmail \
+        /usr/lib/sendmail
+      do
+        test -f "$sendmail" || continue
+        test -x "$sendmail" || continue
+        exec "$sendmail" $SMARTD_ADDRESS <<EOF
+      Subject: ${SMARTD_SUBJECT-[SMARTD_SUBJECT]}
+      To: $(echo $SMARTD_ADDRESS | sed 's/ /, /g')
+      ${SMARTD_FULLMESSAGE-[SMARTD_FULLMESSAGE]}
+      EOF
+        exit $?
+      done
+      echo "$0: found none of 'mail', 'mailx' or 'sendmail'"
+      exit 1
+    dest: /etc/smartmontools/run.d/10mail
+    owner: 0
+    group: 0
+    mode: '755'
