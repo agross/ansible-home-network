@@ -27,6 +27,19 @@
 
     borgmatic_store_atime: false
 
+- name: Patch config file changing archive_name_format
+  ansible.builtin.lineinfile:
+    path: /etc/borgmatic/config.yaml
+    search_string: 'archive_name_format:'
+    line: "    archive_name_format: '{hostname}-system-{now}'"
+
+- name: Patch config file to include match_archives
+  ansible.builtin.lineinfile:
+    path: /etc/borgmatic/config.yaml
+    insertafter: 'archive_name_format:'
+    firstmatch: true
+    line: "    match_archives: 'sh:{hostname}-system-*'"
+
 - name: Install borgmatic from Fedora's testing repo
   ansible.builtin.dnf:
     enablerepo:
