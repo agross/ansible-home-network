@@ -1,7 +1,9 @@
 - name: Configure host as a gateway
-  hosts: gateway:&{{ site | default('home') }}
+  hosts: gateway
   become: true
   roles:
+    - name: networking
+      tags: networking
     - name: dotfiles
       tags: dotfiles
     - name: borgmatic

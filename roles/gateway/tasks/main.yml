@@ -1,17 +1,22 @@
 - name: Install networkd-dispatcher
   ansible.builtin.import_tasks: networkd-dispatcher.yml
 
-- name: Configure systemd-networkd
-  ansible.builtin.import_tasks: systemd-networkd-config.yml
-
 - name: Configure PPPoE
   ansible.builtin.import_tasks: pppoe.yml
 
-- name: Configure firewalld
-  ansible.builtin.import_tasks: firewalld.yml
-
 - name: Configure ddclient
   ansible.builtin.import_tasks: ddclient.yml
+
+# To debug wireguard:
+# echo module wireguard +p > /sys/kernel/debug/dynamic_debug/control
+# followed by:
+# journalctl -kf
+# and
+# sudo wg
+- name: Ensure wireguard-tools is installed (not needed to function)
+  ansible.builtin.package:
+    name: wireguard-tools
+    state: present
 
 - name: Install speed monitoring script
   ansible.builtin.template:

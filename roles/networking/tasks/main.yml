@@ -1,0 +1,5 @@
+- name: Configure systemd-networkd
+  ansible.builtin.import_tasks: systemd-networkd-config.yml
+
+- name: Configure firewalld
+  ansible.builtin.import_tasks: firewalld.yml
