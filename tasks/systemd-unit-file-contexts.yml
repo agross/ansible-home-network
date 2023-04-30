@@ -1,16 +1,19 @@
 - name: Install SELinux packages
+  when: ansible_selinux.status != 'disabled'
   ansible.builtin.package:
     name:
       - python3-policycoreutils
     state: present
 
 - name: Allow systemd to read units below {{ directory }}
+  when: ansible_selinux.status != 'disabled'
   community.general.sefcontext:
     target: "{{ directory }}/.*\\.(timer|service|mount)$"
     setype: systemd_unit_file_t
     state: present
 
 - name: Apply SELinux file context to filesystem below {{ directory }}
+  when: ansible_selinux.status != 'disabled'
   ansible.builtin.command:
     argv:
       - restorecon

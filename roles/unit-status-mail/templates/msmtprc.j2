@@ -1,0 +1,36 @@
+# msmtp system wide configuration file
+
+# A system wide configuration file is optional.
+# If it exists, it usually defines a default account.
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+# This allows msmtp to be used like /usr/sbin/sendmail.
+
+account default
+
+# The SMTP smarthost.
+host smtp-relay.gmail.com
+port 587
+tls on
+tls_starttls on
+auth login
+user {{ google_smtp_user | mandatory }}
+password {{ google_smtp_password | mandatory }}
+
+# Must not be localhost as per Google Workspace.
+# https://marlam.de/msmtp/msmtp.html#domain states we can use %H, but we cannot,
+# at least on Raspbian.
+domain {{ ansible_hostname | mandatory }}.{{ network.domain | mandatory }}
+
+# Set envelope from address. Must match the {{ google_smtp_user }} domain as per
+# the Google Workspace settings.
+from %U@%H.{{ network.domain | mandatory }}
+
+# Always sets a From header and overrides any existing one. The From header is
+# created based on the envelope-from address above.
+set_from_header on
+
+# Map root to {{ google_smtp_user }}.
+aliases /etc/aliases
+
+# Log to stdout.
+logfile -

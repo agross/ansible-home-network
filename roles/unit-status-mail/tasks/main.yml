@@ -1,0 +1,110 @@
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Configure msmtp unless postfix is installed and running
+  # Debian installs the postfix@-.service instance, Fedora does not.
+  when: >-
+    (
+      ansible_facts.services['postfix.service'] is not defined or
+      ansible_facts.services['postfix.service']['state'] != 'running'
+    ) and (
+      ansible_facts.services['postfix@-.service'] is not defined or
+      ansible_facts.services['postfix@-.service']['state'] != 'running'
+    )
+  block:
+    - name: Install msmtp-mta (apt)
+      when: ansible_pkg_mgr == 'apt'
+      ansible.builtin.package:
+        name: msmtp-mta
+        state: present
+
+    - name: Install msmtp-mta (dnf)
+      when: ansible_pkg_mgr == 'dnf'
+      ansible.builtin.package:
+        name: msmtp
+        state: present
+
+    - name: Configure msmtp to relay via Gmail
+      ansible.builtin.template:
+        src: templates/msmtprc.j2
+        dest: /etc/msmtprc
+        mode: '600'
+        owner: root
+        group: root
+        force: true
+
+    - name: Forward mail for root to {{ google_smtp_user }}
+      ansible.builtin.lineinfile:
+        create: true
+        dest: /etc/aliases
+        regexp: "^{{ item.user | ansible.builtin.regex_escape }}:"
+        line: "{{ item.user }}: {{ item.alias }}"
+        mode: '644'
+        owner: 0
+        group: 0
+      loop:
+        - user: root
+          alias: "{{ google_smtp_user }}"
+
+- name: Ensure git is installed
+  ansible.builtin.package:
+    name: git
+    state: present
+
+- name: Clone agross/unit-status-mail
+  ansible.builtin.git:
+    repo: https://github.com/agross/systemd-unit-status-mail.git
+    version: master
+    dest: "{{ root }}"
+    force: true
+
+- name: Install SELinux packages
+  when: ansible_selinux.status != 'disabled'
+  ansible.builtin.package:
+    name:
+      - python3-policycoreutils
+    state: present
+
+- name: Allow execution of the unit-status-mail script
+  when: ansible_selinux.status != 'disabled'
+  community.general.sefcontext:
+    target: "{{ root }}/unit-status-mail"
+    setype: bin_t
+    state: present
+
+- name: Apply SELinux file context for binaries
+  when: ansible_selinux.status != 'disabled'
+  ansible.builtin.command:
+    argv:
+      - restorecon
+      - -irv
+      - "{{ root }}"
+  register: restorecon_result
+  changed_when: restorecon_result.stdout | length > 0
+
+- name: Install systemd service
+  ansible.builtin.copy:
+    content: |
+      # Start this systemd unit with
+      #   systemctl start unit-status-mail@foo.service
+      # Check the result with
+      #   systemctl status unit-status-mail@foo.service
+
+      [Unit]
+      Description=Unit Status Mailer Service
+      After=network.target
+
+      [Service]
+      ExecStart={{ root | ansible.builtin.quote }}/unit-status-mail %i \
+                                                   root \
+                                                   'Hostname: %H' \
+                                                   'Machine ID: %m' \
+                                                   'Boot ID: %b'
+    dest: /etc/systemd/system/unit-status-mail@.service
+    owner: 0
+    group: 0
+    mode: '644'
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true

@@ -21,8 +21,8 @@
       tags: postfix
     - name: dotfiles
       tags: dotfiles
-    # - name: unit-status-mail
-    #   tags: unit-status-mail
+    - name: unit-status-mail
+      tags: unit-status-mail
     - name: borgmatic
       tags: borgmatic
 
