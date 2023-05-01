@@ -7,7 +7,7 @@
     borg_encryption_passphrase: >-
       {{ borgmatic_encryption_passphrase | ansible.builtin.mandatory }}
 
-    borg_repository: ssh://nas/volume2/NetBackup/{{ ansible_hostname }}.borg
+    borg_repository: ssh://nas/volume2/NetBackup/borg/{{ site }}/{{ ansible_hostname }}
     borgmatic_relocated_repo_access_is_ok: true
     borg_remote_path: /usr/local/bin/borg
 
