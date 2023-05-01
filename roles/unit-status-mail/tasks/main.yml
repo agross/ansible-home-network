@@ -18,7 +18,7 @@
         name: msmtp-mta
         state: present
 
-    - name: Install msmtp-mta (dnf)
+    - name: Install msmtp (dnf)
       when: ansible_pkg_mgr == 'dnf'
       ansible.builtin.package:
         name: msmtp
