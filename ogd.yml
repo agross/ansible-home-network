@@ -29,18 +29,12 @@
         ssh_allow_agent_forwarding: true
         sftp_enabled: true
       tags: ssh
-    - name: networking
-      tags: [network, networking]
-    - name: kernel-cmdline
-      tags: kernel-cmdline
     - name: postfix
       tags: postfix
     - name: dotfiles
       tags: dotfiles
     - name: unit-status-mail
       tags: unit-status-mail
-    - name: borgmatic
-      tags: borgmatic
 
 - name: Virtualizaton guest configuration
   hosts: ogd:&guest
@@ -51,6 +45,12 @@
       tags: guest-agent
     - name: watchdog
       tags: watchdog
+    - name: kernel-cmdline
+      tags: kernel-cmdline
+    - name: networking
+      tags: [network, networking]
+    - name: borgmatic
+      tags: borgmatic
 
 - name: Configure host as a gateway
   hosts: gateway-ogd
