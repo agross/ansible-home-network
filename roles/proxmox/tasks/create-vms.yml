@@ -1,0 +1,112 @@
+- name: Ensure proxmoxer is available
+  ansible.builtin.package:
+    name: python3-proxmoxer
+    state: present
+
+- name: Build guest VM list
+  ansible.builtin.set_fact:
+    kvm_guests: >-
+      {{
+        query('inventory_hostnames', 'guest') |
+          map('ansible.builtin.extract', hostvars) |
+          list
+      }}
+
+- name: Create guest VMs
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_api_user | mandatory }}"
+    api_password: "{{ proxmox_api_password | mandatory }}"
+    api_host: localhost
+    node: "{{ ansible_hostname | mandatory }}"
+    vmid: "{{ guest.kvm.id | mandatory }}"
+    name: "{{ guest.inventory_hostname_short | mandatory }}"
+    agent: true
+    protection: true
+    autostart: true
+    onboot: true
+    startup: "{{ guest.kvm.startup | default(omit) }}"
+    acpi: true
+    kvm: true
+    balloon: "{{ guest.kvm.balloon | default(true) }}"
+    memory: "{{ guest.kvm.memory | mandatory }}"
+    bios: ovmf
+    efidisk0:
+      storage: local-lvm
+      format: raw
+      efitype: 4m
+      pre_enrolled_keys: 1
+    boot: order=scsi0;ide0
+    sockets: 1
+    cores: "{{ guest.kvm.cores | mandatory }}"
+    cpu: host
+    machine: q35
+    hotplug: disk,network,usb
+    vga: std
+    ide:
+      ide0: none # local:iso/Fedora-Server-netinst-x86_64-37-1.7.iso,media=cdrom
+    scsihw: virtio-scsi-pci
+    scsi: "{{ guest.kvm.scsi | default(omit) }}"
+    net: "{{ guest.kvm.net | default(omit) }}"
+    # According to https://pve.proxmox.com/pve-docs/api-viewer/index.html#/nodes/{node}/qemu
+    # this is experimental. And it currently fails, which is why we handle
+    # such devices manually below.
+    # hostpci: "{{ guest.kvm.hostpci | default(omit) }}"
+    ostype: l26
+    watchdog: model=i6300esb,action=reset
+  loop: "{{ kvm_guests }}"
+  loop_control:
+    loop_var: guest
+    label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
+  notify: Install guest OS manually
+  register: guest_vms_created
+
+- name: Add host PCI devices to guest
+  ansible.builtin.include_tasks: create-vms-hostpci.yml
+  loop: "{{ kvm_guests }}"
+  loop_control:
+    loop_var: guest
+    label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
+
+- name: Check if the host uses a hardware RNG
+  ansible.builtin.lineinfile:
+    path: /sys/class/misc/hw_random/rng_current
+    regexp: ^none$
+    state: absent
+  changed_when: false
+  check_mode: true
+  register: host_has_no_hwrng
+
+- name: Passthrough hardware RNG to guest
+  when: not host_has_no_hwrng.found
+  block:
+    # /bin/sh does not support pipefail option.
+    - name: Check if the guest has a RNG device configured # noqa risky-shell-pipe
+      ansible.builtin.shell:
+        cmd: >-
+          qm config {{ guest.kvm.id | quote }} | grep --quiet ^rng0:
+      loop: "{{ kvm_guests }}"
+      loop_control:
+        loop_var: guest
+        label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
+      changed_when: false
+      failed_when: false
+      register: rng_configured
+
+    - name: Add RNG device to guest
+      when: rng_configured.results[index].rc != 0
+      ansible.builtin.command:
+        argv:
+          - qm
+          - set
+          - "{{ guest.kvm.id }}"
+          - -rng0
+          - source=/dev/hwrng
+      loop: "{{ kvm_guests }}"
+      loop_control:
+        loop_var: guest
+        index_var: index
+        label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
+      changed_when: true
+
+- name: Install guest OS manually, if a VM was created
+  ansible.builtin.meta: flush_handlers

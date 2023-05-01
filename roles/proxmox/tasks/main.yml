@@ -1,0 +1,28 @@
+- name: Install newer kernel
+  ansible.builtin.apt:
+    name: "{{ kernel_package | default(omit) }}"
+    state: present
+  register: kernel_package_installed
+
+- name: Reboot after kernel installation
+  ansible.builtin.reboot:
+    msg: PVE kernel update
+  when: kernel_package_installed is changed # noqa: no-handler
+
+- name: Configure IOMMU for PCI passthrough
+  ansible.builtin.import_tasks: iommu.yml
+
+- name: Configure DNS
+  ansible.builtin.import_tasks: dns.yml
+
+- name: Configure network interfaces
+  ansible.builtin.import_tasks: network-interfaces.yml
+
+- name: Configure firewall for the Proxmox host
+  ansible.builtin.import_tasks: firewall.yml
+
+- name: Configure ACME account
+  ansible.builtin.import_tasks: acme-account.yml
+
+- name: Create VMs
+  ansible.builtin.import_tasks: create-vms.yml

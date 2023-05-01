@@ -1,0 +1,36 @@
+- name: Ensure cluster firewall config directory exists
+  ansible.builtin.file:
+    dest: /etc/pve/firewall
+    state: directory
+    owner: 0
+    group: 33
+    mode: '755'
+
+- name: >-
+    Ensure that the firewall config file exists such that the following
+    cross-mount copy works
+  ansible.builtin.file:
+    path: /etc/pve/firewall/cluster.fw
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    owner: 0
+    group: 33
+    mode: '640'
+
+# Port 22/tcp and 8006/tcp are still allowed. ICMP ping is disabled by default.
+- name: Enable cluster and nodes firewall
+  ansible.builtin.copy:
+    dest: /etc/pve/firewall/cluster.fw
+    content: |
+      [OPTIONS]
+
+      enable: 1
+
+      [RULES]
+
+      IN Ping(ACCEPT) -log nolog
+    owner: 0
+    group: 33
+    mode: '640'
+  notify: Reload firewall

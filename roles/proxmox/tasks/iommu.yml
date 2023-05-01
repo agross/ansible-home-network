@@ -1,0 +1,47 @@
+- name: Set IOMMU kernel parameter for Intel CPU
+  when: ansible_processor[1] == 'GenuineIntel'
+  ansible.builtin.set_fact:
+    iommu_parameter: intel_iommu
+
+- name: Set IOMMU kernel parameter for AMD CPU
+  when: ansible_processor[1] == 'AuthenticAMD'
+  ansible.builtin.set_fact:
+    iommu_parameter: amd_iommu
+
+- name: Fail if the CPU is not supported by this role
+  when: iommu_parameter is not defined
+  ansible.builtin.fail:
+    msg: "Unsupported CPU: {{ ansible_processor[1] }}"
+
+- name: Set IOMMU kernel parameter
+  when: not ansible_proc_cmdline[iommu_parameter] is defined
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    # What a beauty.
+    # https://stackoverflow.com/a/73507168/149264
+    regexp: >-
+      ^GRUB_CMDLINE_LINUX_DEFAULT="((:?(?!{{ iommu_parameter | ansible.builtin.regex_escape }}=on).)*?)"$
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 {{ iommu_parameter }}=on"'
+    backup: true
+    backrefs: true
+  notify:
+    - Update grub
+    - Reboot because kernel parameters changed
+
+- name: Enable IOMMU passthrough support
+  when: >-
+    not ansible_proc_cmdline.iommu is defined or
+    not ansible_proc_cmdline.iommu == 'pt'
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: >-
+      ^GRUB_CMDLINE_LINUX_DEFAULT="((:?(?!iommu=pt).)*?)"$
+    line: GRUB_CMDLINE_LINUX_DEFAULT="\1 iommu=pt"
+    backup: true
+    backrefs: true
+  notify:
+    - Update grub
+    - Reboot because kernel parameters changed
+
+- name: Reboot now, if required
+  ansible.builtin.meta: flush_handlers

@@ -1,0 +1,130 @@
+- name: Check if the default ACME account has been configured
+  ansible.builtin.stat:
+    path: /etc/pve/priv/acme/{{ pve_acme_account_id | mandatory }}
+  register: acme_account
+
+- name: Register ACME account
+  when: not acme_account.stat.exists
+  block:
+    - name: Install required packages for unattended setup
+      ansible.builtin.package:
+        name: python3-pexpect
+
+    - name: Register default ACME account
+      ansible.builtin.expect:
+        command: >-
+          pvenode
+            acme
+            account
+            register
+            {{ pve_acme_account_id | quote }}
+            {{ acme_account_email | mandatory | quote }}
+            --directory https://acme-v02.api.letsencrypt.org/directory
+        responses:
+          'Do you agree to the above terms?': 'y'
+        echo: true
+
+- name: Check if the INWX DNS plugin is configured
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - plugin
+      - config
+      - inwx-dns
+  register: inwx_dns_plugin
+  changed_when: false
+  failed_when: false
+
+- name: Configure INWX DNS plugin
+  when: inwx_dns_plugin.rc != 0
+  block:
+    - name: Create file with INWX authentication data
+      ansible.builtin.copy:
+        dest: /tmp/inwx-auth
+        content: |
+          INWX_User={{ inwx_username | mandatory }}
+          INWX_Password={{ inwx_password | mandatory }}
+          INWX_Shared_Secret=
+        owner: 0
+        group: 0
+        mode: '400'
+
+    - name: Register INWX DNS plugin
+      ansible.builtin.command:
+        argv:
+          - pvenode
+          - acme
+          - plugin
+          - add
+          - dns
+          - inwx-dns
+          - --api
+          - inwx
+          - --data
+          - /tmp/inwx-auth
+      changed_when: true
+
+  always:
+    - name: Remove INWX authentication data file
+      ansible.builtin.file:
+        dest: /tmp/inwx-auth
+        state: absent
+
+- name: Get default ACME account
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - config
+      - get
+      - -property
+      - acme
+  register: acme_account
+  changed_when: false
+
+- name: Configure default ACME account
+  when: not 'account=' ~ pve_acme_account_id in acme_account.stdout
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - config
+      - set
+      - -acme
+      - "account={{ pve_acme_account_id }}"
+  changed_when: true
+
+- name: Get ACME domain
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - config
+      - get
+      - -property
+      - acmedomain0
+  register: acme_domain
+  changed_when: false
+
+- name: Configure ACME domain
+  when: not pve_fqdn ~ ',plugin=inwx-dns' in acme_domain.stdout
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - config
+      - set
+      - -acmedomain0
+      - "{{ pve_fqdn }},plugin=inwx-dns"
+  changed_when: true
+
+# Not sure if this works. Ordering seems impossible when a certificate is still
+# available, albeit deleted from the UI.
+- name: Order certificate
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - cert
+      - order
+  register: acme_order
+  failed_when: >-
+    acme_order.rc != 0 and not 'Custom certificate exists' in acme_order.stderr
+  changed_when: acme_order.rc == 0

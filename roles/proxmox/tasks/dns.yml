@@ -1,0 +1,13 @@
+- name: Configure DNS
+  ansible.builtin.copy:
+    dest: /etc/resolv.conf
+    content: |
+      {% if dns.search_domains is defined and dns.search_domains | length %}
+      search {{ dns.search_domains | default([], true) | join(' ') }}
+      {% endif %}
+      {% for server in dns.servers | default([], true) %}
+      nameserver {{ server | mandatory }}
+      {% endfor %}
+    owner: 0
+    group: 0
+    mode: '644'

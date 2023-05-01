@@ -1,0 +1,23 @@
+- name: Configure /etc/network/interfaces
+  ansible.builtin.template:
+    src: "templates/{{ inventory_hostname }}/interfaces.j2"
+    dest: /etc/network/interfaces
+    owner: 0
+    group: 0
+    mode: '644'
+    lstrip_blocks: true
+  notify: Reboot because networking changed
+
+- name: Ensure host IP is included in /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    search_string: "{{ inventory_hostname }}"
+    line: >-
+      {{ interfaces.lan.ipv4.address | ansible.utils.ipaddr('address') }}
+      {{ pve_fqdn }}
+      {{ inventory_hostname }}
+    state: present
+    backup: true
+
+- name: Reboot now, if required
+  ansible.builtin.meta: flush_handlers
