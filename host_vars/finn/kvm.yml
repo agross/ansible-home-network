@@ -1,0 +1,14 @@
+kvm:
+  id: 101
+  startup: order=200
+  cores: 4
+  balloon: 2048
+  memory: 4096
+  hostpci:
+    # SATA controller.
+    hostpci0: host=0000:00:12
+  net:
+    net0: "virtio,bridge=vmbr0,firewall=1"
+    net1: "virtio,bridge=vmbr0,firewall=1"
+  scsi:
+    scsi0: local-lvm:100,discard=on,ssd=1

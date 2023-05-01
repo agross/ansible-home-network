@@ -1,0 +1,12 @@
+interfaces:
+  lan:
+    device: enp2s0
+    mtu: 9000
+    ipv4:
+      address: "{{ network.ipv4 | ansible.utils.ipaddr('1') | mandatory }}"
+      gateway: "{{ network.ipv4 | ansible.utils.nthhost(2) | mandatory }}"
+    ipv6:
+      address: "{{ network.ipv6 | ansible.utils.ipaddr('1') | mandatory }}"
+      gateway: "{{ network.ipv6 | ansible.utils.nthhost(2) | mandatory }}"
+  wan:
+    device: enp3s0

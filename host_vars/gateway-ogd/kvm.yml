@@ -1,0 +1,11 @@
+kvm:
+  id: 100
+  startup: order=100
+  cores: 2
+  balloon: 1024
+  memory: 2048
+  net:
+    net0: "virtio,bridge=vmbr0,firewall=1"
+    net1: "virtio,bridge=vmbr1,firewall=1"
+  scsi:
+    scsi0: local-lvm:5,discard=on,ssd=1
