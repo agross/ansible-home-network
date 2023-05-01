@@ -1,3 +1,4 @@
+# hadolint ignore=DL3007
 FROM ricardbejarano/dnsmasq:latest
 
 # Required for DHCP.

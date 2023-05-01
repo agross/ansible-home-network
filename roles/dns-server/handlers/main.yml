@@ -1,9 +1,3 @@
-- name: Restart dns-server-available service
-  when: dns_server_available_started is not changed
-  ansible.builtin.systemd:
-    name: "{{ service_name }}-available"
-    state: restarted
-
 - name: Restart dns-server service
   when: dns_server_started is not changed
   ansible.builtin.systemd:

@@ -1,5 +1,8 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
 # Enable the TFTP.
-enable-tftp=ens192
+enable-tftp={{ interfaces.lan.device | mandatory }}
 
 # Serve files from this directory.
 tftp-root=/tftpboot

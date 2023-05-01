@@ -33,6 +33,7 @@ dns:
   blocking_ipv4: ""
   blocking_ipv6: ""
   blocked_response_ttl: 10
+  protection_disabled_until: null
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   ratelimit: 0
@@ -40,7 +41,7 @@ dns:
   refuse_any: true
   upstream_dns:
     - '# dnsmasq.'
-    - 127.0.0.1:{{ ports.dnsmasq | mandatory }}
+    - 127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}
   upstream_dns_file: ""
   bootstrap_dns:
     - 1.1.1.1
@@ -76,15 +77,23 @@ dns:
   handle_ddr: true
   ipset: []
   ipset_file: ""
+  bootstrap_prefer_ipv6: false
   filtering_enabled: true
   filters_update_interval: 12
   parental_enabled: false
-  safesearch_enabled: false
   safebrowsing_enabled: false
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576
   cache_time: 30
+  safe_search:
+    enabled: false
+    bing: true
+    duckduckgo: true
+    google: true
+    pixabay: true
+    yandex: true
+    youtube: true
   rewrites: []
   blocked_services: []
   upstream_timeout: 10s
@@ -92,9 +101,9 @@ dns:
   use_private_ptr_resolvers: true
   local_ptr_upstreams:
     - '# Resolve IPv4 PTR using dnsmasq...'
-    - '[/in-addr.arpa/]127.0.0.1:{{ ports.dnsmasq | mandatory }}'
+    - '[/in-addr.arpa/]127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}'
     - '# ...and IPv6 PTR using systemd-resolved which supports NDP to resolve link-local addresses.'
-    - '[/ip6.arpa/]127.0.0.1:{{ ports.resolved | mandatory }}'
+    - '[/ip6.arpa/]127.0.0.1:{{ dns_server_ports.resolved | mandatory }}'
   use_dns64: false
   dns64_prefixes: []
   serve_http3: false
@@ -115,15 +124,15 @@ tls:
   private_key_path: ""
   strict_sni_check: false
 querylog:
-  enabled: true
-  file_enabled: true
+  ignored: []
   interval: 24h
   size_memory: 1000
-  ignored: []
-statistics:
   enabled: true
-  interval: 90
+  file_enabled: true
+statistics:
   ignored: []
+  interval: 2160h
+  enabled: true
 filters:
   - enabled: true
     url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
@@ -142,7 +151,8 @@ filters:
     name: EasyList
     id: 1638723474
 whitelist_filters: []
-user_rules: []
+user_rules:
+  - '@@||localhost^$important'
 dhcp:
   enabled: false
   interface_name: ""
@@ -179,4 +189,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 17
+schema_version: 20

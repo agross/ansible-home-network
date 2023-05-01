@@ -1,0 +1,10 @@
+interfaces:
+  lan:
+    device: ens192
+    ip4: "{{ network.ip4 | ansible.utils.ipaddr('3') }}"
+    dns4: 127.0.0.1
+    dns4_search: "{{ dns.search_domains }}"
+    ip6: "{{ network.ip6 | ansible.utils.ipaddr('3') }}"
+    dns6: ::1
+    dns6_search: "{{ dns.search_domains }}"
+    zone: internal

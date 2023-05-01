@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+host-record={{ ansible_hostname }}, {{ ansible_hostname }}.{{ network.domain | mandatory }}, {{ interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}, {{ interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}

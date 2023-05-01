@@ -1,3 +1,6 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
 listen-address=127.0.0.1
 listen-address=::1
 
@@ -7,7 +10,7 @@ listen-address=::1
 # Repeat the line for more than one interface.
 
 # For DHCP requests from the LAN.
-interface=ens192
+interface={{ interfaces.lan.device | mandatory }}
 
 # Do not bind to wildcard IPs.
 # If this option is enabled all of the interfaces above need to be

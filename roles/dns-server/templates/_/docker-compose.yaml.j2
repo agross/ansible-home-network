@@ -1,15 +1,23 @@
+volumes:
+  adguard-data:
+
 services:
   # Primary, ad-blocking DNS with a nice UI. Uses dnsmasq as the only upstream.
   adguard:
     image: adguard/adguardhome:latest
     restart: unless-stopped
-    # Publishing ports would publish them globally via docker's firewalld support,
-    # but only on IPv4.
-    # Host networking follows firewalld rules and enables IPv4 and IPv6.
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.adguard.entrypoints: https
+      traefik.http.routers.adguard.rule: Host(`adguard.{{ network.domain | mandatory }}`)
+      traefik.http.services.adguard.loadbalancer.server.port: 30000
+    # Such that AdGuard logs real IP addresses instead of the proxied docker
+    # address and to be able to talk to dnsmasq which also runs on the host
+    # network.
     network_mode: host
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./adguard/work:/opt/adguardhome/work
+      - adguard-data:/opt/adguardhome/work
       - ./adguard/conf:/opt/adguardhome/conf
       - ./adguard/healthcheck:/opt/adguardhome/healthcheck:ro
     healthcheck:
@@ -17,9 +25,12 @@ services:
         - CMD
         - /opt/adguardhome/healthcheck
       start_period: 5s
+      interval: 5s
+    depends_on:
+      - dnsmasq
 
-  # DHCP + DNS (127.0.0.1:{{ ports.dnsmasq | mandatory }}/udp) with information about DHCP hosts. Uses
-  # dnscrypt-proxy as the only upstream.
+  # DHCP + DNS (127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}/udp) with information about DHCP hosts. Uses
+  # Uses dnscrypt-proxy as its upstream.
   dnsmasq:
     image: ricardbejarano/dnsmasq:custom
     pull_policy: never
@@ -37,17 +48,17 @@ services:
       - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf:ro
       - ./dnsmasq/dnsmasq.conf.d:/etc/dnsmasq.conf.d:ro
       - ./dnsmasq/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
-      - /tftpboot:/tftpboot:ro
     depends_on:
-      - adguard
       - dnscrypt-proxy
 
-  # Outbound DNS server (127.0.0.1:{{ ports.dnscrypt | mandatory }}/udp).
+  # Outbound DNS server (127.0.0.1:{{ dns_server_ports.dnscrypt | mandatory }}/udp).
   dnscrypt-proxy:
     image: klutchell/dnscrypt-proxy
     restart: unless-stopped
     ports:
-      - '127.0.0.1:{{ ports.dnscrypt | mandatory }}:5053/udp'
+      # Bound to localhost such that dnsmasq which runs on the host network can
+      # access it.
+      - '127.0.0.1:{{ dns_server_ports.dnscrypt | mandatory }}:5053/udp'
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./dnscrypt-proxy:/config

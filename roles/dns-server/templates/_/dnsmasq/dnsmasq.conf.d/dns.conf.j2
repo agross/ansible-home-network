@@ -1,5 +1,7 @@
-# If you don't want dnsmasq to read /etc/hosts, uncomment the
-# following line.
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+# Do not read /etc/hosts.
 no-hosts
 
 # Read all the hosts files contained in the directory. New or changed files are
@@ -11,12 +13,10 @@ no-resolv
 
 # Listen on <port> instead of the standard DNS port (53). Changing the default
 # port will no longer set the DNS server option for DHCP clients.
-port={{ ports.dnsmasq | mandatory }}
+port={{ dns_server_ports.dnsmasq | mandatory }}
 
 # Define upstream DNS server (dnscrypt-proxy).
-server=127.0.0.1#{{ ports.dnscrypt | mandatory }}
-
-server=/mirrors.fedoraproject.org/1.1.1.1
+server=127.0.0.1#{{ dns_server_ports.dnscrypt | mandatory }}
 
 # Reject (and log) addresses from upstream nameservers which are in the private
 # ranges. This blocks an attack where a browser behind a firewall is used to
@@ -26,14 +26,10 @@ stop-dns-rebind
 # Exempt 127.0.0.0/8 and ::1 from rebinding checks.
 rebind-localhost-ok
 
-# Do not detect and block dns-rebind on queries to these domains.
-rebind-domain-ok=/wghoch4.local/
-
-# Additional hosts file. Read the specified file as well as
-# /etc/hosts. If no-hosts is given, read only the specified file.
-# This option may be repeated for more than one additional
-# hosts file. If a directory is given, then read all the files
-# contained in that directory.
+# Additional hosts file. Read the specified file as well as /etc/hosts. If
+# no-hosts is given, read only the specified file.
+# This option may be repeated for more than one additional hosts file. If a
+# directory is given, then read all the files contained in that directory.
 # addn-hosts=/etc/dnsmasq.conf.d/hosts
 
 # Bogus private reverse lookups. All reverse lookups for private IP ranges (ie
@@ -48,20 +44,20 @@ cache-size=3000
 # or domain parts, to upstream nameservers.
 domain-needed
 
-# Set this (and domain: see below) if you want to have a domain
-# automatically added to simple names in a hosts-file.
+# Set this (and domain: see below) if you want to have a domain automatically
+# added to simple names in a hosts-file.
 expand-hosts
 
-# Set the domain for dnsmasq. this is optional, but if it is set, it
-# does the following things.
-# 1) Allows DHCP hosts to have fully qualified domain names, as long
-#     as the domain part matches this setting.
-# 2) Sets the "domain" DHCP option thereby potentially setting the
-#    domain of all systems configured by DHCP
+# Set the domain for dnsmasq. this is optional, but if it is set, it does the
+# following things.
+# 1) Allows DHCP hosts to have fully qualified domain names, as long as the
+#    domain part matches this setting.
+# 2) Sets the "domain" DHCP option thereby potentially setting the domain of all
+#    systems configured by DHCP
 # 3) Provides the domain part for "expand-hosts"
-domain=home.therightstuff.de, 172.16.0.0/24, local
+domain={{ network.domain | mandatory }}, {{ network.ip4 | mandatory }}, local
 
-# If you want to disable negative caching, uncomment this.
+# Disable negative caching.
 no-negcache
 
 # When replying with information from /etc/hosts or configuration or the DHCP
