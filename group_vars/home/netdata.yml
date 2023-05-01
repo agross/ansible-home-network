@@ -1,0 +1,2 @@
+netdata_stream_destination: 172.16.0.3
+netdata_stream_api_key: "{{ vault_netdata_stream_api_key }}"

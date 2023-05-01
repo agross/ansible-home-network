@@ -1,5 +1,5 @@
 - name: Configure host as a gateway
-  hosts: gateway
+  hosts: gateway-home
   become: true
   gather_facts: false
   roles:
@@ -17,3 +17,5 @@
       tags: postfix
     - name: gateway
       tags: gateway
+    - name: netdata
+      tags: netdata

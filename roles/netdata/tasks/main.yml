@@ -1,0 +1,44 @@
+- name: Add netdata repo
+  ansible.builtin.yum_repository:
+    name: netdata
+    description: netdata
+    baseurl: https://repo.netdata.cloud/repos/stable/fedora/$releasever/$basearch/
+    gpgcheck: true
+    gpgkey: https://repo.netdata.cloud/netdatabot.gpg.key
+
+- name: Ensure netdata is installed
+  ansible.builtin.package:
+    name: netdata
+    state: present
+
+- name: Disable web server and statsd
+  ansible.builtin.blockinfile:
+    path: /etc/netdata/netdata.conf
+    block: |
+      [web]
+        mode = none
+
+      [statsd]
+        enabled = no
+  notify: Restart netdata service
+
+- name: Enable streaming
+  ansible.builtin.copy:
+    content: |
+      [stream]
+      enabled = yes
+      destination = {{ netdata_stream_destination }}
+      api key = {{ netdata_stream_api_key }}
+    dest: /etc/netdata/stream.conf
+    owner: 0
+    group: netdata
+    mode: '640'
+  notify: Restart netdata service
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: netdata
+    daemon_reload: true
+  register: netdata_started
