@@ -14,8 +14,7 @@ groups:
     ansible_virtualization_type == 'kvm'
 
   guest: >-
-    ansible_virtualization_role == 'guest' and
-    ansible_virtualization_type == 'kvm'
+    ansible_virtualization_role == 'guest'
 
   linux: >-
     ansible_system == 'Linux'
