@@ -4,8 +4,6 @@
   vars:
     docker_install_compose_plugin: true
     docker_install_compose: false
-    docker_users:
-      - "{{ docker_user | default(ansible_user_id) }}"
 
 - name: Support docker management via ansible
   ansible.builtin.include_role:
