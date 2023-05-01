@@ -3,7 +3,7 @@ dns:
     - "{{ network.domain | mandatory }}"
   servers:
     # TODO
-    - "{{ network.ipv4 | ansible.utils.nthhost(102) | mandatory }}"
+    - "{{ network.ip4 | ansible.utils.nthhost(102) | mandatory }}"
 
-    - "{{ network.ipv4 | ansible.utils.nthhost(3) | mandatory }}"
-    - "{{ network.ipv6 | ansible.utils.nthhost(3) | mandatory }}"
+    - "{{ network.ip4 | ansible.utils.nthhost(3) | mandatory }}"
+    - "{{ network.ip6 | ansible.utils.nthhost(3) | mandatory }}"

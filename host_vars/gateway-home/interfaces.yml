@@ -1,10 +1,10 @@
 interfaces:
   lan:
     device: ens192
-    ip4: "{{ network.ipv4 | ansible.utils.ipaddr('1') }}"
+    ip4: "{{ network.ip4 | ansible.utils.ipaddr('1') }}"
     dns4: "{{ dns.servers | ansible.utils.ipv4 }}"
     dns4_search: "{{ dns.search_domains }}"
-    ip6: "{{ network.ipv6 | ansible.utils.ipaddr('1') }}"
+    ip6: "{{ network.ip6 | ansible.utils.ipaddr('1') }}"
     dns6: "{{ dns.servers | ansible.utils.ipv6 }}"
     dns6_search: "{{ dns.search_domains }}"
     zone: internal

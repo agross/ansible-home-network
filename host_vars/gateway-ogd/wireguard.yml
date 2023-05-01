@@ -8,5 +8,5 @@ wireguard:
       endpoint: "{{ hostvars['gateway-home'].network.domain }}:51820"
       persistent_keepalive: 25
       allowed_ips:
-        - "{{ hostvars['gateway-home'].network.ipv4 }}"
-        - "{{ hostvars['gateway-home'].network.ipv6 }}"
+        - "{{ hostvars['gateway-home'].network.ip4 }}"
+        - "{{ hostvars['gateway-home'].network.ip6 }}"

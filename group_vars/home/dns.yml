@@ -2,5 +2,5 @@ dns:
   search_domains:
     - "{{ network.domain | mandatory }}"
   servers:
-    - "{{ network.ipv4 | ansible.utils.nthhost(3) | mandatory }}"
-    - "{{ network.ipv6 | ansible.utils.nthhost(3) | mandatory }}"
+    - "{{ network.ip4 | ansible.utils.nthhost(3) | mandatory }}"
+    - "{{ network.ip6 | ansible.utils.nthhost(3) | mandatory }}"
