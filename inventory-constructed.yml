@@ -21,6 +21,9 @@ groups:
   fedora: >-
     ansible_distribution == 'Fedora'
 
+  raspi: >-
+    'raspberrypi-kernel' in packages
+
   build_agents: >-
     inventory_hostname is match("agent-*")
 
