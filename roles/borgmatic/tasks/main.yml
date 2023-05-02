@@ -1,13 +1,22 @@
+- name: OS-dependent installation
+  ansible.builtin.include_tasks:
+    file: "{{ file }}"
+  with_first_found:
+    - "install-{{ ansible_distribution }}.yml"
+    - "install-{{ ansible_os_family }}.yml"
+  loop_control:
+    loop_var: file
+
 - name: Install borgmatic
   ansible.builtin.include_role:
     name: m3nu.ansible_role_borgbackup
   vars:
-    borg_install_method: package
-
     borg_encryption_passphrase: >-
       {{ borgmatic_encryption_passphrase | ansible.builtin.mandatory }}
 
-    borg_repository: ssh://nas/volume2/NetBackup/borg/{{ site }}/{{ ansible_hostname }}
+    borg_repository: >-
+      ssh://{{ borgmatic_ssh_host | ansible.builtin.mandatory }}/volume2/NetBackup/borg/{{ site | ansible.builtin.mandatory }}/{{ ansible_hostname }}
+
     borgmatic_relocated_repo_access_is_ok: true
     borg_remote_path: /usr/local/bin/borg
 
@@ -15,7 +24,8 @@
     borg_ssh_command: >-
       ssh -o User=backup -i "{{ borg_ssh_key_file_path }}" -o StrictHostKeyChecking=accept-new
 
-    # Timer is installed by the package.
+    # Timer is installed by the package. Or run timers ourselves as the
+    # pip-installed only runs the default borgmatic config.
     borgmatic_timer: ''
 
     borg_source_directories:
@@ -40,13 +50,6 @@
     firstmatch: true
     line: "    match_archives: 'sh:{hostname}-system-*'"
 
-- name: Install borgmatic from Fedora's testing repo # noqa package-latest
-  ansible.builtin.dnf:
-    enablerepo:
-      - updates-testing
-    name: borgmatic
-    state: latest
-
 - name: Ensure /etc/borgmatic.d exists
   ansible.builtin.file:
     path: /etc/borgmatic.d
@@ -55,37 +58,14 @@
     group: 0
     mode: '700'
 
-- name: Ensure /root/.borgmatic exists
-  ansible.builtin.file:
-    path: /root/.borgmatic
-    state: directory
-    owner: 0
-    group: 0
-    mode: '755'
-
-- name: Ensure borgmatic service and timer override directories exists
-  ansible.builtin.file:
-    path: "/etc/systemd/system/{{ item }}.d/"
-    state: directory
-    owner: 0
-    group: 0
-    mode: '755'
-  loop:
-    - borgmatic.timer
-    - borgmatic.service
-
-- name: Install borgmatic service and timer overrides
-  ansible.builtin.template:
-    src: "{{ item }}"
-    dest: "/etc/systemd/system/{{ item }}.d/override.conf"
-    owner: 0
-    group: 0
-    mode: '644'
-    lstrip_blocks: true
-  loop:
-    - borgmatic.timer
-    - borgmatic.service
-  notify: Restart borgmatic timer
+- name: OS-dependent post-installation
+  ansible.builtin.include_tasks:
+    file: "{{ file }}"
+  with_first_found:
+    - "postinstall-{{ ansible_distribution }}.yml"
+    - "postinstall-{{ ansible_os_family }}.yml"
+  loop_control:
+    loop_var: file
 
 - name: Start borgmatic timer
   ansible.builtin.systemd:

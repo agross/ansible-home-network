@@ -1,0 +1,15 @@
+- name: Ensure libfuse3-dev is installed to be able to mount backups
+  ansible.builtin.package:
+    name: libfuse3-dev
+    state: present
+
+- name: Set installation method to 'pip'
+  ansible.builtin.set_fact:
+    borg_install_method: pip
+
+- name: Set dependent Python packages
+  ansible.builtin.set_fact:
+    borg_dependent_python_packages:
+      - cython
+      - pkgconfig
+      - pyfuse3

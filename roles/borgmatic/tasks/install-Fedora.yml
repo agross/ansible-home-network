@@ -1,0 +1,10 @@
+- name: Set installation method to 'package'
+  ansible.builtin.set_fact:
+    borg_install_method: package
+
+- name: Install latest borgmatic from Fedora's testing repo # noqa package-latest
+  ansible.builtin.dnf:
+    enablerepo:
+      - updates-testing
+    name: borgmatic
+    state: latest

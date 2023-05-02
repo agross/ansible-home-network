@@ -1,0 +1,31 @@
+- name: Ensure /root/.borgmatic exists
+  ansible.builtin.file:
+    path: /root/.borgmatic
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Ensure borgmatic service and timer override directories exists
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item | ansible.builtin.basename }}.d/"
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+  loop:
+    - borgmatic.timer
+    - borgmatic.service
+
+- name: Install borgmatic service and timer overrides
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item | ansible.builtin.basename }}.d/override.conf"
+    owner: 0
+    group: 0
+    mode: '644'
+    lstrip_blocks: true
+  loop:
+    - Fedora/borgmatic.service
+    - borgmatic.timer
+  notify: Restart borgmatic timer
