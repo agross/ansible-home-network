@@ -1,9 +1,15 @@
 - name: Ensure NetworkManager is not installed
   ansible.builtin.package:
-    name: NetworkManager
+    name:
+      - NetworkManager
+      - NetworkManager-libnm
     state: absent
 
 - name: Delete NetworkManager config files
   ansible.builtin.file:
-    path: /etc/NetworkManager
+    path: "{{ item }}"
     state: absent
+  loop:
+    - /etc/NetworkManager
+    - /usr/lib/NetworkManager
+    - /var/lib/NetworkManager
