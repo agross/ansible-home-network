@@ -1,0 +1,57 @@
+- name: Linux configuration
+  hosts: home:&linux
+  become: true
+  gather_facts: false
+  roles:
+    - name: watchdog
+      tags: watchdog
+    - name: kernel-cmdline
+      tags: kernel-cmdline
+    - name: devsec.hardening.ssh_hardening
+      vars:
+        network_ipv6_enable: true
+        ssh_listen_to:
+          - '0.0.0.0'
+          - '::'
+        ssh_allow_tcp_forwarding: 'yes'
+        ssh_allow_agent_forwarding: true
+        sftp_enabled: true
+      tags: ssh
+    - name: networking
+      when: systemd_networkd_network is defined
+      tags: [network, networking]
+    - name: postfix
+      when: google_smtp_password is defined
+      tags: postfix
+    - name: unit-status-mail
+      when: google_smtp_password is defined
+      tags: unit-status-mail
+    - name: borgmatic
+      when: borgmatic_encryption_passphrase is defined
+      tags: borgmatic
+    - name: dotfiles
+      tags: dotfiles
+
+- name: Configure host as a gateway
+  hosts: gateway-home
+  become: true
+  gather_facts: false
+  roles:
+    - name: gateway
+      tags: gateway
+
+- name: Hosted services
+  hosts: router
+  become: true
+  gather_facts: false
+  roles:
+    - name: dns-server
+      tags: dns-server
+    - name: vaultwarden
+      tags: vaultwarden
+    - name: photoprism
+      tags: photoprism
+    - name: harbor
+      tags: harbor
+    - name: nextcloud
+      tags: nextcloud
