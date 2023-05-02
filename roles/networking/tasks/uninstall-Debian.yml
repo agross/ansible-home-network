@@ -1,0 +1,39 @@
+# https://raspberrypi.stackexchange.com/a/108593
+- name: Remove classic Debian networking
+  ansible.builtin.package:
+    name:
+      - avahi-daemon
+      - dhcpcd5
+      - ifupdown
+      - isc-dhcp-client
+      - isc-dhcp-common
+      - rsyslog
+    state: absent
+    autoremove: true
+
+- name: Hold packages so they can no longer be installed
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - avahi-daemon
+    - libnss-mdns
+    - dhcpcd5
+    - isc-dhcp-client
+    - isc-dhcp-common
+    - openresolv
+    - raspberrypi-net-mods
+    - rsyslog
+
+- name: Remove config files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/network
+    - /etc/dhcp
+
+- name: Install libnss-resolve (apt)
+  ansible.builtin.package:
+    name: libnss-resolve
+    state: present

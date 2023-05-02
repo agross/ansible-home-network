@@ -1,17 +1,18 @@
 - name: Ensure systemd-networkd is installed
+  # Debian has systemd-networkd included in the systemd package.
+  when: ansible_os_family == 'RedHat'
   ansible.builtin.package:
     name: systemd-networkd
     state: present
 
-- name: Ensure NetworkManager is not installed
-  ansible.builtin.package:
-    name: NetworkManager
-    state: absent
-
-- name: Delete NetworkManager config files
-  ansible.builtin.file:
-    path: /etc/NetworkManager
-    state: absent
+- name: Uninstall OS default networking
+  ansible.builtin.include_tasks:
+    file: "{{ file }}"
+  with_first_found:
+    - "uninstall-{{ ansible_distribution }}.yml"
+    - "uninstall-{{ ansible_os_family }}.yml"
+  loop_control:
+    loop_var: file
 
 - name: Ensure directory for systemd-networkd overrides exists
   ansible.builtin.file:

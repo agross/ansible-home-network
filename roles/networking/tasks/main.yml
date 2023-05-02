@@ -1,5 +1,6 @@
 - name: Configure systemd-networkd
   ansible.builtin.import_tasks: systemd-networkd-config.yml
 
-- name: Configure firewalld
+- name: Configure firewalld on RedHat-based systems
+  when: ansible_os_family == 'RedHat'
   ansible.builtin.import_tasks: firewalld.yml
