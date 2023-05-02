@@ -1,3 +1,23 @@
+- name: Raspberry Pi configuration
+  hosts: home:&raspi
+  become: true
+  gather_facts: false
+  roles:
+    - name: raspi-config
+      tags: raspi-config
+    - name: fstrim
+      tags: fstrim
+    - name: smartmontools
+      tags: smartmontools
+    - name: persistent-journal
+      tags: persistent-journal
+    - name: swapfile
+      tags: swapfile
+    - name: led-heartbeat
+      tags: led-heartbeat
+    - name: argon-one
+      tags: argon-one
+
 - name: Linux configuration
   hosts: home:&linux
   become: true

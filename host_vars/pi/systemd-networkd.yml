@@ -1,0 +1,16 @@
+systemd_networkd_enable_resolved: true
+systemd_networkd_symlink_resolv_conf: true
+systemd_networkd_apply_config: true
+
+systemd_networkd_network:
+  eth0:
+    - Match:
+        - Name: "{{ network_interface | default('eth0') }}"
+    - Network:
+        - DHCP: 'yes'
+        - MulticastDNS: true
+    - DHCPv4:
+        - UseDomains: true
+        - UseMTU: true
+    - IPv6AcceptRA:
+        - UseDomains: true
