@@ -2,6 +2,10 @@
   hosts: ogd:&hypervisor
   become: true
   gather_facts: false
+  pre_tasks:
+    - name: End play for hypervisors that are detected falsely
+      ansible.builtin.meta: end_host
+      when: hypervisor is not defined
   roles:
     - name: lae.proxmox
       vars:

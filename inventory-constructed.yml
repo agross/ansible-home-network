@@ -7,11 +7,10 @@ plugin: ansible.builtin.constructed
 #
 # To see the list of hosts in a specific groups:
 #
-# ansible-inventory --list | jq .gateways
+# ansible-inventory --list | jq .hypervisor
 groups:
   hypervisor: >-
-    ansible_virtualization_role == 'host' and
-    ansible_virtualization_type == 'kvm'
+    ansible_virtualization_role == 'host'
 
   guest: >-
     ansible_virtualization_role == 'guest'
