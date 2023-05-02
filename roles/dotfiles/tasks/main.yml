@@ -31,3 +31,20 @@
   ansible.builtin.user:
     name: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
     shell: /bin/zsh
+
+- name: Install useful tools
+  ansible.builtin.package:
+    name: "{{ tools }}"
+    state: present
+
+- name: Install useful tools (apt)
+  when: ansible_pkg_mgr == 'apt'
+  ansible.builtin.package:
+    name: "{{ tools_apt }}"
+    state: present
+
+- name: Install useful tools (dnf)
+  when: ansible_pkg_mgr == 'dnf'
+  ansible.builtin.package:
+    name: "{{ tools_dnf }}"
+    state: present

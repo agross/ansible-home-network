@@ -6,9 +6,15 @@ requirements:
   - tar
   - zsh
 
-  # Technically not required but useful.
-  - bind-utils
+# Technically not required but useful.
+tools:
   - mc
   - tcpdump
   - tree
   - vim
+
+tools_apt:
+  - bind9-dnsutils
+
+tools_dnf:
+  - bind-utils
