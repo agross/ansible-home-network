@@ -18,3 +18,5 @@ tools_apt:
 
 tools_dnf:
   - bind-utils
+  # For dnf tab completion.
+  - sqlite
