@@ -11,6 +11,7 @@
 - name: Set maximum swap size to twice the available RAM
   ansible.builtin.lineinfile:
     path: /etc/dphys-swapfile
+    regexp: ^CONF_MAXSWAP=
     line: "CONF_MAXSWAP={{ ansible_memtotal_mb * 2 }}"
     backup: true
     state: present
