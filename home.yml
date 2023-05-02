@@ -52,6 +52,27 @@
     - name: dotfiles
       tags: dotfiles
 
+- name: Fedora configuration
+  hosts: home:&fedora
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install cockpit
+      ansible.builtin.package:
+        name:
+          - cockpit
+          - cockpit-selinux
+          - cockpit-pcp
+        state: present
+      tags: cockpit
+
+    - name: Start and enable pmlogger.service for cockpit-pcp
+      ansible.builtin.systemd:
+        service: pmlogger.service
+        state: started
+        enabled: true
+      tags: cockpit
+
 - name: Configure host as a gateway
   hosts: gateway-home
   become: true
