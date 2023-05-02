@@ -8,7 +8,7 @@
       tags: docker
       vars:
         docker_users:
-          - "{{ ansible_user_id }}"
+          - "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
           - build-agent
     - name: devsec.hardening.ssh_hardening
       vars:
