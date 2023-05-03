@@ -80,6 +80,8 @@ systemd_networkd_network:
   he-ipv6:
     - Match:
         - Name: "{{ interfaces['he-ipv6'].device }}"
+    - Link:
+        - RequiredForOnline: false
     - Network:
         - Description: Hurricane Electric Tunnelbroker
         - Address: "{{ he_ipv6.tunnel.client6 }}"
@@ -88,6 +90,8 @@ systemd_networkd_network:
   wan:
     - Match:
         - Name: "{{ interfaces.wan.device }}"
+    - Link:
+        - RequiredForOnline: false
     - Network:
         # Disable auto-configuration via DHCPv4 and DHCPv6.
         - DHCP: false
@@ -98,6 +102,8 @@ systemd_networkd_network:
   wireguard:
     - Match:
         - Name: "{{ interfaces.wireguard.device }}"
+    - Link:
+        - RequiredForOnline: false
     - Network:
         - Address: "{{ interfaces.wireguard.ip4 }}"
         - Address: "{{ interfaces.wireguard.ip6 }}"
