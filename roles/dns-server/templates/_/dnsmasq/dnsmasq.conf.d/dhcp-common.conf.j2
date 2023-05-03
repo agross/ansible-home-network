@@ -51,10 +51,6 @@ dhcp-rapid-commit
 dhcp-option=option:dns-server, 0.0.0.0
 dhcp-option=option6:dns-server, [fe80::]
 
-# NTP server.
-dhcp-option=option:ntp-server, 0.0.0.0
-dhcp-option=option6:ntp-server, [fe80::]
-
 # DHCPv6 options.
 dhcp-option=option6:domain-search, {{ network.domain | mandatory }}
 dhcp-option=option6:information-refresh-time, 21600

@@ -73,6 +73,19 @@
         enabled: true
       tags: cockpit
 
+    - name: Uninstall chrony
+      ansible.builtin.package:
+        name: chrony
+        state: absent
+      tags: ntp
+
+    - name: Start and enable systemd-timesyncd.service
+      ansible.builtin.systemd:
+        service: systemd-timesyncd.service
+        state: started
+        enabled: true
+      tags: ntp
+
 - name: Configure host as a gateway
   hosts: gateway-home
   become: true
