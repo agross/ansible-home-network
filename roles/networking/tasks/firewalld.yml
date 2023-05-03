@@ -31,7 +31,7 @@
   loop_control:
     label: "{{ item.0.key }}: {{ item.1 }}"
 
-- name: Forward ports # noqa args[module]
+- name: Forward IPv4 ports # noqa args[module]
   ansible.posix.firewalld:
     zone: "{{ item.0.key }}"
     port_forward:
@@ -42,6 +42,23 @@
   loop: >-
     {{
       firewalld.forward_ports |
+        default({}) |
+        ansible.builtin.dict2items |
+        ansible.builtin.subelements('value')
+    }}
+  loop_control:
+    label: "{{ item.0.key }}: {{ item.1 }}"
+
+- name: Forward IPv6 ports / apply rich rules
+  ansible.posix.firewalld:
+    zone: "{{ item.0.key }}"
+    rich_rule: "{{ item.1 }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  loop: >-
+    {{
+      firewalld.rich_rules |
         default({}) |
         ansible.builtin.dict2items |
         ansible.builtin.subelements('value')

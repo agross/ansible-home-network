@@ -4,34 +4,85 @@ firewalld:
       - dhcpv6-client
       - wireguard
 
+  rich_rules:
+    # IPv6 port forwarding requires the use of the rich language.
+    external:
+      # HTTP.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=80
+          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-port=80
+      # HTTPS.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=443
+          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-port=443
+      # GitLab SSH.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=10022
+          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-port=10022
+      # Gitea SSH.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=10222
+          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-port=10222
+      # FTP.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=21
+          to-addr={{ network.ip6 | ansible.utils.nthhost(0x10) }}
+          to-port=21
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=10021
+          to-addr={{ network.ip6 | ansible.utils.nthhost(0x10) }}
+          to-port=10021
+
   forward_ports:
     external:
       # HTTP.
       - proto: tcp
         port: 80
-        toaddr: 172.16.0.3
+        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
         toport: 80
       # HTTPS.
       - proto: tcp
         port: 443
-        toaddr: 172.16.0.3
+        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
         toport: 443
       # GitLab SSH.
       - proto: tcp
         port: 10022
-        toaddr: 172.16.0.3
+        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
         toport: 10022
       # Gitea SSH.
       - proto: tcp
         port: 10222
-        toaddr: 172.16.0.3
+        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
         toport: 10222
-      # FTP
+      # FTP.
       - proto: tcp
         port: 21
-        toaddr: 172.16.0.10
+        toaddr: "{{ network.ip4 | ansible.utils.nthhost('10') }}"
         toport: 21
       - proto: tcp
         port: 10021
-        toaddr: 172.16.0.10
+        toaddr: "{{ network.ip4 | ansible.utils.nthhost('10') }}"
         toport: 10021
