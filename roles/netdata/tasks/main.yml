@@ -35,6 +35,25 @@
     mode: '640'
   notify: Restart netdata service
 
+- name: Ensure service override directory exists
+  ansible.builtin.file:
+    state: directory
+    path: /etc/systemd/system/netdata.service.d/
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Allow 30s for the service to stop
+  ansible.builtin.copy:
+    content: |
+      [Service]
+      TimeoutStopSec=30s
+    dest: /etc/systemd/system/netdata.service.d/stop-timeout.conf
+    owner: 0
+    group: 0
+    mode: '644'
+  notify: Restart netdata service
+
 - name: Start service
   ansible.builtin.systemd:
     state: started
