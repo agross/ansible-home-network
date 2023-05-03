@@ -1,0 +1,70 @@
+- name: Upgrade all Fedora hosts
+  hosts: fedora
+  become: true
+  gather_facts: false
+  # Run each host as fast as possible.
+  strategy: free # noqa run-once[play]
+  vars:
+    fedora_release: 38
+  pre_tasks:
+    - name: Display version to upgrade to
+      ansible.builtin.debug:
+        msg: Upgrading to release {{ fedora_release }}
+  tasks:
+    - name: Skip host if it is already upgraded
+      ansible.builtin.meta: end_host
+      when: ansible_facts['distribution_version'] is version(fedora_release, '>=')
+
+    - name: Run dnf upgrade --refresh
+      ansible.builtin.command:
+        argv:
+          - dnf
+          - --assumeyes
+          - upgrade
+          - --refresh
+      register: dnf_upgrade_refresh
+      changed_when: "'Nothing to do.' not in dnf_upgrade_refresh.stdout"
+
+    - name: Reboot # noqa no-handler
+      when: dnf_upgrade_refresh is changed
+      ansible.builtin.reboot:
+
+    - name: Install dnf-plugin-system-upgrade
+      ansible.builtin.dnf:
+        name: dnf-plugin-system-upgrade
+        state: present
+
+    - name: Run dnf system-upgrade download --releasever={{ fedora_release }}
+      ansible.builtin.command:
+        argv:
+          - dnf
+          - --assumeyes
+          - system-upgrade
+          - download
+          - --releasever={{ fedora_release }}
+      changed_when: true
+
+    # Rebooting would fail this task, so reboot manually later.
+    - name: Run dnf system-upgrade reboot without actually rebooting
+      environment:
+        DNF_SYSTEM_UPGRADE_NO_REBOOT: true
+      ansible.builtin.command:
+        argv:
+          - dnf
+          - system-upgrade
+          - reboot
+      changed_when: false
+
+    - name: Reboot
+      ansible.builtin.reboot:
+        post_reboot_delay: 30
+
+    - name: Re-gather ansible_facts
+      ansible.builtin.setup:
+
+    - name: Display current version
+      ansible.builtin.debug:
+        msg: >-
+          {{ ansible_facts['distribution_file_variety'] }}
+          {{ ansible_facts['distribution'] }}
+          {{ ansible_facts['distribution_version'] }}
