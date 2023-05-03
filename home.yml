@@ -93,6 +93,8 @@
   roles:
     - name: gateway
       tags: gateway
+    - name: netdata
+      tags: netdata
 
 - name: Hosted services
   hosts: router
