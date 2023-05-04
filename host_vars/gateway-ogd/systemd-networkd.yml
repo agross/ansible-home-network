@@ -17,6 +17,14 @@ systemd_networkd_netdev:
         - TTL: 255
         - DiscoverPathMTU: true
 
+  wan.pppoe:
+    - NetDev:
+        - Description: VLAN {{ interfaces.telekom.pppoe.vlan }} for Telekom uplink
+        - Name: "{{ interfaces.telekom.pppoe.device }}.{{ interfaces.telekom.pppoe.vlan }}"
+        - Kind: vlan
+    - VLAN:
+        - Id: "{{ interfaces.telekom.pppoe.vlan }}"
+
   wireguard:
     - NetDev:
         - Name: "{{ interfaces.wireguard.device }}"
@@ -90,6 +98,26 @@ systemd_networkd_network:
   wan:
     - Match:
         - Name: "{{ interfaces.wan.device }}"
+    - Link:
+        - RequiredForOnline: false
+    - Network:
+        - Address: "{{ interfaces.wan.ip4 }}"
+        - VLAN: "{{ interfaces.telekom.pppoe.device }}.{{ interfaces.telekom.pppoe.vlan }}"
+
+        # Disable auto-configuration via DHCPv4 and DHCPv6.
+        - DHCP: false
+        - LinkLocalAddressing: false
+        - LLMNR: false
+        - IPv6AcceptRA: false
+    # Potentially not required
+    # - Route:
+    #     - Gateway: "{{ interfaces.wan.ip4 | ansible.utils.nthhost(1) }}"
+    #     - Destination: "{{ interfaces.wan.ip4 | ansible.utils.ipaddr('0') }}"
+    #     - GatewayOnLink: true
+
+  wan.pppoe:
+    - Match:
+        - Name: "{{ interfaces.telekom.pppoe.device }}.{{ interfaces.telekom.pppoe.vlan }}"
     - Link:
         - RequiredForOnline: false
     - Network:

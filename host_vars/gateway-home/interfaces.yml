@@ -10,11 +10,14 @@ interfaces:
     zone: internal
 
   wan:
-    device: ens224
+    device: &pppoe_dev ens224
 
   telekom:
     device: telekom
     zone: external
+    pppoe:
+      device: *pppoe_dev
+      vlan: # Assigned by the DSL modem.
 
   he-ipv6:
     device: he-ipv6

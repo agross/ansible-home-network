@@ -10,11 +10,15 @@ interfaces:
     zone: internal
 
   wan:
-    device: enp6s19
+    device: &pppoe_dev enp6s19
+    ip4: 192.168.100.2/24
 
   telekom:
     device: telekom
     zone: external
+    pppoe:
+      device: *pppoe_dev
+      vlan: 7
 
   he-ipv6:
     device: he-ipv6
