@@ -4,11 +4,9 @@ interfaces:
     ip4:
       address: "{{ network.ip4 | ansible.utils.ipaddr('1') }}"
       dns: "{{ dns.servers | ansible.utils.ipv4 }}"
-      dns_search: "{{ dns.search_domains }}"
     ip6:
       address: "{{ network.ip6 | ansible.utils.ipaddr('1') }}"
       dns: "{{ dns.servers | ansible.utils.ipv6 }}"
-      dns_search: "{{ dns.search_domains }}"
     zone: internal
 
   wan:
