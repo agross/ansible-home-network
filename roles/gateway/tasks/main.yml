@@ -20,7 +20,7 @@
 
 - name: Install speed monitoring script
   ansible.builtin.template:
-    src: templates/speed.j2
+    src: templates/speed
     dest: /usr/local/bin/speed
     owner: 0
     group: 0

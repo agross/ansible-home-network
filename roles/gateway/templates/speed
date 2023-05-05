@@ -1,0 +1,55 @@
+#!/usr/bin/env zsh
+
+set -eu
+setopt pipe_fail
+
+if [[ -t 1 ]]; then
+  autoload -U colors && colors
+else
+  typeset -A fg
+  fg_bold[blue]=
+  fg_bold[red]=
+  fg_bold[green]=
+  reset_color=
+fi
+
+typeset -A rx tx
+
+get-data() {
+  local iface lines line parts prefix=${1?-Need prefix}
+
+  lines=("${(@f)$(cat /proc/net/dev)}")
+
+  for line in ${lines:2}; do
+    parts=(${(z)line})
+
+    iface=${parts[1]%:}
+    rx[$prefix-$iface]=$parts[2]
+    tx[$prefix-$iface]=$parts[10]
+  done
+}
+
+get-data 1
+sleep 1
+get-data 2
+
+for key in ${(koM)rx:#1-*}; do
+  iface=${key:2}
+
+  rx1=$rx[$key]
+  rx2=$rx[2-$iface]
+
+  tx1=$tx[$key]
+  tx2=$tx[2-$iface]
+
+  printf "%b%-10s%b ▼ %s%10.2f kB/s%s ▲ %s%10.2f kB/s%s\n" \
+         "$fg_bold[blue]" \
+         $iface: \
+         "$reset_color" \
+         "$fg_bold[green]" \
+         $(( (rx2 - rx1) / 1024 )) \
+         "$reset_color" \
+         "$fg_bold[red]" \
+         $(( (tx2 - tx1) / 1024 )) \
+         "$reset_color"
+done
