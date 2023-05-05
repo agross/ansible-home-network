@@ -109,11 +109,6 @@ systemd_networkd_network:
         - LinkLocalAddressing: false
         - LLMNR: false
         - IPv6AcceptRA: false
-    # Potentially not required
-    # - Route:
-    #     - Gateway: "{{ interfaces.wan.ip4 | ansible.utils.nthhost(1) }}"
-    #     - Destination: "{{ interfaces.wan.ip4 | ansible.utils.ipaddr('0') }}"
-    #     - GatewayOnLink: true
 
   wan.pppoe:
     - Match:
