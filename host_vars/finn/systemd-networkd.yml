@@ -7,11 +7,11 @@ systemd_networkd_network:
     - Match:
         - Name: "{{ interfaces.lan.device }}"
     - Network:
-        - Address: "{{ interfaces.lan.ip4 }}"
-        - Address: "{{ interfaces.lan.ip6 }}"
+        - Address: "{{ interfaces.lan.ip4.address }}"
+        - Address: "{{ interfaces.lan.ip6.address }}"
         # TODO
-        # - DNS: "{{ interfaces.lan.dns4 }}"
-        # - DNS: "{{ interfaces.lan.dns6 }}"
+        # - DNS: "{{ interfaces.lan.ip4.dns }}"
+        # - DNS: "{{ interfaces.lan.ip6.dns }}"
         - DNS: 172.16.1.102
         - DNSDefaultRoute: true
         - Domains: "{{ dns.search_domains | join(' ') }}"
@@ -21,6 +21,6 @@ systemd_networkd_network:
 
     - Route:
         # TODO
-        # - Gateway: "{{ hostvars['gateway-ogd'].interfaces.lan.ip4 }}"
+        # - Gateway: "{{ hostvars['gateway-ogd'].interfaces.lan.ip4.address }}"
         - Gateway: 172.16.1.102
         - GatewayOnLink: true

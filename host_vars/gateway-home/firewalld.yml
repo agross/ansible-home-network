@@ -13,7 +13,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=80
-          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-addr={{ hostvars.router.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
           to-port=80
       # HTTPS.
       - >-
@@ -21,7 +21,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=443
-          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-addr={{ hostvars.router.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
           to-port=443
       # GitLab SSH.
       - >-
@@ -29,7 +29,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=10022
-          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-addr={{ hostvars.router.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
           to-port=10022
       # Gitea SSH.
       - >-
@@ -37,7 +37,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=10222
-          to-addr={{ hostvars.router.interfaces.lan.ip6 | ansible.utils.ipaddr('address') }}
+          to-addr={{ hostvars.router.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
           to-port=10222
       # FTP.
       - >-
@@ -60,22 +60,38 @@ firewalld:
       # HTTP.
       - proto: tcp
         port: 80
-        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
+        toaddr: >-
+          {{
+            hostvars.router.interfaces.lan.ip4.address |
+              ansible.utils.ipaddr('address')
+          }}
         toport: 80
       # HTTPS.
       - proto: tcp
         port: 443
-        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
+        toaddr: >-
+          {{
+            hostvars.router.interfaces.lan.ip4.address |
+              ansible.utils.ipaddr('address')
+          }}
         toport: 443
       # GitLab SSH.
       - proto: tcp
         port: 10022
-        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
+        toaddr: >-
+          {{
+            hostvars.router.interfaces.lan.ip4.address |
+              ansible.utils.ipaddr('address')
+          }}
         toport: 10022
       # Gitea SSH.
       - proto: tcp
         port: 10222
-        toaddr: "{{ hostvars.router.interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
+        toaddr: >-
+          {{
+            hostvars.router.interfaces.lan.ip4.address |
+              ansible.utils.ipaddr('address')
+          }}
         toport: 10222
       # FTP.
       - proto: tcp

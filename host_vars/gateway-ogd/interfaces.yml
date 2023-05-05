@@ -1,17 +1,20 @@
 interfaces:
   lan:
     device: enp6s18
-    ip4: "{{ network.ip4 | ansible.utils.ipaddr('2') }}"
-    dns4: "{{ dns.servers | ansible.utils.ipv4 }}"
-    dns4_search: "{{ dns.search_domains }}"
-    ip6: "{{ network.ip6 | ansible.utils.ipaddr('2') }}"
-    dns6: "{{ dns.servers | ansible.utils.ipv6 }}"
-    dns6_search: "{{ dns.search_domains }}"
+    ip4:
+      address: "{{ network.ip4 | ansible.utils.ipaddr('2') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv4 }}"
+      dns_search: "{{ dns.search_domains }}"
+    ip6:
+      address: "{{ network.ip6 | ansible.utils.ipaddr('2') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv6 }}"
+      dns_search: "{{ dns.search_domains }}"
     zone: internal
 
   wan:
     device: &pppoe_dev enp6s19
-    ip4: 192.168.100.2/24
+    ip4:
+      address: 192.168.100.2/24
 
   telekom:
     device: telekom
@@ -26,6 +29,8 @@ interfaces:
 
   wireguard:
     device: wg0
-    ip4: "{{ network.wireguard.ip4 | ansible.utils.ipaddr('4') }}"
-    ip6: "{{ network.wireguard.ip6 | ansible.utils.ipaddr('4') }}"
+    ip4:
+      address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr('4') }}"
+    ip6:
+      address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr('4') }}"
     zone: trusted

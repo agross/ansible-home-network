@@ -1,12 +1,14 @@
 interfaces:
   lan:
     device: ens192
-    ip4: "{{ network.ip4 | ansible.utils.ipaddr('1') }}"
-    dns4: "{{ dns.servers | ansible.utils.ipv4 }}"
-    dns4_search: "{{ dns.search_domains }}"
-    ip6: "{{ network.ip6 | ansible.utils.ipaddr('1') }}"
-    dns6: "{{ dns.servers | ansible.utils.ipv6 }}"
-    dns6_search: "{{ dns.search_domains }}"
+    ip4:
+      address: "{{ network.ip4 | ansible.utils.ipaddr('1') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv4 }}"
+      dns_search: "{{ dns.search_domains }}"
+    ip6:
+      address: "{{ network.ip6 | ansible.utils.ipaddr('1') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv6 }}"
+      dns_search: "{{ dns.search_domains }}"
     zone: internal
 
   wan:
@@ -25,8 +27,10 @@ interfaces:
 
   wireguard:
     device: wg0
-    ip4: "{{ network.wireguard.ip4 | ansible.utils.ipaddr('1') }}"
-    ip6: "{{ network.wireguard.ip6 | ansible.utils.ipaddr('1') }}"
+    ip4:
+      address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr('1') }}"
+    ip6:
+      address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr('1') }}"
     # Perhaps another zone?
     # https://serverfault.com/questions/1068004/firewalld-forwarding-functionality-with-wireguard
     # https://www.procustodibus.com/blog/2021/07/wireguard-firewalld/

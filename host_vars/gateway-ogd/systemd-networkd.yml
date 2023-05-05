@@ -12,7 +12,7 @@ systemd_networkd_netdev:
         - MTUBytes: 1472
     - Tunnel:
         - Independent: true
-        - Local: "{{ interfaces.lan.ip4 | ansible.utils.ipaddr('address') }}"
+        - Local: "{{ interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}"
         - Remote: "{{ he_ipv6.tunnel.server4 }}"
         - TTL: 255
         - DiscoverPathMTU: true
@@ -48,10 +48,10 @@ systemd_networkd_network:
         - RequiredFamilyForOnline: ipv4
         - ActivationPolicy: always-up
     - Network:
-        - Address: "{{ interfaces.lan.ip4 }}"
-        - Address: "{{ interfaces.lan.ip6 }}"
-        - DNS: "{{ interfaces.lan.dns4 }}"
-        - DNS: "{{ interfaces.lan.dns6 }}"
+        - Address: "{{ interfaces.lan.ip4.address }}"
+        - Address: "{{ interfaces.lan.ip6.address }}"
+        - DNS: "{{ interfaces.lan.ip4.dns }}"
+        - DNS: "{{ interfaces.lan.ip6.dns }}"
         - DNSDefaultRoute: true
         - Domains: "{{ dns.search_domains | join(' ') }}"
         - MulticastDNS: true
@@ -101,7 +101,7 @@ systemd_networkd_network:
     - Link:
         - RequiredForOnline: false
     - Network:
-        - Address: "{{ interfaces.wan.ip4 }}"
+        - Address: "{{ interfaces.wan.ip4.address }}"
         - VLAN: "{{ interfaces.telekom.pppoe.device }}.{{ interfaces.telekom.pppoe.vlan }}"
 
         # Disable auto-configuration via DHCPv4 and DHCPv6.
@@ -133,8 +133,8 @@ systemd_networkd_network:
     - Link:
         - RequiredForOnline: false
     - Network:
-        - Address: "{{ interfaces.wireguard.ip4 }}"
-        - Address: "{{ interfaces.wireguard.ip6 }}"
+        - Address: "{{ interfaces.wireguard.ip4.address }}"
+        - Address: "{{ interfaces.wireguard.ip6.address }}"
 
   telekom:
     - Match:
