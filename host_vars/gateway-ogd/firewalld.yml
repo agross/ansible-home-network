@@ -2,3 +2,44 @@ firewalld:
   services:
     external:
       - dhcpv6-client
+
+  rich_rules:
+    # IPv6 port forwarding requires the use of the rich language.
+    external:
+      # HTTP.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=80
+          to-addr={{ hostvars.finn.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
+          to-port=80
+      # HTTPS.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=443
+          to-addr={{ hostvars.finn.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
+          to-port=443
+
+  forward_ports:
+    external:
+      # HTTP.
+      - proto: tcp
+        port: 80
+        toaddr: >-
+          {{
+            hostvars.finn.interfaces.lan.ip4.address |
+              ansible.utils.ipaddr('address')
+          }}
+        toport: 80
+      # HTTPS.
+      - proto: tcp
+        port: 443
+        toaddr: >-
+          {{
+            hostvars.finn.interfaces.lan.ip4.address |
+              ansible.utils.ipaddr('address')
+          }}
+        toport: 443
