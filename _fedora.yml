@@ -1,0 +1,33 @@
+- name: Fedora configuration
+  hosts: "{{ playbook_hosts | mandatory }}"
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install cockpit
+      ansible.builtin.package:
+        name:
+          - cockpit
+          - cockpit-selinux
+          - cockpit-pcp
+        state: present
+      tags: cockpit
+
+    - name: Start and enable pmlogger.service for cockpit-pcp
+      ansible.builtin.systemd:
+        service: pmlogger.service
+        state: started
+        enabled: true
+      tags: cockpit
+
+    - name: Uninstall chrony
+      ansible.builtin.package:
+        name: chrony
+        state: absent
+      tags: ntp
+
+    - name: Start and enable systemd-timesyncd.service
+      ansible.builtin.systemd:
+        service: systemd-timesyncd.service
+        state: started
+        enabled: true
+      tags: ntp

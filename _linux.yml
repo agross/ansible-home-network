@@ -1,0 +1,36 @@
+- name: Linux configuration
+  hosts: "{{ playbook_hosts | mandatory }}"
+  become: true
+  gather_facts: false
+  roles:
+    - name: guest-agent
+      tags: guest-agent
+    - name: watchdog
+      when: ansible_virtualization_role == 'guest'
+      tags: watchdog
+    - name: kernel-cmdline
+      tags: kernel-cmdline
+    - name: devsec.hardening.ssh_hardening
+      vars:
+        network_ipv6_enable: true
+        ssh_listen_to:
+          - '0.0.0.0'
+          - '::'
+        ssh_allow_tcp_forwarding: 'yes'
+        ssh_allow_agent_forwarding: true
+        sftp_enabled: true
+      tags: ssh
+    - name: networking
+      when: systemd_networkd_network is defined
+      tags: [network, networking]
+    - name: postfix
+      when: google_smtp_password is defined
+      tags: postfix
+    - name: unit-status-mail
+      when: google_smtp_password is defined
+      tags: unit-status-mail
+    - name: borgmatic
+      when: borgmatic_encryption_passphrase is defined
+      tags: borgmatic
+    - name: dotfiles
+      tags: dotfiles

@@ -18,83 +18,20 @@
     - name: argon-one
       tags: argon-one
 
-- name: Linux configuration
-  hosts: home:&linux
-  become: true
-  gather_facts: false
-  roles:
-    - name: watchdog
-      tags: watchdog
-    - name: kernel-cmdline
-      tags: kernel-cmdline
-    - name: devsec.hardening.ssh_hardening
-      vars:
-        network_ipv6_enable: true
-        ssh_listen_to:
-          - '0.0.0.0'
-          - '::'
-        ssh_allow_tcp_forwarding: 'yes'
-        ssh_allow_agent_forwarding: true
-        sftp_enabled: true
-      tags: ssh
-    - name: networking
-      when: systemd_networkd_network is defined
-      tags: [network, networking]
-    - name: postfix
-      when: google_smtp_password is defined
-      tags: postfix
-    - name: unit-status-mail
-      when: google_smtp_password is defined
-      tags: unit-status-mail
-    - name: borgmatic
-      when: borgmatic_encryption_passphrase is defined
-      tags: borgmatic
-    - name: dotfiles
-      tags: dotfiles
+- name: Import Linux configuration playbook
+  ansible.builtin.import_playbook: _linux.yml
+  vars:
+    playbook_hosts: home:&linux
 
-- name: Fedora configuration
-  hosts: home:&fedora
-  become: true
-  gather_facts: false
-  tasks:
-    - name: Install cockpit
-      ansible.builtin.package:
-        name:
-          - cockpit
-          - cockpit-selinux
-          - cockpit-pcp
-        state: present
-      tags: cockpit
+- name: Import Fedora configuration playbook
+  ansible.builtin.import_playbook: _fedora.yml
+  vars:
+    playbook_hosts: home:&fedora
 
-    - name: Start and enable pmlogger.service for cockpit-pcp
-      ansible.builtin.systemd:
-        service: pmlogger.service
-        state: started
-        enabled: true
-      tags: cockpit
-
-    - name: Uninstall chrony
-      ansible.builtin.package:
-        name: chrony
-        state: absent
-      tags: ntp
-
-    - name: Start and enable systemd-timesyncd.service
-      ansible.builtin.systemd:
-        service: systemd-timesyncd.service
-        state: started
-        enabled: true
-      tags: ntp
-
-- name: Configure host as a gateway
-  hosts: gateway-home
-  become: true
-  gather_facts: false
-  roles:
-    - name: gateway
-      tags: gateway
-    - name: netdata
-      tags: netdata
+- name: Import gateway configuration playbook
+  ansible.builtin.import_playbook: _gateway.yml
+  vars:
+    playbook_hosts: gateway-home
 
 - name: Hosted services
   hosts: router

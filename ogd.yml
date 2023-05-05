@@ -18,51 +18,20 @@
     - name: smartmontools
       tags: smartmontools
 
-- name: Linux configuration
-  hosts: ogd:&linux
-  become: true
-  gather_facts: false
-  roles:
-    - name: devsec.hardening.ssh_hardening
-      vars:
-        network_ipv6_enable: true
-        ssh_listen_to:
-          - '0.0.0.0'
-          - '::'
-        ssh_allow_tcp_forwarding: 'yes'
-        ssh_allow_agent_forwarding: true
-        sftp_enabled: true
-      tags: ssh
-    - name: postfix
-      tags: postfix
-    - name: dotfiles
-      tags: dotfiles
-    - name: unit-status-mail
-      tags: unit-status-mail
+- name: Import Linux configuration playbook
+  ansible.builtin.import_playbook: _linux.yml
+  vars:
+    playbook_hosts: ogd:&linux
 
-- name: Virtualizaton guest configuration
-  hosts: ogd:&guest
-  become: true
-  gather_facts: false
-  roles:
-    - name: guest-agent
-      tags: guest-agent
-    - name: watchdog
-      tags: watchdog
-    - name: kernel-cmdline
-      tags: kernel-cmdline
-    - name: networking
-      tags: [network, networking]
-    - name: borgmatic
-      tags: borgmatic
+- name: Import Fedora configuration playbook
+  ansible.builtin.import_playbook: _fedora.yml
+  vars:
+    playbook_hosts: ogd:&fedora
 
-- name: Configure host as a gateway
-  hosts: gateway-ogd
-  become: true
-  gather_facts: false
-  roles:
-    - name: gateway
-      tags: gateway
+- name: Import gateway configuration playbook
+  ansible.builtin.import_playbook: _gateway.yml
+  vars:
+    playbook_hosts: gateway-ogd
 
 # - name: Hosted services
 #   hosts: finn
