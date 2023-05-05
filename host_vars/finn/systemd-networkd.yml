@@ -20,5 +20,5 @@ systemd_networkd_network:
     - Route:
         # TODO
         # - Gateway: "{{ hostvars['gateway-ogd'].interfaces.lan.ip4.address }}"
-        - Gateway: 172.16.1.102
+        - Gateway: 172.16.1.101
         - GatewayOnLink: true

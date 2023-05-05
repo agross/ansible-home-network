@@ -82,7 +82,7 @@ systemd_networkd_network:
 
     # TODO
     - Route:
-        - Gateway: 172.16.1.102
+        - Gateway: 172.16.1.101
         - GatewayOnLink: true
 
   he-ipv6:

@@ -17,7 +17,7 @@ auto vmbr0
 iface vmbr0 inet static
   address {{ interfaces.lan.ip4.address | mandatory }}
   # TODO gateway {{ interfaces.lan.ip4.gateway | mandatory }}
-  gateway 172.16.1.102
+  gateway 172.16.1.101
   bridge-ports {{ interfaces.lan.device | mandatory }}
   bridge-stp off
   bridge-fd 0
