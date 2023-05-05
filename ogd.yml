@@ -39,10 +39,10 @@
   roles:
     - name: docker
       tags: docker
-#     - name: dns-server
-#       tags:
-#         - dns-server
-#         - container
+    - name: dns-server
+      tags:
+        - dns-server
+        - container
 #     - name: mqtt
 #       tags:
 #         - mqtt

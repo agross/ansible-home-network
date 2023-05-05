@@ -9,10 +9,8 @@ systemd_networkd_network:
     - Network:
         - Address: "{{ interfaces.lan.ip4.address }}"
         - Address: "{{ interfaces.lan.ip6.address }}"
-        # TODO
-        # - DNS: "{{ interfaces.lan.ip4.dns }}"
-        # - DNS: "{{ interfaces.lan.ip6.dns }}"
-        - DNS: 172.16.1.102
+        - DNS: "{{ interfaces.lan.ip4.dns }}"
+        - DNS: "{{ interfaces.lan.ip6.dns }}"
         - DNSDefaultRoute: true
         - Domains: "{{ dns.search_domains | join(' ') }}"
         - MulticastDNS: true
