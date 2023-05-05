@@ -9,6 +9,7 @@
       {{
         query('inventory_hostnames', 'guest') |
           map('ansible.builtin.extract', hostvars) |
+          selectattr('kvm', 'defined') |
           list
       }}
 
