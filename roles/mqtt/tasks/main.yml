@@ -5,10 +5,12 @@
     directory: ../templates
     notify: Restart mqtt service
 
-- name: Set SELinux file contexts
-  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart mqtt service
 
 - name: Build custom image
   community.docker.docker_image:
@@ -20,18 +22,11 @@
       pull: true
   notify: Restart mqtt service
 
-- name: Symlink systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/systemd/mqtt.service"
-    path: /etc/systemd/system/mqtt.service
-    force: true
-  notify: Restart mqtt service
-
-- name: Start service
+- name: Start systemd units
   ansible.builtin.systemd:
-    name: mqtt
+    name: "{{ item }}"
     state: started
     enabled: true
     daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
   register: mqtt_started

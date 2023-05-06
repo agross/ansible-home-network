@@ -10,10 +10,12 @@
     directory: "../templates/{{ inventory_hostname }}"
     notify: Restart dns-server service
 
-- name: Set SELinux file contexts
-  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ root }}/systemd"
+    local_units: templates/_/systemd
+    notify: Restart dns-server service
 
 - name: Copy systemd-resolved config files
   ansible.builtin.import_tasks: copy-templates.yml
@@ -28,14 +30,6 @@
     state: started
     enabled: true
   register: systemd_resolved_started
-
-- name: Symlink dns-server systemd unit file
-  ansible.builtin.file:
-    src: "{{ root }}/systemd/dns-server.service"
-    path: /etc/systemd/system/dns-server.service
-    state: link
-    force: true
-  notify: Restart dns-server service
 
 - name: Create dnsmasq.leases unless it exists
   ansible.builtin.file:
@@ -78,12 +72,13 @@
     notify:
       - Restart dns-server service
 
-- name: Start dns-server service
+- name: Start systemd units
   ansible.builtin.systemd:
-    name: dns-server
+    name: "{{ item }}"
     state: started
     enabled: true
     daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
   register: dns_server_started
 
 - name: Install DNS utils

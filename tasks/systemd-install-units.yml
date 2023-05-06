@@ -1,0 +1,39 @@
+- name: Set SELinux file contexts
+  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
+
+- name: Get systemd unit names
+  ansible.builtin.set_fact:
+    systemd_units: >-
+      {{
+        (
+          lookup('ansible.builtin.fileglob',
+                 local_units ~ '/*.service*',
+                 wantlist = true) +
+          lookup('ansible.builtin.fileglob',
+                 local_units ~ '/*.timer*',
+                 wantlist = true) +
+          lookup('ansible.builtin.fileglob',
+                 local_units ~ '/*.mount*',
+                 wantlist = true)
+        ) |
+        map('basename') |
+        map('regex_replace', '\.j2$', '')
+      }}
+
+- name: Get list of systemd units to autostart
+  ansible.builtin.set_fact:
+    systemd_units_autostart: >-
+      {{
+        systemd_units |
+          reject('match', '-backup\.service$') |
+          reject('match', '\.mount$')
+      }}
+
+- name: Symlink systemd units
+  ansible.builtin.file:
+    state: link
+    src: "{{ directory | ansible.builtin.mandatory }}/{{ item }}"
+    path: "/etc/systemd/system/{{ item }}"
+    force: true
+  loop: "{{ systemd_units }}"
+  notify: "{{ notify | default(omit) }}"
