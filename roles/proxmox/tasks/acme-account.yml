@@ -43,8 +43,8 @@
       ansible.builtin.copy:
         dest: /tmp/inwx-auth
         content: |
-          INWX_User={{ inwx_username | mandatory }}
-          INWX_Password={{ inwx_password | mandatory }}
+          INWX_User={{ inwx.acme.username | mandatory }}
+          INWX_Password={{ inwx.acme.password | mandatory }}
           INWX_Shared_Secret=
         owner: 0
         group: 0
