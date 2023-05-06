@@ -10,14 +10,15 @@
   vars:
     directory: ../templates
     notify: Restart traefik service
+    files:
+      systemd/traefik.service.j2:
+        mode: '600'
 
-- name: Set permissions on file containing credentials or TLS keys
+- name: Set permissions on files containing TLS keys
   ansible.builtin.import_tasks:
     file: file-permissions.yml
   vars:
     files:
-      - path: "{{ root }}/systemd/traefik.service"
-        mode: '600'
       - path: "{{ root }}/conf/acme/trs-dns.json"
         mode: '600'
       - path: "{{ root }}/conf/acme/trs-dns-staging.json"

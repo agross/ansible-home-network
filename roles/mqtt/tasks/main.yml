@@ -4,13 +4,8 @@
   vars:
     directory: ../templates
     notify: Restart mqtt service
-
-- name: Set permissions on file containing credentials or TLS keys
-  ansible.builtin.import_tasks:
-    file: file-permissions.yml
-  vars:
     files:
-      - path: "{{ root }}/mosquitto/mosquitto.conf"
+      mosquitto/mosquitto.conf:
         mode: '640'
 
 - name: Install systemd units

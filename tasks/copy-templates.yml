@@ -2,14 +2,18 @@
   ansible.builtin.file:
     path: "{{ target | default(root) }}"
     state: directory
-    mode: '755'
+    owner: "{{ files[target | default(root)].owner | default(omit) }}"
+    group: "{{ files[target | default(root)].group | default(omit) }}"
+    mode: "{{ files[target | default(root)].mode | default('755', true) }}"
   notify: "{{ notify | default(omit) }}"
 
 - name: Create directories
   ansible.builtin.file:
     path: "{{ target | default(root) }}/{{ item.path }}"
     state: directory
-    mode: '755'
+    owner: "{{ files[item.path].owner | default(omit) }}"
+    group: "{{ files[item.path].group | default(omit) }}"
+    mode: "{{ files[item.path].mode | default('755', true) }}"
   when: item.state == 'directory'
   with_community.general.filetree: "{{ directory }}"
   loop_control:
@@ -20,7 +24,9 @@
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ target | default(root) }}/{{ item.path }}"
-    mode: preserve
+    owner: "{{ files[item.path].owner | default(omit) }}"
+    group: "{{ files[item.path].group | default(omit) }}"
+    mode: "{{ files[item.path].mode | default('preserve', true) }}"
   when:
     item.state == 'file' and
       (not item.path.endswith('.j2')) and
@@ -34,7 +40,9 @@
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ target | default(root) }}/{{ item.path | regex_replace('\\.j2$', '') }}"
-    mode: preserve
+    owner: "{{ files[item.path].owner | default(omit) }}"
+    group: "{{ files[item.path].group | default(omit) }}"
+    mode: "{{ files[item.path].mode | default('preserve', true) }}"
     lstrip_blocks: true
   when:
     item.state == 'file' and

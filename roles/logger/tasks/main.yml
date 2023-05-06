@@ -14,18 +14,13 @@
   vars:
     directory: ../templates
     notify: Restart logger service
-
-- name: Set permissions on file containing credentials
-  ansible.builtin.import_tasks:
-    file: file-permissions.yml
-  vars:
     files:
-      - path: "{{ root }}/backup"
+      backup.j2:
         mode: '700'
-      - path: "{{ root }}/grafana/grafana.ini"
+      grafana/grafana.ini.j2:
         owner: 472
         mode: '460'
-      - path: "{{ root }}/telegraf/telegraf.d/influxdb.conf"
+      telegraf/telegraf.d/influxdb.conf.j2:
         owner: 999
         mode: '460'
 
