@@ -32,7 +32,7 @@
 - name: Symlink dns-server systemd unit file
   ansible.builtin.file:
     src: "{{ root }}/systemd/dns-server.service"
-    path: /etc/systemd/system/{{ service_name }}.service
+    path: /etc/systemd/system/dns-server.service
     state: link
     force: true
   notify: Restart dns-server service
@@ -80,7 +80,7 @@
 
 - name: Start dns-server service
   ansible.builtin.systemd:
-    name: "{{ service_name }}"
+    name: dns-server
     state: started
     enabled: true
     daemon_reload: true

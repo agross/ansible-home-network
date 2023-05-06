@@ -13,7 +13,7 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/systemd/vaultwarden.service"
-    path: /etc/systemd/system/{{ service_name }}.service
+    path: /etc/systemd/system/vaultwarden.service
     force: true
   notify: Restart vaultwarden service
 
@@ -64,12 +64,12 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
+    path: "/etc/borgmatic.d/vaultwarden.yaml"
 
 - name: Start service
   ansible.builtin.systemd:
+    name: vaultwarden
     state: started
     enabled: true
-    name: "{{ service_name }}"
     daemon_reload: true
   register: vaultwarden_started

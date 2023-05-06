@@ -1,3 +1,1 @@
-service_name: unit-status-mail
-
-root: /data/{{ service_name }}
+root: /data/unit-status-mail

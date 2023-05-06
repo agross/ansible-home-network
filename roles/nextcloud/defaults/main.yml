@@ -1,3 +1,1 @@
-service_name: nextcloud
-
-root: /var/data/{{ service_name }}
+root: /var/data/nextcloud

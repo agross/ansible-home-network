@@ -12,7 +12,7 @@ cleanup() {
 db() {
   local -a exec=(
     docker compose \
-           --project-name {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }} \
+           --project-name vaultwarden \
            exec \
            db
   )

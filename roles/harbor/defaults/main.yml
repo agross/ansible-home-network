@@ -1,6 +1,4 @@
-service_name: harbor
-
-root: /data/{{ service_name }}
+root: /data/harbor
 
 harbor_installer_version: 2.7.0
 harbor_installer_url: >-

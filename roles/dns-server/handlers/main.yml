@@ -1,7 +1,7 @@
 - name: Restart dns-server service
   when: dns_server_started is not changed
   ansible.builtin.systemd:
-    name: "{{ service_name }}"
+    name: dns-server
     state: restarted
 
 - name: Restart systemd-resolved service

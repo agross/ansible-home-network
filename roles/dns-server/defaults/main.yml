@@ -1,6 +1,4 @@
-service_name: dns-server
-
-root: /data/{{ service_name }}
+root: /data/dns-server
 
 dns_server_ports:
   adguard: 53

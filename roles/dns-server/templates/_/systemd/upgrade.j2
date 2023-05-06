@@ -18,9 +18,9 @@ docker compose build --pull
            "$yellow" \
            "$reset" \
            "$green" \
-           {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }} \
+           dns-server \
            "$reset"
 
-systemctl restart {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }}
+systemctl restart dns-server
 
 sleep 5

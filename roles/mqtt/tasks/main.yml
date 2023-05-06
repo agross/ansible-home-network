@@ -24,13 +24,13 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/systemd/mqtt.service"
-    path: /etc/systemd/system/{{ service_name }}.service
+    path: /etc/systemd/system/mqtt.service
     force: true
   notify: Restart mqtt service
 
 - name: Start service
   ansible.builtin.systemd:
-    name: "{{ service_name }}"
+    name: mqtt
     state: started
     enabled: true
     daemon_reload: true

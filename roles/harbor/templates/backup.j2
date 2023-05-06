@@ -11,7 +11,7 @@ cleanup() {
 
 db() {
   docker compose \
-         --project-name {{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }} \
+         --project-name harbor \
          exec \
          postgresql \
          pg_dumpall \

@@ -13,7 +13,7 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/systemd/harbor.service"
-    path: /etc/systemd/system/{{ service_name }}.service
+    path: /etc/systemd/system/harbor.service
     force: true
   notify: Restart harbor service
 
@@ -21,7 +21,7 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/systemd/data-harbor-app.mount"
-    path: "/etc/systemd/system/data-{{ service_name }}-app.mount"
+    path: "/etc/systemd/system/data-harbor-app.mount"
     force: true
   notify: Restart harbor service
 
@@ -157,12 +157,12 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
+    path: "/etc/borgmatic.d/harbor.yaml"
 
 - name: Start service
   ansible.builtin.systemd:
+    name: harbor
     state: started
     enabled: true
-    name: "{{ service_name }}"
     daemon_reload: true
   register: harbor_started

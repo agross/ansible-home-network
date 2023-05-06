@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME={{ service_name | ansible.builtin.mandatory | ansible.builtin.quote }}
+export COMPOSE_PROJECT_NAME=nextcloud
 
 occ=(docker compose exec --user www-data app php occ)
 

@@ -5,7 +5,7 @@ Conflicts=umount.target
 Before=local-fs.target umount.target
 
 [Mount]
-What=/fs/data/{{ service_name }}/app
+What=/fs/data/photoprism/app
 Where={{ root }}/app
 Type=none
 Options=bind

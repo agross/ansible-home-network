@@ -13,7 +13,7 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/systemd/photoprism.service"
-    path: /etc/systemd/system/{{ service_name }}.service
+    path: /etc/systemd/system/photoprism.service
     force: true
   notify: Restart photoprism service
 
@@ -51,8 +51,8 @@
 
 - name: Start service
   ansible.builtin.systemd:
+    name: photoprism
     state: started
     enabled: true
-    name: "{{ service_name }}"
     daemon_reload: true
   register: photoprism_started

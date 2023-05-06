@@ -8,7 +8,7 @@
 - name: Copy systemd service unit
   ansible.builtin.template:
     src: led-heartbeat.service
-    dest: /etc/systemd/system/{{ service_name }}.service
+    dest: /etc/systemd/system/led-heartbeat.service
     owner: 0
     group: 0
     mode: '644'
@@ -16,7 +16,7 @@
 
 - name: Start service
   ansible.builtin.systemd:
+    name: led-heartbeat
     state: started
     enabled: true
-    name: "{{ service_name }}"
     daemon_reload: true

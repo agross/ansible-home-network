@@ -12,4 +12,4 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
+    path: "/etc/borgmatic.d/nextcloud.yaml"
