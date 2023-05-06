@@ -11,24 +11,17 @@
     directory: ../templates
     notify: Restart traefik service
 
-- name: Set permissions on file containing credentials
-  ansible.builtin.file:
-    path: "{{ root }}/systemd/traefik.service"
-    state: file
-    access_time: preserve
-    modification_time: preserve
-    mode: '600'
-
-- name: Set permissions on files containing private TLS keys
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: touch
-    access_time: preserve
-    modification_time: preserve
-    mode: '600'
-  loop:
-    - "{{ root }}/conf/acme/trs-dns.json"
-    - "{{ root }}/conf/acme/trs-dns-staging.json"
+- name: Set permissions on file containing credentials or TLS keys
+  ansible.builtin.import_tasks:
+    file: file-permissions.yml
+  vars:
+    files:
+      - path: "{{ root }}/systemd/traefik.service"
+        mode: '600'
+      - path: "{{ root }}/conf/acme/trs-dns.json"
+        mode: '600'
+      - path: "{{ root }}/conf/acme/trs-dns-staging.json"
+        mode: '600'
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
