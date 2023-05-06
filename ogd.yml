@@ -47,6 +47,10 @@
       tags:
         - mqtt
         - container
+    - name: traefik
+      tags:
+        - traefik
+        - container
 #     - name: iobroker
 #       tags:
 #         - iobroker
@@ -54,10 +58,6 @@
 #     - name: logger
 #       tags:
 #         - logger
-#         - container
-#     - name: traefik
-#       tags:
-#         - traefik
 #         - container
 #     - name: vscode-remote-ssh
 #       tags: vscode-remote-ssh

@@ -3,32 +3,52 @@
   vars:
     users: "{{ traefik_users.dashboard }}"
     salt: "{{ traefik_users.password_salt }}"
-    fact: dashboard_users
+    fact: traefik_dashboard_users
 
 - name: Copy templates
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
-    notify: Restart Traefik
+    notify: Restart traefik service
+
+- name: Set permissions on file containing credentials
+  ansible.builtin.file:
+    path: "{{ root }}/systemd/traefik.service"
+    state: file
+    access_time: preserve
+    modification_time: preserve
+    mode: '600'
+
+- name: Set permissions on files containing private TLS keys
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    mode: '600'
+  loop:
+    - "{{ root }}/conf/acme/trs-dns.json"
+    - "{{ root }}/conf/acme/trs-dns-staging.json"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart traefik service
 
 - name: Pull Traefik image
   community.docker.docker_image:
     name: "{{ traefik_image | ansible.builtin.mandatory }}"
     source: pull
     force_source: "{{ docker_update is defined }}"
-  notify: Restart Traefik
-
-- name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
-  vars:
-    target_dir: "{{ root }}"
-    templates: templates
+  notify: Restart traefik service
 
 - name: Start systemd units
   ansible.builtin.systemd:
+    name: "{{ item }}"
     state: started
     enabled: true
-    name: "{{ item }}"
     daemon_reload: true
   loop: "{{ systemd_units_autostart }}"
   register: traefik_started

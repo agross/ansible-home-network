@@ -1,0 +1,4 @@
+traefik_users:
+  password_salt: "{{ vault_traefik_users_password_salt }}"
+  dashboard:
+    agross: "{{ vault_traefik_dashboard_password_agross }}"

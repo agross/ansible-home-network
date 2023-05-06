@@ -11,9 +11,6 @@ providers:
 api:
   dashboard: true
 
-pilot:
-  token: c2cba910-03ae-4828-a602-6b0e4fdeac6f
-
 # docker exec traefik traefik healthcheck
 ping: {}
 
@@ -34,38 +31,44 @@ entryPoints:
     address: ":443"
     http:
       tls:
-        certResolver: letsencrypt-gw-dns
+        certResolver: letsencrypt-trs-dns
 
 certificatesResolvers:
-  letsencrypt-http:
+  letsencrypt-trs-dns:
     acme:
-      email: agross@grossweber.com
-      storage: /etc/traefik/acme/http.json
-      httpChallenge:
-        entryPoint: http
-
-  letsencrypt-gw-dns:
-    acme:
-      email: agross@grossweber.com
-      storage: /etc/traefik/acme/gw-dns.json
+      email: agross@therightstuff.de
+      storage: /etc/traefik/acme/trs-dns.json
       dnsChallenge:
         provider: inwx
-        # https://github.com/go-acme/lego/issues/1297
-        delayBeforeCheck: 420
+        # By default, the Traefik provider verifies the TXT record before
+        # letting ACME verify. Wait 360 seconds (6 minutes) for the TXT record
+        # to be available before starting validation using the go-acme/lego
+        # library that Traefik uses. It is configured using the INWX_
+        # environment variables. The INWX_PROPAGATION_TIMEOUT is set to 0
+        # because propagation was pre-verified by Traefik.
+        # https://go-acme.github.io/lego/dns/inwx/
+        #
+        # LEGO_DISABLE_CNAME_SUPPORT needs to be set to true because
+        # {{ network.domain }} has a wildcard CNAME record registered in INWX
+        # DNS.
+        # _acme-challenge.{{ network.domain }} would be resolved to find the
+        # delegated domain used for certificate validations.
+        # https://letsencrypt.org/2019/10/09/onboarding-your-customers-with-lets-encrypt-and-acme.html#the-advantages-of-a-cname
+        delayBeforeCheck: 360
         resolvers:
           - ns.inwx.de
           - ns2.inwx.de
           - ns3.inwx.eu
 
-  letsencrypt-gw-dns-staging:
+  letsencrypt-trs-dns-staging:
     acme:
       caServer: https://acme-staging-v02.api.letsencrypt.org/directory
-      email: agross@grossweber.com
-      storage: /etc/traefik/acme/gw-dns-staging.json
+      email: agross@therightstuff.de
+      storage: /etc/traefik/acme/trs-dns-staging.json
       dnsChallenge:
         provider: inwx
-        # https://github.com/go-acme/lego/issues/1297
-        delayBeforeCheck: 420
+        # See above.
+        delayBeforeCheck: 360
         resolvers:
           - ns.inwx.de
           - ns2.inwx.de
