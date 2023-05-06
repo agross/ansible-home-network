@@ -2,10 +2,10 @@ interfaces:
   lan:
     device: enp6s18
     ip4:
-      address: "{{ network.ip4 | ansible.utils.ipaddr('2') }}"
+      address: "{{ network.ip4 | ansible.utils.ipaddr(2) }}"
       dns: "{{ dns.servers | ansible.utils.ipv4 }}"
     ip6:
-      address: "{{ network.ip6 | ansible.utils.ipaddr('2') }}"
+      address: "{{ network.ip6 | ansible.utils.ipaddr(2) }}"
       dns: "{{ dns.servers | ansible.utils.ipv6 }}"
     zone: internal
 
@@ -28,7 +28,7 @@ interfaces:
   wireguard:
     device: wg0
     ip4:
-      address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr('4') }}"
+      address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr(4) }}"
     ip6:
-      address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr('4') }}"
+      address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr(4) }}"
     zone: trusted

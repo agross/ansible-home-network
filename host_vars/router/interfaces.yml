@@ -2,9 +2,9 @@ interfaces:
   lan:
     device: ens192
     ip4:
-      address: "{{ network.ip4 | ansible.utils.ipaddr('3') }}"
+      address: "{{ network.ip4 | ansible.utils.ipaddr(3) }}"
       dns: 127.0.0.1
     ip6:
-      address: "{{ network.ip6 | ansible.utils.ipaddr('3') }}"
+      address: "{{ network.ip6 | ansible.utils.ipaddr(3) }}"
       dns: ::1
     zone: internal
