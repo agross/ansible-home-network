@@ -13,5 +13,5 @@ cname=iobroker.ogd.therightstuff.de,                   finn-old.ogd.therightstuf
 cname=lovelace.ogd.therightstuff.de,                   finn-old.ogd.therightstuff.de
 cname=gast.ogd.therightstuff.de,                       finn-old.ogd.therightstuff.de
 
-cname=mqtt,                 mqtt.ogd.therightstuff.de, finn-old.ogd.therightstuff.de
+cname=mqtt,                 mqtt.ogd.therightstuff.de, finn.ogd.therightstuff.de
 cname=influxdb,         influxdb.ogd.therightstuff.de, finn-old.ogd.therightstuff.de
