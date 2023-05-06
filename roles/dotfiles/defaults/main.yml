@@ -8,6 +8,7 @@ requirements:
 
 # Technically not required but useful.
 tools:
+  - htop
   - mc
   - tcpdump
   - tree
