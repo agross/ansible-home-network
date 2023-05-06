@@ -1,7 +1,7 @@
 - name: Restart photoprism service
   when: photoprism_started is not changed
   ansible.builtin.systemd:
-    name: photoprism
+    name: photoprism.service
     state: restarted
 
 - name: Restart photoprism backup timer

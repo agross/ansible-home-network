@@ -1,5 +1,5 @@
 - name: Restart mqtt service
-  ansible.builtin.systemd:
-    name: mqtt
-    state: restarted
   when: mqtt_started is not changed
+  ansible.builtin.systemd:
+    name: mqtt.service
+    state: restarted

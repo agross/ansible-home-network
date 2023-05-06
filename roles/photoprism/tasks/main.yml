@@ -51,7 +51,7 @@
 
 - name: Start service
   ansible.builtin.systemd:
-    name: photoprism
+    name: photoprism.service
     state: started
     enabled: true
     daemon_reload: true

@@ -68,7 +68,7 @@
 
 - name: Start service
   ansible.builtin.systemd:
-    name: vaultwarden
+    name: vaultwarden.service
     state: started
     enabled: true
     daemon_reload: true

@@ -1,5 +1,5 @@
 - name: Restart vaultwarden service
   when: vaultwarden_started is not changed
   ansible.builtin.systemd:
-    name: vaultwarden
+    name: vaultwarden.service
     state: restarted

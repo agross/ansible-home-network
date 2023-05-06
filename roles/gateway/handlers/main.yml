@@ -1,4 +1,4 @@
-- name: Restart ddclient
+- name: Restart ddclient service
   ansible.builtin.systemd:
     name: ddclient.service
     state: restarted

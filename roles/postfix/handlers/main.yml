@@ -11,7 +11,7 @@
       - newaliases
   changed_when: true
 
-- name: Restart postfix
+- name: Restart postfix service
   ansible.builtin.systemd:
     name: postfix.service
     state: restarted

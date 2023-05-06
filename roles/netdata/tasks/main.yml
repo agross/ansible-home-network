@@ -56,8 +56,8 @@
 
 - name: Start service
   ansible.builtin.systemd:
+    name: netdata.service
     state: started
     enabled: true
-    name: netdata
     daemon_reload: true
   register: netdata_started

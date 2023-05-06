@@ -1,5 +1,5 @@
 - name: Restart Traefik
   when: traefik_started is not changed
   ansible.builtin.systemd:
-    name: traefik
+    name: traefik.service
     state: restarted

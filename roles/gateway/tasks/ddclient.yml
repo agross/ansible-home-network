@@ -26,7 +26,7 @@
     owner: ddclient
     group: ddclient
     mode: '600'
-  notify: Restart ddclient
+  notify: Restart ddclient service
 
 - name: Enable ddclient service
   ansible.builtin.systemd:

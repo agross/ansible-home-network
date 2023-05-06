@@ -161,7 +161,7 @@
 
 - name: Start service
   ansible.builtin.systemd:
-    name: harbor
+    name: harbor.service
     state: started
     enabled: true
     daemon_reload: true

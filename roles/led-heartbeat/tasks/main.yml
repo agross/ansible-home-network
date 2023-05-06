@@ -16,7 +16,7 @@
 
 - name: Start service
   ansible.builtin.systemd:
-    name: led-heartbeat
+    name: led-heartbeat.service
     state: started
     enabled: true
     daemon_reload: true

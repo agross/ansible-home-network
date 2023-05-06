@@ -1,4 +1,4 @@
 - name: Restart led-heartbeat service
   ansible.builtin.systemd:
-    name: led-heartbeat
+    name: led-heartbeat.service
     state: restarted
