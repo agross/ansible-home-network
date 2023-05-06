@@ -7,11 +7,21 @@
   ansible.builtin.set_fact:
     kvm_guests: >-
       {{
-        query('inventory_hostnames', 'guest') |
-          map('ansible.builtin.extract', hostvars) |
-          selectattr('kvm', 'defined') |
-          list
+        kvm_guests | default([]) +
+          (
+            hostvars[item].kvm is defined | ternary(
+              [
+                {
+                  'inventory_hostname': item,
+                  'inventory_hostname_short': hostvars[item].inventory_hostname_short,
+                  'kvm': hostvars[item].kvm
+                }
+              ],
+              []
+            )
+          )
       }}
+  loop: "{{ groups['guest'] | default([]) }}"
 
 - name: Create guest VMs
   community.general.proxmox_kvm:
