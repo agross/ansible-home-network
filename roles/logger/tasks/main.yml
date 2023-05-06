@@ -15,6 +15,27 @@
     directory: ../templates
     notify: Restart logger service
 
+- name: Set permissions on file containing credentials
+  ansible.builtin.import_tasks:
+    file: file-permissions.yml
+  vars:
+    files:
+      - path: "{{ root }}/backup"
+        mode: '700'
+      - path: "{{ root }}/grafana/grafana.ini"
+        owner: 472
+        mode: '460'
+      - path: "{{ root }}/telegraf/telegraf.d/influxdb.conf"
+        owner: 999
+        mode: '460'
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart logger service
+
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
@@ -24,26 +45,6 @@
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify: Restart logger service
-
-- name: Get systemd unit files
-  ansible.builtin.find:
-    paths: "{{ root }}"
-    file_type: file
-    recurse: true
-    patterns: '*.service,*.timer'
-  register: systemd_units
-
-- name: Symlink systemd unit files
-  ansible.builtin.file:
-    state: link
-    src: "{{ item.path }}"
-    path:
-      /etc/systemd/system/{{ item.path | basename | regex_replace('^logger', service_name) }}
-    force: true
-  loop: "{{ systemd_units.files }}"
-  loop_control:
-    label: "{{ item.path }}"
-  notify: Restart logger service
 
 - name: Symlink InfluxDB rename script
   ansible.builtin.file:
@@ -55,16 +56,17 @@
   ansible.builtin.file:
     state: link
     src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
+    path: /etc/borgmatic.d/logger.yaml
 
 - name: Update InfluxDB 1 to 2
   ansible.builtin.import_tasks:
     file: influxdb-upgrade-1-to-2.yml
 
-- name: Start service
+- name: Start systemd units
   ansible.builtin.systemd:
+    name: "{{ item }}"
     state: started
     enabled: true
-    name: "{{ service_name }}.service"
     daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
   register: logger_started

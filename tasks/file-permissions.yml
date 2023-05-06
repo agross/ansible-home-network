@@ -1,0 +1,10 @@
+- name: Set file permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: file
+    access_time: preserve
+    modification_time: preserve
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "{{ item.mode | default(omit) }}"
+  loop: "{{ files | default([], true) }}"

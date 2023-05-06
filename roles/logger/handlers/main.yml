@@ -1,5 +1,5 @@
 - name: Restart logger service
   when: logger_started is not changed
   ansible.builtin.systemd:
-    name: "{{ service_name }}.service"
+    name: logger.service
     state: reloaded

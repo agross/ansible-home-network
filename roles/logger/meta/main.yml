@@ -1,4 +1,0 @@
-dependencies:
-  - docker
-  - libseccomp2
-  - memory-cgroups

@@ -53,7 +53,7 @@ EOF
          "$bucket"
 
   docker compose \
-         --project-name {{ service_name | quote }} \
+         --project-name logger \
          exec \
          influxdb \
          influx query "$copy"
@@ -63,7 +63,7 @@ EOF
          "$bucket"
 
   docker compose \
-         --project-name {{ service_name | quote }} \
+         --project-name logger \
          exec \
          influxdb \
          influx delete \

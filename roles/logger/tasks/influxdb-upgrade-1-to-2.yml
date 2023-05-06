@@ -1,16 +1,16 @@
-- name: Set InfluxDB container name
-  ansible.builtin.set_fact:
-    influxdb_container: "{{ service_name }}_influxdb_1"
-
 - name: Get version of the InfluxDB container
   community.docker.docker_container_info:
-    name: "{{ influxdb_container }}"
+    name: "{{ influxdb_migration_container }}"
   register: influxdb_info
 
 - name: Get InfluxDB version entry from environment
   when: influxdb_info.exists and 'Env' in influxdb_info.container.Config
   ansible.builtin.set_fact:
-    version_env_entry: "{{ influxdb_info.container.Config.Env | select('match', 'INFLUXDB_VERSION=') }}"
+    version_env_entry: >-
+      {{
+        influxdb_info.container.Config.Env |
+          select('match', 'INFLUXDB_VERSION=')
+      }}
 
 - name: Get InfluxDB version number from version entry
   when: version_env_entry | default([], true) | length
@@ -23,7 +23,7 @@
   block:
     - name: Make sure InfluxDB 2 volumes do not exist yet
       community.docker.docker_volume_info:
-        name: "{{ service_name }}_influxdb2-{{ item }}"
+        name: "logger_influxdb2-{{ item }}"
       register: influxdb_volume_info
       failed_when: influxdb_volume_info.exists
       loop:
@@ -43,7 +43,7 @@
           - /var/lib/influxdb
         detach: false
         interactive: false
-        volumes_from: "{{ service_name }}_influxdb_1"
+        volumes_from: "{{ influxdb_migration_container }}"
 
     - name: Create temporary directory to hold the entrypoint from InfluxDB 2
       ansible.builtin.tempfile:
@@ -88,9 +88,9 @@
           to not run InfluxDB 2 after upgrading data.
       when: entrypoint_patched is not changed
 
-    - name: Stop {{ service_name }} service # noqa: name[template]
+    - name: Stop logger service
       ansible.builtin.systemd:
-        name: "{{ service_name }}"
+        name: logger
         state: stopped
 
     - name: Run migration
@@ -106,16 +106,16 @@
           DOCKER_INFLUXDB_INIT_ORG: "{{ influxdb_init_org }}"
           DOCKER_INFLUXDB_INIT_BUCKET: "{{ influxdb_init_bucket }}"
           DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "{{ influxdb_init_admin_token }}"
-        volumes_from: "{{ influxdb_container }}"
+        volumes_from: "{{ influxdb_migration_container }}"
         mounts:
           - type: bind
             source: "{{ influxdb_entrypoint_file }}"
             target: /entrypoint.sh
           - type: volume
-            source: "{{ service_name }}_influxdb2-config"
+            source: logger_influxdb2-config
             target: /etc/influxdb2
           - type: volume
-            source: "{{ service_name }}_influxdb2-data"
+            source: logger_influxdb2-data
             target: /var/lib/influxdb2
       register: migration
       failed_when: "'Upgrade successfully completed' not in migration.container.Output"

@@ -1,0 +1,1 @@
+traefik_host: "{{ traefik_users is defined }}"

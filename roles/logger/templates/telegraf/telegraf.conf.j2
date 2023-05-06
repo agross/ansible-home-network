@@ -1,3 +1,5 @@
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
 # Telegraf Configuration
 #
 # Telegraf is entirely plugin driven. All metrics are gathered from the
@@ -91,7 +93,7 @@
   # logfile_rotation_max_archives = 5
 
   ## Override default hostname, if empty use os.Hostname()
-  hostname = "{{ inventory_hostname }}"
+  hostname = "{{ ansible_hostname }}"
   ## If set to true, do no set the "host" tag in the telegraf agent.
   omit_hostname = false
 

@@ -36,6 +36,7 @@
 - name: Hosted services
   hosts: finn
   become: true
+  gather_facts: false
   roles:
     - name: docker
       tags: docker
@@ -55,10 +56,10 @@
 #       tags:
 #         - iobroker
 #         - container
-#     - name: logger
-#       tags:
-#         - logger
-#         - container
+    - name: logger
+      tags:
+        - logger
+        - container
 #     - name: vscode-remote-ssh
 #       tags: vscode-remote-ssh
 #     - name: vladgh.samba.server

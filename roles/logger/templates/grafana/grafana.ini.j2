@@ -47,9 +47,8 @@
 # The full public facing url you use in browser, used for redirects and emails
 # If you use reverse proxy and sub path specify full url (with sub path)
 ;root_url = %(protocol)s://%(domain)s:%(http_port)s/
-{% if grafana_root_url is defined %}
-root_url = {{ grafana_root_url }}
-{% endif %}
+root_url = https://grafana.{{ network.domain | ansible.builtin.mandatory }}
+
 
 # Serve Grafana from subpath specified in `root_url` setting. By default it is set to `false` for compatibility reasons.
 ;serve_from_sub_path = false
@@ -417,7 +416,7 @@ login_maximum_inactive_lifetime_duration = 30d
 enabled = true
 allow_sign_up = false
 client_id = {{ grafana_github_client_id }}
-client_secret = {{ grafana_github_client_secret | mandatory }}
+client_secret = {{ grafana_github_client_secret | ansible.builtin.mandatory }}
 {% endif%}
 
 
@@ -450,7 +449,7 @@ client_secret = {{ grafana_github_client_secret | mandatory }}
 enabled = true
 allow_sign_up = false
 client_id = {{ grafana_google_client_id }}
-client_secret = {{ grafana_google_client_secret | mandatory }}
+client_secret = {{ grafana_google_client_secret | ansible.builtin.mandatory }}
 {% if grafana_google_allowed_domains is defined %}
 allowed_domains = {{ grafana_google_allowed_domains }}
 {% endif %}
@@ -606,13 +605,13 @@ allowed_domains = {{ grafana_google_allowed_domains }}
 ;ehlo_identity = dashboard.example.com
 # SMTP startTLS policy (defaults to 'OpportunisticStartTLS')
 ;startTLS_policy = NoStartTLS
-{% if grafana_smtp_host is defined %}
+{% if grafana_smtp_user is defined %}
 enabled = true
-host = {{ grafana_smtp_host | mandatory }}
-user = {{ grafana_smtp_user | mandatory }}
-password = {{ grafana_smtp_password | mandatory }}
-ehlo_identity = {{ grafana_root_url | urlsplit('hostname') }}
-from_address = grafana@{{ grafana_smtp_user | split('@', 1) | last }}
+host = smtp-relay.gmail.com:587
+user = {{ grafana_smtp_user | ansible.builtin.mandatory }}
+password = {{ grafana_smtp_password | ansible.builtin.mandatory }}
+ehlo_identity = grafana.{{ network.domain }}
+from_address = grafana@{{ ansible_hostname }}.{{ network.domain }}
 {% endif %}
 
 [emails]

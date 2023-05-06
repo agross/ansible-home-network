@@ -1,6 +1,4 @@
-service_name: logger
-
-root: /data/{{ service_name }}
+root: /data/logger
 
 influxdb_init_user: admin
 influxdb_init_password:
@@ -8,9 +6,12 @@ influxdb_init_org:
 influxdb_init_bucket: default
 influxdb_init_admin_token:
 
-logger_backup_grafana:
-  # The API key needs to have the "Admin" role.
-  api_key: "{{ grafana_api_key }}"
-  admin:
-    user: "{{ grafana_admin_user }}"
-    password: "{{ grafana_admin_password }}"
+influxdb_backup_buckets: []
+
+# Container for migration from v1 to v2.
+influxdb_migration_container: "logger-influxdb-1"
+
+# The API key needs to have the "Admin" role.
+logger_grafana_backup_api_key:
+logger_grafana_backup_admin_user:
+logger_grafana_backup_admin_password:

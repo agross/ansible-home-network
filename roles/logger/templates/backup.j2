@@ -15,7 +15,7 @@ cleanup() {
 influxdb() {
   for bucket in {{ influxdb_backup_buckets | map('ansible.builtin.quote') | join(' ') }}; do
     docker compose \
-           --project-name {{ service_name | ansible.builtin.quote }} \
+           --project-name logger \
            exec \
            influxdb \
            influx backup \
@@ -67,11 +67,11 @@ grafana() {
          --rm \
          --name grafana-backup \
          --env 'GRAFANA_URL=http://grafana:3000' \
-         --env 'GRAFANA_TOKEN={{ logger_backup_grafana.api_key }}' \
-         --env 'GRAFANA_ADMIN_ACCOUNT={{ logger_backup_grafana.admin.user }}' \
-         --env 'GRAFANA_ADMIN_PASSWORD={{ logger_backup_grafana.admin.password }}' \
+         --env 'GRAFANA_TOKEN={{ logger_grafana_backup_api_key }}' \
+         --env 'GRAFANA_ADMIN_ACCOUNT={{ logger_grafana_backup_admin_user }}' \
+         --env 'GRAFANA_ADMIN_PASSWORD={{ logger_grafana_backup_admin_password }}' \
          --env 'TZ=Europe/Berlin' \
-         --network 'container:{{ service_name }}-grafana-1' \
+         --network 'container:logger-grafana-1' \
          --volume "$target:/opt/grafana-backup-tool/_OUTPUT_"  \
          "$image"
 }

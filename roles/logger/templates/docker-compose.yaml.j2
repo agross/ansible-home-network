@@ -3,14 +3,14 @@ volumes:
   influxdb2-data:
   grafana-data:
 
-{% if traefik_domain | default('', true) | length or
-      iobroker_support_wake_on_lan | default(false) | bool == false %}
+{% if traefik_host or
+      iobroker_support_wake_on_lan | default(false, true) | bool == false %}
 networks:
-{% if traefik_domain | default('', true) | length  %}
+{% if traefik_host  %}
   web:
     external: true
 {% endif %}
-{% if iobroker_support_wake_on_lan | default(false) | bool == false %}
+{% if iobroker_support_wake_on_lan | default(false, true) | bool == false %}
   iobroker_default:
     external: true
 {% endif %}
@@ -22,22 +22,32 @@ services:
 
     restart: unless-stopped
     env_file: ./influxdb/.env
-    {% if iobroker_support_wake_on_lan | default(false) | bool == false %}
-    # Run on own logger network and the iobroker network so ioBroker can log
-    # data without the need to publish the InfluxDB port.
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.influxdb.entrypoints: https
+      traefik.http.routers.influxdb.rule: Host(`influxdb.{{ network.domain }}`)
+      traefik.http.services.influxdb.loadbalancer.server.port: 8086
+    {% if traefik_host %}
     networks:
       - default
-      - iobroker_default
-    {% endif %}
+      - web
+    {% else %}
     ports:
       - "8086:8086"
+    {% endif %}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./backups/influxdb:/backups
       - influxdb2-config:/etc/influxdb2
       - influxdb2-data:/var/lib/influxdb2
     healthcheck:
-      test: ["CMD", "wget", "--server-response", "--output-document", "/dev/null", "http://localhost:8086/ping"]
+      test:
+        - CMD
+        - wget
+        - --server-response
+        - --output-document
+        - /dev/null
+        - http://localhost:8086/ping
       start_period: 30s
       interval: 5s
 
@@ -46,12 +56,12 @@ services:
 
     restart: unless-stopped
     env_file: ./grafana/.env
-    {% if traefik_domain | default('', true) | length  %}
     labels:
       traefik.enable: 'true'
       traefik.http.routers.grafana.entrypoints: https
-      traefik.http.routers.grafana.rule: Host(`grafana.{{ traefik_domain }}`)
+      traefik.http.routers.grafana.rule: Host(`grafana.{{ network.domain }}`)
       traefik.http.services.grafana.loadbalancer.server.port: 3000
+    {% if traefik_host %}
     networks:
       - default
       - web
@@ -64,7 +74,13 @@ services:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - grafana-data:/var/lib/grafana
     healthcheck:
-      test: ["CMD", "wget", "-S", "-O", "/dev/null", "http://localhost:3000"]
+      test:
+        - CMD
+        - wget
+        - -S
+        - -O
+        - /dev/null
+        - http://localhost:3000
       start_period: 5s
       interval: 5s
     depends_on:
@@ -73,6 +89,7 @@ services:
 
   telegraf:
     image: telegraf
+
     restart: unless-stopped
     privileged: true
     user: telegraf:{{ docker_group | mandatory }}
@@ -90,8 +107,6 @@ services:
       # For host monitoring.
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /:/host:ro
-    command:
-      --config-directory /etc/telegraf/telegraf.d
     depends_on:
       influxdb:
         condition: service_healthy

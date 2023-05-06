@@ -8,10 +8,10 @@ cname=ogd.therightstuff.de,                         gateway.ogd.therightstuff.de
 
 cname=traefik.ogd.therightstuff.de,                    finn.ogd.therightstuff.de
 cname=adguard.ogd.therightstuff.de,                    finn.ogd.therightstuff.de
-cname=grafana.ogd.therightstuff.de,                    finn-old.ogd.therightstuff.de
+cname=grafana.ogd.therightstuff.de,                    finn.ogd.therightstuff.de
 cname=iobroker.ogd.therightstuff.de,                   finn-old.ogd.therightstuff.de
 cname=lovelace.ogd.therightstuff.de,                   finn-old.ogd.therightstuff.de
 cname=gast.ogd.therightstuff.de,                       finn-old.ogd.therightstuff.de
 
 cname=mqtt,                 mqtt.ogd.therightstuff.de, finn.ogd.therightstuff.de
-cname=influxdb,         influxdb.ogd.therightstuff.de, finn-old.ogd.therightstuff.de
+cname=influxdb,         influxdb.ogd.therightstuff.de, finn.ogd.therightstuff.de
