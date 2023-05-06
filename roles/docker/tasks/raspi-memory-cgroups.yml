@@ -1,16 +1,14 @@
 - name: Check if memory cgroups are enabled
-  ansible.builtin.command:
-    argv:
-      - grep
-      - -E
-      - ^memory\s+.*\s+1$
-      - /proc/cgroups
+  ansible.builtin.lineinfile:
+    path: /proc/cgroups
+    regexp: ^memory\s+.*\s+1$
+    state: absent
   changed_when: false
-  failed_when: false
+  check_mode: true
   register: memory_cgroups_enabled
 
 - name: Enable memory cgroups
-  when: memory_cgroups_enabled.rc != 0
+  when: not memory_cgroups_enabled.found
   block:
     - name: Create a backup of /boot/cmdline.txt
       ansible.builtin.copy:

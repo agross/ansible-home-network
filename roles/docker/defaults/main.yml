@@ -1,0 +1,3 @@
+libseccomp2_package: libseccomp2
+libseccomp2_repo: https://ftp.debian.org/debian/pool/main/libs/libseccomp/
+libseccomp2_install_version: 2.5.1-1

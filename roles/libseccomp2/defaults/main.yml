@@ -1,3 +1,0 @@
-package: libseccomp2
-repo: https://ftp.debian.org/debian/pool/main/libs/libseccomp/
-install_version: 2.5.1-1

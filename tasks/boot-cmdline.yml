@@ -1,0 +1,43 @@
+# https://stackoverflow.com/a/67649971/149264
+
+- name: Read /boot/cmdline.txt
+  ansible.builtin.slurp:
+    src: /boot/cmdline.txt
+  register: cmdline_txt
+
+- name: Generate regular expression for existing arguments
+  ansible.builtin.set_fact:
+    regex_existing: >-
+      {{
+        "\b" + key | string +
+          "=" +
+          ("[\w]*" if update else value | string) +
+          "\b"
+      }}
+    key_value_pair: >-
+      {{
+        key | string +
+          "=" +
+          value | string
+      }}
+
+- name: Generate regular expression for new arguments
+  ansible.builtin.set_fact:
+    regex_add_missing: >-
+      {{
+        "^((?!(?:.|\n)*" +
+          regex_existing +
+          ")((?:.|\n)*))$"
+      }}
+
+- name: Update /boot/cmdline.txt
+  ansible.builtin.copy:
+    content: >-
+      {{
+        cmdline_txt.content |
+          b64decode |
+          regex_replace(regex_existing, key_value_pair) |
+          regex_replace(regex_add_missing, key_value_pair + " \1")
+      }}
+    dest: /boot/cmdline.txt
+    mode: preserve
