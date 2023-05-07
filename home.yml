@@ -39,12 +39,22 @@
   gather_facts: false
   roles:
     - name: dns-server
-      tags: dns-server
+      tags:
+        - dns-server
+        - container
     - name: vaultwarden
-      tags: vaultwarden
+      tags:
+        - vaultwarden
+        - container
     - name: photoprism
-      tags: photoprism
+      tags:
+        - photoprism
+        - container
     - name: harbor
-      tags: harbor
+      tags:
+        - harbor
+        - container
     - name: nextcloud
-      tags: nextcloud
+      tags:
+        - nextcloud
+        - container
