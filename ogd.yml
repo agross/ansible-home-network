@@ -60,8 +60,6 @@
       tags:
         - logger
         - container
-#     - name: vscode-remote-ssh
-#       tags: vscode-remote-ssh
 #     - name: vladgh.samba.server
 #       vars:
 #         samba_shares_root: /tmp/unused
