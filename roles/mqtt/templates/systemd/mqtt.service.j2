@@ -14,13 +14,17 @@ ExecStartPre=-/usr/bin/docker container rm '%p'
 ExecStartPre=-/usr/bin/docker volume create '%p_data'
 ExecStartPre=-/usr/bin/docker volume create '%p_log'
 
+{% set account = mqtt_accounts | default({}, true) | ansible.builtin.dict2items | first | default(None) -%}
 ExecStart=/usr/bin/docker container \
                           run \
                           --name '%p' \
                           --rm \
-                          --health-cmd 'mosquitto_pub --id docker-healthcheck --topic /docker-healthcheck --null-message' \
+                          --health-cmd 'mosquitto_pub {{ account | ternary('-u ' ~ account.key | default(''), '') }} {{ account | ternary('-P ' ~ account.value | default(''), '') }} --id docker-healthcheck --topic /docker-healthcheck --null-message' \
+                          --health-interval 5s \
+                          --health-start-period 5s \
                           --publish 1883:1883 \
                           --volume '{{ root }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro' \
+                          --volume '{{ root }}/mosquitto/auth:/mosquitto/config/auth:ro' \
                           --volume '%p_data:/mosquitto/data' \
                           --volume '%p_log:/mosquitto/log' \
                           {{ mqtt_image | ansible.builtin.quote }}

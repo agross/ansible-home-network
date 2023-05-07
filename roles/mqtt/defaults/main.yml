@@ -1,3 +1,5 @@
 root: /data/mqtt
 
 mqtt_image: eclipse-mosquitto:with-clients
+
+mqtt_accounts:

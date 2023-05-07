@@ -1,0 +1,21 @@
+# vim: set ft=jinja ts=2 sw=2 et:
+
+{# https://github.com/eclipse/mosquitto/blob/4e6fbae45ce424d2204c8b5d51b37dc5a08013bc/src/password_mosq.h#L28 #}
+{%- set salt_length = 12 -%}
+
+{# https://github.com/eclipse/mosquitto/blob/4e6fbae45ce424d2204c8b5d51b37dc5a08013bc/src/password_mosq.h#L29 #}
+{%- set iterations = 101 -%}
+
+{% for username, password in (mqtt_accounts | default({})).items() %}
+{%- set salt = lookup('ansible.builtin.password',
+                      '/dev/null',
+                      chars = ['ascii_letters', 'digit'],
+                      length = salt_length,
+                      seed = inventory_hostname ~ password) -%}
+{{ username }}:{{
+  password |
+    ansible.builtin.password_hash('pbkdf2_sha512', rounds = iterations, salt = salt) |
+    replace('$pbkdf2-sha512$', '$7$') |
+    replace('.', '+')
+  }}==
+{% endfor %}

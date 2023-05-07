@@ -1,3 +1,13 @@
+- name: Collect MQTT accounts for site {{ site }}
+  ansible.builtin.set_fact:
+    mqtt_accounts: >-
+      {{
+        mqtt_accounts |
+          default({}) |
+          ansible.builtin.combine(hostvars[item].mqtt_accounts | default({}))
+      }}
+  loop: "{{ groups[site] | default([]) }}"
+
 - name: Copy templates
   ansible.builtin.import_tasks:
     file: copy-templates.yml
@@ -5,7 +15,16 @@
     directory: ../templates
     notify: Restart mqtt service
     files:
-      mosquitto/mosquitto.conf:
+      mosquitto/mosquitto.conf.j2:
+        owner: 1883
+        group: 1883
+      mosquitto/auth.j2:
+        owner: 1883
+        group: 1883
+        mode: '640'
+      systemd/mqtt.service.j2:
+        owner: 0
+        group: 0
         mode: '640'
 
 - name: Install systemd units
