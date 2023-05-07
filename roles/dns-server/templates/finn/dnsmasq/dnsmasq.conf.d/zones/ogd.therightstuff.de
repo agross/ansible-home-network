@@ -1,3 +1,5 @@
+host-record=modem,        modem.ogd.therightstuff.de,         192.168.100.1
+
 host-record=proxmox,      proxmox.ogd.therightstuff.de,       172.16.1.1, 2001:470:1f0b:fd4::1
 host-record=gateway,      gateway.ogd.therightstuff.de,       172.16.1.2, 2001:470:1f0b:fd4::2
 # TODO
