@@ -1,5 +1,7 @@
 root: /data/dns-server
 
+dns_server_firewalld: []
+
 dns_server_ports:
   adguard: 53
   resolved: 53531

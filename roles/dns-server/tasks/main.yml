@@ -57,11 +57,7 @@
     immediate: true
     permanent: true
     state: enabled
-  loop:
-    - dhcp
-    - dhcpv6
-    - dns
-    - tftp
+  loop: "{{ dns_server_firewalld }}"
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml

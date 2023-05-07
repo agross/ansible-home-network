@@ -1,0 +1,4 @@
+dns_server_firewalld:
+  - dhcp
+  - dhcpv6
+  - dns
