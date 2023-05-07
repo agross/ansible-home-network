@@ -1,0 +1,24 @@
+device_model: Shelly 2.5 PM
+room: Living Room
+purpose: Shutter
+function: shutter
+
+# https://templates.blakadder.com/shelly_25.html
+template: >-
+  {"NAME":"Shelly 2.5 PM","GPIO":[320,0,0,0,224,193,0,0,640,192,608,225,3456,4736],"FLAG":0,"BASE":18}
+
+# Enable shutter support
+custom_backlog: |
+  # Shutter support.
+  SetOption80 1
+
+  # Interlock relays 1 and 2.
+  Interlock 1,2
+  Interlock ON
+
+  # All relays off after reboot.
+  PowerOnState 0
+
+  # Open and close durations.
+  ShutterOpenDuration1 15.7
+  ShutterCloseDuration1 14.2

@@ -30,3 +30,17 @@ groups:
 
   gateway: >-
     inventory_hostname is match("gateway-*")
+
+  tasmotas: >-
+    inventory_hostname is match("gosund-*") or
+    inventory_hostname is match("nous-*") or
+    inventory_hostname is match("shelly*")
+
+  gosunds: >-
+    inventory_hostname is match("gosund-*")
+
+  nouses: >-
+    inventory_hostname is match("nous-*")
+
+  shellies: >-
+    inventory_hostname is match("shelly*")

@@ -1,0 +1,8 @@
+mqtt_host: mqtt
+mqtt_port: 1883
+
+# Suffix because of https://github.com/arendst/Tasmota/issues/9282.
+mqtt_client: "{{ inventory_hostname_short }}-client"
+
+mqtt_topic: >-
+  {{ site }}/{{ room | lower | replace(' ', '-') }}/{{ function }}/%prefix%/%topic%/

@@ -1,0 +1,10 @@
+tasmota_password: "{{ vault_tasmota_password }}"
+
+# Device function, e.g. power, lights, climate.
+function: power
+
+friendly_name: >-
+  {{ device_model }}
+  #{{ inventory_hostname_short | regex_search('(?<=-)\d+$') }}
+  {{ room }}
+  {% if installation_location is defined %}{{ installation_location }} {% endif %}{{ purpose }}

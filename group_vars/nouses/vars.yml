@@ -1,0 +1,9 @@
+device_model: NOUS A1T
+
+template: >-
+  {"NAME":"NOUS A1T","GPIO":[17,0,0,0,134,132,0,0,131,56,21,0,0],"FLAG":0,"BASE":49}
+
+# Disable LED, but enable when there are connection issues.
+custom_backlog: |
+  LedPower 0
+  SetOption31 0
