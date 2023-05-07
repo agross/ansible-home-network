@@ -1,10 +1,10 @@
 # /bin/sh does not support pipefail option.
-- name: Get host PCI devices of guest {{ guest.inventory_hostname }} # noqa risky-shell-pipe
+- name: Get host USB devices of guest {{ guest.inventory_hostname }} # noqa risky-shell-pipe
   ansible.builtin.shell:
     cmd: >-
       qm config {{ guest.kvm.id | quote }} |
         grep --quiet '^{{ device.key }}: {{ device.value }}'
-  loop: "{{ guest.kvm.hostpci | default({}) | ansible.builtin.dict2items }}"
+  loop: "{{ guest.kvm.usb | default({}) | ansible.builtin.dict2items }}"
   loop_control:
     loop_var: device
     label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }} device={{ device }}"
@@ -12,7 +12,7 @@
   failed_when: false
   register: devices_configured
 
-- name: Add host PCI devices to guest {{ guest.inventory_hostname }}
+- name: Add host USB devices to guest {{ guest.inventory_hostname }}
   when: devices_configured.results[index].rc != 0
   ansible.builtin.command:
     argv:
@@ -21,7 +21,7 @@
       - "{{ guest.kvm.id }}"
       - "-{{ device.key }}"
       - "{{ device.value }}"
-  loop: "{{ guest.kvm.hostpci | default({}) | ansible.builtin.dict2items }}"
+  loop: "{{ guest.kvm.usb | default({}) | ansible.builtin.dict2items }}"
   loop_control:
     loop_var: device
     index_var: index
