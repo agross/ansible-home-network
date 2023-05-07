@@ -1,0 +1,14 @@
+[Unit]
+Description=ioBroker IoT platform healthcheck timer
+# Stop if iobroker.service is not running.
+BindsTo=iobroker.service
+# Start after iobroker.service has finished starting.
+After=iobroker.service
+
+[Timer]
+OnBootSec=30min
+OnUnitActiveSec=5min
+
+[Install]
+# When iobroker.service starts, also start the timer.
+WantedBy=iobroker.service timers.target

@@ -1,6 +1,6 @@
 [Unit]
 Description=ioBroker IoT platform healthcheck
-BindsTo={{ service_name }}.service
+BindsTo=iobroker.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]

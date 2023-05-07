@@ -2,8 +2,50 @@
   ansible.builtin.import_tasks:
     file: copy-templates.yml
   vars:
-    directory: ../templates/app
-    notify: Restart iobroker service
+    directory: ../templates
+    notify:
+      - Restart iobroker service
+      - Restart iobroker healthcheck timer
+    files:
+      backups:
+        owner: 1000
+        group: 1000
+        mode: '755'
+      roles/iobroker/templates/crunchfit/.env.j2:
+        mode: '640'
+
+- name: Install SELinux packages
+  when: ansible_selinux.status != 'disabled'
+  ansible.builtin.package:
+    name:
+      - python3-policycoreutils
+    state: present
+
+- name: Allow execution of the healthcheck script
+  when: ansible_selinux.status != 'disabled'
+  community.general.sefcontext:
+    target: "{{ root }}/healthcheck"
+    setype: bin_t
+    state: present
+
+- name: Apply SELinux file context for the healthcheck script
+  when: ansible_selinux.status != 'disabled'
+  ansible.builtin.command:
+    argv:
+      - restorecon
+      - -iv
+      - "{{ root }}/healthcheck"
+  register: restorecon_result
+  changed_when: restorecon_result.stdout | length > 0
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ root }}/systemd"
+    local_units: templates/systemd
+    notify:
+      - Restart iobroker service
+      - Restart iobroker healthcheck timer
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
@@ -13,67 +55,37 @@
     directory: "{{ root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify: Restart iobroker service
+    notify:
+      - Restart iobroker service
+      - Restart iobroker healthcheck timer
 
-- name: Set permissions on backups directory
-  ansible.builtin.file:
-    path: "{{ root }}/backups"
-    state: directory
-    owner: 1000
-    group: 1000
-    mode: '755'
-
-- name: Add sysctls for Redis
-  ansible.builtin.copy:
-    src: ../templates/app/redis/sysctl.conf
-    dest: /etc/sysctl.d/redis-vm.overcommit.conf
-    mode: '644'
-    # Overwrite existing files.
-    force: true
+- name: Add vm.overcommit_memory sysctl for Redis
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: '1'
+    sysctl_file: /etc/sysctl.d/redis-vm.overcommit.conf
+    sysctl_set: true
+    state: present
+    reload: true
 
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
     src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/{{ service_name }}.yaml"
-
-- name: Symlink systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/iobroker.service"
-    path: /etc/systemd/system/{{ service_name }}.service
-    force: true
-  notify: Restart iobroker service
+    path: "/etc/borgmatic.d/iobroker.yaml"
 
 - name: Start service
   ansible.builtin.systemd:
+    name: iobroker.service
     state: started
     enabled: true
-    name: "{{ service_name }}"
     daemon_reload: true
   register: iobroker_started
 
-- name: Copy templates
-  ansible.builtin.import_tasks:
-    file: copy-templates.yml
-  vars:
-    directory: ../templates/healthcheck
-    notify: Restart iobroker healthcheck timer
-
-- name: Symlink healthcheck systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/iobroker-healthcheck.{{ item }}"
-    path: /etc/systemd/system/{{ service_name }}-healthcheck.{{ item }}
-    force: true
-  loop:
-    - service
-    - timer
-
 - name: Start healthcheck timer
   ansible.builtin.systemd:
+    name: iobroker-healthcheck.timer
     state: started
     enabled: true
-    name: "{{ service_name }}-healthcheck.timer"
     daemon_reload: true
   register: iobroker_healthcheck_started

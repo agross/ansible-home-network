@@ -1,6 +1,11 @@
 services:
   ti-cc-tool:
-    {% set dev = iobroker_devices | default([]) | selectattr('zigbee', 'defined') | first %}
+    {%
+      set dev = iobroker_devices |
+        selectattr('zigbee', 'defined') |
+        first |
+        default({ 'host': '', 'container': '', 'zigbee': { 'firmware': '' } })
+    %}
     image: ckware/ti-cc-tool
     devices:
       - {{ dev.host }}:{{ dev.container }}:rw

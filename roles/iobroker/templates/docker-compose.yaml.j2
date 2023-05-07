@@ -1,7 +1,7 @@
 volumes:
   iobroker-data:
 
-{% if traefik_domain | default('', true) | length  %}
+{% if traefik_host %}
 networks:
   web:
     external: true
@@ -23,7 +23,7 @@ services:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       - ./redis/data:/data
     healthcheck:
-      test: redis-cli -h localhost ping | grep -xq PONG || exit 1
+      test: redis-cli ping | grep -xq PONG
       start_period: 5s
       interval: 5s
     sysctls:
@@ -38,25 +38,27 @@ services:
     restart: unless-stopped
     env_file: ./iobroker/.env
     hostname: iobroker
-    {% if iobroker_support_wake_on_lan | default(false) | bool %}
-    network_mode: host
-    {% elif traefik_domain | default('', true) | length  %}
     labels:
       traefik.enable: 'true'
       traefik.http.routers.iobroker.entrypoints: https
-      traefik.http.routers.iobroker.rule: Host(`iobroker.{{ traefik_domain }}`)
+      traefik.http.routers.iobroker.rule: Host(`iobroker.{{ network.domain }}`)
       traefik.http.routers.iobroker.service: iobroker
-      traefik.http.services.iobroker.loadbalancer.server.port: 8081
+      traefik.http.services.iobroker.loadbalancer.server.port: {{ iobroker_ports.iobroker }}
+      {% if iobroker_ports.lovelace is defined %}
       traefik.http.routers.iobroker-lovelace.entrypoints: https
-      traefik.http.routers.iobroker-lovelace.rule: Host(`lovelace.{{ traefik_domain }}`)
+      traefik.http.routers.iobroker-lovelace.rule: Host(`lovelace.{{ network.domain }}`)
       traefik.http.routers.iobroker-lovelace.service: iobroker-lovelace
-      traefik.http.services.iobroker-lovelace.loadbalancer.server.port: 8091
-      {% if iobroker_guest_access | default(false) | bool == true %}
-      traefik.http.routers.iobroker-lovelace-guests.entrypoints: https
-      traefik.http.routers.iobroker-lovelace-guests.rule: Host(`gast.{{ traefik_domain }}`)
-      traefik.http.routers.iobroker-lovelace-guests.service: iobroker-lovelace-guests
-      traefik.http.services.iobroker-lovelace-guests.loadbalancer.server.port: 8092
+      traefik.http.services.iobroker-lovelace.loadbalancer.server.port: {{ iobroker_ports.lovelace }}
       {% endif %}
+      {% if iobroker_ports.lovelace_guests is defined %}
+      traefik.http.routers.iobroker-lovelace-guests.entrypoints: https
+      traefik.http.routers.iobroker-lovelace-guests.rule: Host(`gast.{{ network.domain }}`)
+      traefik.http.routers.iobroker-lovelace-guests.service: iobroker-lovelace-guests
+      traefik.http.services.iobroker-lovelace-guests.loadbalancer.server.port: {{ iobroker_ports.lovelace_guests }}
+      {% endif %}
+    {% if iobroker_support_wake_on_lan | default(false) | bool %}
+    network_mode: host
+    {% elif traefik_host %}
     networks:
       - default
       - web
@@ -70,15 +72,17 @@ services:
       {% endfor %}
     {% endif %}
     volumes:
-      - {{ root }}/backups:/opt/iobroker/backups
+      - ./backups:/opt/iobroker/backups
       - iobroker-data:/opt/iobroker
       # Enable mirroring in the iobroker.javascript adapter and edit scripts via
       # SSH with e.g. VS Code.
-      - {{ root }}/scripts:/opt/iobroker/mirrored-scripts
+      - ./scripts:/opt/iobroker/mirrored-scripts
+    {% if iobroker_devices | length %}
     devices:
-      {% for dev in iobroker_devices | default([]) %}
+      {% for dev in iobroker_devices %}
       - {{ dev.host }}:{{ dev.container }}:rw
       {% endfor %}
+    {% endif %}
     depends_on:
       redis:
         condition: service_healthy

@@ -1,5 +1,6 @@
 FROM python:3-alpine
 
+# hadolint ignore=DL3013,DL3018
 RUN apk add --no-cache git && \
     pip install --no-cache-dir --upgrade git+https://github.com/m-wrzr/populartimes
 

@@ -52,10 +52,10 @@
       tags:
         - traefik
         - container
-#     - name: iobroker
-#       tags:
-#         - iobroker
-#         - container
+    - name: iobroker
+      tags:
+        - iobroker
+        - container
     - name: logger
       tags:
         - logger

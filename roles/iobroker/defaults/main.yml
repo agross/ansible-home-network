@@ -1,19 +1,12 @@
-service_name: iobroker
-
-root: /data/{{ service_name }}
+root: /data/iobroker
 
 iobroker_image: buanet/iobroker:custom
 
 iobroker_support_wake_on_lan: false
 
+iobroker_devices: []
+
 iobroker_ports:
   iobroker: 8081
-  lovelace: 8091
-
-  # homematic_rfd: 42001
-  homematic_ip: 42010
-  homematic_virtual_devices: 49292
-
-iobroker_guest_access: false
 
 google_maps_api_key:

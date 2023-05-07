@@ -1,11 +1,11 @@
 - name: Restart iobroker service
   when: iobroker_started is not changed
   ansible.builtin.systemd:
-    name: "{{ service_name }}"
+    name: iobroker.service
     state: reloaded
 
 - name: Restart iobroker healthcheck timer
   when: iobroker_healthcheck_started is not changed
   ansible.builtin.systemd:
-    name: "{{ service_name }}-healthcheck.timer"
+    name: iobroker-healthcheck.timer
     state: restarted
