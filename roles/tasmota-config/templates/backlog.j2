@@ -14,11 +14,11 @@ DeviceName {{ friendly_name }}
 {% if mqtt_host %}
   MqttHost {{ mqtt_host }}
 {% endif %}
-{% if mqtt_user %}
-  MqttUser {{ mqtt_user }}
+{% if mqtt_accounts is defined %}
+  MqttUser {{ (mqtt_accounts | ansible.builtin.dict2items | first).key }}
 {% endif %}
-{% if mqtt_password %}
-  MqttPassword {{ mqtt_password }}
+{% if mqtt_accounts is defined %}
+  MqttPassword {{ (mqtt_accounts | ansible.builtin.dict2items | first).value }}
 {% endif %}
 MqttPort {{ mqtt_port | default(1883) }}
 MqttClient {{ mqtt_client }}

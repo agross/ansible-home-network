@@ -1,33 +1,33 @@
 - name: Create backlog file
+  delegate_to: localhost
   ansible.builtin.tempfile:
     state: file
     suffix: backlog
-  delegate_to: localhost
   changed_when: false
   register: backlog_file
 
 - name: Generate backlog
+  delegate_to: localhost
   ansible.builtin.template:
     src: templates/backlog.j2
     dest: "{{ backlog_file.path }}"
     trim_blocks: true
     lstrip_blocks: true
     mode: preserve
-  delegate_to: localhost
   changed_when: false
 
 - name: Read backlog
+  delegate_to: localhost
   ansible.builtin.set_fact:
     # The select filter removes empty strings.
     backlog: >-
       {{ lookup('file', backlog_file.path).splitlines() | map('trim') | select | join(';') }}
-  delegate_to: localhost
 
 - name: Remove backlog file
+  delegate_to: localhost
   ansible.builtin.file:
     path: "{{ backlog_file.path }}"
     state: absent
-  delegate_to: localhost
   changed_when: false
 
 - name: Print backlog
@@ -35,11 +35,11 @@
     var: backlog
 
 - name: Execute backlog
+  delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
+      http://{{ inventory_hostname }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
     return_content: true
-  delegate_to: localhost
   register: backlog_result
   changed_when: true
 

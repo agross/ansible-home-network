@@ -1,16 +1,16 @@
 - name: Get latest Tasmota release
+  delegate_to: localhost
+  run_once: true
   ansible.builtin.uri:
     url: "{{ tasmota_version_info }}"
     return_content: true
-  delegate_to: localhost
-  run_once: true
-  register: latest_release
   changed_when: false
+  register: latest_release
 
 - name: Determine latest Tasmota release version
+  run_once: true
   ansible.builtin.set_fact:
     latest_release_key: >-
       {{ latest_release.json | list | first }}
     latest_release_version: >-
       {{ latest_release.json | list | first | regex_replace('^.*-', '') }}
-  run_once: true
