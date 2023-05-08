@@ -50,6 +50,7 @@
 - name: Allow HTTP and HTTPS through firewall
   ansible.posix.firewalld:
     service: "{{ item }}"
+    zone: "{{ interfaces.lan.zone }}"
     immediate: true
     permanent: true
     state: enabled
