@@ -11,7 +11,7 @@ kvm:
     net0: "virtio,bridge=vmbr0,firewall=1"
     net1: "virtio,bridge=vmbr0,firewall=1"
   scsi:
-    scsi0: local-lvm:100,discard=on,ssd=1
+    scsi0: local-lvm:100,discard=on,iothread=1,ssd=1
   usb:
     # Sonoff Zigbee stick.
     usb0: host=10c4:ea60

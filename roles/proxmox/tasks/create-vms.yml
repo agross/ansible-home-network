@@ -55,7 +55,7 @@
     vga: std
     ide:
       ide0: none # local:iso/Fedora-Server-netinst-x86_64-37-1.7.iso,media=cdrom
-    scsihw: virtio-scsi-pci
+    scsihw: virtio-scsi-single
     scsi: "{{ guest.kvm.scsi | default(omit) }}"
     net: "{{ guest.kvm.net | default(omit) }}"
     # According to https://pve.proxmox.com/pve-docs/api-viewer/index.html#/nodes/{node}/qemu
