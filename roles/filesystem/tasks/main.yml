@@ -1,0 +1,6 @@
+- name: Ensure extra filesystem mount units are installed
+  ansible.builtin.include_tasks:
+    file: create-mount-unit.yml
+  loop: "{{ filesystems | default([]) }}"
+  loop_control:
+    loop_var: filesystem

@@ -1,0 +1,51 @@
+- name: Get mount unit file name for {{ filesystem.where }}
+  ansible.builtin.command:
+    argv:
+      - systemd-escape
+      - --path
+      - "{{ filesystem.where }}"
+  changed_when: false
+  register: mount_file_name
+
+- name: Set facts
+  ansible.builtin.set_fact:
+    automount: >-
+      {{ filesystem.automount is defined and filesystem.automount | default(false) | bool == true }}
+    mount_unit_name: "{{ mount_file_name.stdout_lines | first }}.mount"
+    automount_unit_name: "{{ mount_file_name.stdout_lines | first }}.automount"
+
+- name: Create mount unit for {{ filesystem.where }}
+  ansible.builtin.template:
+    src: mount.j2
+    dest: "/etc/systemd/system/{{ mount_unit_name }}"
+    owner: 0
+    group: 0
+    mode: '644'
+    lstrip_blocks: true
+
+- name: Start mount unit unless automounted for {{ filesystem.where }}
+  when: not automount
+  ansible.builtin.systemd:
+    unit: "{{ mount_unit_name }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Create and start automount unit
+  when: automount
+  block:
+    - name: Create automount unit for {{ filesystem.where }}
+      ansible.builtin.template:
+        src: automount.j2
+        dest: "/etc/systemd/system/{{ automount_unit_name }}"
+        owner: 0
+        group: 0
+        mode: '644'
+        lstrip_blocks: true
+
+    - name: Start automount unit for {{ filesystem.where }}
+      ansible.builtin.systemd:
+        unit: "{{ automount_unit_name }}"
+        enabled: true
+        state: started
+        daemon_reload: true

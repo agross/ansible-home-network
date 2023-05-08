@@ -1,0 +1,11 @@
+[Unit]
+Description=Mount {{ filesystem.where }}
+
+[Mount]
+What={{ filesystem.what }}
+Where={{ filesystem.where }}
+
+{% if not automount %}
+[Install]
+WantedBy=multi-user.target
+{% endif %}

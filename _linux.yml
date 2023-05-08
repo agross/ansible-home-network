@@ -10,6 +10,8 @@
       tags: watchdog
     - name: kernel-cmdline
       tags: kernel-cmdline
+    - name: filesystem
+      tags: filesystem
     - name: devsec.hardening.ssh_hardening
       vars:
         network_ipv6_enable: true

@@ -1,0 +1,4 @@
+filesystems:
+  - what: /dev/sdd1
+    where: /home/agross/data-nvme
+    automount: true
