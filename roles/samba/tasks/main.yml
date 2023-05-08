@@ -1,0 +1,28 @@
+- name: Ensure mounts are available
+  ansible.builtin.include_tasks:
+    file: create-mount-unit.yml
+  loop: "{{ samba_shares | selectattr('mount', 'defined') }}"
+  loop_control:
+    loop_var: share
+
+- name: Install Samba server
+  ansible.builtin.import_role:
+    name: vladgh.samba.server
+
+- name: Ensure avahi-daemon is available for Time Machine auto-discovery
+  ansible.builtin.package:
+    name: avahi
+    state: present
+
+- name: Start avahi-daemon
+  ansible.builtin.systemd:
+    service: avahi-daemon.service
+    state: started
+
+- name: Allow Samba through firewall
+  ansible.posix.firewalld:
+    service: samba
+    zone: "{{ interfaces.lan.zone }}"
+    immediate: true
+    permanent: true
+    state: enabled

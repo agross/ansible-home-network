@@ -60,25 +60,5 @@
       tags:
         - logger
         - container
-#     - name: vladgh.samba.server
-#       vars:
-#         samba_shares_root: /tmp/unused
-#         samba_shares:
-#           - name: Time Machine
-#             comment: Time Machine Backups
-#             path: /time-machine
-#             write_list: agross
-#             include_file: samba-share-timemachine.conf
-
-#         samba_users: "{{ vault_samba_users }}"
-
-#         # See "templates" directory.
-#         samba_global_include: samba-global.conf
-#         samba_homes_include: samba-homes.conf
-
-#         samba_load_homes: true
-#         samba_wins_support: false
-#         # Bullseye has 4.13.13, fix is required up to 4.6.4 as per docs, but
-#         # the version comparison fails for some reason.
-#         samba_mitigate_cve_2017_7494: false
-#       tags: samba
+    - name: samba
+      tags: samba
