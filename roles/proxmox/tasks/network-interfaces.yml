@@ -6,7 +6,7 @@
     group: 0
     mode: '644'
     lstrip_blocks: true
-  notify: Reboot because networking changed
+  notify: Reload network interfaces
 
 - name: Ensure host IP is included in /etc/hosts
   ansible.builtin.lineinfile:
@@ -19,5 +19,5 @@
     state: present
     backup: true
 
-- name: Reboot now, if required
+- name: Reload network interfaces if required
   ansible.builtin.meta: flush_handlers
