@@ -1,3 +1,8 @@
+- name: Restart systemd-resolved service
+  ansible.builtin.systemd:
+    service: systemd-resolved.service
+    state: restarted
+
 - name: Reload firewalld
   ansible.builtin.command:
     argv:

@@ -107,7 +107,6 @@ systemd_networkd_network:
         # Disable auto-configuration via DHCPv4 and DHCPv6.
         - DHCP: false
         - LinkLocalAddressing: false
-        - LLMNR: false
         - IPv6AcceptRA: false
 
   wan.pppoe:
@@ -119,7 +118,6 @@ systemd_networkd_network:
         # Disable auto-configuration via DHCPv4 and DHCPv6.
         - DHCP: false
         - LinkLocalAddressing: false
-        - LLMNR: false
         - IPv6AcceptRA: false
 
   wireguard:
@@ -138,7 +136,6 @@ systemd_networkd_network:
     - Link:
         - RequiredForOnline: false
     - Network:
-        - LLMNR: false
         # Do not drop IP and routes on networkctl reload.
         - KeepConfiguration: true
 

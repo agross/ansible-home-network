@@ -1,0 +1,4 @@
+[Service]
+Name=%H
+Type=_adisk._tcp
+TxtText=dk0=adVN="Time Machine",adVF=0x82 sys=adVF=0x100

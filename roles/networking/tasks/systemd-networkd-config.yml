@@ -49,6 +49,35 @@
     owner: 0
     group: 0
     mode: '644'
+  notify: Restart systemd-resolved service
+
+- name: Disable LLMNR
+  ansible.builtin.copy:
+    content: |
+      [Resolve]
+      # Disable LLMNR as it has been ditched by Microsoft.
+      # https://techcommunity.microsoft.com/t5/networking-blog/aligning-on-mdns-ramping-down-netbios-name-resolution-and-llmnr/ba-p/3290816
+      LLMNR=false
+    dest: /etc/systemd/resolved.conf.d/disable-llmnr.conf
+    owner: 0
+    group: 0
+    mode: '644'
+  notify: Restart systemd-resolved service
+
+- name: Enable Multicast DNS
+  # For Samba we still use avahi-daemon since Samba auto-registers.
+  when: samba_shares_root is not defined
+  ansible.builtin.copy:
+    content: |
+      [Resolve]
+      # Enable Multicast DNS, needs to be enabled on a per-network level as well.
+      # https://unix.stackexchange.com/a/712010/72946
+      MulticastDNS=true
+    dest: /etc/systemd/resolved.conf.d/multicast-dns.conf
+    owner: 0
+    group: 0
+    mode: '644'
+  notify: Restart systemd-resolved service
 
 - name: Configure systemd-networkd
   ansible.builtin.include_role:
