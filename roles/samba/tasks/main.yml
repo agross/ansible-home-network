@@ -9,16 +9,6 @@
   ansible.builtin.import_role:
     name: vladgh.samba.server
 
-- name: Ensure avahi-daemon is available for Time Machine auto-discovery
-  ansible.builtin.package:
-    name: avahi
-    state: present
-
-- name: Start avahi-daemon
-  ansible.builtin.systemd:
-    service: avahi-daemon.service
-    state: started
-
 - name: Allow Samba through firewall
   ansible.posix.firewalld:
     service: samba
@@ -26,3 +16,27 @@
     immediate: true
     permanent: true
     state: enabled
+
+- name: Ensure /etc/systemd/dnssd exists
+  ansible.builtin.file:
+    path: /etc/systemd/dnssd
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Publish Samba-related services via Multicast DNS
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: >-
+      /etc/systemd/dnssd/{{ item | ansible.builtin.basename | ansible.builtin.regex_replace('\.j2$', '') }}
+    owner: 0
+    group: 0
+    mode: '644'
+    lstrip_blocks: true
+  loop: >-
+    {{
+      lookup('ansible.builtin.fileglob', '../templates/dnssd/*.dnssd', wantlist=true) +
+      lookup('ansible.builtin.fileglob', '../templates/dnssd/*.dnssd.j2', wantlist=true)
+    }}
+  notify: Restart systemd-resolved service

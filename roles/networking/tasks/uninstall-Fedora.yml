@@ -6,8 +6,6 @@
     state: absent
 
 - name: Ensure avahi is not installed
-  # For Samba we still use avahi-daemon since Samba auto-registers.
-  when: samba_shares_root is not defined
   ansible.builtin.package:
     name:
       - avahi

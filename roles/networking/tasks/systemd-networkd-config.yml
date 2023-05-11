@@ -65,8 +65,6 @@
   notify: Restart systemd-resolved service
 
 - name: Enable Multicast DNS
-  # For Samba we still use avahi-daemon since Samba auto-registers.
-  when: samba_shares_root is not defined
   ansible.builtin.copy:
     content: |
       [Resolve]

@@ -1,0 +1,25 @@
+# vim: set ft=jinja-systemd ts=2 sw=2 et:
+
+[Service]
+Name=%H
+Type=_adisk._tcp
+# adVF=0x100: Connecting to the share prompts for a username and password.
+
+# "adVN" name must match the Time Machine SMB share.
+# 0x02:  SMB is supported on this volume.
+# 0x80:  Time Machine should allow this SMB volume as a backup destination.
+TxtText=
+{#- https://stackoverflow.com/a/49699589/149264 #}
+{%- set index = namespace(value = 0) %}
+{%- for share in samba_shares | default([], true) %}
+{% if share.vfs_objects |
+      default({}) |
+      map(attribute = 'options', default = []) |
+      ansible.builtin.flatten |
+      selectattr('name', 'defined') |
+      selectattr('name', 'equalto', 'time machine') |
+      selectattr('value', 'defined') |
+      selectattr('value', 'equalto', 'yes') %}
+dk{{ index.value }}=adVN="{{ share.name }}",adVF=0x82 {% set index.value = index.value + 1 %}{% endif %}
+{% endfor -%}
+sys=adVF=0x100
