@@ -10,6 +10,8 @@
       tags: watchdog
     - name: kernel-cmdline
       tags: kernel-cmdline
+    - name: fstrim
+      tags: fstrim
     - name: filesystem
       tags: filesystem
     - name: devsec.hardening.ssh_hardening
