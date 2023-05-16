@@ -1,12 +1,12 @@
 roles:
   - name: aruhier.systemd_networkd
+  - name: borgbase.ansible_role_borgbackup
+    version: v1.0.1
   - name: exploide.dnf-automatic
   - name: geerlingguy.docker
     version: 6.0.4
   - name: geerlingguy.postfix
   - name: lae.proxmox
-  - name: m3nu.ansible_role_borgbackup
-    version: master
   - name: geerlingguy.pip
     version: 2.2.0
 

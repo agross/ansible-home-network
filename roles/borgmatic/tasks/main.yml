@@ -9,7 +9,7 @@
 
 - name: Install borgmatic
   ansible.builtin.include_role:
-    name: m3nu.ansible_role_borgbackup
+    name: borgbase.ansible_role_borgbackup
   vars:
     borg_encryption_passphrase: >-
       {{ borgmatic_encryption_passphrase | ansible.builtin.mandatory }}
