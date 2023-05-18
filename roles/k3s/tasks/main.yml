@@ -1,24 +1,31 @@
+- name: Ensure firewalld is not installed
+  ansible.builtin.package:
+    name: firewalld
+    state: absent
+
 # https://rancher.com/docs/k3s/latest/en/advanced/#enabling-legacy-iptables-on-raspbian-buster
-- name: Install iptables
+- name: Ensure iptables is installed
   ansible.builtin.package:
     name: iptables
     state: present
 
-- name: Uninstall firewalld
-  ansible.builtin.package:
-    name: firewalld
-    state: absent
+- name: Enable memory cgroups on Raspberry Pi
+  when: "'raspi' in group_names"
+  ansible.builtin.import_tasks:
+    file: raspi-memory-cgroups.yml
 
 - name: Deploy k3s
   ansible.builtin.include_role:
     name: xanmanning.k3s
   vars:
-    k3s_become_for_all: true
+    k3s_become: true
 
 - name: Apply Traefik customizations
   ansible.builtin.template:
     src: templates/traefik-config.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+    owner: 0
+    group: 0
     mode: '600'
   when: k3s_control_node | default(false)
   notify: Restart k3s

@@ -29,6 +29,9 @@ groups:
   build_agents: >-
     inventory_hostname is match("agent-*")
 
+  kubes: >-
+    inventory_hostname is match("kube-*")
+
   gateway: >-
     inventory_hostname is match("gateway-*")
 

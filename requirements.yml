@@ -9,6 +9,7 @@ roles:
   - name: lae.proxmox
   - name: geerlingguy.pip
     version: 2.2.0
+  - name: xanmanning.k3s
 
 collections:
   - name: ansible.posix

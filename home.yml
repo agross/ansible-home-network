@@ -28,6 +28,14 @@
   vars:
     playbook_hosts: home:&fedora
 
+- name: Configure Kubernetes
+  hosts: kubes
+  become: true
+  gather_facts: false
+  roles:
+    - name: k3s
+      tags: k3s
+
 - name: Gateway configuration
   hosts: gateway-home
   become: true

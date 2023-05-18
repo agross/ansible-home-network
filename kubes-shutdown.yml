@@ -1,0 +1,6 @@
+- name: Shutdown Kubernetes Pis
+  hosts: raspi:&kubes
+  become: true
+  gather_facts: false
+  roles:
+    - name: shutdown
