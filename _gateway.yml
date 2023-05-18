@@ -5,5 +5,3 @@
   roles:
     - name: gateway
       tags: gateway
-    - name: netdata
-      tags: netdata

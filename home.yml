@@ -28,10 +28,13 @@
   vars:
     playbook_hosts: home:&fedora
 
-- name: Import gateway configuration playbook
-  ansible.builtin.import_playbook: _gateway.yml
-  vars:
-    playbook_hosts: gateway-home
+- name: Gateway configuration
+  hosts: gateway-home
+  become: true
+  gather_facts: false
+  roles:
+    - name: gateway
+      tags: gateway
 
 - name: Home automation
   hosts: pi

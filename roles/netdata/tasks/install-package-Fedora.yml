@@ -1,0 +1,7 @@
+- name: Add netdata repo
+  ansible.builtin.yum_repository:
+    name: netdata
+    description: netdata
+    baseurl: https://repo.netdata.cloud/repos/stable/fedora/$releasever/$basearch/
+    gpgcheck: true
+    gpgkey: https://repo.netdata.cloud/netdatabot.gpg.key

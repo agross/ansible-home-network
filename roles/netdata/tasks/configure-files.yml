@@ -1,0 +1,51 @@
+- name: Ensure config directory exists
+  ansible.builtin.file:
+    path: "{{ directory.key }}"
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Create config file (blockinfile)
+  ansible.builtin.blockinfile:
+    path: "/etc/netdata/{{ directory.key }}/{{ file.key }}"
+    create: true
+    block: |
+      {{
+        (file.value.block |
+          ansible.builtin.type_debug == 'dict') |
+          ansible.builtin.ternary(file.value.block | ansible.builtin.to_nice_yaml(indent = 2),
+                                  file.value.block)
+      }}
+    marker: "# {mark} ANSIBLE MANAGED CONFIG BLOCK"
+    owner: 0
+    group: netdata
+    mode: '640'
+  loop: >-
+    {{
+      directory.value |
+        ansible.builtin.dict2items |
+        selectattr('value.block', 'defined')
+    }}
+  loop_control:
+    loop_var: file
+    label: "/etc/netdata/{{ directory.key }}/{{ file.key }}"
+  notify: Restart netdata service
+
+- name: Create config file (content)
+  ansible.builtin.copy:
+    content: "{{ file.value.content }}"
+    dest: "/etc/netdata/{{ directory.key }}/{{ file.key }}"
+    owner: 0
+    group: netdata
+    mode: '640'
+  loop: >-
+    {{
+      directory.value |
+        ansible.builtin.dict2items |
+        selectattr('value.content', 'defined')
+    }}
+  loop_control:
+    loop_var: file
+    label: "/etc/netdata/{{ directory.key }}/{{ file.key }}"
+  notify: Restart netdata service

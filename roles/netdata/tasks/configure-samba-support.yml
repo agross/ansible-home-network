@@ -1,0 +1,36 @@
+- name: Ensure /etc/sudoers.d exists
+  ansible.builtin.file:
+    path: /etc/sudoers.d
+    state: directory
+    mode: '750'
+
+- name: Enable passwordless sudo for netdata to run smbstatus
+  ansible.builtin.copy:
+    content: |
+      netdata ALL=(root) NOPASSWD: /usr/bin/smbstatus
+    dest: /etc/sudoers.d/netdata
+    owner: 0
+    group: 0
+    mode: '440'
+    validate: visudo -cf %s
+  notify: Restart netdata service
+
+- name: Ensure netdata service override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/netdata.service.d/
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Enable all capabilities to run smbstatus with sudo
+  ansible.builtin.copy:
+    content: |
+      [Service]
+      # https://learn.netdata.cloud/docs/data-collection/monitor-anything/networking/samba#requirements
+      CapabilityBoundingSet=~
+    dest: "/etc/systemd/system/netdata.service.d/sudo-smbstatus.conf"
+    owner: 0
+    group: 0
+    mode: '644'
+  notify: Restart netdata service

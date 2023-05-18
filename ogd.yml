@@ -28,10 +28,13 @@
   vars:
     playbook_hosts: ogd:&fedora
 
-- name: Import gateway configuration playbook
-  ansible.builtin.import_playbook: _gateway.yml
-  vars:
-    playbook_hosts: gateway-ogd
+- name: Gateway configuration
+  hosts: gateway-ogd
+  become: true
+  gather_facts: false
+  roles:
+    - name: gateway
+      tags: gateway
 
 - name: Hosted services
   hosts: finn

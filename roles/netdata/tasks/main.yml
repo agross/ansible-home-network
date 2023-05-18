@@ -1,58 +1,10 @@
-- name: Add netdata repo
-  ansible.builtin.yum_repository:
-    name: netdata
-    description: netdata
-    baseurl: https://repo.netdata.cloud/repos/stable/fedora/$releasever/$basearch/
-    gpgcheck: true
-    gpgkey: https://repo.netdata.cloud/netdatabot.gpg.key
+- name: Install netdata
+  ansible.builtin.import_tasks:
+    file: install.yml
 
-- name: Ensure netdata is installed
-  ansible.builtin.package:
-    name: netdata
-    state: present
-
-- name: Disable web server and statsd
-  ansible.builtin.blockinfile:
-    path: /etc/netdata/netdata.conf
-    block: |
-      [web]
-        mode = none
-
-      [statsd]
-        enabled = no
-  notify: Restart netdata service
-
-- name: Enable streaming
-  ansible.builtin.copy:
-    content: |
-      [stream]
-      enabled = yes
-      destination = {{ netdata_stream_destination }}
-      api key = {{ netdata_stream_api_key }}
-    dest: /etc/netdata/stream.conf
-    owner: 0
-    group: netdata
-    mode: '640'
-  notify: Restart netdata service
-
-- name: Ensure service override directory exists
-  ansible.builtin.file:
-    state: directory
-    path: /etc/systemd/system/netdata.service.d/
-    owner: 0
-    group: 0
-    mode: '755'
-
-- name: Allow 30s for the service to stop
-  ansible.builtin.copy:
-    content: |
-      [Service]
-      TimeoutStopSec=30s
-    dest: /etc/systemd/system/netdata.service.d/stop-timeout.conf
-    owner: 0
-    group: 0
-    mode: '644'
-  notify: Restart netdata service
+- name: Configure netdata
+  ansible.builtin.import_tasks:
+    file: configure.yml
 
 - name: Start service
   ansible.builtin.systemd:

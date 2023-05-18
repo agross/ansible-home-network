@@ -1,0 +1,18 @@
+- name: Add apt key
+  ansible.builtin.get_url:
+    url: https://repo.netdata.cloud/netdatabot.gpg.key
+    owner: 0
+    group: 0
+    dest: /etc/apt/trusted.gpg.d/netdata.asc
+    mode: '0644'
+    force: true
+
+- name: Add apt repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb
+      [signed-by=/etc/apt/trusted.gpg.d/netdata.asc]
+      http://repo.netdata.cloud/repos/stable/{{ ansible_distribution | lower }}/
+      {{ ansible_distribution_release }}/
+    filename: netdata
+    state: present

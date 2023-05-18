@@ -38,5 +38,7 @@
     - name: borgmatic
       when: borgmatic_encryption_passphrase is defined
       tags: borgmatic
+    - name: netdata
+      tags: netdata
     - name: dotfiles
       tags: dotfiles

@@ -1,0 +1,78 @@
+volumes:
+  config:
+  lib:
+  cache:
+
+# Options regarding monitoring other docker containers:
+#   1. Run netdata inside own network and use proxy to connect to docker on host
+#      Downside: Other docker-hosted services exposing ports cannot be detected.
+#      Upside:   Secure setup.
+#                Docker container names can be determined.
+#   2. Run netdata on host network
+#      Downside: Container names cannot be detected because proxy (on separate
+#                network) is inaccessible.
+#      Upside:   Other docker-hosted services exposing ports can be detected.
+#                Rather secure setup.
+#   3. Run netdata on host, mount docker socket and access it as root
+#      Downside: Insecure setup.
+#      Upside:   Other docker-hosted services exposing ports can be detected.
+#                Docker container names can be determined.
+#   4. Run netdata and proxy on host network
+#      Downside: Running on the host network.
+#                Custom docker proxy build required to have proxy bind localhost.
+#      Upside:   Other docker-hosted services exposing ports can be detected.
+#                Docker container names can be determined.
+#                Rather secure setup.
+#
+# Option 4 is implemented below.
+
+services:
+  proxy:
+    image: tecnativa/docker-socket-proxy:custom
+    pull_policy: never
+    build:
+      context: ./docker-proxy
+
+    network_mode: host
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      CONTAINERS: 1
+
+  app:
+    image: netdata/netdata
+
+    command: >-
+      -W set global 'memory mode' none
+      -W set web mode none
+      -W set statsd enabled no
+      -W set ml enabled no
+      -W set health enabled no
+      -W set example.random enabled no
+      {{ netdata_extra_args }}
+
+    hostname: {{ ansible_hostname }}
+    environment:
+      NETDATA_HEALTHCHECK_TARGET: cli
+      VIRTUALIZATION: $VIRTUALIZATION
+      DOCKER_HOST: localhost:2375
+      TZ: Europe/Berlin
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    # Such that services from other containers can be detected automatically.
+    network_mode: host
+    volumes:
+      - config:/etc/netdata
+      - ./netdata/stream.conf:/etc/netdata/stream.conf:ro
+      - lib:/var/lib/netdata
+      - cache:/var/cache/netdata
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    depends_on:
+      - proxy

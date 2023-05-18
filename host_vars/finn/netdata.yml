@@ -1,0 +1,33 @@
+netdata_install_method: package
+
+netdata_config_files:
+  .:
+    netdata.conf: # noqa: yaml[line-length]
+      block: |
+        [global]
+          access log = none
+
+    python.d.conf:
+      block:
+        example: false
+        samba: true
+
+    stream.conf:
+      block: |
+        [{{ netdata_stream_api_key }}]
+        enabled = yes
+        allow from = {{ network.ip4 | ansible.utils.nthhost(-1) | replace('255', '*') }}
+        default memory mode = ram
+
+  go.d:
+    dnsmasq_dhcp.conf:
+      block:
+        jobs:
+          - name: dnsmasq_dhcp
+            leases_path: /data/dns-server/dnsmasq/dnsmasq.leases
+            conf_path: /data/dns-server/dnsmasq/dnsmasq.conf
+            conf_dir: /data/dns-server/dnsmasq/dnsmasq.conf.d
+
+    samba.conf:
+      block:
+        update_every: 5

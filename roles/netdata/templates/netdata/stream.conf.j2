@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+{% if netdata_stream_destination | default('', true) != inventory_hostname %}
+[stream]
+  enabled = yes
+  destination = {{ hostvars[netdata_stream_destination].interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}
+  api key = {{ netdata_stream_api_key }}
+{% endif %}
