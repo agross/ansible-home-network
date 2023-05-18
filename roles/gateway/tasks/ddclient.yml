@@ -3,7 +3,7 @@
     name: ddclient
     state: present
 
-- name: Ensure service override directory exists
+- name: Ensure ddclient service override directory exists
   ansible.builtin.file:
     state: directory
     path: /etc/systemd/system/ddclient.service.d/
