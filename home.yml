@@ -33,6 +33,18 @@
   vars:
     playbook_hosts: gateway-home
 
+- name: Home automation
+  hosts: pi
+  become: true
+  gather_facts: false
+  roles:
+    - name: docker
+      tags: docker
+    - name: mqtt
+      tags:
+        - mqtt
+        - container
+
 - name: Hosted services
   hosts: router
   become: true

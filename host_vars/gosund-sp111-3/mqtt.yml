@@ -1,0 +1,2 @@
+mqtt_accounts:
+  gosund-sp111-3: "{{ vault_mqtt_accounts_gosund_sp111_3 }}"
