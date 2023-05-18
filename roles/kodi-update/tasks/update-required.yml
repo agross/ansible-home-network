@@ -1,30 +1,33 @@
 - name: Connect ADB
+  delegate_to: localhost
   ansible.builtin.command:
     argv:
       - adb
       - connect
-      - "{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}"
-  delegate_to: localhost
+      - "{{ inventory_hostname }}"
   changed_when: false
 
 - name: Get installed packages
-  ansible.builtin.shell:
+  delegate_to: localhost
+  ansible.builtin.shell: # noqa risky-shell-pipe
     cmd: >-
       adb shell dumpsys package packages |
         grep -E 'Package \[|versionName' |
         grep -A 1 org.xbmc.kodi
-  delegate_to: localhost
   register: installed_packages
   changed_when: false
 
 - name: Determine installed version
   ansible.builtin.set_fact:
-    installed_version: "{{ installed_packages.stdout_lines[1] | regex_replace('.*versionName=', '') }}"
+    installed_version: >-
+      {{
+        installed_packages.stdout_lines[1] |
+          regex_replace('.*versionName=', '')
+      }}
 
 - name: Remove host if no update is required
   ansible.builtin.meta: end_host
   when: >-
     installed_version is defined and
     latest_release_version is defined and
-    installed_version
-      is version(latest_release_version, '>=')
+    installed_version is version(latest_release_version, '>=')

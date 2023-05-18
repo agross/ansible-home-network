@@ -1,0 +1,7 @@
+- name: Update Kodi to latest release
+  hosts: kodis
+  become: false
+  gather_facts: false
+  roles:
+    - name: kodi-update
+      tags: kodi-update
