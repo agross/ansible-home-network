@@ -1,7 +1,5 @@
 - name: Copy templates
-  when: >-
-    ansible_facts.packages is defined and
-    'raspberrypi-kernel' in ansible_facts.packages
+  when: "'raspi' in group_names"
   ansible.builtin.import_tasks:
     file: copy-templates.yml
   vars:

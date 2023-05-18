@@ -1,17 +1,20 @@
 # https://diode.io/raspberry%20pi/running-forever-with-the-raspberry-pi-hardware-watchdog-20202/
 
-- name: Check the existence of /boot/config.txt
-  ansible.builtin.stat:
-    path: /boot/config.txt
-  register: boot_config
+- name: Enable watchdog on Raspberry Pi
+  when: "'raspi' in group_names"
+  block:
+    - name: Check the existence of /boot/config.txt
+      ansible.builtin.stat:
+        path: /boot/config.txt
+      register: boot_config
 
-- name: Enable watchdog boot config
-  when: boot_config.stat.exists
-  ansible.builtin.lineinfile:
-    path: /boot/config.txt
-    line: dtparam=watchdog=on
-    state: present
-  notify: Reboot
+    - name: Enable watchdog boot config
+      when: boot_config.stat.exists
+      ansible.builtin.lineinfile:
+        path: /boot/config.txt
+        line: dtparam=watchdog=on
+        state: present
+      notify: Reboot
 
-- name: Reboot now, if required
-  ansible.builtin.meta: flush_handlers
+    - name: Reboot now, if required
+      ansible.builtin.meta: flush_handlers

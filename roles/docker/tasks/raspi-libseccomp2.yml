@@ -1,5 +1,8 @@
 # https://github.com/alpinelinux/docker-alpine/issues/135
 
+- name: Gather installed packages
+  ansible.builtin.package_facts:
+
 - name: Get package information about {{ libseccomp2_package }}
   when: >-
     ansible_facts.packages is defined and

@@ -22,8 +22,9 @@ groups:
     ansible_distribution == 'Fedora'
 
   # Only works after ansible.builtin.package_facts was run against the host.
+  # 'raspberrypi-kernel' in packages
   raspi: >-
-    'raspberrypi-kernel' in packages
+    'snd_bcm2835.enable_hdmi' in ansible_cmdline
 
   build_agents: >-
     inventory_hostname is match("agent-*")

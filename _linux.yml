@@ -6,7 +6,9 @@
     - name: guest-agent
       tags: guest-agent
     - name: watchdog
-      when: ansible_virtualization_role == 'guest'
+      when: >-
+        ansible_virtualization_role == 'guest' or
+        "'raspi' in group_names"
       tags: watchdog
     - name: kernel-cmdline
       tags: kernel-cmdline
