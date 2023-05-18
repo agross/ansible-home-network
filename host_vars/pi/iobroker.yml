@@ -1,0 +1,21 @@
+iobroker_support_wake_on_lan: true
+
+iobroker_crunchfit_google_maps_api_key: "{{ vault_iobroker_crunchfit_google_maps_api_key }}"
+
+iobroker_devices:
+  - container: /dev/ttyUSB0
+    host: /dev/ttyUSB0
+    # TODO Currently broken on Raspbian.
+    # https://www.reddit.com/r/debian/comments/1331wlr/devserialbyid_suddenly_missing/
+    # host: /dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0
+    usb: true
+    zigbee:
+      type: sonoff
+      firmware: CC1352P2_CC2652P_launchpad_coordinator_20221226.zip
+
+iobroker_ports:
+  iobroker: 8081
+  lovelace: 8091
+
+  homematic_ip: 42010
+  homematic_virtual_devices: 49292

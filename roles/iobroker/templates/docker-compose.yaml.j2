@@ -87,7 +87,7 @@ services:
       redis:
         condition: service_healthy
 
-  {% if iobroker_needs_crunchfit | default(false) | bool %}
+  {% if iobroker_crunchfit_google_maps_api_key | default('', true) | length %}
   crunchfit:
     image: crunchfit
     pull_policy: never
