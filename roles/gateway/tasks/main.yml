@@ -7,16 +7,8 @@
 - name: Configure ddclient
   ansible.builtin.import_tasks: ddclient.yml
 
-# To debug wireguard:
-# echo module wireguard +p > /sys/kernel/debug/dynamic_debug/control
-# followed by:
-# journalctl -kf
-# and
-# sudo wg
-- name: Ensure wireguard-tools is installed (not needed to function)
-  ansible.builtin.package:
-    name: wireguard-tools
-    state: present
+- name: Configure WireGuard
+  ansible.builtin.import_tasks: wireguard.yml
 
 - name: Install speed monitoring script
   ansible.builtin.template:

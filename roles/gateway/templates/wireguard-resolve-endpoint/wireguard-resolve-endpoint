@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+# Reference:
+# https://git.zx2c4.com/WireGuard/tree/contrib/examples/reresolve-dns/reresolve-dns.sh
+set -euo pipefail
+
+if ! hash wg 2> /dev/null; then
+  >&2 printf 'wg not found\n'
+  exit
+fi
+
+failed=()
+timeout=120
+
+# https://lists.zx2c4.com/pipermail/wireguard/2020-December/006222.html
+wg_public_key='[A-Za-z0-9+/]{42}[A|E|I|M|Q|U|Y|c|g|k|o|s|w|4|8|0]='
+
+line_interface='^\s*Name\s*=\s*(\w+)'
+line_peer_section='^\s*\[WireGuardPeer\]\s*$'
+# The Endpoint= always includes the port, otherwise systemd-network does not
+# configure the peer. Also matches IPv4 addresses, but these do not resolve.
+line_endpoint='^\s*Endpoint\s*=\s*([[:alnum:].]+):([[:digit:]]+)\s*$'
+line_publickey="^\s*PublicKey\s*=\s*($wg_public_key)\s*$"
+line_handshake="^($wg_public_key)\s+([[:digit:]]+)$"
+
+update-endpoint-ip() {
+  local -a handshakes
+  local interface publickey endpoint port
+  local handshake peer timestamp now ip
+
+  interface="${1:?Need interface}"
+  publickey="${2:?Need public key}"
+  endpoint="${3:?Need endpoint}"
+  port="${4:?Need port}"
+
+  mapfile -t handshakes < <(wg show "$interface" latest-handshakes)
+
+  for handshake in "${handshakes[@]}"; do
+    [[ "$handshake" =~ $line_handshake ]] || continue
+
+    peer="${BASH_REMATCH[1]}"
+    timestamp="${BASH_REMATCH[2]}"
+
+    [[ "$peer" == "$publickey" ]] || continue
+
+    now="$(date +%s)"
+
+    if (( now - timestamp < timeout )); then
+      printf 'Peer %s shook hands less than %s seconds ago\n' "$peer" "$timeout"
+      return
+    fi
+
+    ip="$(dig +short A "$endpoint" @1.1.1.1)"
+
+    if [[ -z "$ip" ]]; then
+     >&2 printf 'Peer %s: Could not resolve %s\n' "$peer" "$endpoint"
+     return 1
+    fi
+
+    printf 'Peer %s: Endpoint %s resolved to %s:%s\n' "$peer" "$endpoint" "$ip" "$port"
+
+    wg set "$interface" peer "$publickey" endpoint "$ip:$port"
+    return
+  done
+
+  >&2 printf 'Peer %s: Did not find matching handshake\n' "$publickey"
+  return 2
+}
+
+for dev in /etc/systemd/network/*.netdev; do
+  interface=
+  publickey=
+  endpoint=
+  port=
+
+  if [[ ! -f "$dev" ]] || \
+     ! grep --quiet --extended-regexp --ignore-case '^Kind\s+?=\s+?wireguard' "$dev"; then
+    >&2 printf 'Not a wireguard device, ignoring: %s\n' "$dev"
+    continue
+  fi
+
+  printf 'Inspecting %s\n' "$dev"
+
+  while read -r line; do
+    [[ -z "$line" ]] && continue
+
+    if [[ "$line" =~ $line_interface ]]; then
+      interface="${BASH_REMATCH[1]}"
+    elif [[ "$line" =~ $line_peer_section ]]; then
+      publickey=
+      endpoint=
+      port=
+    elif [[ "$line" =~ $line_publickey ]]; then
+      publickey="${BASH_REMATCH[1]}"
+    elif [[ "$line" =~ $line_endpoint ]]; then
+      endpoint="${BASH_REMATCH[1]}"
+      port="${BASH_REMATCH[2]}"
+
+      # $line_endpoint also matches IPv4 addresses. If we remove all dots and
+      # are left with numbers only, this is an IPv4 address. Ignore the section.
+      if [[ "${endpoint//./}" =~ ^[[:digit:]]+$ ]]; then
+        publickey=
+        endpoint=
+        port=
+
+        continue
+      fi
+    else
+      continue
+    fi
+
+    if [[ -z "$interface" || -z "$publickey" || -z "$endpoint" || -z "$port" ]]; then
+      continue
+    fi
+
+    if ! update-endpoint-ip "$interface" "$publickey" "$endpoint" "$port"; then
+      failed+=("$endpoint")
+    fi
+
+    publickey=
+    endpoint=
+    port=
+  done < "$dev"
+done
+
+if (( ${#failed[@]} )); then
+  >&2 printf 'Updating these endpoints failed:\n'
+
+  for f in "${failed[@]}"; do
+    >&2 printf '  %s\n' "$f"
+  done
+
+  exit 1
+fi

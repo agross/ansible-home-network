@@ -1,0 +1,41 @@
+# To debug wireguard:
+# echo module wireguard +p > /sys/kernel/debug/dynamic_debug/control
+# followed by:
+# journalctl -kf
+# and
+# sudo wg
+- name: Ensure wireguard-resolve-endpoint script dependencies are available
+  ansible.builtin.package:
+    name:
+      - bind-utils
+      - wireguard-tools
+    state: present
+
+- name: Install wireguard-resolve-endpoint script
+  ansible.builtin.copy:
+    src: templates/wireguard-resolve-endpoint/wireguard-resolve-endpoint
+    dest: /usr/local/sbin/wireguard-resolve-endpoint
+    owner: 0
+    group: 0
+    mode: '755'
+
+- name: Install wireguard-resolve-endpoint service and timer
+  ansible.builtin.template:
+    src: "templates/wireguard-resolve-endpoint/{{ item }}"
+    dest: "/etc/systemd/system/{{ item | ansible.builtin.basename }}"
+    owner: 0
+    group: 0
+    mode: '644'
+    lstrip_blocks: true
+  loop:
+    - wireguard-resolve-endpoint.service
+    - wireguard-resolve-endpoint.timer
+  notify: Restart wireguard-resolve-endpoint timer
+
+- name: Enable and start wireguard-resolve-endpoint systemd timer
+  ansible.builtin.systemd:
+    name: wireguard-resolve-endpoint.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+  register: wireguard_resolve_endpoint_timer_started

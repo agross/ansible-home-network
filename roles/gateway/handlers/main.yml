@@ -2,3 +2,9 @@
   ansible.builtin.systemd:
     name: ddclient.service
     state: restarted
+
+- name: Restart wireguard-resolve-endpoint timer
+  when: wireguard_resolve_endpoint_timer_started is not changed
+  ansible.builtin.systemd:
+    name: wireguard-resolve-endpoint.timer
+    state: restarted

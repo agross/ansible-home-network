@@ -1,0 +1,8 @@
+[Unit]
+Description=Resolve WireGuard peer endpoint IP address
+After=network.target
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/wireguard-resolve-endpoint
