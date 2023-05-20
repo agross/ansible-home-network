@@ -31,7 +31,7 @@ ExecStart=/usr/bin/docker container \
                           --volume '/etc/localtime:/etc/localtime:ro' \
                           --volume '{{ root }}/conf/acme/:/etc/traefik/acme/' \
                           --volume '{{ root }}/conf/traefik.yaml:/etc/traefik/traefik.yaml:ro' \
-                          --volume '{{ root }}/conf/traefik-tls.yaml:/etc/traefik/traefik-tls.yaml:ro' \
+                          --volume '{{ traefik_dynamic_file_configuration }}:/etc/traefik/conf.d/:ro' \
                           --env 'LEGO_DISABLE_CNAME_SUPPORT=true' \
                           --env 'INWX_USERNAME={{ inwx.acme.username | mandatory }}' \
                           --env 'INWX_PASSWORD={{ inwx.acme.password | mandatory }}' \

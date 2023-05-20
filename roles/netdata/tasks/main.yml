@@ -6,6 +6,31 @@
   ansible.builtin.import_tasks:
     file: configure.yml
 
+- name: Make netdata available through traefik
+  when: >-
+    netdata_install_method == 'package' and
+    traefik_host and
+    traefik_dynamic_file_configuration is defined
+  ansible.builtin.copy:
+    content: |
+      http:
+        routers:
+          netdata:
+            entrypoints:
+              - https
+            rule: Host(`netdata.{{ network.domain | mandatory }}`)
+            service: netdata
+
+        services:
+          netdata:
+            loadBalancer:
+              servers:
+                - url: http://host.docker.internal:19999/
+    dest: "{{ traefik_dynamic_file_configuration }}/netdata.yaml"
+    owner: 0
+    group: 0
+    mode: '644'
+
 - name: Start service
   ansible.builtin.systemd:
     name: netdata.service

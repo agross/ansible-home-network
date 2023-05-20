@@ -5,8 +5,8 @@ providers:
     # All traefik-enabled containers must be on this network.
     network: web
   file:
-    # Required to define default TLS options.
-    filename: /etc/traefik/traefik-tls.yaml
+    directory: /etc/traefik/conf.d
+    watch: true
 
 api:
   dashboard: true
