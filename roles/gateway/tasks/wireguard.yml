@@ -1,8 +1,14 @@
 # To debug wireguard:
 # echo module wireguard +p > /sys/kernel/debug/dynamic_debug/control
-# followed by:
-# journalctl -kf
-# and
+#
+# If that does not work because of secure boot:
+# https://serverfault.com/a/1129119/247219
+# sudo modprobe --remove wireguard && sudo modprobe wireguard dyndbg
+#
+# View wireguard messages using:
+# journalctl --kernel --follow | grep wireguard
+#
+# and inspect the peers with:
 # sudo wg
 - name: Ensure wireguard-resolve-endpoint script dependencies are available
   ansible.builtin.package:
