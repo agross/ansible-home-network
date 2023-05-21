@@ -1,0 +1,34 @@
+- name: Make netdata available through Traefik
+  when: >-
+    netdata_install_method == 'package' and
+    traefik_host and
+    traefik_dynamic_file_configuration is defined
+  block:
+    - name: Ensure Traefik configuration directory exists
+      ansible.builtin.file:
+        path: "{{ traefik_dynamic_file_configuration }}"
+        state: directory
+        owner: 0
+        group: 0
+        mode: '755'
+
+    - name: Copy Traefik configuration file
+      ansible.builtin.copy:
+        content: |
+          http:
+            routers:
+              netdata:
+                entrypoints:
+                  - https
+                rule: Host(`netdata.{{ network.domain | mandatory }}`)
+                service: netdata
+
+            services:
+              netdata:
+                loadBalancer:
+                  servers:
+                    - url: http://host.docker.internal:19999/
+        dest: "{{ traefik_dynamic_file_configuration }}/netdata.yaml"
+        owner: 0
+        group: 0
+        mode: '644'
