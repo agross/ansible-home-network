@@ -96,9 +96,9 @@ firewalld:
       # FTP.
       - proto: tcp
         port: 21
-        toaddr: "{{ network.ip4 | ansible.utils.nthhost('10') }}"
+        toaddr: "{{ network.ip4 | ansible.utils.nthhost(10) }}"
         toport: 21
       - proto: tcp
         port: 10021
-        toaddr: "{{ network.ip4 | ansible.utils.nthhost('10') }}"
+        toaddr: "{{ network.ip4 | ansible.utils.nthhost(10) }}"
         toport: 10021
