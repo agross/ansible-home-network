@@ -31,3 +31,95 @@
         state: started
         enabled: true
       tags: ntp
+
+    - name: Make cockpit available through Traefik
+      tags: cockpit
+      when: >-
+        traefik_host and
+        traefik_dynamic_file_configuration is defined
+      block:
+        - name: Enable and start cockpit socket
+          ansible.builtin.systemd:
+            unit: cockpit.socket
+            state: started
+            enabled: true
+
+        # https://github.com/cockpit-project/cockpit/wiki/Proxying-Cockpit-over-nginx
+        - name: Make cockpit proxy-aware
+          ansible.builtin.copy:
+            content: |
+              [WebService]
+              Origins = https://cockpit.{{ network.domain | mandatory }} wss://cockpit.{{ network.domain | mandatory }}
+              ProtocolHeader = X-Forwarded-Protohttp:
+            dest: /etc/cockpit/cockpit.conf
+            owner: 0
+            group: 0
+            mode: '644'
+
+        # Since cockpit starts an SSH agent and calls ssh-add without arguments,
+        # this key will be loaded automatically and can be used to access
+        # remote cockpit instances. Key files with different names would have to
+        # be enabled on the cockpit UI first (after every login).
+        # https://cockpit-project.org/guide/latest/authentication.html#public-key
+        #
+        # A password may be added to the private key using the cockpit UI,
+        - name: Generate an SSH keypair to be able to add remote hosts
+          community.crypto.openssh_keypair:
+            path: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_ed25519"
+            type: ed25519
+            comment: >-
+              cockpit-{{ ansible_env.SUDO_USER | default(ansible_user_id) }}-{{ ansible_hostname }}
+            owner: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+            group: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+
+        - name: Read SSH public key
+          ansible.builtin.slurp:
+            src: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_ed25519.pub"
+          register: cockpit_ssh_key
+
+        - name: Ensure Traefik configuration directory exists
+          ansible.builtin.file:
+            path: "{{ traefik_dynamic_file_configuration }}"
+            state: directory
+            owner: 0
+            group: 0
+            mode: '755'
+
+        - name: Copy Traefik configuration
+          ansible.builtin.copy:
+            content: |
+              http:
+                routers:
+                  cockpit:
+                    entrypoints:
+                      - https
+                    rule: Host(`cockpit.{{ network.domain | mandatory }}`)
+                    service: cockpit
+
+                serversTransports:
+                  cockpit:
+                    insecureSkipVerify: true
+
+                services:
+                  cockpit:
+                    loadBalancer:
+                      serversTransport: cockpit
+                      servers:
+                        - url: https://host.docker.internal:9090/
+            dest: "{{ traefik_dynamic_file_configuration }}/cockpit.yaml"
+            owner: 0
+            group: 0
+            mode: '644'
+
+    - name: Authorize generated SSH key on non-Traefik hosts
+      tags: cockpit
+      when: >-
+        not traefik_host and
+        hostvars[host].traefik_host and
+        'cockpit_ssh_key' in hostvars[host]
+      ansible.posix.authorized_key:
+        user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+        key: "{{ hostvars[host].cockpit_ssh_key.content | ansible.builtin.b64decode }}"
+      loop: "{{ ansible_play_hosts }}"
+      loop_control:
+        loop_var: host
