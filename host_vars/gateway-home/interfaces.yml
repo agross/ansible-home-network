@@ -27,8 +27,9 @@ interfaces:
     device: wg0
     ip4:
       address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr(1) }}"
-    ip6:
-      address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr(1) }}"
+    # TODO: Potentially not required.
+    # ip6:
+    #   address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr(1) }}"
     # Perhaps another zone?
     # https://serverfault.com/questions/1068004/firewalld-forwarding-functionality-with-wireguard
     # https://www.procustodibus.com/blog/2021/07/wireguard-firewalld/

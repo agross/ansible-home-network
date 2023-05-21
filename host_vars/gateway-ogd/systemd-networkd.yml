@@ -127,7 +127,16 @@ systemd_networkd_network:
         - RequiredForOnline: false
     - Network:
         - Address: "{{ interfaces.wireguard.ip4.address }}"
-        - Address: "{{ interfaces.wireguard.ip6.address }}"
+        # IPv6 address is not required.
+    - Route:
+        - Scope: link
+        - Destination: "{{ wireguard.peers.home.allowed_ips[0] }}"
+    - Route:
+        - Scope: link
+        - Destination: "{{ wireguard.peers.home.allowed_ips[1] }}"
+    - Route:
+        - Scope: link
+        - Destination: "{{ wireguard.peers.home.allowed_ips[2] }}"
 
   telekom:
     - Match:

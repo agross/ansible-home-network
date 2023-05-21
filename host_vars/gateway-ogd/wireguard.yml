@@ -8,5 +8,6 @@ wireguard:
       endpoint: "{{ hostvars['gateway-home'].network.domain }}:51820"
       persistent_keepalive: 25
       allowed_ips:
+        - "{{ network.wireguard.ip4 | ansible.utils.nthhost(1) }}"
         - "{{ hostvars['gateway-home'].network.ip4 }}"
         - "{{ hostvars['gateway-home'].network.ip6 }}"

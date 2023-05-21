@@ -21,6 +21,7 @@ wireguard:
       psk: "{{ vault_wireguard_peer_ogd_psk }}"
       allowed_ips:
         - "{{ network.wireguard.ip4 | ansible.utils.nthhost(4) }}"
-        - "{{ network.wireguard.ip6 | ansible.utils.nthhost(4) }}"
+        # TODO: Potentially not required.
+        # - "{{ network.wireguard.ip6 | ansible.utils.nthhost(4) }}"
         - "{{ hostvars['gateway-ogd'].network.ip4 }}"
         - "{{ hostvars['gateway-ogd'].network.ip6 }}"
