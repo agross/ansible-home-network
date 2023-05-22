@@ -6,6 +6,7 @@
 # journalctl --follow --unit networkd-dispatcher.service
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 [[ "$IFACE" == {{ interfaces.telekom.device | mandatory | quote }} ]] || exit  0
 
@@ -19,10 +20,8 @@ printf 'ddclient failed, attempting manual DynDNS update\n'
 resolve() {
   local host="${1?Need host to resolve}"
 
-  ip="$(dig +short @8.8.8.8 A "$host")"
-
-  if [[ -z "$ip" ]]; then
-    >&2 printf 'Could not resolve %s\n' "$host"
+  if ! ip="$(dig +short @8.8.8.8 A "$host")" || [[ -z "$ip" ]]; then
+    >&2 printf 'Could not resolve %s: %s\n' "$host" "$ip"
     return 1
   fi
 

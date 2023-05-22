@@ -2,7 +2,9 @@
 
 # Reference:
 # https://git.zx2c4.com/WireGuard/tree/contrib/examples/reresolve-dns/reresolve-dns.sh
+
 set -euo pipefail
+shopt -s inherit_errexit
 
 if ! hash wg 2> /dev/null; then
   >&2 printf 'wg not found\n'
@@ -50,10 +52,8 @@ update-endpoint-ip() {
       return
     fi
 
-    ip="$(dig +short A "$endpoint" @1.1.1.1)"
-
-    if [[ -z "$ip" ]]; then
-     >&2 printf 'Peer %s: Could not resolve %s\n' "$peer" "$endpoint"
+    if ! ip="$(dig +short @8.8.8.8 A "$endpoint")" || [[ -z "$ip" ]]; then
+     >&2 printf 'Peer %s: Could not resolve %s: %s\n' "$peer" "$endpoint" "$ip"
      return 1
     fi
 
