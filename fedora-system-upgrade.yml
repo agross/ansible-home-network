@@ -9,11 +9,16 @@
   pre_tasks:
     - name: Display version to upgrade to
       ansible.builtin.debug:
-        msg: Upgrading to release {{ fedora_release }}
+        msg: >-
+          Upgrading
+          {{ ansible_distribution }}
+          {{ ansible_distribution_version }}
+          to release
+          {{ fedora_release }}
   tasks:
     - name: Skip host if it is already upgraded
+      when: ansible_distribution_version is version(fedora_release, '>=')
       ansible.builtin.meta: end_host
-      when: ansible_facts['distribution_version'] is version(fedora_release, '>=')
 
     - name: Run dnf upgrade --refresh
       ansible.builtin.command:
