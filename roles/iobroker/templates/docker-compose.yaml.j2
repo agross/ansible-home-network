@@ -55,6 +55,11 @@ services:
       traefik.http.routers.iobroker-lovelace-guests.rule: Host(`gast.{{ network.domain }}`)
       traefik.http.routers.iobroker-lovelace-guests.service: iobroker-lovelace-guests
       traefik.http.services.iobroker-lovelace-guests.loadbalancer.server.port: {{ iobroker_ports.lovelace_guests }}
+      # No access from outside this network.
+      traefik.http.middlewares.iobroker-lovelace-guests-ipwhitelist.ipwhitelist.sourcerange:
+        127.0.0.1/32, {{ network.ip4 }}, {{ network.ip6 }}, fe80::/10, fc00::/7
+      traefik.http.routers.iobroker-lovelace-guests.middlewares:
+        iobroker-lovelace-guests-ipwhitelist
       {% endif %}
     {% if iobroker_support_wake_on_lan | default(false) | bool %}
     network_mode: host
