@@ -18,7 +18,9 @@ systemd_networkd_network:
         - IPv6LinkLocalAddressGenerationMode: stable-privacy
 
     - Route:
-        # TODO
-        # - Gateway: "{{ hostvars['gateway-ogd'].interfaces.lan.ip4.address }}"
-        - Gateway: 172.16.1.101
+        - Gateway: >-
+            {{
+              hostvars['gateway-ogd'].interfaces.lan.ip4.address |
+                ansible.utils.ipaddr('address')
+            }}
         - GatewayOnLink: true

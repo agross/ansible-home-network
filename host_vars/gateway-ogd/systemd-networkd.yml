@@ -63,9 +63,10 @@ systemd_networkd_network:
         - IPv6LinkLocalAddressGenerationMode: stable-privacy
 
         # Send RAs with the delegated prefix from the "telekom" interface.
-        # Issues with ingress packets on he-ipv6 with replies egressing on telekom.
+        # Issues with ingress packets on he-ipv6 with replies egressing on
+        # telekom.
         # - DHCPPrefixDelegation: true
-        - IPv6SendRA: false # TODO
+        - IPv6SendRA: true
         - IPv6AcceptRA: false
     - IPv6SendRA:
         # Use stateful DHCPv6 by dnsmasq.
@@ -79,11 +80,6 @@ systemd_networkd_network:
     - DHCPPrefixDelegation:
         - UplinkInterface: "{{ interfaces.telekom.device }}"
         - SubnetId: 1
-
-    # TODO
-    - Route:
-        - Gateway: 172.16.1.101
-        - GatewayOnLink: true
 
   he-ipv6:
     - Match:
