@@ -6,7 +6,7 @@
 # sudo modprobe --remove wireguard && sudo modprobe wireguard dyndbg
 #
 # View wireguard messages using:
-# journalctl --kernel --follow | grep wireguard
+# journalctl -k --follow | grep wireguard
 #
 # and inspect the peers with:
 # sudo wg
