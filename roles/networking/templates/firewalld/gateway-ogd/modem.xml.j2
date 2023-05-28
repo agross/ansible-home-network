@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policy priority="1" target="ACCEPT">
+  <rule>
+    <tcp-mss-clamp value="pmtu"/>
+  </rule>
+  <ingress-zone name="{{ interfaces.lan.zone }}"/>
+  <egress-zone name="external"/>
+</policy>
