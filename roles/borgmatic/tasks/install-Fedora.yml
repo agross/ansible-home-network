@@ -2,9 +2,7 @@
   ansible.builtin.set_fact:
     borg_install_method: package
 
-- name: Install latest borgmatic from Fedora's testing repo # noqa package-latest
+- name: Ensure borgmatic is installed
   ansible.builtin.dnf:
-    enablerepo:
-      - updates-testing
     name: borgmatic
-    state: latest
+    state: present
