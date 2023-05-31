@@ -6,7 +6,7 @@ firewalld:
 
   rich_rules:
     # IPv6 port forwarding requires the use of the rich language.
-    external:
+    external: &rich_rules_external
       # HTTP.
       - >-
         rule family=ipv6
@@ -54,9 +54,10 @@ firewalld:
           port=10021
           to-addr={{ network.ip6 | ansible.utils.nthhost(0x10) }}
           to-port=10021
+    trusted: *rich_rules_external
 
   forward_ports:
-    external:
+    external: &forward_ports_external
       # HTTP.
       - proto: tcp
         port: 80
@@ -102,3 +103,4 @@ firewalld:
         port: 10021
         toaddr: "{{ network.ip4 | ansible.utils.nthhost(10) }}"
         toport: 10021
+    trusted: *forward_ports_external
