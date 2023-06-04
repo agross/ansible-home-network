@@ -4,6 +4,7 @@
 set -euo pipefail
 
 export COMPOSE_PROJECT_NAME=nextcloud
+pushd -- {{ root | ansible.builtin.quote }}/systemd
 
 occ=(docker compose exec --user www-data app php occ)
 
