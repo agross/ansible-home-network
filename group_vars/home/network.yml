@@ -4,5 +4,9 @@ network:
   ip6: "{{ he_ipv6.network64 }}"
   wireguard:
     ip4: 192.168.168.0/24
-    # TODO: Potentially not required.
-    # ip6: "{{ he_ipv6.network48 | ansible.utils.ipaddr(0xC0DE0000000000000000) | ansible.utils.ipaddr('address') }}/64"
+    ip6: >-
+      {{
+        he_ipv6.network48 |
+          ansible.utils.ipaddr(0xc0de0000000000000000) |
+          ansible.utils.ipaddr('address')
+      }}/64

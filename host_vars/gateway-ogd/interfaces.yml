@@ -32,7 +32,4 @@ interfaces:
     device: wg0
     ip4:
       address: "{{ network.wireguard.ip4 | ansible.utils.nthhost(4) }}/32"
-    # TODO: Potentially not required.
-    # ip6:
-    #   address: "{{ network.wireguard.ip6 | ansible.utils.nthhost(4) }}/128"
     zone: trusted

@@ -27,12 +27,4 @@ interfaces:
     device: wg0
     ip4:
       address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr(1) }}"
-    # TODO: Potentially not required.
-    # ip6:
-    #   address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr(1) }}"
-    # Perhaps another zone?
-    # https://serverfault.com/questions/1068004/firewalld-forwarding-functionality-with-wireguard
-    # https://www.procustodibus.com/blog/2021/07/wireguard-firewalld/
-    # I also tried this:
-    # sudo ip route add 172.16.1.0/24 via 192.168.168.4 dev wg0
     zone: trusted
