@@ -1,7 +1,7 @@
 - name: Set file permissions
   ansible.builtin.file:
     path: "{{ item.path }}"
-    state: file
+    state: touch
     access_time: preserve
     modification_time: preserve
     owner: "{{ item.owner | default(omit) }}"
