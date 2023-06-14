@@ -5,7 +5,7 @@ firewalld:
 
   rich_rules:
     # IPv6 port forwarding requires the use of the rich language.
-    external: &rich_rules_external
+    external:
       # HTTP.
       - >-
         rule family=ipv6
@@ -22,10 +22,9 @@ firewalld:
           port=443
           to-addr={{ hostvars.finn.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
           to-port=443
-    trusted: *rich_rules_external
 
   forward_ports:
-    external: &forward_ports_external
+    external:
       # HTTP.
       - proto: tcp
         port: 80
@@ -44,4 +43,3 @@ firewalld:
               ansible.utils.ipaddr('address')
           }}
         toport: 443
-    trusted: *forward_ports_external
