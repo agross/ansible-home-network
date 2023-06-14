@@ -1,3 +1,9 @@
+- name: Uninstall fwupd on virtual hosts
+  when: ansible_virtualization_role == 'guest'
+  ansible.builtin.package:
+    name: fwupd
+    state: absent
+
 - name: Install and enable QEMU guest agent
   when: >-
     ansible_virtualization_role == 'guest' and
