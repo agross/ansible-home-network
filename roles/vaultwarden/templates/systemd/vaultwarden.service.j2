@@ -7,9 +7,6 @@ OnFailure=unit-status-mail@%n.service
 [Service]
 WorkingDirectory={{ root }}
 
-# Required for the database healthcheck which uses an environment variable.
-EnvironmentFile={{ root }}/.env.db
-
 ExecStartPre=/usr/bin/docker compose config
 ExecStart=/usr/bin/docker compose up
 ExecStop=/usr/bin/docker compose stop

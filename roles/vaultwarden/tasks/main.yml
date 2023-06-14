@@ -45,21 +45,6 @@
     group: "{{ vaultwarden_uid_gid }}"
     recurse: true
 
-- name: Ensure environment files can be read by systemd
-  community.general.sefcontext:
-    target: "{{ root }}/(.*\\/)?\\.env.*"
-    setype: systemd_unit_file_t
-    state: present
-
-- name: Apply file context to environment files
-  ansible.builtin.command:
-    argv:
-      - restorecon
-      - -iRv
-      - "{{ root }}"
-  register: restorecon_result
-  changed_when: restorecon_result.stdout | length > 0
-
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
