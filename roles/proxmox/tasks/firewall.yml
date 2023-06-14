@@ -27,6 +27,11 @@
 
       enable: 1
 
+      [IPSET management] # Allow management from hosts behind the WireGuard tunnel.
+
+      {{ network.wireguard | ansible.utils.nthhost(1) | mandatory }} # Remote tunnel endpoint IP.
+      {{ hostvars['gateway-home'].network.ip6 | mandatory }} # Remote IPv6 subnet.
+
       [RULES]
 
       IN Ping(ACCEPT) -log nolog
