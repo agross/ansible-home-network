@@ -3,6 +3,15 @@
   vars:
     directory: ../templates
     notify: Restart vaultwarden service
+    files:
+      .env.db.j2:
+        owner: 0
+        group: 0
+        mode: '600'
+      .env.vaultwarden.j2:
+        owner: 0
+        group: 0
+        mode: '600'
 
 - name: Set SELinux file contexts
   ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
@@ -25,16 +34,6 @@
     build: "{{ docker_update is defined }}"
     notify:
       - Restart vaultwarden service
-
-- name: Ensure environment files are accessible to root only
-  ansible.builtin.file:
-    path: "{{ root }}/{{ item }}"
-    owner: 0
-    group: 0
-    mode: '600'
-  loop:
-    - .env.db
-    - .env.vaultwarden
 
 - name: Ensure the app data directory exists and is accessible by Vaultwarden
   ansible.builtin.file:
