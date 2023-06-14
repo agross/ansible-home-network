@@ -17,10 +17,10 @@ services:
     healthcheck:
       test:
         - CMD
-        - mysqladmin
+        - mariadb-admin
         - ping
-        - --user=$MYSQL_USER
-        - --password=$MYSQL_PASSWORD
+        - --user=$MARIADB_USER
+        - --password=$MARIADB_PASSWORD
       start_period: 5s
       interval: 5s
 
