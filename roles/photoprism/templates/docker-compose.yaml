@@ -21,12 +21,11 @@ services:
     healthcheck:
       test:
         - CMD
-        - mariadb-admin
-        - --user
-        - root
-        - --password=$MARIADB_ROOT_PASSWORD
-        - ping
-      start_period: 15s
+        - healthcheck.sh
+        - --su-mysql
+        - --connect
+        - --innodb_initialized
+      start_period: 5s
       interval: 5s
 
   app:

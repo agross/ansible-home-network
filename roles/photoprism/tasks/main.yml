@@ -34,21 +34,6 @@
     notify:
       - Restart photoprism service
 
-- name: Ensure environment files can be read by systemd
-  community.general.sefcontext:
-    target: "{{ root }}/\\.env.*"
-    setype: systemd_unit_file_t
-    state: present
-
-- name: Apply file context to environment files
-  ansible.builtin.command:
-    argv:
-      - restorecon
-      - -iv
-      - "{{ root }}"
-  register: restorecon_result
-  changed_when: restorecon_result.stdout | length > 0
-
 - name: Start service
   ansible.builtin.systemd:
     name: photoprism.service
