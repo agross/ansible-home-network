@@ -43,6 +43,7 @@ dns:
     - '# dnsmasq.'
     - 127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}
     - '[/{{ hostvars.router.network.domain }}/]{{ hostvars.router.interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}'
+    - '[/grossweber.com/]{{ hostvars.router.interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}'
   upstream_dns_file: ""
   bootstrap_dns:
     - 1.1.1.1
