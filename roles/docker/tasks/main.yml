@@ -1,18 +1,6 @@
 - name: Install docker
   ansible.builtin.include_role:
     name: geerlingguy.docker
-  vars:
-    docker_install_compose_plugin: true
-    docker_install_compose: false
-    docker_users:
-      - "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
-    # IPv6 support with NAT for containers, so they are not exposed to the
-    # internet.
-    docker_daemon_options:
-      ipv6: true
-      fixed-cidr-v6: fd00:c0ff:ee::/48
-      experimental: true
-      ip6tables: true
 
 - name: Support docker management via ansible
   ansible.builtin.include_role:
