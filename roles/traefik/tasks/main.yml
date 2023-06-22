@@ -13,6 +13,8 @@
     files:
       systemd/traefik.service.j2:
         mode: '600'
+      conf/conf.d/dashboard.yaml.j2:
+        mode: '600'
 
 - name: Set permissions on files containing TLS keys
   ansible.builtin.import_tasks:

@@ -37,16 +37,6 @@ ExecStart=/usr/bin/docker container \
                           --env 'INWX_PASSWORD={{ inwx.acme.password | mandatory }}' \
                           --env 'INWX_PROPAGATION_TIMEOUT=0' \
                           --add-host=host.docker.internal:host-gateway \
-                          --label traefik.enable=true \
-                          --label 'traefik.http.routers.dashboard.entrypoints=https' \
-                          --label 'traefik.http.routers.dashboard.rule=Host(`traefik.{{ network.domain | mandatory }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))' \
-                          --label 'traefik.http.routers.dashboard.service=api@internal' \
-                          --label 'traefik.http.routers.dashboard.middlewares=traefik-auth' \
-                          --label 'traefik.http.routers.dashboard.tls.certresolver=letsencrypt-trs-dns' \
-                          --label 'traefik.http.routers.dashboard.tls.domains[0].main={{ network.domain }}' \
-                          --label 'traefik.http.routers.dashboard.tls.domains[0].sans=*.{{ network.domain }}' \
-                          --label 'traefik.http.middlewares.traefik-auth.basicauth.realm=Traefik' \
-                          --label 'traefik.http.middlewares.traefik-auth.basicauth.users={{ traefik_dashboard_users }}' \
                           --health-cmd 'traefik healthcheck' \
                           {{ traefik_image | mandatory | quote }}
 

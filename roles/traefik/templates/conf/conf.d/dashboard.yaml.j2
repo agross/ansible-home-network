@@ -1,0 +1,22 @@
+http:
+  routers:
+    dashboard:
+      entrypoints: https
+      rule: >-
+        Host(`traefik.{{ network.domain | mandatory }}`) &&
+        (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      middlewares:
+        - dashboard-auth
+      tls:
+        certResolver: letsencrypt-trs-dns
+        domains:
+          - main: {{ network.domain }}
+            sans: "*.{{ network.domain }}"
+
+  middlewares:
+    dashboard-auth:
+      basicAuth:
+        realm: Traefik
+        users:
+          {{ traefik_dashboard_users | ansible.builtin.to_nice_yaml | indent(10) }}
