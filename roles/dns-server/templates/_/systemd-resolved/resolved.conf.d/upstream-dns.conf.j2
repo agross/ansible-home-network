@@ -1,4 +1,6 @@
 [Resolve]
+# Not required because the LAN interface defines the same server as its DNS.
+# Would lead to duplicate nameserver entries in /etc/resolv.conf.
 # AdGuard.
-DNS=127.0.0.1:{{ dns_server_ports.adguard | mandatory }}
-DNSSEC=false
+# DNS=127.0.0.1:{{ dns_server_ports.adguard | mandatory }}
+# DNSSEC=false
