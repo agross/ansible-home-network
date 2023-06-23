@@ -1,3 +1,0 @@
-# *.test domain for testing.
-address=/test/::1
-address=/test/127.0.0.1
