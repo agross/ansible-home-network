@@ -2,7 +2,6 @@ kvm:
   id: 100
   startup: order=100
   cores: 2
-  balloon: 1024
   memory: 2048
   net:
     net0: "virtio,bridge=vmbr0,firewall=1"
