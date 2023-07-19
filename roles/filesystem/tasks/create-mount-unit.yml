@@ -1,3 +1,29 @@
+- name: Set up encrypted volume
+  when: filesystem.crypt is defined
+  block:
+    - name: Ensure crypttab entry exists
+      community.general.crypttab:
+        name: "{{ filesystem.crypt.name }}"
+        backing_device: "{{ filesystem.crypt.device }}"
+        password: "{{ filesystem.crypt.password | default('-') }}"
+        opts: "{{ filesystem.crypt.opts }}"
+        state: present
+
+    - name: Get mount unit file name for /dev/mapper/{{ filesystem.crypt.name }}
+      when: filesystem.crypt is defined
+      ansible.builtin.command:
+        argv:
+          - systemd-escape
+          - --suffix=device
+          - --path
+          - "/dev/mapper/{{ filesystem.crypt.name }}"
+      changed_when: false
+      register: crypt_device_name
+
+    - name: Set facts
+      ansible.builtin.set_fact:
+        crypt_device_name: "{{ crypt_device_name.stdout_lines | first }}"
+
 - name: Get mount unit file name for {{ filesystem.where }}
   ansible.builtin.command:
     argv:
@@ -10,7 +36,10 @@
 - name: Set facts
   ansible.builtin.set_fact:
     automount: >-
-      {{ filesystem.automount is defined and filesystem.automount | default(false) | bool == true }}
+      {{
+        filesystem.automount is defined and
+        filesystem.automount | default(false) | bool == true
+      }}
     mount_unit_name: "{{ mount_file_name.stdout_lines | first }}.mount"
     automount_unit_name: "{{ mount_file_name.stdout_lines | first }}.automount"
 

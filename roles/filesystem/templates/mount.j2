@@ -1,8 +1,15 @@
 [Unit]
 Description=Mount {{ filesystem.where }}
+{% if filesystem.crypt is defined %}
+Wants={{ crypt_device_name }}
+{% endif %}
 
 [Mount]
+{% if filesystem.crypt is defined %}
+What=/dev/mapper/{{ filesystem.crypt.name }}
+{% else %}
 What={{ filesystem.what }}
+{% endif %}
 Where={{ filesystem.where }}
 
 {% if not automount %}

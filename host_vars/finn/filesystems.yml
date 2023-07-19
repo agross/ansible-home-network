@@ -1,5 +1,9 @@
 filesystems:
-  - what: /dev/sda1
+  - crypt:
+      name: data-ssd
+      device: /dev/sda1
+      password: none
+      opts: discard,noauto,nofail
     where: /home/agross/data-ssd
     automount: true
   - what: /dev/sdd1
