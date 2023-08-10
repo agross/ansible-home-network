@@ -16,4 +16,6 @@ collections:
   - name: community.general
   - name: community.docker
     version: '2.0'
+  - name: devsec.hardening
+    version: '8.8.0'
   - name: vladgh.samba
