@@ -1,5 +1,6 @@
-bind_host: 0.0.0.0
-bind_port: 30000
+http:
+  address: 0.0.0.0:30000
+  session_ttl: 720h
 users:
 {% for user, password in adguard_users.items() %}
   - name: {{ user }}
@@ -22,7 +23,6 @@ http_proxy: ""
 language: ""
 theme: auto
 debug_pprof: false
-web_session_ttl: 720
 dns:
   bind_hosts:
     - 0.0.0.0
@@ -96,7 +96,10 @@ dns:
     yandex: true
     youtube: true
   rewrites: []
-  blocked_services: []
+  blocked_services:
+    schedule:
+      time_zone: Local
+    ids: []
   upstream_timeout: 10s
   private_networks: []
   use_private_ptr_resolvers: true
@@ -179,15 +182,16 @@ clients:
     dhcp: true
     hosts: false
   persistent: []
-log_file: ""
-log_max_backups: 0
-log_max_size: 100
-log_max_age: 3
-log_compress: false
-log_localtime: false
-verbose: false
+log:
+  file: ""
+  max_backups: 0
+  max_size: 100
+  max_age: 3
+  compress: false
+  local_time: false
+  verbose: false
 os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 20
+schema_version: 24
