@@ -91,3 +91,7 @@
       tags:
         - nextcloud
         - container
+    - name: immich
+      tags:
+        - immich
+        - container

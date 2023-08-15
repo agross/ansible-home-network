@@ -1,0 +1,1 @@
+immich_typesense_api_key: "{{ vault_immich_typesense_api_key }}"

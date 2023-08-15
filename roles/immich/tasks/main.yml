@@ -1,0 +1,49 @@
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    notify: Restart immich service
+    files:
+      .env.j2:
+        mode: '640'
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart immich service
+
+# Enable update with: ansible-playbook --extra-vars docker_update=42
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart immich service
+
+- name: Add vm.overcommit_memory sysctl for Redis
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: '1'
+    sysctl_file: /etc/sysctl.d/redis-vm.overcommit.conf
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/backup.yaml"
+    path: "/etc/borgmatic.d/immich.yaml"
+
+- name: Start service
+  ansible.builtin.systemd:
+    name: immich.service
+    state: started
+    enabled: true
+    daemon_reload: true
+  register: immich_started
