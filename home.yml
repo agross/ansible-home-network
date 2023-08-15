@@ -79,10 +79,6 @@
       tags:
         - vaultwarden
         - container
-    - name: photoprism
-      tags:
-        - photoprism
-        - container
     - name: harbor
       tags:
         - harbor
