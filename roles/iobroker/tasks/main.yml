@@ -11,7 +11,7 @@
         owner: 1000
         group: 1000
         mode: '755'
-      roles/iobroker/templates/crunchfit/.env.j2:
+      crunchfit/.env.j2:
         mode: '640'
 
 - name: Install SELinux packages
