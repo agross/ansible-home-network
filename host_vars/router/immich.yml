@@ -1,1 +1,6 @@
+immich_url: https://photos.home.therightstuff.de
+
 immich_typesense_api_key: "{{ vault_immich_typesense_api_key }}"
+
+immich_google_client_id: "{{ vault_immich_google_client_id }}"
+immich_google_client_secret: "{{ vault_immich_google_client_secret }}"

@@ -4,6 +4,7 @@ services:
     command: [ "start.sh", "immich" ]
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - {{ root }}/immich-config.json:/immich-config.json:ro
     env_file:
       - .env
     depends_on:
@@ -23,6 +24,7 @@ services:
     command: [ "start.sh", "microservices" ]
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - {{ root }}/immich-config.json:/immich-config.json:ro
     env_file:
       - .env
     depends_on:
