@@ -2,4 +2,4 @@
   when: immich_started is not changed
   ansible.builtin.systemd:
     name: immich.service
-    state: restarted
+    state: reloaded
