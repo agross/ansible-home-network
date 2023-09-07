@@ -1,6 +1,10 @@
 # {{ ansible_managed }}
 # vim: set ft=jinja-properties ts=2 sw=2 et:
 
+# DNS domain search list. First the local domain, then the OGD domain.
+dhcp-option=option:domain-search, {{ network.domain | mandatory }}, {{ hostvars['gateway-ogd'].network.domain }}
+dhcp-option=option6:domain-search, {{ network.domain | mandatory }}, {{ hostvars['gateway-ogd'].network.domain }}
+
 # Lease time 3 hours.
 dhcp-range={{ network.ip4 | ansible.utils.nthhost(20) | mandatory }}, {{ network.ip4 | ansible.utils.nthhost(240) | mandatory }}, 255.255.255.0, 3h
 

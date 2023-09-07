@@ -52,7 +52,6 @@ dhcp-option=option:dns-server, 0.0.0.0
 dhcp-option=option6:dns-server, [fe80::]
 
 # DHCPv6 options.
-dhcp-option=option6:domain-search, {{ network.domain | mandatory }}
 dhcp-option=option6:information-refresh-time, 21600
 
 # If a DHCP client claims that its name is "wpad", ignore that.
