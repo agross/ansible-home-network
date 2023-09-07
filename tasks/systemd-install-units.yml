@@ -25,8 +25,8 @@
     systemd_units_autostart: >-
       {{
         systemd_units |
-          reject('match', '-backup\.service$') |
-          reject('match', '\.mount$')
+          reject('regex', '-backup\.service$') |
+          reject('regex', '\.mount$')
       }}
 
 - name: Symlink systemd units
