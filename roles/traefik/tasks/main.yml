@@ -2,7 +2,6 @@
   ansible.builtin.import_tasks: htpasswd-users.yml
   vars:
     users: "{{ traefik_users.dashboard }}"
-    salt: "{{ traefik_users.password_salt }}"
     fact: traefik_dashboard_users
 
 - name: Copy templates
