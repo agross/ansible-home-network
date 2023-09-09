@@ -14,6 +14,19 @@
       crunchfit/.env.j2:
         mode: '640'
 
+- name: Copy dynamic Traefik configuration
+  when: iobroker_ports.telegram is defined
+  ansible.builtin.copy:
+    content: |
+      http:
+        serversTransports:
+          iobroker-telegram:
+            insecureSkipVerify: true
+    dest: "{{ traefik_dynamic_file_configuration }}/cockpit.yaml"
+    owner: 0
+    group: 0
+    mode: '644'
+
 - name: Install SELinux packages
   when: ansible_selinux.status != 'disabled'
   ansible.builtin.package:

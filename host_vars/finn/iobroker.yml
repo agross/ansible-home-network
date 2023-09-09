@@ -12,3 +12,4 @@ iobroker_ports:
   iobroker: 8081
   lovelace: 8091
   lovelace_guests: 8092
+  telegram: 8443

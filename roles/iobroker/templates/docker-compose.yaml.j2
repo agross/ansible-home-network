@@ -44,6 +44,14 @@ services:
       traefik.http.routers.iobroker.rule: Host(`iobroker.{{ network.domain }}`)
       traefik.http.routers.iobroker.service: iobroker
       traefik.http.services.iobroker.loadbalancer.server.port: {{ iobroker_ports.iobroker }}
+      {% if iobroker_ports.telegram is defined %}
+      traefik.http.routers.iobroker-telegram.entrypoints: https
+      traefik.http.routers.iobroker-telegram.rule: Host(`telegram.{{ network.domain }}`)
+      traefik.http.routers.iobroker-telegram.service: iobroker-telegram
+      traefik.http.services.iobroker-telegram.loadbalancer.serverstransport: iobroker-telegram@file
+      traefik.http.services.iobroker-telegram.loadbalancer.server.port: {{ iobroker_ports.telegram }}
+      traefik.http.services.iobroker-telegram.loadbalancer.server.scheme: https
+      {% endif %}
       {% if iobroker_ports.lovelace is defined %}
       traefik.http.routers.iobroker-lovelace.entrypoints: https
       traefik.http.routers.iobroker-lovelace.rule: Host(`lovelace.{{ network.domain }}`)
