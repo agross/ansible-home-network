@@ -1,0 +1,7 @@
+# Since our Hurricane Electric IPv6 often is considered something that
+# Cloudflare needs to check when running Chrome-based tests, disable it.
+- name: Disable IPv6 for ens192
+  community.general.nmcli:
+    conn_name: ens192
+    method6: disabled
+    state: present

@@ -9,6 +9,10 @@
     policy: targeted
     update_kernel_param: true
 
+- name: Disable IPv6
+  ansible.builtin.import_tasks:
+    file: disable-ipv6.yml
+
 - name: Add user to run build agent
   ansible.builtin.user:
     name: build-agent
