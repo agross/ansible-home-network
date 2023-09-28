@@ -1,0 +1,50 @@
+volumes:
+  db:
+
+networks:
+  ipv6:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fd00:c0ff:ff::/48
+
+services:
+  db:
+    image: postgres:15-alpine
+    networks:
+      - ipv6
+    environment:
+      POSTGRES_USER: feedr
+      POSTGRES_PASSWORD: feedr
+      POSTGRES_DB: feedr
+      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
+      TZ: Europe/Berlin
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD
+        - psql
+        - --username=feedr
+        - --dbname=feedr
+        - --command=select 1
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  app:
+    image: ghcr.io/agross/feedr
+    networks:
+      - ipv6
+    environment:
+      ConnectionStrings__Marten: Server=db; Port=5432; Database=feedr; User Id=feedr; Password=feedr;
+
+      Commafeed__BaseUrl: $COMMAFEED_API
+      Commafeed__Username: $COMMAFEED_USER
+      Commafeed__Password: $COMMAFEED_PASSWORD
+    ports:
+      - "127.0.0.1:2284:80"
+    depends_on:
+      db:
+        condition: service_healthy

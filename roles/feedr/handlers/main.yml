@@ -1,0 +1,5 @@
+- name: Restart feedr service
+  when: feedr_started is not changed
+  ansible.builtin.systemd:
+    name: feedr.service
+    state: reloaded

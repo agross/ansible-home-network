@@ -91,3 +91,7 @@
       tags:
         - immich
         - container
+    - name: feedr
+      tags:
+        - feedr
+        - container

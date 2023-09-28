@@ -1,0 +1,2 @@
+github_read_packages_user: agross
+github_read_packages_token: "{{ vault_github_read_packages_token }}"
