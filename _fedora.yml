@@ -50,7 +50,7 @@
             content: |
               [WebService]
               Origins = https://cockpit.{{ network.domain | mandatory }} wss://cockpit.{{ network.domain | mandatory }}
-              ProtocolHeader = X-Forwarded-Protohttp:
+              ProtocolHeader = X-Forwarded-Proto
             dest: /etc/cockpit/cockpit.conf
             owner: 0
             group: 0
