@@ -22,7 +22,7 @@
         serversTransports:
           iobroker-telegram:
             insecureSkipVerify: true
-    dest: "{{ traefik_dynamic_file_configuration }}/cockpit.yaml"
+    dest: "{{ traefik_dynamic_file_configuration }}/iobroker-telegram.yaml"
     owner: 0
     group: 0
     mode: '644'
