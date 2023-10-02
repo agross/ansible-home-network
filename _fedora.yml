@@ -63,6 +63,8 @@
         # https://cockpit-project.org/guide/latest/authentication.html#public-key
         #
         # A password may be added to the private key using the cockpit UI,
+        # but then running this module again will fail which is why we check for
+        # this case in failed_when.
         - name: Generate an SSH keypair to be able to add remote hosts
           community.crypto.openssh_keypair:
             path: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_ed25519"
@@ -71,6 +73,10 @@
               cockpit-{{ ansible_env.SUDO_USER | default(ansible_user_id) }}-{{ ansible_hostname }}
             owner: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
             group: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+          register: openssh_keypair_result
+          failed_when: >-
+            openssh_keypair_result.msg is defined and
+            not 'The key is protected with a passphrase or broken' in openssh_keypair_result.msg
 
         - name: Read SSH public key
           ansible.builtin.slurp:
