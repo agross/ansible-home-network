@@ -1,4 +1,4 @@
-immich_url: https://photos.home.therightstuff.de
+immich_url: https://photos.therightstuff.de
 
 immich_typesense_api_key: "{{ vault_immich_typesense_api_key }}"
 
