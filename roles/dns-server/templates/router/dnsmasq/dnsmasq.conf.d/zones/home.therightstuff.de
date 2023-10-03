@@ -6,6 +6,8 @@ host-record=esxi,         esxi.home.therightstuff.de,         172.16.0.254, 2001
 
 cname=home.therightstuff.de,                       gateway.home.therightstuff.de
 
+cname=cloud.therightstuff.de,                       router.home.therightstuff.de
+
 cname=adguard.home.therightstuff.de,                router.home.therightstuff.de
 cname=bitwarden.home.therightstuff.de,              router.home.therightstuff.de
 cname=build.home.therightstuff.de,                  router.home.therightstuff.de
