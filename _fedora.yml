@@ -91,7 +91,7 @@
             group: 0
             mode: '755'
 
-        - name: Copy Traefik configuration
+        - name: Copy dynamic Traefik configuration file
           ansible.builtin.copy:
             content: |
               http:

@@ -14,7 +14,7 @@
       crunchfit/.env.j2:
         mode: '640'
 
-- name: Copy dynamic Traefik configuration
+- name: Copy dynamic Traefik configuration file
   when: iobroker_ports.telegram is defined
   ansible.builtin.copy:
     content: |
