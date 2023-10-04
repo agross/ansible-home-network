@@ -1,3 +1,19 @@
 #!/usr/bin/env sh
 
-ansible --module-name ansible.builtin.setup --become "${1:-all}"
+playbook="$(mktemp)"
+
+cat > "$playbook" <<PLAYBOOK
+- name: Gather fact for host group "${1:-all}"
+  hosts: ${1:-all}
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Gather fact for host that do not have disable_fact_gathering=true
+      when: >-
+        disable_fact_gathering is not defined or
+        disable_fact_gathering is defined and not disable_fact_gathering | bool
+
+      ansible.builtin.setup:
+PLAYBOOK
+
+ansible-playbook "$playbook"
