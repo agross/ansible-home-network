@@ -21,8 +21,4 @@
         sftp_enabled: true
       tags: ssh
     - name: exploide.dnf-automatic
-      vars:
-        dnf_automatic_upgrade_type: default
-        dnf_automatic_emit_via: stdio, email
-        dnf_automatic_email_to: "{{ dnf_automatic_recipient | default('root') }}"
       tags: dnf-automatic

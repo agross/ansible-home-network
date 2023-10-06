@@ -1,0 +1,4 @@
+dnf_automatic_upgrade_type: default
+dnf_automatic_emit_via: stdio, email
+dnf_automatic_email_to: root
+dnf_automatic_random_sleep: 0
