@@ -2,6 +2,9 @@
   hosts: "{{ playbook_hosts | mandatory }}"
   become: true
   gather_facts: false
+  roles:
+    - name: exploide.dnf-automatic
+      tags: dnf-automatic
   tasks:
     - name: Install cockpit
       ansible.builtin.package:
