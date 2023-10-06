@@ -4,10 +4,6 @@
     directory: ../templates
     notify: Restart vaultwarden service
     files:
-      .env.db.j2:
-        owner: 0
-        group: 0
-        mode: '600'
       .env.vaultwarden.j2:
         owner: 0
         group: 0

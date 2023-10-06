@@ -8,12 +8,22 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: true
+      MARIADB_DATABASE: vaultwarden
+      MARIADB_USER: vaultwarden
+      MARIADB_PASSWORD: vaultwarden
+      MARIADB_AUTO_UPGRADE: true
+      MARIADB_DISABLE_UPGRADE_BACKUP: true
+      # Create the mysql user with root permissions that is only able to connect
+      # via a Unix socket. Used for backups.
+      # docker exec --user mysql ...
+      MARIADB_MYSQL_LOCALHOST_USER: true
+      MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - mariadb:/var/lib/mysql
       - ./backups:/backups:z
-    env_file:
-      - ./.env.db
     healthcheck:
       test:
         - CMD
