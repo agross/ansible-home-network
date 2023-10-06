@@ -38,4 +38,5 @@ services:
     environment:
       RUST_BACKTRACE: 1
     depends_on:
-      - db
+      db:
+        condition: service_healthy
