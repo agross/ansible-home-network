@@ -1,0 +1,3 @@
+docker_users:
+  - "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+  - build-agent

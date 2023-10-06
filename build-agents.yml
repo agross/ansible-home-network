@@ -6,10 +6,6 @@
       tags: build-agent
     - name: docker
       tags: docker
-      vars:
-        docker_users:
-          - "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
-          - build-agent
     - name: devsec.hardening.ssh_hardening
       tags: ssh
     - name: exploide.dnf-automatic
