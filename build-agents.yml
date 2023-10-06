@@ -11,14 +11,6 @@
           - "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
           - build-agent
     - name: devsec.hardening.ssh_hardening
-      vars:
-        network_ipv6_enable: true
-        ssh_listen_to:
-          - '0.0.0.0'
-          - '::'
-        ssh_allow_tcp_forwarding: 'yes'
-        ssh_allow_agent_forwarding: true
-        sftp_enabled: true
       tags: ssh
     - name: exploide.dnf-automatic
       tags: dnf-automatic
