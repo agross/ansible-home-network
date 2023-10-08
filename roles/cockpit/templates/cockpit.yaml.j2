@@ -1,0 +1,18 @@
+http:
+  routers:
+    cockpit:
+      entrypoints:
+        - https
+      rule: Host(`cockpit.{{ network.domain | mandatory }}`)
+      service: cockpit
+
+  serversTransports:
+    cockpit:
+      insecureSkipVerify: true
+
+  services:
+    cockpit:
+      loadBalancer:
+        serversTransport: cockpit
+        servers:
+          - url: https://host.docker.internal:9090/
