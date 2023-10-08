@@ -5,18 +5,9 @@
   roles:
     - name: cockpit
       tags: cockpit
+    - name: systemd-timesyncd
+      tags:
+        - ntp
+        - systemd-timesyncd
     - name: exploide.dnf-automatic
       tags: dnf-automatic
-  tasks:
-    - name: Uninstall chrony
-      ansible.builtin.package:
-        name: chrony
-        state: absent
-      tags: ntp
-
-    - name: Start and enable systemd-timesyncd.service
-      ansible.builtin.systemd:
-        service: systemd-timesyncd.service
-        state: started
-        enabled: true
-      tags: ntp
