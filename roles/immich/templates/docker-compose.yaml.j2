@@ -68,7 +68,7 @@ services:
       - {{ root }}/redis:/data
 
   db:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     env_file:
       - .env
     environment:
