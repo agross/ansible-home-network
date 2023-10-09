@@ -18,3 +18,4 @@ collections:
   - name: devsec.hardening
     version: '8.8.0'
   - name: vladgh.samba
+    version: '>=3.2.1'
