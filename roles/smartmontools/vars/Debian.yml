@@ -1,0 +1,2 @@
+smartd_service_name: smartmontools
+smartd_email_notifier: /etc/smartmontools/run.d/10mail

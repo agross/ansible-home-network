@@ -1,0 +1,2 @@
+smartd_service_name: smartd
+smartd_email_notifier: /usr/libexec/smartmontools/smartdnotify

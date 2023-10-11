@@ -43,6 +43,8 @@
   become: true
   gather_facts: false
   roles:
+    - name: smartmontools
+      tags: smartmontools
     - name: docker
       tags: docker
     - name: dns-server
