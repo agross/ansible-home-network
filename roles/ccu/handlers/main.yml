@@ -1,0 +1,8 @@
+- name: Reboot
+  ansible.builtin.reboot:
+
+- name: Restart ccu service
+  when: ccu_started is not changed
+  ansible.builtin.systemd:
+    name: ccu
+    state: restarted

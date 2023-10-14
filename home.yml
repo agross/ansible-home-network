@@ -57,6 +57,10 @@
       tags:
         - mqtt
         - container
+    - name: ccu
+      tags:
+        - ccu
+        - container
     - name: iobroker
       tags:
         - iobroker

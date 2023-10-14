@@ -1,0 +1,6 @@
+# This should be set to true if a transceiver on the GPIO pins is used:
+# - HM-MOD-RPI-PCB or
+# - RPI-RF-MOD
+ccu_gpio_header_transceiver: false
+
+ccu_image: ghcr.io/jens-maus/raspberrymatic:latest

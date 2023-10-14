@@ -1,0 +1,45 @@
+- name: Install transceiver dependencies
+  ansible.builtin.import_tasks: dependencies.yml
+
+- name: Enable support for GPIO transceiver
+  ansible.builtin.import_tasks: gpio-transceiver.yml
+
+- name: Enable eq3loop
+  ansible.builtin.copy:
+    content: eq3_char_loop
+    dest: /etc/modules-load.d/eq3_char_loop.conf
+    mode: '644'
+    owner: 0
+    group: 0
+  notify: Reboot
+
+- name: If some task requested a reboot, do it now
+  ansible.builtin.meta: flush_handlers
+
+- name: Copy service unit file
+  ansible.builtin.template:
+    src: templates/ccu.service.j2
+    dest: /etc/systemd/system/ccu.service
+    mode: '644'
+    owner: root
+    group: root
+    force: true
+  notify: Restart ccu service
+
+- name: Pull docker images
+  community.docker.docker_image:
+    name: "{{ item }}"
+    source: pull
+    force_source: true
+  loop:
+    - "{{ ccu_image | ansible.builtin.mandatory }}"
+  when: docker_update is defined
+  notify: Restart ccu service
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: ccu.service
+    daemon_reload: true
+  register: ccu_started

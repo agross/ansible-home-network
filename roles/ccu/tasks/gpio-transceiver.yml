@@ -1,0 +1,38 @@
+- name: Handling for GPIO-connected transceivers
+  when: ccu_gpio_header_transceiver | default(false) | ansible.builtin.bool
+  block:
+    - name: Install GPIO device tree patches
+      ansible.builtin.apt:
+        name:
+          - pivccu-modules-raspberrypi
+        state: present
+      notify: Reboot
+
+    - name: Enable UART GPIO pins by disabling Bluetooth
+      ansible.builtin.lineinfile:
+        path: /boot/config.txt
+        line: dtoverlay=pi3-disable-bt
+      notify: Reboot
+
+    - name: Stop and disable hciuart.service
+      ansible.builtin.systemd:
+        name: hciuart.service
+        state: stopped
+        enabled: false
+        masked: true
+
+    # backup: true in the replace task below does not work on FAT volumes.
+    - name: Create a backup of /boot/cmdline.txt
+      ansible.builtin.copy:
+        src: /boot/cmdline.txt
+        remote_src: true
+        dest: /boot/cmdline.txt.bak-pivccu
+        mode: preserve
+        # Do not overwrite existing files.
+        force: false
+
+    - name: Disable serial console
+      ansible.builtin.replace:
+        path: /boot/cmdline.txt
+        regexp: \bconsole=(serial|ttyAMA0)\S+
+      notify: Reboot
