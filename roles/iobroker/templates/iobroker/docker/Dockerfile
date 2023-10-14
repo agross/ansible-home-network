@@ -1,4 +1,4 @@
-FROM buanet/iobroker:latest-v8
+FROM buanet/iobroker:latest-v9
 
 # hadolint ignore=DL3008
 RUN apt-get update \
