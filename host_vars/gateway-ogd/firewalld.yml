@@ -2,6 +2,7 @@ firewalld:
   services:
     external:
       - dhcpv6-client
+      - wireguard
 
   rich_rules:
     # IPv6 port forwarding requires the use of the rich language.

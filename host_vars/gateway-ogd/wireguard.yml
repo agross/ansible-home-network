@@ -11,3 +11,15 @@ wireguard:
         - "{{ network.wireguard.ip4 | ansible.utils.nthhost(1) }}"
         - "{{ hostvars['gateway-home'].network.ip4 }}"
         - "{{ hostvars['gateway-home'].network.ip6 }}"
+
+    android:
+      public_key: 7QrFMBw001bW6Idzyymzt5ixT9rUOwVZ1uhFWrtx/Fg=
+      psk: "{{ vault_wireguard_peer_android_psk }}"
+      allowed_ips:
+        - "{{ network.wireguard.ip4 | ansible.utils.nthhost(2) }}"
+
+    mac:
+      public_key: QoFFxb6PYiWsfkwzKfPkPj4lJcL8Irpd3jKyKHgQ7GY=
+      psk: "{{ vault_wireguard_peer_mac_psk }}"
+      allowed_ips:
+        - "{{ network.wireguard.ip4 | ansible.utils.nthhost(3) }}"

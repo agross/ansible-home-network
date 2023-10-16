@@ -35,6 +35,17 @@ systemd_networkd_netdev:
         # Add routing table entries for AllowedIPs below.
         - RouteTable: main
     - WireGuardPeer:
+        - '# Peer': Android
+        - PublicKey: "{{ wireguard.peers.android.public_key }}"
+        - PresharedKey: "{{ wireguard.peers.android.psk }}"
+        - AllowedIPs: "{{ wireguard.peers.android.allowed_ips | default([]) | join(',') }}"
+    - WireGuardPeer:
+        - '# Peer': MacBook
+        - PublicKey: "{{ wireguard.peers.mac.public_key }}"
+        - PresharedKey: "{{ wireguard.peers.mac.psk }}"
+        - AllowedIPs: "{{ wireguard.peers.mac.allowed_ips | default([]) | join(',') }}"
+    - WireGuardPeer:
+        - '# Peer': home
         - PublicKey: "{{ wireguard.peers.home.public_key }}"
         - PresharedKey: "{{ wireguard.peers.home.psk }}"
         - AllowedIPs: "{{ wireguard.peers.home.allowed_ips | default([]) | join(',') }}"
