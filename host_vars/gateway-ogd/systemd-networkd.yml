@@ -32,8 +32,6 @@ systemd_networkd_netdev:
     - WireGuard:
         - ListenPort: 51820
         - PrivateKey: "{{ wireguard.private_key }}"
-        # Add routing table entries for AllowedIPs below.
-        - RouteTable: main
     - WireGuardPeer:
         - '# Peer': Android
         - PublicKey: "{{ wireguard.peers.android.public_key }}"
@@ -48,6 +46,8 @@ systemd_networkd_netdev:
         - '# Peer': home
         - PublicKey: "{{ wireguard.peers.home.public_key }}"
         - PresharedKey: "{{ wireguard.peers.home.psk }}"
+        # Add routing table entries for AllowedIPs below.
+        - RouteTable: main
         - AllowedIPs: "{{ wireguard.peers.home.allowed_ips | default([]) | join(',') }}"
         - Endpoint: "{{ wireguard.peers.home.endpoint }}"
         - PersistentKeepalive: "{{ wireguard.peers.home.persistent_keepalive }}"
