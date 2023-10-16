@@ -31,5 +31,5 @@ interfaces:
   wireguard:
     device: wg0
     ip4:
-      address: "{{ network.wireguard.ip4 | ansible.utils.nthhost(4) }}/32"
+      address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr(4) }}"
     zone: trusted
