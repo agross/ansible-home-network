@@ -24,6 +24,8 @@ systemd_networkd_netdev:
     - WireGuard:
         - ListenPort: 51820
         - PrivateKey: "{{ wireguard.private_key }}"
+        # Add routing table entries for AllowedIPs below.
+        - RouteTable: main
     - WireGuardPeer:
         - PublicKey: "{{ wireguard.peers.android.public_key }}"
         - PresharedKey: "{{ wireguard.peers.android.psk }}"
@@ -108,15 +110,6 @@ systemd_networkd_network:
     - Network:
         - Address: "{{ interfaces.wireguard.ip4.address }}"
         - Address: "{{ interfaces.wireguard.ip6.address }}"
-    - Route:
-        - Scope: link
-        - Destination: "{{ wireguard.peers.ogd.allowed_ips[1] }}"
-    - Route:
-        - Scope: link
-        - Destination: "{{ wireguard.peers.ogd.allowed_ips[2] }}"
-    - Route:
-        - Scope: link
-        - Destination: "{{ network.wireguard.ip6 }}"
 
   telekom:
     - Match:
