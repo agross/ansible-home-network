@@ -10,6 +10,7 @@ cname=adguard.home.therightstuff.de,                router.home.therightstuff.de
 cname=bitwarden.home.therightstuff.de,              router.home.therightstuff.de
 cname=build.home.therightstuff.de,                  router.home.therightstuff.de
 cname=cloud.therightstuff.de,                       router.home.therightstuff.de
+cname=kibana.cloud.therightstuff.de,                router.home.therightstuff.de
 cname=cockpit.home.therightstuff.de,                router.home.therightstuff.de
 cname=feedr.therightstuff.de,                       router.home.therightstuff.de
 cname=feeds.therightstuff.de,                       router.home.therightstuff.de
