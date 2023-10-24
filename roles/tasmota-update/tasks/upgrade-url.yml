@@ -2,7 +2,7 @@
   delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
+      http://{{ device_name }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
     return_content: true
   register: original_ota_url
   changed_when: false
@@ -24,7 +24,7 @@
   delegate_to: localhost
   ansible.builtin.uri: # noqa: yaml[line-length]
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
+      http://{{ device_name }}/cm?cmnd=OtaUrl%20{{ tasmota_upgrade_url }}{{ tasmota_credentials | default('') }}
     return_content: true
   register: ota_url
 

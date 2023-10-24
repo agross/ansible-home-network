@@ -1,3 +1,5 @@
+device_name: "{{ (ansible_host == 'localhost') | ternary(inventory_hostname, ansible_host) }}"
+
 tasmota_password: "{{ vault_tasmota_password }}"
 
 # Device function, e.g. power, lights, climate.

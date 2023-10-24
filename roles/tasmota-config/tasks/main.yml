@@ -17,7 +17,6 @@
   changed_when: false
 
 - name: Read backlog
-  delegate_to: localhost
   ansible.builtin.set_fact:
     # The select filter removes empty strings.
     backlog: >-
@@ -38,7 +37,7 @@
   delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ inventory_hostname }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
+      http://{{ device_name }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
     return_content: true
   register: backlog_result
   changed_when: true

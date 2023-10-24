@@ -1,0 +1,2 @@
+mqtt_accounts:
+  nous-a1t-3: "{{ vault_mqtt_accounts_nous_a1t_3 }}"

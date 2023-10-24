@@ -29,6 +29,7 @@ dc:a6:32:44:18:0d, 172.16.0.204, [::204], kube-4, 12h
 d8:f1:5b:d4:98:89,                        gosund-sp111-2, 7d
 2c:f4:32:db:e0:e8,                        gosund-sp111-3, 7d
 d8:f1:5b:d4:97:a0,                        gosund-sp111-4, 7d
+48:55:19:18:60:36,                        nous-a1t-1, 7d
 98:f4:ab:f3:a3:1b,                        shelly1-1,  7d
 e0:98:06:95:1c:d4,                        shelly1-2,  7d
 98:f4:ab:f4:13:29,                        shelly1-3,  7d
