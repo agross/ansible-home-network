@@ -8,7 +8,8 @@ wireguard:
       endpoint: "{{ hostvars['gateway-home'].network.domain }}:51820"
       persistent_keepalive: 25
       allowed_ips:
-        - "{{ network.wireguard.ip4 | ansible.utils.nthhost(1) }}"
+        - "{{ hostvars['gateway-home'].interfaces.wireguard.ip4.address }}"
+        - "{{ hostvars['gateway-home'].interfaces.wireguard.ip6.address }}"
         - "{{ hostvars['gateway-home'].network.ip4 }}"
         - "{{ hostvars['gateway-home'].network.ip6 }}"
 
@@ -17,9 +18,11 @@ wireguard:
       psk: "{{ vault_wireguard_peer_android_psk }}"
       allowed_ips:
         - "{{ network.wireguard.ip4 | ansible.utils.nthhost(2) }}"
+        - "{{ network.wireguard.ip6 | ansible.utils.nthhost(2) }}"
 
     mac:
       public_key: QoFFxb6PYiWsfkwzKfPkPj4lJcL8Irpd3jKyKHgQ7GY=
       psk: "{{ vault_wireguard_peer_mac_psk }}"
       allowed_ips:
         - "{{ network.wireguard.ip4 | ansible.utils.nthhost(3) }}"
+        - "{{ network.wireguard.ip6 | ansible.utils.nthhost(3) }}"

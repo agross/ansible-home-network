@@ -20,6 +20,7 @@ wireguard:
       public_key: Xovvu810xYuzxfKDcBrBE9fJFg30apC0d3nd0hElWyU=
       psk: "{{ vault_wireguard_peer_ogd_psk }}"
       allowed_ips:
-        - "{{ network.wireguard.ip4 | ansible.utils.nthhost(4) }}"
+        - "{{ hostvars['gateway-ogd'].interfaces.wireguard.ip4.address }}"
+        - "{{ hostvars['gateway-ogd'].interfaces.wireguard.ip6.address }}"
         - "{{ hostvars['gateway-ogd'].network.ip4 }}"
         - "{{ hostvars['gateway-ogd'].network.ip6 }}"
