@@ -150,8 +150,6 @@ systemd_networkd_network:
     - Match:
         - Name: "{{ interfaces.telekom.device }}"
         - Type: ppp
-    - Link:
-        - RequiredForOnline: false
     - Network:
         # Do not drop IP and routes on networkctl reload.
         - KeepConfiguration: true

@@ -1,6 +1,7 @@
 [Unit]
 Description=Resolve WireGuard peer endpoint IP address
-After=network.target
+Wants=network-online.target
+After=network-online.target
 OnFailure=unit-status-mail@%n.service
 
 [Service]
