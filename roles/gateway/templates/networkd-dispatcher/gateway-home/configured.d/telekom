@@ -10,6 +10,16 @@ shopt -s inherit_errexit
 
 [[ "$IFACE" == {{ interfaces.telekom.device | mandatory | quote }} ]] || exit  0
 
+# Redirect traffic incoming on $IFACE to $IFACE-ingress to shape it there.
+# https://www.bufferbloat.net/projects/codel/wiki/CakeRecipes/
+if [[ -z "$(tc filter show dev "$IFACE" ingress)" ]]; then
+  printf 'Redirecting incoming traffic from %s to %s\n' "$IFACE" "$IFACE-ingress"
+  tc filter add dev "$IFACE" \
+            parent ffff: basic \
+            action mirred egress redirect \
+            dev "$IFACE-ingress"
+fi
+
 if sudo --user=ddclient -- ddclient -daemon=0 -debug -use=if -if="$IFACE"; then
   printf 'ddclient succeeded\n'
   exit

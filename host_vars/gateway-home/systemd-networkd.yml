@@ -17,6 +17,14 @@ systemd_networkd_netdev:
         - TTL: 255
         - DiscoverPathMTU: true
 
+  telekom-ingress:
+    - Match: ''
+    - NetDev:
+        - Description: >-
+            Ingress device for Telekom uplink to allow shaping incoming traffic
+        - Name: "{{ interfaces.telekom.device }}-ingress"
+        - Kind: ifb
+
   wireguard:
     - NetDev:
         - Name: "{{ interfaces.wireguard.device }}"
@@ -139,11 +147,39 @@ systemd_networkd_network:
         - WithoutRA: solicit
         - UseDNS: false
         - UseDomains: false
+    # Allow redirecting incoming traffic to telekom-ingress using a tc filter
+    # set up in /etc/networkd-dispatcher/configured.d/telekom.
+    - QDisc:
+        - Parent: ingress
+        - Handle: '0xffff'
+    # Egress qdisc.
     - CAKE:
-        - Bandwidth: "{{ pppoe.bandwidth.ingress }}"
-        - OverheadBytes: 38
+        # This is a VDSL2 link.
+        #
+        # https://www.bufferbloat.net/projects/codel/wiki/CakeRecipes/
+        # https://openwrt.org/docs/guide-user/network/traffic-shaping/sqm-details
+        - Bandwidth: "{{ pppoe.bandwidth.egress }}"
+        # https://allysmith.uk/vdsl2-overheads
+        # Ethernet + PPPoE + PTM + VLAN tag
+        - OverheadBytes: "{{ 18 + 8 + 4 + 4 }}"
+        # https://forum.openwrt.org/t/150432
         - MPUBytes: 84
-        - UseRawPacketSize: true
+        - CompensationMode: ptm
+        - AckFilter: true
         - FlowIsolationMode: triple
         - NAT: true
         - PriorityQueueingPreset: diffserv8
+
+  telekom-ingress:
+    - Match:
+        - Name: "{{ interfaces.telekom.device }}-ingress"
+        - Kind: ifb
+    - Link:
+        - RequiredForOnline: false
+    - Network:
+        - LinkLocalAddressing: false
+    # Ingress qdisc. Needs to be configured by adding a tc filter in
+    # /etc/networkd-dispatcher/configured.d/telekom.
+    - CAKE:
+        - Bandwidth: "{{ pppoe.bandwidth.ingress }}"
+        - PriorityQueueingPreset: besteffort
