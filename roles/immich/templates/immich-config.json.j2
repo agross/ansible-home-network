@@ -1,48 +1,37 @@
 {
-  "oauth": {
-    "enabled": true,
-    "issuerUrl": "https://accounts.google.com/.well-known/openid-configuration",
-    "clientId": "{{ immich_google_client_id }}",
-    "clientSecret": "{{ immich_google_client_secret }}",
-    "buttonText": "Login with Google",
-    "mobileOverrideEnabled": true,
-    "mobileRedirectUri": "{{ immich_url | mandatory }}/api/oauth/mobile-redirect",
-    "scope": "openid email profile",
-    "storageLabelClaim": "preferred_username",
-    "autoRegister": true,
-    "autoLaunch": false
-  },
-  "storageTemplate": {
-    "template": "{% raw %}{{y}}/{{MM}}/{{dd}}/{{filename}}{% endraw %}"
-  },
   "ffmpeg": {
-    "threads": 10,
-    "transcode": "all",
-    "preset": "medium",
-    "targetResolution": "original",
-    "tonemap": "mobius",
-    "twoPass": true,
     "crf": 23,
+    "threads": 10,
+    "preset": "medium",
     "targetVideoCodec": "h264",
     "targetAudioCodec": "aac",
+    "targetResolution": "original",
     "maxBitrate": "0",
+    "bframes": -1,
+    "refs": 0,
+    "gopSize": 0,
+    "npl": 0,
+    "temporalAQ": false,
+    "cqMode": "auto",
+    "twoPass": true,
+    "transcode": "all",
+    "tonemap": "mobius",
     "accel": "disabled"
   },
-  "thumbnail": {
-    "webpSize": 480,
-    "jpegSize": 2160
-  },
   "job": {
-    "thumbnailGeneration": {
-      "concurrency": 7
-    },
     "backgroundTask": {
       "concurrency": 5
     },
     "clipEncoding": {
       "concurrency": 2
     },
+    "library": {
+      "concurrency": 5
+    },
     "metadataExtraction": {
+      "concurrency": 5
+    },
+    "migration": {
       "concurrency": 5
     },
     "objectTagging": {
@@ -59,6 +48,9 @@
     },
     "storageTemplateMigration": {
       "concurrency": 5
+    },
+    "thumbnailGeneration": {
+      "concurrency": 7
     },
     "videoConversion": {
       "concurrency": 1
@@ -80,10 +72,51 @@
       "enabled": true,
       "modelName": "buffalo_l",
       "minScore": 0.7,
-      "maxDistance": 0.6
+      "maxDistance": 0.6,
+      "minFaces": 1
     }
+  },
+  "map": {
+    "enabled": true,
+    "tileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+  },
+  "reverseGeocoding": {
+    "enabled": true,
+    "citiesFileOverride": "cities500"
+  },
+  "oauth": {
+    "enabled": true,
+    "issuerUrl": "https://accounts.google.com/.well-known/openid-configuration",
+    "clientId": "{{ immich_google_client_id }}",
+    "clientSecret": "{{ immich_google_client_secret }}",
+    "buttonText": "Login with Google",
+    "mobileOverrideEnabled": true,
+    "mobileRedirectUri": "{{ immich_url | mandatory }}/api/oauth/mobile-redirect",
+    "scope": "openid email profile",
+    "storageLabelClaim": "preferred_username",
+    "autoRegister": true,
+    "autoLaunch": false
   },
   "passwordLogin": {
     "enabled": true
+  },
+  "storageTemplate": {
+    "template": "{% raw %}{{y}}/{{MM}}/{{dd}}/{{filename}}{% endraw %}"
+  },
+  "thumbnail": {
+    "webpSize": 480,
+    "jpegSize": 2160,
+    "quality": 80,
+    "colorspace": "p3"
+  },
+  "newVersionCheck": {
+    "enabled": true
+  },
+  "trash": {
+    "enabled": true,
+    "days": 30
+  },
+  "theme": {
+    "customCss": ""
   }
 }
