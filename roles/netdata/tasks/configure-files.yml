@@ -1,6 +1,6 @@
 - name: Ensure config directory exists
   ansible.builtin.file:
-    path: "{{ directory.key }}"
+    path: "/etc/netdata/{{ directory.key }}"
     state: directory
     owner: 0
     group: 0
