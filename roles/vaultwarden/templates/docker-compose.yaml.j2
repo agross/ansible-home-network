@@ -40,7 +40,6 @@ services:
     user: {{ vaultwarden_uid_gid | ansible.builtin.mandatory }}:{{ vaultwarden_uid_gid }}
     ports:
       - 127.0.0.1:3011:3011
-      - 127.0.0.1:3012:3012
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./app:/data/
