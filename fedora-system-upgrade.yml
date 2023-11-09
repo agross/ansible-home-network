@@ -5,7 +5,7 @@
   # Run each host as fast as possible.
   strategy: free # noqa run-once[play]
   vars:
-    fedora_release: 38
+    fedora_release: 39
   pre_tasks:
     - name: Display version to upgrade to
       ansible.builtin.debug:
