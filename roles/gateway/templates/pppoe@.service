@@ -37,6 +37,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 StandardOutput=null
 # https://github.com/systemd/systemd/issues/481#issuecomment-544341423
 Restart=always
+RestartSec=5s
 PrivateTmp=yes
 ProtectHome=yes
 ProtectSystem=strict
