@@ -1,6 +1,6 @@
-- name: Ensure rp-pppoe is installed
+- name: Ensure ppp is installed
   ansible.builtin.package:
-    name: rp-pppoe
+    name: ppp
     state: present
 
 - name: Ensure pppd configuration directory exists

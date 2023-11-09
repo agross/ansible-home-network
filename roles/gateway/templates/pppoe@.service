@@ -27,7 +27,7 @@ ExecStartPre=/lib/systemd/systemd-networkd-wait-online --interface=%i \
                                                        --operational-state=carrier
 # Fedora 37's pppd is not compiled with systemd support, hence up_sdnotify is
 # not available.
-ExecStart=/usr/sbin/pppd plugin rp-pppoe.so %i \
+ExecStart=/usr/sbin/pppd plugin pppoe.so %i \
                          call %j \
                          linkname %i \
                          ifname %j \
