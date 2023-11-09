@@ -33,6 +33,14 @@ get-data 1
 sleep 1
 get-data 2
 
+# This bit of zsh magic:
+# 1. Gets all keys (interface names) of the rx associative array
+# 2. Matches the whole string (##*) of each interface name, gets its length (N)
+#    and performs a numeric sort in descending order (nO)
+# 3. Takes the first element which is the length of the longest interface name
+#    ([1])
+pad=${${(nON)${(k)rx}##*}[1]}
+
 for key in ${(koM)rx:#1-*}; do
   iface=${key:2}
 
@@ -42,7 +50,7 @@ for key in ${(koM)rx:#1-*}; do
   tx1=$tx[$key]
   tx2=$tx[2-$iface]
 
-  printf "%b%-10s%b ▼ %s%10.2f kB/s%s ▲ %s%10.2f kB/s%s\n" \
+  printf "%b%-${pad}s%b ▼ %s%10.2f kB/s%s ▲ %s%10.2f kB/s%s\n" \
          "$fg_bold[blue]" \
          $iface: \
          "$reset_color" \
