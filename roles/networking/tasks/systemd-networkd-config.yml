@@ -14,6 +14,26 @@
   loop_control:
     loop_var: file
 
+- name: Ensure directory for systemd-networkd configuration file exists
+  ansible.builtin.file:
+    path: /etc/systemd/networkd.conf.d
+    state: directory
+    owner: 0
+    group: 0
+    mode: '755'
+
+
+- name: Enable systemd-networkd speed meter
+  ansible.builtin.copy:
+    content: |
+      [Network]
+      SpeedMeter=true
+      SpeedMeterIntervalSec=5s
+    dest: /etc/systemd/networkd.conf.d/speed-meter.conf
+    owner: 0
+    group: 0
+    mode: '644'
+
 - name: Ensure directory for systemd-networkd overrides exists
   ansible.builtin.file:
     path: /etc/systemd/system/systemd-networkd.service.d
