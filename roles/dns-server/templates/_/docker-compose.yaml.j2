@@ -62,3 +62,13 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./dnscrypt-proxy:/config
+    healthcheck:
+      test:
+        - CMD
+        - dnsprobe
+        - example.com
+        - localhost:5053
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
