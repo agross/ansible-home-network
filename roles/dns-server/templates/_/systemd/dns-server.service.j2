@@ -13,5 +13,8 @@ ExecStop=/usr/bin/docker compose stop
 
 ExecReload=/usr/bin/docker compose up --detach
 
+Restart=on-failure
+RestartSec=5s
+
 [Install]
 WantedBy=multi-user.target
