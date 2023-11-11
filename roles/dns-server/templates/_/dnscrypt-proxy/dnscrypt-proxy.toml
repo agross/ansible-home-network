@@ -29,10 +29,7 @@
 ##
 ## Remove the leading # first to enable this; lines starting with # are ignored.
 
-# These do not increase the TTL to a minimum value. Useful for dynamic DNS and
-# the WireGuard connection to home.
-server_names = ['nextdns', 'libredns', 'quad9-dnscrypt-ip4-nofilter-ecs-pri', 'quad9-dnscrypt-ip4-nofilter-pri', 'quad9-doh-ip4-port443-nofilter-pri', 'quad9-doh-ip4-port443-nofilter-ecs-pri', 'quad9-doh-ip4-port5053-nofilter-pri', 'bortzmeyer', 'dns.sb', 'adguard-dns-unfiltered', 'adguard-dns-unfiltered-doh', 'dns.digitalsize.net', 'uncensoreddns-ipv4', 'nextdns-ultralow', 'dns.digitale-gesellschaft.ch', 'ibksturm']
-
+# server_names = ['scaleway-fr', 'google', 'yandex', 'cloudflare']
 
 ## List of local addresses and ports to listen to. Can be IPv4 and/or IPv6.
 ## Example with both IPv4 and IPv6:
@@ -87,7 +84,54 @@ require_nolog = true
 require_nofilter = true
 
 # Server names to avoid even if they match all criteria
-disabled_server_names = []
+disabled_server_names = [
+  'ams-ads-doh-nl',
+  'bebasdns-unfiltered-doh',
+  'brahma-world-ipv6',
+  'cleanbrowsing-adult',
+  'cleanbrowsing-family',
+  'cleanbrowsing-security',
+  'dct-at1',
+  'dct-nl1',
+  'dct-ru1',
+  'dnscrypt.ca-1',
+  'dnscrypt.ca-1-doh',
+  'dnscrypt.ca-1-doh-ipv6',
+  'dnscrypt.ca-1-ipv6',
+  'dnscrypt.ca-2',
+  'dnscrypt.ca-2-doh',
+  'dnscrypt.ca-2-doh-ipv6',
+  'dnscrypt.ca-2-ipv6',
+  'dnscrypt.uk-ipv4',
+  'dnscrypt.uk-ipv6',
+  'dnsforge.de',
+  'doh-cleanbrowsing-adult',
+  'doh-cleanbrowsing-family',
+  'doh-cleanbrowsing-security',
+  'doh-crypto-sx',
+  'doh-crypto-sx-ipv6',
+  'meganerd',
+  'meganerd-doh-ipv4',
+  'meganerd-doh-ipv6',
+  'meganerd-ipv6',
+  'pryv8boi',
+  'saldns02-conoha-ipv4',
+  'saldns03-conoha-ipv4',
+  'sby-doh-limotelu',
+  'sby-limotelu',
+  'scaleway-ams-ipv6',
+  'scaleway-fr',
+  'scaleway-fr-ipv6',
+  'serbica',
+  'sfw.scaleway-fr',
+  'sth-ads-doh-se',
+  'sth-dnscrypt-se',
+  'sth-dnscrypt-se-ipv6',
+  'sth-doh-se',
+  'techsaviours.org-dnscrypt',
+  'v.dnscrypt.uk-ipv4',
+  'v.dnscrypt.uk-ipv6',
+]
 
 
 ## Always use TCP to connect to upstream servers.
