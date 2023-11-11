@@ -7,15 +7,15 @@
       ansible.builtin.meta: end_host
       when: hypervisor is not defined
   roles:
-    - name: lae.proxmox
+    - role: lae.proxmox
       vars:
         # Would remove Proxmox completely.
         # https://github.com/lae/ansible-role-proxmox/issues/223
         pve_remove_old_kernels: false
       tags: proxmox
-    - name: proxmox
+    - role: proxmox
       tags: proxmox
-    - name: smartmontools
+    - role: smartmontools
       tags: smartmontools
 
 - name: Import Linux configuration playbook
@@ -35,7 +35,7 @@
   become: true
   gather_facts: false
   roles:
-    - name: gateway
+    - role: gateway
       tags: gateway
 
 - name: Hosted services
@@ -43,29 +43,29 @@
   become: true
   gather_facts: false
   roles:
-    - name: smartmontools
+    - role: smartmontools
       tags: smartmontools
-    - name: docker
+    - role: docker
       tags: docker
-    - name: dns-server
+    - role: dns-server
       tags:
         - dns-server
         - container
-    - name: mqtt
+    - role: mqtt
       tags:
         - mqtt
         - container
-    - name: traefik
+    - role: traefik
       tags:
         - traefik
         - container
-    - name: iobroker
+    - role: iobroker
       tags:
         - iobroker
         - container
-    - name: logger
+    - role: logger
       tags:
         - logger
         - container
-    - name: samba
+    - role: samba
       tags: samba

@@ -3,5 +3,5 @@
   become: true
   gather_facts: false
   roles:
-    - name: gateway
+    - role: gateway
       tags: gateway

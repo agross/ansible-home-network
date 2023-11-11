@@ -3,19 +3,19 @@
   become: true
   gather_facts: false
   roles:
-    - name: raspi-config
+    - role: raspi-config
       tags: raspi-config
-    - name: fstrim
+    - role: fstrim
       tags: fstrim
-    - name: smartmontools
+    - role: smartmontools
       tags: smartmontools
-    - name: persistent-journal
+    - role: persistent-journal
       tags: persistent-journal
-    - name: swapfile
+    - role: swapfile
       tags: swapfile
-    - name: led-heartbeat
+    - role: led-heartbeat
       tags: led-heartbeat
-    - name: argon-one
+    - role: argon-one
       tags: argon-one
 
 - name: Import Linux configuration playbook
@@ -35,7 +35,7 @@
   become: true
   gather_facts: false
   roles:
-    - name: k3s
+    - role: k3s
       tags: k3s
 
 - name: Gateway configuration
@@ -43,7 +43,7 @@
   become: true
   gather_facts: false
   roles:
-    - name: gateway
+    - role: gateway
       tags: gateway
 
 - name: Home automation
@@ -51,21 +51,21 @@
   become: true
   gather_facts: false
   roles:
-    - name: docker
+    - role: docker
       tags: docker
-    - name: mqtt
+    - role: mqtt
       tags:
         - mqtt
         - container
-    - name: ccu
+    - role: ccu
       tags:
         - ccu
         - container
-    - name: iobroker
+    - role: iobroker
       tags:
         - iobroker
         - container
-    - name: logger
+    - role: logger
       tags:
         - logger
         - container
@@ -75,27 +75,27 @@
   become: true
   gather_facts: false
   roles:
-    - name: dns-server
+    - role: dns-server
       tags:
         - dns-server
         - container
-    - name: vaultwarden
+    - role: vaultwarden
       tags:
         - vaultwarden
         - container
-    - name: harbor
+    - role: harbor
       tags:
         - harbor
         - container
-    - name: nextcloud
+    - role: nextcloud
       tags:
         - nextcloud
         - container
-    - name: immich
+    - role: immich
       tags:
         - immich
         - container
-    - name: feedr
+    - role: feedr
       tags:
         - feedr
         - container

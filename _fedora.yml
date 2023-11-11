@@ -3,11 +3,11 @@
   become: true
   gather_facts: false
   roles:
-    - name: cockpit
+    - role: cockpit
       tags: cockpit
-    - name: systemd-timesyncd
+    - role: systemd-timesyncd
       tags:
         - ntp
         - systemd-timesyncd
-    - name: exploide.dnf-automatic
+    - role: exploide.dnf-automatic
       tags: dnf-automatic

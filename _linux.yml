@@ -3,34 +3,34 @@
   become: true
   gather_facts: false
   roles:
-    - name: guest-agent
+    - role: guest-agent
       tags: guest-agent
-    - name: watchdog
+    - role: watchdog
       when: >-
         ansible_virtualization_role == 'guest' or
         "'raspi' in group_names"
       tags: watchdog
-    - name: kernel-cmdline
+    - role: kernel-cmdline
       tags: kernel-cmdline
-    - name: fstrim
+    - role: fstrim
       tags: fstrim
-    - name: filesystem
+    - role: filesystem
       tags: filesystem
-    - name: devsec.hardening.ssh_hardening
+    - role: devsec.hardening.ssh_hardening
       tags: ssh
-    - name: networking
+    - role: networking
       when: systemd_networkd_network is defined
       tags: [network, networking]
-    - name: postfix
+    - role: postfix
       when: google_smtp_password is defined
       tags: postfix
-    - name: unit-status-mail
+    - role: unit-status-mail
       when: google_smtp_password is defined
       tags: unit-status-mail
-    - name: borgmatic
+    - role: borgmatic
       when: borgmatic_encryption_passphrase is defined
       tags: borgmatic
-    - name: netdata
+    - role: netdata
       tags: netdata
-    - name: dotfiles
+    - role: dotfiles
       tags: dotfiles
