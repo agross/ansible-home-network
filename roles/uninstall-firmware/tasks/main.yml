@@ -1,0 +1,18 @@
+- name: Gather installed packages
+  ansible.builtin.package_facts:
+
+- name: Determine packages including "firmware"
+  ansible.builtin.set_fact:
+    firmware_packages: >-
+      {{
+        ansible_facts.packages |
+        ansible.builtin.dict2items |
+        map(attribute = 'key') |
+        select('ansible.builtin.search', '-firmware') |
+        reject('ansible.builtin.search', '^(linux|amd|intel)-')
+      }}
+
+- name: Uninstall packages
+  ansible.builtin.package:
+    name: "{{ firmware_packages }}"
+    state: absent

@@ -5,6 +5,9 @@
   roles:
     - role: guest-agent
       tags: guest-agent
+    - role: uninstall-firmware
+      when: ansible_virtualization_role == 'guest'
+      tags: uninstall-firmware
     - role: watchdog
       when: >-
         ansible_virtualization_role == 'guest' or
