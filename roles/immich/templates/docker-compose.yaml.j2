@@ -4,9 +4,12 @@ services:
     command: [ "start.sh", "immich" ]
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
       - {{ root }}/immich-config.json:/immich-config.json:ro
     env_file:
       - .env
+    ports:
+      - 127.0.0.1:2283:3001
     depends_on:
       - redis
       - db
@@ -24,6 +27,7 @@ services:
     command: [ "start.sh", "microservices" ]
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
       - {{ root }}/immich-config.json:/immich-config.json:ro
     env_file:
       - .env
@@ -42,15 +46,6 @@ services:
       default:
         aliases:
           - immich-machine-learning
-
-  web:
-    image: ghcr.io/immich-app/immich-web:${IMMICH_VERSION:-release}
-    env_file:
-      - .env
-    networks:
-      default:
-        aliases:
-          - immich-web
 
   typesense:
     image: typesense/typesense:0.24.1@sha256:9bcff2b829f12074426ca044b56160ca9d777a0c488303469143dd9f8259d4dd
@@ -79,18 +74,6 @@ services:
       TZ: Europe/Berlin
     volumes:
       - db-data:/var/lib/postgresql/data
-
-  proxy:
-    image: ghcr.io/immich-app/immich-proxy:${IMMICH_VERSION:-release}
-    environment:
-      # Make sure these values get passed through from the env file
-      - IMMICH_SERVER_URL
-      - IMMICH_WEB_URL
-    ports:
-      - 127.0.0.1:2283:8080
-    depends_on:
-      - server
-      - web
 
 volumes:
   db-data:
