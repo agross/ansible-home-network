@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# vim: set ft=jinja-shell ts=2 sw=2 et:s
 
 set -euo pipefail
 
