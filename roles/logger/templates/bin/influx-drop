@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:s
+
+set -euo pipefail
+
+drop() {
+  bucket="${1?Need bucket}"
+  measurement="${2?Need measurement that will be dropped}"
+
+  printf 'Dropping measurement "%s" (bucket: %s)...\n' \
+         "$measurement" \
+         "$bucket"
+
+  docker compose \
+         --project-name logger \
+         exec \
+         influxdb \
+         influx delete \
+               --bucket "$bucket" \
+               --start 1970-01-01T00:00:00Z \
+               --stop "$(date +'%Y-%m-%dT%H:%M:%SZ')" \
+               --predicate "_measurement=\"$measurement\""
+}
+
+drop "${@}"
