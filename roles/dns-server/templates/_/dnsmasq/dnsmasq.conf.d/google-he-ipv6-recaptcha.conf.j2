@@ -4,5 +4,5 @@
 # Work around Google identifying TunnelBroker tunnels als potential ToS violations.
 # https://forums.he.net/index.php?topic=4253.0
 server=/google.de/google.com/127.0.0.1#{{ dns_server_ports.dnscrypt | mandatory }}
-address=/google.de/::
-address=/google.com/::
+address=/google.de/2001:db8::1
+address=/google.com/2001:db8::1
