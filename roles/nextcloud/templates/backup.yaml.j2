@@ -5,7 +5,7 @@
 # have a constant named "hostname" with the value "myhostname", then the string
 # "{hostname}" will be replaced with "myhostname" in the configuration file.
 constants:
-  name: nextcloud
+  name: {{ ansible_role_name }}
 
 # Where to look for files to backup, and where to store those backups.
 # See https://borgbackup.readthedocs.io/en/stable/quickstart.html and
@@ -15,7 +15,7 @@ location:
   # List of source directories to backup. Globs and tildes are expanded. Do not
   # backslash spaces in path names.
   source_directories: !retain
-    - {{ root }}
+    - {{ nextcloud_root }}
 
   # Stay in same file system: do not cross mount points beyond the given source
   # directories. Defaults to false. But when a database hook is used, the
@@ -41,25 +41,26 @@ location:
   # output of "borg help patterns" for more details.
   exclude_patterns:
     # Exclude logs.
-    - {{ root }}/app/data/*.log
-    - {{ root }}/app/data/*.log.*
+    - {{ nextcloud_root }}/app/data/*.log
+    - {{ nextcloud_root }}/app/data/*.log.*
 
     # No trashbins and versions.
-    - {{ root }}/app/data/*/files_trashbin/
-    - {{ root }}/app/data/*/files_versions/
+    - {{ nextcloud_root }}/app/data/*/files_trashbin/
+    - {{ nextcloud_root }}/app/data/*/files_versions/
 
     # No previews.
-    - {{ root }}/app/data/appdata*/preview/
+    - {{ nextcloud_root }}/app/data/appdata*/preview/
 
     # Big user data.
-    - {{ root }}/app/data/agross/files/_Shared/
-    - {{ root }}/app/data/agross/files/Music/_Queue/
-    - {{ root }}/app/data/agross/files/Funstuff/Marcis Fotos/
+    - {{ nextcloud_root }}/app/data/agross/files/_Shared/
+    - {{ nextcloud_root }}/app/data/agross/files/Music/_Queue/
+    - {{ nextcloud_root }}/app/data/agross/files/Funstuff/Marcis Fotos/
 
-    - {{ root }}/app/data/amay/
+    - {{ nextcloud_root }}/app/data/amay/
 
-    - {{ root }}/app/data/kfochtmann/files/_SHARED/
-    - {{ root }}/app/data/kfochtmann/files/Photos/HURTIGRUTEN PHOTOS/
+    - {{ nextcloud_root }}/app/data/kfochtmann/files/_SHARED/
+    - {{ nextcloud_root }}/app/data/kfochtmann/files/Photos/
+    - {{ nextcloud_root }}/app/data/kfochtmann/files/*/*.avi
 
   # If true, the exclude_if_present filename is included in backups. Defaults to
   # false, meaning that the exclude_if_present filename is omitted from backups.
@@ -81,18 +82,18 @@ hooks:
   # List of one or more shell commands or scripts to execute before creating a
   # backup, run once per repository.
   before_backup:
-    - {{ root }}/backup start
+    - {{ nextcloud_root }}/backup start
 
   # List of one or more shell commands or scripts to execute after creating a
   # backup, run once per repository.
   after_backup:
-    - {{ root }}/backup stop
+    - {{ nextcloud_root }}/backup stop
 
   # List of one or more shell commands or scripts to execute when an exception
   # occurs during a "create", "prune", "compact", or "check" action or an
   # associated before/after hook.
   on_error:
-    - {{ root }}/backup error
+    - {{ nextcloud_root }}/backup error
 
   # Configuration for a monitoring integration with Healthchecks. Create an
   # account at https://healthchecks.io (or self-host Healthchecks) if you'd like

@@ -1,1 +1,6 @@
-root: /var/data/nextcloud
+nextcloud_root: /data/nextcloud
+nextcloud_domain: "cloud.{{ network.domain | ansible.builtin.mandatory }}"
+
+nextcloud_elk_stack_version: 8.15.1
+
+nextcloud_upgrade_timeout: 2m

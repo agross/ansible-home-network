@@ -1,0 +1,26 @@
+[Unit]
+Description=Nextcloud
+BindsTo=docker.service
+After=docker.service
+OnFailure=unit-status-mail@%n.service
+RequiresMountsFor={{ nextcloud_root }}/app {{ nextcloud_root }}/backups
+
+[Service]
+Environment=COMPOSE_PROJECT_NAME=%p
+
+WorkingDirectory={{ nextcloud_root }}
+
+ExecStartPre=/usr/bin/docker compose config
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose stop
+ExecReload=/usr/bin/docker compose up --detach
+
+# Upgrades may take some time.
+TimeoutStartSec={{ nextcloud_upgrade_timeout | ansible.builtin.mandatory }}
+
+# Restart 30 seconds after docker run exited with an error status.
+Restart=always
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target

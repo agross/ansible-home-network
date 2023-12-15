@@ -1,0 +1,228 @@
+volumes:
+  mariadb:
+  search01:
+  app:
+
+networks:
+  search:
+
+services:
+  db:
+    image: mariadb:latest
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: true
+      MARIADB_DATABASE: nextcloud
+      MARIADB_USER: nextcloud
+      MARIADB_PASSWORD: nextcloud
+      MARIADB_AUTO_UPGRADE: true
+      MARIADB_DISABLE_UPGRADE_BACKUP: true
+      # Create the mysql user with root permissions that is only able to connect
+      # via a Unix socket. Used for backups.
+      # docker exec --user mysql ...
+      MARIADB_MYSQL_LOCALHOST_USER: true
+      MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - mariadb:/var/lib/mysql
+    healthcheck:
+      test:
+        - CMD
+        - healthcheck.sh
+        - --su-mysql
+        - --connect
+        - --innodb_initialized
+      start_period: 5s
+      interval: 5s
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - ./redis/data:/data:z
+    healthcheck:
+      test: redis-cli ping | grep -xq PONG
+      start_period: 5s
+      interval: 5s
+    sysctls:
+      net.core.somaxconn: 512
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:{{ nextcloud_elk_stack_version | ansible.builtin.mandatory }}
+    networks:
+     - search
+    ports:
+      - 127.0.0.1:5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: http://search01:9200
+      SERVER_PUBLICBASEURL: https://kibana.{{ nextcloud_domain | ansible.builtin.mandatory }}
+    labels:
+      traefik.enable: true
+      traefik.http.routers.nextcloud-kibana.entrypoints: https
+      traefik.http.routers.nextcloud-kibana.rule: Host(`kibana.{{ nextcloud_domain | ansible.builtin.mandatory }}`)
+      traefik.http.routers.nextcloud-kibana.middlewares: >-
+        nextcloud-kibana-auth
+      traefik.http.middlewares.nextcloud-kibana-auth.basicauth.users: {{ nextcloud_kibana_auth_comma_separated}}
+    healthcheck:
+      test: curl --fail --dump-header /dev/stderr http://localhost:5601/api/status || exit 1
+      start_period: 5s
+      interval: 5s
+    depends_on:
+      search01:
+        condition: service_healthy
+
+  search01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:{{ nextcloud_elk_stack_version | ansible.builtin.mandatory }}
+
+    networks:
+      default:
+        aliases:
+          - search
+      search:
+    ports:
+      - 127.0.0.1:9200:9200
+    environment:
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.low=1gb
+      - cluster.routing.allocation.disk.watermark.high=500mb
+      - cluster.routing.allocation.disk.watermark.flood_stage=250mb
+
+      - node.name=search01
+      - cluster.initial_master_nodes=search01
+      - cluster.name=nextcloud-cluster
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g -Des.enforce.bootstrap.checks=true
+      - http.max_content_length=500mb
+      # For backups.
+      - path.repo=/backups
+      # No security.
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - search01:/usr/share/elasticsearch/data
+      - ./backups/search:/backups:z
+    healthcheck:
+      test: curl --fail --dump-header /dev/stderr http://localhost:9200/_cat/health | tee | grep --extended-regexp '\b(green|yellow)\b'
+      start_period: {{ nextcloud_upgrade_timeout | ansible.builtin.mandatory }}
+      interval: 5s
+
+  push:
+    image: busybox
+    entrypoint:
+      /var/www/html/custom_apps/notify_push/bin/x86_64/notify_push
+    restart: on-failure
+    ports:
+      - 127.0.0.1:7867:7867
+    environment:
+      LOG: notify_push=trace
+      DATABASE_URL: mysql://nextcloud:nextcloud@db/nextcloud
+      DATABASE_PREFIX: oc_
+      REDIS_URL: redis://redis
+      NEXTCLOUD_URL: https://{{ nextcloud_domain | ansible.builtin.mandatory }}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./app/custom_apps:/var/www/html/custom_apps:ro,z
+    labels:
+      traefik.enable: true
+      traefik.http.routers.nextcloud-push.entrypoints: https
+      traefik.http.routers.nextcloud-push.rule: >-
+        Host(`{{ nextcloud_domain | ansible.builtin.mandatory }}`) && PathPrefix(`/push`)
+      traefik.http.routers.nextcloud-push.priority: 2
+      traefik.http.routers.nextcloud-push.middlewares: nextcloud-push-stripprefix
+      traefik.http.middlewares.nextcloud-push-stripprefix.stripprefix.prefixes: /push
+      traefik.http.services.nextcloud-push.loadbalancer.server.port: 7867
+    healthcheck:
+      test: cat /proc/1/net/tcp | grep -F '00000000:1EBB '
+      start_period: 5s
+      interval: 5s
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  imaginary:
+    image: nextcloud/aio-imaginary
+    cap_add:
+      # Required for HEIC previews.
+      - SYS_NICE
+
+  cron:
+    image: nextcloud:apache
+    entrypoint: /cron.sh
+    volumes:
+      - app:/var/www/html
+      - ./app/custom_apps:/var/www/html/custom_apps:z
+      - ./app/config:/var/www/html/config:z
+      - ./app/data:/var/www/html/data:z
+      - ./app/themes:/var/www/html/themes:z
+      - ./cron/www-data:/var/spool/cron/crontabs/www-data:ro,z
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  app:
+    image: nextcloud:apache-svg
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      PHP_MEMORY_LIMIT: 1G
+      NEXTCLOUD_INIT_HTACCESS: true
+      # These define the max upload size.
+      PHP_UPLOAD_LIMIT: 16G
+      # Since nginx does not chunk uploads all uploads will be PUT in one piece.
+      POST_MAX_SIZE: 16G
+      # Newer Apache versions set a 1G limit on request bodies.
+      APACHE_BODY_LIMIT: 17179869184 # 1073741824 (the 1G default) * 16 = 16G
+    ports:
+      - 127.0.0.1:8015:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - app:/var/www/html
+      - ./app/custom_apps:/var/www/html/custom_apps:z
+      - ./app/config:/var/www/html/config:z
+      - ./app/data:/var/www/html/data:z
+      - ./app/themes:/var/www/html/themes:z
+      - ./app/hooks/post-upgrade:/docker-entrypoint-hooks.d/post-upgrade:ro,z
+    labels:
+      traefik.enable: true
+      traefik.http.routers.nextcloud.entrypoints: https
+      traefik.http.routers.nextcloud.rule: Host(`{{ nextcloud_domain | ansible.builtin.mandatory }}`)
+      traefik.http.routers.nextcloud.priority: 1
+      traefik.http.routers.nextcloud.middlewares: >-
+        nextcloud-services, security-headers@file
+      traefik.http.middlewares.nextcloud-services.redirectregex.regex: >-
+        https://(.*)/.well-known/(?:card|cal)dav
+      traefik.http.middlewares.nextcloud-services.redirectregex.replacement: >-
+        https://$${1}/remote.php/dav/
+      traefik.http.middlewares.nextcloud-services.redirectregex.permanent: true
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - --dump-header
+        - "-"
+        - --output
+        - /dev/null
+        - http://localhost/status.php
+      start_period: {{ nextcloud_upgrade_timeout | ansible.builtin.mandatory }}
+      interval: 5s
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      search01:
+        condition: service_healthy

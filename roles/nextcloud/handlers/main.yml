@@ -1,0 +1,5 @@
+- name: Restart nextcloud service
+  when: nextcloud_started is not changed
+  ansible.builtin.systemd:
+    name: nextcloud
+    state: reloaded

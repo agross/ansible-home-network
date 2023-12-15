@@ -1,0 +1,10 @@
+<?php
+$CONFIG = array (
+  # https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#trusted-domains
+  'trusted_domains' => array (
+    0 => '{{ nextcloud_domain | ansible.builtin.mandatory }}',
+  ),
+  // Used for activity notification e-mails.
+  // https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#overwrite-cli-url
+  'overwrite.cli.url' => 'https://{{ nextcloud_domain | ansible.builtin.mandatory }}',
+);

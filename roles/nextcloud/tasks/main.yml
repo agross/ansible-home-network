@@ -1,7 +1,89 @@
+- name: Generate htpasswd-compatible Kibana users
+  ansible.builtin.import_tasks: htpasswd-users.yml
+  vars:
+    users: "{{ nextcloud_kibana_users }}"
+    fact: nextcloud_kibana_auth
+
 - name: Copy templates
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ nextcloud_root }}"
+    notify: Restart nextcloud service
+    files:
+      app/config:
+        owner: 33
+        group: 33
+        mode: '750'
+      app/hooks/post-upgrade/occ-tasks.sh:
+        owner: 33
+        group: 33
+        mode: '750'
+      backups/search:
+        owner: 1000
+        group: 1000
+        mode: '750'
+
+- name: Determine existence of app/config/config.php
+  ansible.builtin.stat:
+    path: "{{ nextcloud_root }}/app/config/config.php"
+  register: nextcloud_config_php
+
+- name: Create app/config/CAN_INSTALL
+  when: not nextcloud_config_php.stat.exists
+  ansible.builtin.file:
+    path: "{{ nextcloud_root }}/app/config/CAN_INSTALL"
+    state: touch
+    mode: '644'
+
+- name: Create application data directory owned by www-data
+  ansible.builtin.file:
+    path: "{{ nextcloud_root }}/app/{{ item }}"
+    state: directory
+    owner: 33
+    group: 33
+    mode: '750'
+  loop:
+    - config
+    - custom_apps
+    - data
+    - themes
+
+- name: >-
+    Add agross to group 33 (www-data) such that symlinks to Nextcloud data
+    directories are possible
+  ansible.builtin.user:
+    name: agross
+    groups: 33
+    append: true
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ nextcloud_root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart nextcloud service
+
+- name: Add vm.overcommit_memory sysctl for Redis
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: '1'
+    sysctl_file: /etc/sysctl.d/redis-vm.overcommit.conf
+    sysctl_set: true
+    state: present
+    reload: true
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
+- name: Add vm.max_map_count sysctl for Elasticsearch
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    sysctl_file: /etc/sysctl.d/elasticsearch.conf
+    sysctl_set: true
+    state: present
+    reload: true
 
 - name: Ensure jq is installed (used for backup script)
   ansible.builtin.package:
@@ -11,5 +93,21 @@
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/backup.yaml"
+    src: "{{ nextcloud_root }}/backup.yaml"
     path: "/etc/borgmatic.d/nextcloud.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ nextcloud_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart nextcloud service
+
+- name: Start systemd units
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: nextcloud_started

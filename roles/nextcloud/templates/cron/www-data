@@ -1,0 +1,5 @@
+# Default crontab entry.
+*/5 * * * * php -f /var/www/html/cron.php
+
+# Pregenerate previews.
+*/10 * * * * /var/www/html/occ preview:pre-generate

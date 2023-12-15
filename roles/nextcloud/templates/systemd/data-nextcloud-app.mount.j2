@@ -1,0 +1,8 @@
+[Unit]
+Description=Mount {{ nextcloud_root }}/app
+
+[Mount]
+What=/fs/data/nextcloud/app
+Where={{ nextcloud_root }}/app
+Type=none
+Options=bind
