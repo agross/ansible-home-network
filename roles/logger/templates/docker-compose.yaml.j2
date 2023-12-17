@@ -55,7 +55,6 @@ services:
     image: grafana/grafana
 
     restart: unless-stopped
-    env_file: ./grafana/.env
     labels:
       traefik.enable: 'true'
       traefik.http.routers.grafana.entrypoints: https
