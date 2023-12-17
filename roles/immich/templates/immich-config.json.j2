@@ -25,13 +25,7 @@
     "smartSearch": {
       "concurrency": 2
     },
-    "library": {
-      "concurrency": 5
-    },
     "metadataExtraction": {
-      "concurrency": 5
-    },
-    "migration": {
       "concurrency": 5
     },
     "objectTagging": {
@@ -46,7 +40,13 @@
     "sidecar": {
       "concurrency": 5
     },
+    "library": {
+      "concurrency": 5
+    },
     "storageTemplateMigration": {
+      "concurrency": 5
+    },
+    "migration": {
       "concurrency": 5
     },
     "thumbnailGeneration": {
@@ -55,6 +55,10 @@
     "videoConversion": {
       "concurrency": 1
     }
+  },
+  "logging": {
+    "enabled": true,
+    "level": "log"
   },
   "machineLearning": {
     "enabled": true,
@@ -77,6 +81,11 @@
     }
   },
   "map": {
+    "enabled": true,
+    "lightStyle": "",
+    "darkStyle": ""
+  },
+  "reverseGeocoding": {
     "enabled": true
   },
   "oauth": {
@@ -113,5 +122,11 @@
   },
   "theme": {
     "customCss": ""
+  },
+  "library": {
+    "scan": {
+      "enabled": true,
+      "cronExpression": "0 0 * * *"
+    }
   }
 }
