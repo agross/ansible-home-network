@@ -4,7 +4,7 @@
   become: false
   gather_facts: false
   roles:
-    - name: tasmota-config
+    - role: tasmota-config
       tags: tasmota-config
-    - name: tasmota-update
+    - role: tasmota-update
       tags: tasmota-update

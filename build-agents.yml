@@ -2,11 +2,11 @@
   hosts: build_agents
   become: true
   roles:
-    - name: build-agent
+    - role: build-agent
       tags: build-agent
-    - name: docker
+    - role: docker
       tags: docker
-    - name: devsec.hardening.ssh_hardening
+    - role: devsec.hardening.ssh_hardening
       tags: ssh
-    - name: exploide.dnf-automatic
+    - role: exploide.dnf-automatic
       tags: dnf-automatic

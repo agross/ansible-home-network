@@ -3,4 +3,4 @@
   become: true
   gather_facts: false
   roles:
-    - name: shutdown
+    - role: shutdown
