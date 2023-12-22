@@ -20,7 +20,14 @@
   ansible.builtin.set_fact:
     # The select filter removes empty strings.
     backlog: >-
-      {{ lookup('file', backlog_file.path).splitlines() | map('trim') | select | join(';') }}
+      {{
+        lookup('file', backlog_file.path).splitlines() |
+        map('trim') |
+        select |
+        join(';') |
+        urlencode |
+        replace('/', '%2F')
+      }}
 
 - name: Remove backlog file
   delegate_to: localhost
@@ -37,7 +44,7 @@
   delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ device_name }}/cm?cmnd=Backlog%20{{ backlog | urlencode | replace('/', '%2F') }}
+      http://{{ device_name }}/cm?cmnd=Backlog%20{{ backlog }}
     return_content: true
   register: backlog_result
   changed_when: true
