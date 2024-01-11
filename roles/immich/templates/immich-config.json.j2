@@ -28,9 +28,6 @@
     "metadataExtraction": {
       "concurrency": 5
     },
-    "objectTagging": {
-      "concurrency": 2
-    },
     "recognizeFaces": {
       "concurrency": 2
     },
@@ -63,14 +60,9 @@
   "machineLearning": {
     "enabled": true,
     "url": "http://immich-machine-learning:3003",
-    "classification": {
-      "enabled": true,
-      "modelName": "microsoft/resnet-50",
-      "minScore": 0.9
-    },
     "clip": {
       "enabled": true,
-      "modelName": "ViT-B-32::openai"
+      "modelName": "ViT-B-32__openai"
     },
     "facialRecognition": {
       "enabled": true,
@@ -105,6 +97,8 @@
     "enabled": true
   },
   "storageTemplate": {
+    "enabled": true,
+    "hashVerificationEnabled": true,
     "template": "{% raw %}{{album}}/{{y}}/{{MM}}/{{dd}}/{{filename}}{% endraw %}"
   },
   "thumbnail": {
@@ -128,5 +122,9 @@
       "enabled": true,
       "cronExpression": "0 0 * * *"
     }
+  },
+  "server": {
+    "externalDomain": "",
+    "loginPageMessage": ""
   }
 }
