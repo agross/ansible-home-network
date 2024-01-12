@@ -5,9 +5,3 @@ ssh_listen_to:
 ssh_allow_tcp_forwarding: 'yes'
 ssh_allow_agent_forwarding: true
 sftp_enabled: true
-ssh_ciphers:
-  - aes256-gcm@openssh.com
-  - aes128-gcm@openssh.com
-  - aes256-ctr
-  - aes192-ctr
-  - aes128-ctr
