@@ -51,7 +51,7 @@ services:
       - {{ root }}/redis:/data
 
   db:
-    image: tensorchord/pgvecto-rs:pg16-v0.1.11
+    image: tensorchord/pgvecto-rs:pg16-v0.2.0
     env_file:
       - .env
     environment:

@@ -4,7 +4,13 @@
     "threads": 10,
     "preset": "medium",
     "targetVideoCodec": "h264",
+    "acceptedVideoCodecs": [
+      "h264"
+    ],
     "targetAudioCodec": "aac",
+    "acceptedAudioCodecs": [
+      "aac"
+    ],
     "targetResolution": "original",
     "maxBitrate": "0",
     "bframes": -1,
@@ -14,6 +20,7 @@
     "temporalAQ": false,
     "cqMode": "auto",
     "twoPass": true,
+    "preferredHwDevice": "auto",
     "transcode": "all",
     "tonemap": "mobius",
     "accel": "disabled"
@@ -28,7 +35,7 @@
     "metadataExtraction": {
       "concurrency": 5
     },
-    "recognizeFaces": {
+    "faceDetection": {
       "concurrency": 2
     },
     "search": {
@@ -121,6 +128,11 @@
     "scan": {
       "enabled": true,
       "cronExpression": "0 0 * * *"
+    },
+    "watch": {
+      "enabled": false,
+      "usePolling": false,
+      "interval": 10000
     }
   },
   "server": {
