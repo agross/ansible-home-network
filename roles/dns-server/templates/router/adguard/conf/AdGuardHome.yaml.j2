@@ -31,6 +31,8 @@ dns:
   port: 53
   anonymize_client_ip: false
   ratelimit: 0
+  ratelimit_subnet_len_ipv4: 24
+  ratelimit_subnet_len_ipv6: 56
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
@@ -46,8 +48,7 @@ dns:
     - 2620:fe::10
     - 2620:fe::fe:10
   fallback_dns: []
-  all_servers: false
-  fastest_addr: false
+  upstream_mode: load_balance
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
@@ -79,13 +80,15 @@ dns:
   use_private_ptr_resolvers: true
   local_ptr_upstreams:
     - '# Resolve IPv4 PTR using dnsmasq...'
-    - '[/in-addr.arpa/]127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}'
+    - 127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}
     - '# ...and IPv6 PTR using systemd-resolved which supports NDP to resolve link-local addresses.'
     - '[/ip6.arpa/]127.0.0.1:{{ dns_server_ports.resolved | mandatory }}'
   use_dns64: false
   dns64_prefixes: []
   serve_http3: false
   use_http3_upstreams: false
+  serve_plain_dns: true
+  hostsfile_enabled: false
 tls:
   enabled: false
   server_name: ""
@@ -102,12 +105,14 @@ tls:
   private_key_path: ""
   strict_sni_check: false
 querylog:
+  dir_path: ""
   ignored: []
   interval: 24h
   size_memory: 1000
   enabled: true
   file_enabled: true
 statistics:
+  dir_path: ""
   ignored: []
   interval: 2160h
   enabled: true
@@ -198,4 +203,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 27
+schema_version: 28
