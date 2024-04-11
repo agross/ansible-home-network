@@ -15,7 +15,7 @@
       {{ borgmatic_encryption_passphrase | ansible.builtin.mandatory }}
 
     borg_repository: >-
-      ssh://{{ borgmatic_ssh_host | ansible.builtin.mandatory }}/volume2/NetBackup/borg/{{ site | ansible.builtin.mandatory }}/{{ ansible_hostname }}
+      ssh://{{ borgmatic_ssh_host | ansible.builtin.mandatory }}/volume2/NetBackup/borg/{{ site | ansible.builtin.mandatory }}/{{ borgmatic_server_name | default(ansible_hostname) }}
 
     borgmatic_relocated_repo_access_is_ok: true
     borg_remote_path: /usr/local/bin/borg
@@ -48,7 +48,7 @@
     path: /etc/borgmatic/config.yaml
     insertafter: 'archive_name_format:'
     firstmatch: true
-    line: "    match_archives: 'sh:{hostname}-system-*'"
+    line: "    match_archives: 'sh:{{ borgmatic_server_name | default('{hostname}') }}-system-*'"
 
 - name: Ensure /etc/borgmatic.d exists
   ansible.builtin.file:
