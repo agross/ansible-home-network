@@ -99,3 +99,7 @@
       tags:
         - feedr
         - container
+    - role: freshrss
+      tags:
+        - freshrss
+        - container

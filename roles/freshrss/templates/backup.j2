@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups
+  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
+}
+
+db() {
+  docker compose \
+         --project-name {{ ansible_role_name | ansible.builtin.quote }} \
+         exec \
+         db \
+         pg_dumpall \
+         --username=freshrss \
+    > {{ root | ansible.builtin.quote }}/backups/db.sql
+}
+
+data() {
+  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
+
+  docker compose \
+         --project-name {{ ansible_role_name | ansible.builtin.quote }} \
+         cp \
+         --archive \
+         app:/var/www/FreshRSS/data \
+         {{ root | ansible.builtin.quote }}/backups/data
+
+  find {{ root | ansible.builtin.quote }}/backups/data \
+       -type f \
+       -name 'log*.txt' \
+       -delete
+
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups/data/cache \
+            {{ root | ansible.builtin.quote }}/backups/data/favicons
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+db
+data

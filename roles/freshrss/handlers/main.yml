@@ -1,0 +1,5 @@
+- name: Restart freshrss service
+  when: freshrss_started is not changed
+  ansible.builtin.systemd:
+    name: freshrss.service
+    state: reloaded

@@ -1,0 +1,60 @@
+volumes:
+  data:
+  extensions:
+  db:
+
+services:
+  app:
+    image: freshrss/freshrss:1-alpine
+    volumes:
+      - data:/var/www/FreshRSS/data
+      - extensions:/var/www/FreshRSS/extensions
+    ports:
+      - "127.0.0.1:8050:80"
+    environment:
+      TZ: Europe/Berlin
+      TRUSTED_PROXY: 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+      BASE_URL: https://rss.therightstuff.de
+      DB_HOST: db
+      DB_BASE: freshrss
+      DB_USER: freshrss
+      DB_PASSWORD: freshrss
+    depends_on:
+      db:
+        condition: service_healthy
+
+  cron:
+    image: freshrss/freshrss:1-alpine
+    volumes:
+      - data:/var/www/FreshRSS/data
+      - extensions:/var/www/FreshRSS/extensions
+    environment:
+      TZ: Europe/Berlin
+      # Cron job to refresh feeds at specified minutes.
+      CRON_MIN: "1,31"
+    command: crond -f -d 6
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: freshrss
+      POSTGRES_PASSWORD: freshrss
+      POSTGRES_DB: freshrss
+      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
+      TZ: Europe/Berlin
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD
+        - psql
+        - --username=freshrss
+        - --dbname=freshrss
+        - --command=select 1
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
