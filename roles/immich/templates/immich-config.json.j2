@@ -9,7 +9,9 @@
     ],
     "targetAudioCodec": "aac",
     "acceptedAudioCodecs": [
-      "aac"
+      "aac",
+      "mp3",
+      "libopus"
     ],
     "targetResolution": "original",
     "maxBitrate": "0",
@@ -45,9 +47,6 @@
       "concurrency": 5
     },
     "library": {
-      "concurrency": 5
-    },
-    "storageTemplateMigration": {
       "concurrency": 5
     },
     "migration": {
@@ -88,17 +87,20 @@
     "enabled": true
   },
   "oauth": {
-    "enabled": true,
-    "issuerUrl": "https://accounts.google.com/.well-known/openid-configuration",
+    "autoLaunch": false,
+    "autoRegister": false,
+    "buttonText": "Login with Google",
     "clientId": "{{ immich_google_client_id }}",
     "clientSecret": "{{ immich_google_client_secret }}",
-    "buttonText": "Login with Google",
+    "defaultStorageQuota": 0,
+    "enabled": true,
+    "issuerUrl": "https://accounts.google.com/.well-known/openid-configuration",
     "mobileOverrideEnabled": true,
     "mobileRedirectUri": "{{ immich_url | mandatory }}/api/oauth/mobile-redirect",
     "scope": "openid email profile",
+    "signingAlgorithm": "RS256",
     "storageLabelClaim": "preferred_username",
-    "autoRegister": false,
-    "autoLaunch": false
+    "storageQuotaClaim": "immich_quota"
   },
   "passwordLogin": {
     "enabled": true
@@ -108,9 +110,11 @@
     "hashVerificationEnabled": true,
     "template": "{% raw %}{{album}}/{{y}}/{{MM}}/{{dd}}/{{filename}}{% endraw %}"
   },
-  "thumbnail": {
-    "webpSize": 480,
-    "jpegSize": 2160,
+  "image": {
+    "thumbnailFormat": "webp",
+    "thumbnailSize": 480,
+    "previewFormat": "jpeg",
+    "previewSize": 2160,
     "quality": 80,
     "colorspace": "p3"
   },
@@ -130,13 +134,14 @@
       "cronExpression": "0 0 * * *"
     },
     "watch": {
-      "enabled": false,
-      "usePolling": false,
-      "interval": 10000
+      "enabled": false
     }
   },
   "server": {
     "externalDomain": "",
     "loginPageMessage": ""
+  },
+  "user": {
+    "deleteDelay": 7
   }
 }
