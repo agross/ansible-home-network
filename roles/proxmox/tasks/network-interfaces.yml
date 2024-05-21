@@ -19,5 +19,14 @@
     state: present
     backup: true
 
+- name: Ensure WebAuthn can be used
+  ansible.builtin.lineinfile:
+    path: /etc/pve/datacenter.cfg
+    regexp: "^webauthn:"
+    line: >-
+      webauthn: rp={{ pve_fqdn }},origin=https://{{ pve_fqdn }}:8006,id={{ pve_fqdn }}
+    state: present
+    backup: true
+
 - name: Reload network interfaces if required
   ansible.builtin.meta: flush_handlers
