@@ -26,7 +26,8 @@
 - name: Create guest VMs
   community.general.proxmox_kvm:
     api_user: "{{ proxmox_api_user | mandatory }}"
-    api_password: "{{ proxmox_api_password | mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_password | mandatory }}"
     api_host: localhost
     node: "{{ ansible_hostname | mandatory }}"
     vmid: "{{ guest.kvm.id | mandatory }}"
