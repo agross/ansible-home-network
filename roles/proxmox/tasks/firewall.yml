@@ -29,7 +29,7 @@
 
       [IPSET management] # Allow management from hosts behind the WireGuard tunnel.
 
-      {{ network.wireguard | ansible.utils.nthhost(1) | mandatory }} # Remote tunnel endpoint IP.
+      {{ network.wireguard.ip4 | ansible.utils.nthhost(1) | mandatory }} # Remote tunnel endpoint IP.
       {{ hostvars['gateway-home'].network.ip6 | mandatory }} # Remote IPv6 subnet.
 
       {{ network.ip6 | mandatory }} # Local IPv6 subnet.
