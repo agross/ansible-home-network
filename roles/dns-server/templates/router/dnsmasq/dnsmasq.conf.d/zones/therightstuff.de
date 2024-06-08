@@ -2,5 +2,5 @@ cname=cloud.therightstuff.de,                       router.home.therightstuff.de
 cname=kibana.cloud.therightstuff.de,                router.home.therightstuff.de
 cname=feedr.therightstuff.de,                       router.home.therightstuff.de
 cname=feeds.therightstuff.de,                       router.home.therightstuff.de
-cname=rss.home.therightstuff.de,                    router.home.therightstuff.de
+cname=rss.therightstuff.de,                         router.home.therightstuff.de
 cname=photos.therightstuff.de,                      router.home.therightstuff.de
