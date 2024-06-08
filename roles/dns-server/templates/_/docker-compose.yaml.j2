@@ -32,11 +32,10 @@ services:
   # DHCP + DNS (127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}/udp) with information about DHCP hosts. Uses
   # Uses dnscrypt-proxy as its upstream.
   dnsmasq:
-    image: ricardbejarano/dnsmasq:custom
-    pull_policy: never
-    build:
-      context: ./dnsmasq
+    image: ricardbejarano/dnsmasq:latest
     command: --keep-in-foreground --pid-file --log-facility=- --conf-file=/etc/dnsmasq.conf
+    # Required for DHCP.
+    user: 0:0
     # Required for DHCP.
     network_mode: host
     restart: unless-stopped
