@@ -150,6 +150,20 @@
     "externalDomain": "",
     "loginPageMessage": ""
   },
+  "notifications": {
+    "smtp": {
+      "enabled": true,
+      "from": "Immich <immich@{{ immich_smtp_user | split('@', 1) | last }}>",
+      "replyTo": "",
+      "transport": {
+        "ignoreCert": false,
+        "host": "smtp-relay.gmail.com",
+        "port": 587,
+        "username": "{{ immich_smtp_user | ansible.builtin.mandatory }}",
+        "password": "{{ immich_smtp_password | ansible.builtin.mandatory }}"
+      }
+    }
+  },
   "user": {
     "deleteDelay": 7
   }

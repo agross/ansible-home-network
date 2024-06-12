@@ -2,3 +2,6 @@ immich_url: https://photos.therightstuff.de
 
 immich_google_client_id: "{{ vault_immich_google_client_id }}"
 immich_google_client_secret: "{{ vault_immich_google_client_secret }}"
+
+immich_smtp_user: "{{ google_smtp_user }}"
+immich_smtp_password: "{{ vault_immich_smtp_password }}"
