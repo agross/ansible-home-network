@@ -37,9 +37,18 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
+      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE --data-checksums
     volumes:
       - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: >-
+        psql --username="$$POSTGRES_USER" --dbname="$$POSTGRES_DB" --command='SELECT 1' || exit 1;
+        failures="$$(psql --username="$$POSTGRES_USER" --dbname="$$POSTGRES_DB" --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')";
+        echo "Checksum failure count is $$failures";
+        [ "$$failures" = 0 ] || exit 1
+      start_interval: 5s
+      start_period: 1m
+      interval: 5m
 
 volumes:
   db-data:
