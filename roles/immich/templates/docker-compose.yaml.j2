@@ -1,35 +1,14 @@
 services:
   server:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    command: [ "start.sh", "immich" ]
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
-      - {{ root }}/immich-config.json:/immich-config.json:ro
+      - ./immich-config.json:/immich-config.json:ro
     env_file:
       - .env
     ports:
       - 127.0.0.1:2283:3001
-    depends_on:
-      - redis
-      - db
-    networks:
-      default:
-        aliases:
-          - immich-server
-
-  microservices:
-    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    # extends:
-    #   file: hwaccel.yml
-    #   service: hwaccel
-    command: [ "start.sh", "microservices" ]
-    volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /etc/localtime:/etc/localtime:ro
-      - {{ root }}/immich-config.json:/immich-config.json:ro
-    env_file:
-      - .env
     depends_on:
       - redis
       - db
@@ -40,15 +19,15 @@ services:
       - ml-model-cache:/cache
     env_file:
       - .env
-    networks:
-      default:
-        aliases:
-          - immich-machine-learning
 
   redis:
     image: redis:alpine
     volumes:
-      - {{ root }}/redis:/data
+      - ./redis:/data
+    healthcheck:
+      test: redis-cli ping | grep -xq PONG
+      start_period: 5s
+      interval: 5s
 
   db:
     image: tensorchord/pgvecto-rs:pg16-v0.2.0
@@ -59,7 +38,6 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
-      TZ: Europe/Berlin
     volumes:
       - db-data:/var/lib/postgresql/data
 

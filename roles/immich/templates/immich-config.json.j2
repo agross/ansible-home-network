@@ -25,7 +25,8 @@
     "preferredHwDevice": "auto",
     "transcode": "all",
     "tonemap": "mobius",
-    "accel": "disabled"
+    "accel": "disabled",
+    "accelDecode": false
   },
   "job": {
     "backgroundTask": {
@@ -57,6 +58,9 @@
     },
     "videoConversion": {
       "concurrency": 1
+    },
+    "notifications": {
+      "concurrency": 5
     }
   },
   "logging": {
@@ -65,10 +69,14 @@
   },
   "machineLearning": {
     "enabled": true,
-    "url": "http://immich-machine-learning:3003",
+    "url": "http://machine-learning:3003",
     "clip": {
       "enabled": true,
       "modelName": "ViT-B-32__openai"
+    },
+    "duplicateDetection": {
+      "enabled": true,
+      "maxDistance": 0.0155
     },
     "facialRecognition": {
       "enabled": true,
@@ -116,7 +124,8 @@
     "previewFormat": "webp",
     "previewSize": 2160,
     "quality": 80,
-    "colorspace": "p3"
+    "colorspace": "p3",
+    "extractEmbedded": false
   },
   "newVersionCheck": {
     "enabled": true
