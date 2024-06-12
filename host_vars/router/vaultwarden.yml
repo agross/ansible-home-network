@@ -1,4 +1,6 @@
 vaultwarden_admin_token: "{{ vault_vaultwarden_admin_token }}"
-vaultwarden_google_smtp_password: "{{ vault_vaultwarden_google_smtp_password }}"
+
+vaultwarden_smtp_user: "{{ google_smtp_user }}"
+vaultwarden_smtp_password: "{{ vault_vaultwarden_smtp_password }}"
 
 vaultwarden_domain: bitwarden.home.therightstuff.de

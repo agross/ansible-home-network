@@ -2,7 +2,7 @@ grafana_google_client_id: "{{ vault_grafana_google_client_id }}"
 grafana_google_client_secret: "{{ vault_grafana_google_client_secret }}"
 grafana_google_allowed_domains: "{{ vault_grafana_google_allowed_domains }}"
 
-grafana_smtp_user: "{{ vault_grafana_smtp_user }}"
+grafana_smtp_user: "{{ google_smtp_user }}"
 grafana_smtp_password: "{{ vault_grafana_smtp_password }}"
 
 # The API key needs to have the "Admin" role.
