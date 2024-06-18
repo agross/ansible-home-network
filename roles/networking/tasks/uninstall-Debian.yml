@@ -15,6 +15,7 @@
   ansible.builtin.dpkg_selections:
     name: "{{ item }}"
     selection: hold
+  failed_when: false
   loop:
     - avahi-daemon
     - libnss-mdns
