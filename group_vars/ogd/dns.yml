@@ -1,6 +1,9 @@
 dns:
   search_domains:
     - "{{ network.domain | mandatory }}"
+    # This fails when templating.
+    # - "{{ hostvars['gateway-home'].network.domain | mandatory }}"
+    - home.therightstuff.de
   servers:
     - "{{ network.ip4 | ansible.utils.nthhost(3) | mandatory }}"
     - "{{ network.ip6 | ansible.utils.nthhost(3) | mandatory }}"

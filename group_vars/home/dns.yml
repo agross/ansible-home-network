@@ -1,6 +1,9 @@
 dns:
   search_domains:
     - "{{ network.domain | mandatory }}"
+    # This fails when templating.
+    # - "{{ hostvars['gateway-ogd'].network.domain | mandatory }}"
+    - ogd.therightstuff.de
   servers:
     - "{{ network.ip4 | ansible.utils.nthhost(3) | mandatory }}"
     - "{{ network.ip6 | ansible.utils.nthhost(3) | mandatory }}"
