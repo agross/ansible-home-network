@@ -9,9 +9,6 @@ harbor_installer_args: []
 
 harbor_installer_with:
   - trivy
-  # - clair
-  # - notary
-  # - chartmuseum
 
 harbor_installer_arguments: >-
   {{ harbor_installer_args +
