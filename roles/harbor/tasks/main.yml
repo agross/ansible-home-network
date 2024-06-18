@@ -112,6 +112,17 @@
           - --quiet
       changed_when: false
 
+    - name: Pull images
+      ansible.builtin.command:
+        argv:
+          - docker
+          - compose
+          - --file
+          - "{{ harbor_installer_directory }}/harbor/docker-compose.yml"
+          - pull
+      register: docker_compose_pull
+      changed_when: "'Pull complete' in docker_compose_pull.stderr"
+
   rescue:
     - name: Restore backup file because validation failed
       when: docker_compose_yaml is defined
