@@ -44,7 +44,7 @@ services:
       Commafeed__Username: $COMMAFEED_USER
       Commafeed__Password: $COMMAFEED_PASSWORD
     ports:
-      - "127.0.0.1:2284:80"
+      - "127.0.0.1:2284:8080"
     depends_on:
       db:
         condition: service_healthy
