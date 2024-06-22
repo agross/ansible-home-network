@@ -43,6 +43,8 @@
   become: true
   gather_facts: false
   roles:
+    - role: ssh
+      tags: ssh
     - role: gateway
       tags: gateway
 

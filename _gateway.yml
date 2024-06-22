@@ -1,7 +1,0 @@
-- name: Configure host as a gateway
-  hosts: "{{ playbook_hosts | mandatory }}"
-  become: true
-  gather_facts: false
-  roles:
-    - role: gateway
-      tags: gateway
