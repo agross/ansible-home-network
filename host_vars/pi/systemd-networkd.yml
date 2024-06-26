@@ -5,12 +5,22 @@ systemd_networkd_apply_config: true
 systemd_networkd_network:
   eth0:
     - Match:
-        - Name: "{{ network_interface | default('eth0') }}"
+        - Name: "{{ interfaces.lan.device }}"
     - Network:
-        - DHCP: 'yes'
+        - Address: "{{ interfaces.lan.ip4.address }}"
+        - Address: "{{ interfaces.lan.ip6.address }}"
+        - DNS: "{{ interfaces.lan.ip4.dns }}"
+        - DNS: "{{ interfaces.lan.ip6.dns }}"
+        - DNSDefaultRoute: true
+        - Domains: "{{ dns.search_domains | join(' ') }}"
         - MulticastDNS: true
-    - DHCPv4:
-        - UseDomains: true
-        - UseMTU: true
-    - IPv6AcceptRA:
-        - UseDomains: true
+
+        - IPv6LinkLocalAddressGenerationMode: stable-privacy
+
+    - Route:
+        - Gateway: >-
+            {{
+              hostvars['gateway-home'].interfaces.lan.ip4.address |
+                ansible.utils.ipaddr('address')
+            }}
+        - GatewayOnLink: true
