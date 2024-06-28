@@ -26,7 +26,7 @@ netdata_config_files:
           - name: dnsmasq_dhcp
             leases_path: /data/dns-server/dnsmasq/dnsmasq.leases
             conf_path: /data/dns-server/dnsmasq/dnsmasq.conf
-            conf_dir: /data/dns-server/dnsmasq/dnsmasq.conf.d
+            conf_dir: /data/dns-server/dnsmasq/conf.d
 
     samba.conf:
       block:

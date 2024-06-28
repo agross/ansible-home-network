@@ -45,7 +45,7 @@ services:
       - NET_ADMIN # Modify routing tables and other network-related operations.
     volumes:
       - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf:ro
-      - ./dnsmasq/dnsmasq.conf.d:/etc/dnsmasq.conf.d:ro
+      - ./dnsmasq/conf.d:/etc/dnsmasq.conf.d:ro
       - ./dnsmasq/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
     depends_on:
       - dnscrypt-proxy
