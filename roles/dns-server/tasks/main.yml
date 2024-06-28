@@ -1,26 +1,26 @@
 - name: Copy default templates
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
-    directory: ../templates/_
+    directory: ../templates
     notify: Restart dns-server service
 
 - name: Copy templates for {{ inventory_hostname }}
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
-    directory: "../templates/{{ inventory_hostname }}"
+    directory: "templates/dns-server/{{ inventory_hostname }}"
     notify: Restart dns-server service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ root }}/systemd"
-    local_units: templates/_/systemd
+    local_units: templates/systemd
     notify: Restart dns-server service
 
 - name: Copy systemd-resolved config files
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
-    directory: ../templates/_/systemd-resolved/resolved.conf.d
+    directory: templates/systemd-resolved/resolved.conf.d
     target: /etc/systemd/resolved.conf.d
     notify: Restart systemd-resolved service
 
