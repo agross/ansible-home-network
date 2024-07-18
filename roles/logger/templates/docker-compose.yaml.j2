@@ -87,6 +87,8 @@ services:
         condition: service_healthy
 
   telegraf:
+    profiles:
+      - metrics-self
     image: telegraf
 
     restart: unless-stopped

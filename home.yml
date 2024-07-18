@@ -67,10 +67,6 @@
       tags:
         - iobroker
         - container
-    - role: logger
-      tags:
-        - logger
-        - container
 
 - name: Hosted services
   hosts: router
@@ -104,4 +100,8 @@
     - role: freshrss
       tags:
         - freshrss
+        - container
+    - role: logger
+      tags:
+        - logger
         - container

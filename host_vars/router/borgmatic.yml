@@ -6,3 +6,4 @@ borgmatic_healthchecks_vaultwarden: "{{ vault_borgmatic_healthchecks_vaultwarden
 borgmatic_healthchecks_nextcloud: "{{ vault_borgmatic_healthchecks_nextcloud }}"
 borgmatic_healthchecks_immich: "{{ vault_borgmatic_healthchecks_immich }}"
 borgmatic_healthchecks_freshrss: "{{ vault_borgmatic_healthchecks_freshrss }}"
+borgmatic_healthchecks_logger: "{{ vault_borgmatic_healthchecks_logger }}"
