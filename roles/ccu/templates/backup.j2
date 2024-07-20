@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+  # Directory needs to be kept because it is mounted on the MariaDB container.
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups/*
+}
+
+ccu() {
+  docker container \
+         exec \
+         {{ ansible_role_name | ansible.builtin.quote }} \
+         /bin/createBackup.sh \
+         /backups
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+ccu

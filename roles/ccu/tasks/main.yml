@@ -16,15 +16,28 @@
 - name: If some task requested a reboot, do it now
   ansible.builtin.meta: flush_handlers
 
-- name: Copy service unit file
-  ansible.builtin.template:
-    src: templates/ccu.service.j2
-    dest: /etc/systemd/system/ccu.service
-    mode: '644'
-    owner: root
-    group: root
-    force: true
-  notify: Restart ccu service
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    notify: Restart ccu service
+    files:
+      .env.j2:
+        mode: '640'
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart ccu service
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
 
 - name: Pull docker images
   community.docker.docker_image:

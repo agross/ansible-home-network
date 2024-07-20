@@ -41,6 +41,7 @@ ExecStart=/usr/bin/docker container \
                           --volume /etc/localtime:/etc/localtime:ro \
                           --volume /lib/modules:/lib/modules:ro \
                           --volume ccu_data:/usr/local \
+                          --volume {{ root | ansible.builtin.quote }}/backups:/backups \
                           {{ ccu_image | ansible.builtin.mandatory | ansible.builtin.quote }}
 
 ExecStop=/usr/bin/docker container stop '%p'

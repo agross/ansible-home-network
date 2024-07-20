@@ -1,3 +1,5 @@
+root: /data/ccu
+
 # This should be set to true if a transceiver on the GPIO pins is used:
 # - HM-MOD-RPI-PCB or
 # - RPI-RF-MOD
