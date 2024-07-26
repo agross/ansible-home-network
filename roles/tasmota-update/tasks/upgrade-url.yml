@@ -10,7 +10,7 @@
 - name: Determine Tasmota variant
   ansible.builtin.set_fact:
     tasmota_variant: >-
-      {{ firmware.json.StatusFWR.Version | regex_replace('.*\((.*)\)$', '\1') }}
+      {{ firmware.json.StatusFWR.Version | regex_replace('.*\(release-(.*)\)$', '\1') }}
 
 - name: Determine OTA URL for variant
   ansible.builtin.set_fact:
@@ -18,6 +18,11 @@
   vars:
     query: >-
       "{{ latest_release_key }}"[?variant=='{{ tasmota_variant }}'].otaurl | [0]
+
+- name: Fail if the OTA URL is invalid
+  when: not tasmota_upgrade_url is url
+  ansible.builtin.fail:
+    msg: "{{ tasmota_upgrade_url  }} is not a valid URL"
 
 - name: Set upgrade URL
   when: original_ota_url.json.OtaUrl != tasmota_upgrade_url
