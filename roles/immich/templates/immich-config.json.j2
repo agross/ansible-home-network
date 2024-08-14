@@ -13,6 +13,11 @@
       "mp3",
       "libopus"
     ],
+    "acceptedContainers": [
+      "mov",
+      "ogg",
+      "webm"
+    ],
     "targetResolution": "original",
     "maxBitrate": "0",
     "bframes": -1,
@@ -107,6 +112,7 @@
     "mobileRedirectUri": "{{ immich_url | mandatory }}/api/oauth/mobile-redirect",
     "scope": "openid email profile",
     "signingAlgorithm": "RS256",
+    "profileSigningAlgorithm": "none",
     "storageLabelClaim": "preferred_username",
     "storageQuotaClaim": "immich_quota"
   },
