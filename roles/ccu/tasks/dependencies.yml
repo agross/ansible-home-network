@@ -1,11 +1,14 @@
 - name: Install required packages
   ansible.builtin.apt:
-    name:
-      - build-essential
-      - bison
-      - flex
-      - libssl-dev
-      - raspberrypi-kernel-headers
+    name: >-
+      {{
+        [
+          'build-essential',
+          'bison',
+          'flex',
+          'libssl-dev'
+        ] + (ccu_required_packages | default([]))
+      }}
     state: present
 
 - name: Add apt key
