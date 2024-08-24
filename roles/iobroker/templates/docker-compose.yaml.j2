@@ -1,11 +1,24 @@
 volumes:
   iobroker-data:
 
-{% if traefik_host %}
 networks:
+  default:
+  {% if traefik_host | default(false) | bool %}
   web:
     external: true
-{% endif %}
+  {% endif %}
+  {% if iobroker_support_wake_on_lan | default(false) | bool %}
+  iobroker:
+    name: iobroker
+    driver: macvlan
+    driver_opts:
+      parent: {{ iobroker_network_interface }}
+    internal: true
+    ipam:
+      config:
+        - subnet: {{ network.ip4 }}
+          ip_range: {{ iobroker_ip4_range | ansible.builtin.mandatory }}
+  {% endif %}
 
 services:
   redis:
@@ -14,10 +27,8 @@ services:
     restart: unless-stopped
     environment:
       TZ: Europe/Berlin
-    {% if iobroker_support_wake_on_lan | default(false) | bool %}
-    ports:
-      - "127.0.0.1:6379:6379"
-    {% endif %}
+    networks:
+      default:
     command: /usr/local/etc/redis/redis.conf
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
@@ -69,21 +80,15 @@ services:
       traefik.http.routers.iobroker-lovelace-guests.middlewares:
         iobroker-lovelace-guests-ipwhitelist
       {% endif %}
-    {% if iobroker_support_wake_on_lan | default(false) | bool %}
-    network_mode: host
-    {% elif traefik_host %}
     networks:
-      - default
-      - web
-    {% else %}
-    ports:
-      {% for service, port in iobroker_ports.items() %}
-      {% if port %}
-      # {{ service }}
-      - "{{ port }}:{{ port }}"
+      default:
+      {% if traefik_host %}
+      web:
       {% endif %}
-      {% endfor %}
-    {% endif %}
+      {% if iobroker_support_wake_on_lan | default(false) | bool %}
+      iobroker:
+        ipv4_address: {{ iobroker_ip4 | ansible.builtin.mandatory }}
+      {% endif %}
     volumes:
       - ./backups:/opt/iobroker/backups
       - iobroker-data:/opt/iobroker
@@ -109,10 +114,8 @@ services:
 
     restart: unless-stopped
     env_file: ./crunchfit/.env
-    {% if iobroker_support_wake_on_lan | default(false) | bool %}
-    ports:
-      - "127.0.0.1:50000:5000"
-    {% endif %}
+    networks:
+      default:
     volumes:
       - /etc/localtime:/etc/localtime
   {% endif %}
