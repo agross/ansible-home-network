@@ -25,6 +25,5 @@ cname=pxe.home.therightstuff.de,                    router.home.therightstuff.de
 cname=vault.home.therightstuff.de,                  router.home.therightstuff.de
 cname=youtrack.home.therightstuff.de,               router.home.therightstuff.de
 
-cname=mqtt,               mqtt.home.therightstuff.de, nest.home.therightstuff.de
-
-cname=influxdb,     influxdb.home.therightstuff.de, router.home.therightstuff.de
+cname=mqtt, mqtt.home.therightstuff.de,               nest.home.therightstuff.de
+cname=influxdb, influxdb.home.therightstuff.de,       nest.home.therightstuff.de

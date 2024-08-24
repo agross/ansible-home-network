@@ -125,7 +125,3 @@
       tags:
         - freshrss
         - container
-    - role: logger
-      tags:
-        - logger
-        - container
