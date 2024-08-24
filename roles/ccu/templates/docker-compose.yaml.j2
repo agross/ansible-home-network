@@ -1,0 +1,31 @@
+volumes:
+  data:
+
+networks:
+  default:
+  ccu:
+    name: ccu
+    driver: macvlan
+    driver_opts:
+      parent: {{ ccu_network_interface | ansible.builtin.mandatory }}
+    internal: true
+    ipam:
+      config:
+        - subnet: {{ network.ip4 }}
+          ip_range: {{ ccu_ip4_range | ansible.builtin.mandatory }}
+
+services:
+  ccu:
+    image: {{ ccu_image | ansible.builtin.mandatory }}
+    hostname: ccu
+    read_only: true
+    privileged: true
+    stop_grace_period: 30s
+    volumes:
+      - data:/usr/local
+      - /etc/localtime:/etc/localtime:ro
+      - /lib/modules:/lib/modules:ro
+    networks:
+      default:
+      ccu:
+        ipv4_address: {{ ccu_ip4 | ansible.builtin.mandatory }}

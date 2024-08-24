@@ -5,50 +5,14 @@ After=docker.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]
-# docker stop/rm just in case the container has not been removed (e.g. the system crashed).
-ExecStartPre=-/usr/bin/docker container stop '%p'
-ExecStartPre=-/usr/bin/docker container rm '%p'
+WorkingDirectory={{ root }}
+Environment=COMPOSE_PROJECT_NAME='%p'
 
-# May fail when the network already exists.
-ExecStartPre=-/usr/bin/docker network create iobroker_default
-# May fail when the volume already exists.
-ExecStartPre=-/usr/bin/docker volume create ccu_data
+ExecStartPre=/usr/bin/docker compose config
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose stop
 
-# This happens on a normal container stop.
-SuccessExitStatus=129
-
-ExecStart=/usr/bin/docker container \
-                          run \
-                          --rm \
-                          --name '%p' \
-                          --hostname ccu \
-                          --stop-timeout 30 \
-                          --network iobroker_default \
-                          # Admin UI. \
-                          --publish 8080:80 \
-                          # HomeMatic IP (HTTP and TLS).
-                          --publish 127.0.0.1:2010:2010 \
-                          --publish 127.0.0.1:42010:42010 \
-                          # Virtual Devices (HTTP and TLS).
-                          --publish 127.0.0.1:9292:9292 \
-                          --publish 127.0.0.1:49292:49292 \
-                          # ReGa availability check, hard-coded to port 443 for ioBroker hm-rega and backitup adapters.
-                          --publish 127.0.0.1:443:443 \
-                          # ReGa (HTTP and TLS).
-                          --publish 127.0.0.1:8181:8181 \
-                          --publish 127.0.0.1:48181:48181 \
-                          --privileged \
-                          --volume /etc/localtime:/etc/localtime:ro \
-                          --volume /lib/modules:/lib/modules:ro \
-                          --volume ccu_data:/usr/local \
-                          --volume {{ root | ansible.builtin.quote }}/backups:/backups \
-                          {{ ccu_image | ansible.builtin.mandatory | ansible.builtin.quote }}
-
-ExecStop=/usr/bin/docker container stop '%p'
-
-# Restart 2 seconds after docker run exited with an error status.
-Restart=always
-RestartSec=2s
+ExecReload=/usr/bin/docker compose up --detach
 
 [Install]
 WantedBy=multi-user.target

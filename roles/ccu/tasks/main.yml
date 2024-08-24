@@ -22,9 +22,6 @@
   vars:
     directory: ../templates
     notify: Restart ccu service
-    files:
-      .env.j2:
-        mode: '640'
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
@@ -39,15 +36,14 @@
     src: "{{ root }}/backup.yaml"
     path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
 
-- name: Pull docker images
-  community.docker.docker_image:
-    name: "{{ item }}"
-    source: pull
-    force_source: true
-  loop:
-    - "{{ ccu_image | ansible.builtin.mandatory }}"
-  when: docker_update is defined
-  notify: Restart ccu service
+- name: Update docker-compose images
+  ansible.builtin.import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify:
+      - Restart ccu service
 
 - name: Start service
   ansible.builtin.systemd:
