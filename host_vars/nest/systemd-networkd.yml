@@ -2,6 +2,15 @@ systemd_networkd_enable_resolved: true
 systemd_networkd_symlink_resolv_conf: true
 systemd_networkd_apply_config: true
 
+systemd_networkd_netdev:
+  iobroker:
+    - NetDev:
+        - Name: iobroker
+        - Kind: macvlan
+
+    - MACVLAN:
+        - Mode: bridge
+
 systemd_networkd_network:
   ens192:
     - Match:
@@ -17,6 +26,8 @@ systemd_networkd_network:
 
         - IPv6LinkLocalAddressGenerationMode: stable-privacy
 
+        - MACVLAN: iobroker
+
     - Route:
         - Gateway: >-
             {{
@@ -24,3 +35,17 @@ systemd_networkd_network:
                 ansible.utils.ipaddr('address')
             }}
         - GatewayOnLink: true
+
+  iobroker:
+    - Match:
+        - Name: iobroker
+
+    - Network:
+        - Address: "{{ iobroker_ip4_range | ansible.utils.next_nth_usable(2) }}"
+        - LinkLocalAddressing: false
+        - IPv6AcceptRA: false
+        # - IPForward: true
+        - ConfigureWithoutCarrier: true
+
+    - Route:
+        - Destination: "{{ iobroker_ip4 }}"
