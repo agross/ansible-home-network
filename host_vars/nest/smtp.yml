@@ -1,0 +1,1 @@
+google_smtp_password: "{{ vault_google_smtp_password }}"

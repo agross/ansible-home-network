@@ -68,6 +68,30 @@
         - iobroker
         - container
 
+- name: Home automation
+  hosts: nest
+  become: true
+  gather_facts: false
+  roles:
+    - role: docker
+      tags: docker
+    - role: mqtt
+      tags:
+        - mqtt
+        - container
+    - role: ccu
+      tags:
+        - ccu
+        - container
+    - role: iobroker
+      tags:
+        - iobroker
+        - container
+    - role: logger
+      tags:
+        - logger
+        - container
+
 - name: Hosted services
   hosts: router
   become: true

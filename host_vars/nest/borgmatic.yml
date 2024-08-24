@@ -1,0 +1,6 @@
+borgmatic_encryption_passphrase: "{{ vault_borgmatic_encryption_passphrase }}"
+
+borgmatic_healthchecks_system: "{{ vault_borgmatic_healthchecks_system }}"
+borgmatic_healthchecks_iobroker: "{{ vault_borgmatic_healthchecks_iobroker }}"
+borgmatic_healthchecks_ccu: "{{ vault_borgmatic_healthchecks_ccu }}"
+borgmatic_healthchecks_logger: "{{ vault_borgmatic_healthchecks_logger }}"

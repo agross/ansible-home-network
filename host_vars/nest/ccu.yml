@@ -1,0 +1,3 @@
+ccu_network_interface: "{{ interfaces.lan.device }}"
+ccu_ip4_range: "{{ network.ip4 | ansible.utils.nthhost(240) }}/30"
+ccu_ip4: "{{ ccu_ip4_range | ansible.utils.next_nth_usable(1) }}"

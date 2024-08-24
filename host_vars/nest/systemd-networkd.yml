@@ -1,0 +1,26 @@
+systemd_networkd_enable_resolved: true
+systemd_networkd_symlink_resolv_conf: true
+systemd_networkd_apply_config: true
+
+systemd_networkd_network:
+  ens192:
+    - Match:
+        - Name: "{{ interfaces.lan.device }}"
+    - Network:
+        - Address: "{{ interfaces.lan.ip4.address }}"
+        - Address: "{{ interfaces.lan.ip6.address }}"
+        - DNS: "{{ interfaces.lan.ip4.dns }}"
+        - DNS: "{{ interfaces.lan.ip6.dns }}"
+        - DNSDefaultRoute: true
+        - Domains: "{{ dns.search_domains | join(' ') }}"
+        - MulticastDNS: true
+
+        - IPv6LinkLocalAddressGenerationMode: stable-privacy
+
+    - Route:
+        - Gateway: >-
+            {{
+              hostvars['gateway-home'].interfaces.lan.ip4.address |
+                ansible.utils.ipaddr('address')
+            }}
+        - GatewayOnLink: true

@@ -1,0 +1,5 @@
+docker_daemon_options:
+  ipv6: true
+  fixed-cidr-v6: fd00:c0ff:ee::/48
+  experimental: true
+  ip6tables: true
