@@ -10,9 +10,10 @@ cleanup() {
 }
 
 ccu() {
-  docker container \
+  docker compose \
+         --project-name {{ ansible_role_name | ansible.builtin.quote }} \
          exec \
-         {{ ansible_role_name | ansible.builtin.quote }} \
+         ccu \
          /bin/createBackup.sh \
          /backups
 }

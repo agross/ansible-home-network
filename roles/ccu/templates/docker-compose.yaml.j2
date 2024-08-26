@@ -18,13 +18,13 @@ services:
   ccu:
     image: {{ ccu_image | ansible.builtin.mandatory }}
     hostname: ccu
-    read_only: true
     privileged: true
     stop_grace_period: 30s
     volumes:
       - data:/usr/local
       - /etc/localtime:/etc/localtime:ro
       - /lib/modules:/lib/modules:ro
+      - ./backups:/backups
     networks:
       default:
       ccu:
