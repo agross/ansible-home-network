@@ -17,6 +17,3 @@ iobroker_devices:
 iobroker_ports:
   iobroker: 8081
   lovelace: 8091
-
-  homematic_ip: 42010
-  homematic_virtual_devices: 49292
