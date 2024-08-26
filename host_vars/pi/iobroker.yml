@@ -8,7 +8,7 @@ iobroker_devices:
     usb: true
     zigbee:
       type: sonoff
-      firmware: CC1352P2_CC2652P_launchpad_coordinator_20230507.zip
+      firmware: CC1352P2_CC2652P_launchpad_coordinator_20240710.zip
 
 iobroker_ports:
   iobroker: 8081
