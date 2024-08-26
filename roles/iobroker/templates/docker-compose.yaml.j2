@@ -7,7 +7,7 @@ networks:
   web:
     external: true
   {% endif %}
-  {% if iobroker_support_wake_on_lan | default(false) | bool %}
+  {% if iobroker_direct_network_access | default(false) | bool %}
   iobroker:
     name: iobroker
     driver: macvlan
@@ -82,10 +82,10 @@ services:
       {% endif %}
     networks:
       default:
-      {% if traefik_host %}
+      {% if traefik_host | default(false) | bool %}
       web:
       {% endif %}
-      {% if iobroker_support_wake_on_lan | default(false) | bool %}
+      {% if iobroker_direct_network_access | default(false) | bool %}
       iobroker:
         ipv4_address: {{ iobroker_ip4 | ansible.builtin.mandatory }}
       {% endif %}

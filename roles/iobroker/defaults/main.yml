@@ -2,7 +2,7 @@ root: /data/iobroker
 
 iobroker_image: buanet/iobroker:custom
 
-iobroker_support_wake_on_lan: false
+iobroker_direct_network_access: false
 
 iobroker_devices: []
 

@@ -1,4 +1,4 @@
-iobroker_support_wake_on_lan: false
+iobroker_direct_network_access: false
 
 iobroker_devices:
   - container: /dev/ttyUSB0

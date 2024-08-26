@@ -1,4 +1,4 @@
-iobroker_support_wake_on_lan: true
+iobroker_direct_network_access: true
 
 iobroker_crunchfit_google_maps_api_key: "{{ vault_iobroker_crunchfit_google_maps_api_key }}"
 

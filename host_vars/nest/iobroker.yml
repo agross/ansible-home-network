@@ -1,4 +1,4 @@
-iobroker_support_wake_on_lan: true
+iobroker_direct_network_access: true
 
 iobroker_network_interface: "{{ interfaces.lan.device }}"
 iobroker_ip4_range: "{{ network.ip4 | ansible.utils.nthhost(244) }}/30"
