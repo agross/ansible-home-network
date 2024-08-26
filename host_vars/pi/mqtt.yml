@@ -1,3 +1,0 @@
-mqtt_accounts:
-  agross: "{{ vault_mqtt_accounts_agross }}"
-  iobroker: "{{ vault_mqtt_accounts_iobroker }}"
