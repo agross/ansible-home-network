@@ -6,7 +6,7 @@ services:
         first |
         default({ 'host': '', 'container': '', 'zigbee': { 'firmware': '' } })
     %}
-    image: ckware/ti-cc-tool
+    image: ckware/ti-cc-tool:2024-03-19
     user: root
     devices:
       - {{ dev.host }}:{{ dev.container }}:rw
