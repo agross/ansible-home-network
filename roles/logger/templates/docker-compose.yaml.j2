@@ -3,18 +3,12 @@ volumes:
   influxdb2-data:
   grafana-data:
 
-{% if traefik_host or
-      iobroker_support_wake_on_lan | default(false, true) | bool == false %}
 networks:
-{% if traefik_host  %}
+  default:
+  {% if traefik_host | default(false) | bool %}
   web:
     external: true
-{% endif %}
-{% if iobroker_support_wake_on_lan | default(false, true) | bool == false %}
-  iobroker_default:
-    external: true
-{% endif %}
-{% endif %}
+  {% endif %}
 
 services:
   influxdb:
