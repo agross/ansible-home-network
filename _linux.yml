@@ -37,3 +37,8 @@
       tags: netdata
     - role: dotfiles
       tags: dotfiles
+    - role: automatic-updates
+      tags:
+        - apt
+        - dnf
+        - updates

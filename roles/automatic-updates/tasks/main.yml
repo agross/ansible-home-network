@@ -1,0 +1,36 @@
+- name: Automatic updates (dnf)
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: Automatic updates (dnf)
+      ansible.builtin.include_role:
+        name: exploide.dnf-automatic
+      vars:
+        # We roll our own reboot behavior below.
+        dnf_automatic_reboot: false
+
+- name: Automatic updates (dnf)
+  when: ansible_os_family == 'RedHat' and dnf_automatic_reboot | default(false) | bool
+  block:
+    - name: Ensure dnf-automatic-install service override directory exists
+      ansible.builtin.file:
+        state: directory
+        path: /etc/systemd/system/dnf-automatic-install.service.d/
+        owner: 0
+        group: 0
+        mode: '755'
+
+    - name: Enable automatic reboot after upgrades
+      ansible.builtin.copy:
+        content: |
+          [Service]
+          ExecStartPost=/bin/bash -c 'dnf needs-restarting --reboothint || reboot'
+        dest: /etc/systemd/system/dnf-automatic-install.service.d/restart.conf
+        mode: '644'
+        owner: 0
+        group: 0
+      notify: Reload systemd
+
+- name: Automatic updates (apt)
+  when: ansible_os_family == 'Debian'
+  ansible.builtin.include_role:
+    name: hifis.unattended_upgrades

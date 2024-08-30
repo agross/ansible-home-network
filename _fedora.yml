@@ -9,5 +9,3 @@
       tags:
         - ntp
         - systemd-timesyncd
-    - role: exploide.dnf-automatic
-      tags: dnf-automatic

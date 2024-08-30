@@ -1,0 +1,6 @@
+# Install security updates at 3:00 + up to 30min, reboot immeditately if
+# required.
+unattended_systemd_timer_override: true
+unattended_apt_daily_upgrade_oncalendar: "*-*-* 3:30"
+unattended_apt_daily_upgrade_randomizeddelaysec: 10m
+unattended_automatic_reboot: true
