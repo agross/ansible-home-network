@@ -11,7 +11,7 @@ services:
     devices:
       - {{ dev.host }}:{{ dev.container }}:rw
     environment:
-      FIRMWARE_URL: https://github.com/Koenkk/Z-Stack-firmware/raw/master/coordinator/Z-Stack_3.x.0/bin/{{ dev.zigbee.firmware }}
+      FIRMWARE_URL: {{ dev.zigbee.firmware }}
     command:
       - -ewv
       - -p
