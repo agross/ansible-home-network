@@ -8,7 +8,10 @@ RUN apt-get update \
                --yes \
                --no-install-recommends \
                android-tools-adb \
+               dnsutils \
                iputils-ping \
+               iproute2 \
+               tcpdump \
                vim \
     && rm -rf /var/lib/apt/lists/* \
     && iobroker upgrade self
