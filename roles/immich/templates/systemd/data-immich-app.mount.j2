@@ -1,8 +1,5 @@
 [Unit]
 Description=Mount {{ root }}/app
-DefaultDependencies=no
-Conflicts=umount.target
-Before=local-fs.target umount.target
 
 [Mount]
 What=/fs/data/immich/app
