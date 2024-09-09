@@ -12,7 +12,7 @@ What={{ filesystem.what }}
 {% endif %}
 Where={{ filesystem.where }}
 
-{% if not automount %}
+{% if not automount and filesystem.install | default(false) | bool %}
 [Install]
 WantedBy=multi-user.target
 {% endif %}

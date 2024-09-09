@@ -1,0 +1,6 @@
+filesystems:
+  - what: /dev/disk/by-uuid/cf566ecd-74c7-4e4e-99f5-6a8f81851d3b
+    where: /fs/data
+    install: true
+  - what: /dev/disk/by-uuid/ae2de4ef-4c06-4f8d-8edc-84f40a26cb7d
+    where: /var/lib/docker
