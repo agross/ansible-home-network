@@ -4,8 +4,8 @@ filesystems:
       device: /dev/sda1
       password: none
       opts: discard,noauto,nofail
-    where: /home/agross/data-ssd
+    where: /home/agross/data/ssd
     automount: true
   - what: /dev/sdd1
-    where: /home/agross/data-nvme
+    where: /home/agross/data/nvme
     automount: true
