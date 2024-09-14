@@ -23,7 +23,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - mariadb:/var/lib/mysql
-      - ./backups:/backups:z
     healthcheck:
       test:
         - CMD

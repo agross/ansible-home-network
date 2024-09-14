@@ -8,8 +8,8 @@ target={{ root | ansible.builtin.quote }}/backups
 
 cleanup() {
   printf 'Cleaning up backup directory.\n'
-  # Directory needs to be kept because it is mounted on the MariaDB container.
-  rm -rf -- "$target"/*
+  rm -rf -- {{ root | ansible.builtin.quote }}/backups
+  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
 }
 
 db() {
