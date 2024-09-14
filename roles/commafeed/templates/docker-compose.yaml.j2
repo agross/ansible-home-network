@@ -1,0 +1,49 @@
+volumes:
+  mariadb:
+
+services:
+  db:
+    image: mariadb
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: true
+      MARIADB_DATABASE: commafeed
+      MARIADB_USER: commafeed
+      MARIADB_PASSWORD: commafeed
+      MARIADB_AUTO_UPGRADE: true
+      MARIADB_DISABLE_UPGRADE_BACKUP: true
+      # Create the mysql user with root permissions that is only able to connect
+      # via a Unix socket. Used for backups.
+      # docker exec --user mysql ...
+      MARIADB_MYSQL_LOCALHOST_USER: true
+      MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - mariadb:/var/lib/mysql
+    healthcheck:
+      test:
+        - CMD
+        - healthcheck.sh
+        - --su-mysql
+        - --connect
+        - --innodb_initialized
+      start_period: 5s
+      interval: 5s
+
+  app:
+    image: athou/commafeed:latest-mariadb
+    environment:
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:mariadb://db/commafeed?autoReconnect=true&failOverReadOnly=false&maxReconnects=20&rewriteBatchedStatements=true&t
+      QUARKUS_DATASOURCE_USERNAME: commafeed
+      QUARKUS_DATASOURCE_PASSWORD: commafeed
+
+      COMMAFEED_USERS_CREATE_DEMO_ACCOUNT: false
+      COMMAFEED_USERS_ALLOW_REGISTRATIONS: false
+      COMMAFEED_DATABASE_CLEANUP_MAX_FEED_CAPACITY: 1500
+    ports:
+      - 127.0.0.1:8082:8082
+    depends_on:
+      db:
+        condition: service_healthy
