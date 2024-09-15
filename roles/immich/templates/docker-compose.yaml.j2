@@ -2,9 +2,9 @@ services:
   server:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - ${UPLOAD_LOCATION}/library:/external
       - /etc/localtime:/etc/localtime:ro
+      - ./app:/usr/src/app/upload
+      - ./app/library:/external
       - ./immich-config.json:/immich-config.json:ro
     env_file:
       - .env
