@@ -2,25 +2,13 @@
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ commafeed_root }}"
     notify: Restart commafeed service
-
-- name: Set SELinux file contexts
-  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
-  vars:
-    directory: "{{ root }}/systemd"
-
-- name: Symlink systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/systemd/commafeed.service"
-    path: /etc/systemd/system/commafeed.service
-    force: true
-  notify: Restart commafeed service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
-    directory: "{{ root }}"
+    directory: "{{ commafeed_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify:
@@ -29,13 +17,21 @@
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/commafeed.yaml"
+    src: "{{ commafeed_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ commafeed_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart commafeed service
 
 - name: Start service
   ansible.builtin.systemd:
-    name: commafeed.service
     state: started
     enabled: true
+    name: "{{ item }}"
     daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
   register: commafeed_started
