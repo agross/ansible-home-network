@@ -15,7 +15,7 @@ location:
   # List of source directories to backup. Globs and tildes are expanded. Do not
   # backslash spaces in path names.
   source_directories: !retain
-    - {{ root }}/backups
+    - {{ ccu_root }}/backups
 
   # Only store/extract numeric user and group identifiers. Defaults to false.
   numeric_ids: true
@@ -60,7 +60,7 @@ hooks:
   # List of one or more shell commands or scripts to execute before creating a
   # backup, run once per repository.
   before_backup:
-    - {{ root }}/backup
+    - {{ ccu_root }}/backup
 
   # Configuration for a monitoring integration with Healthchecks. Create an
   # account at https://healthchecks.io (or self-host Healthchecks) if you'd like

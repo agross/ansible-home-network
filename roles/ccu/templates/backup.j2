@@ -6,7 +6,7 @@ set -euo pipefail
 cleanup() {
   printf 'Cleaning up backup directory.\n'
   # Directory needs to be kept because it is mounted on the CCU container.
-  rm -rf -- {{ root | ansible.builtin.quote }}/backups/*
+  rm -rf -- {{ ccu_root | ansible.builtin.quote }}/backups/*
 }
 
 ccu() {

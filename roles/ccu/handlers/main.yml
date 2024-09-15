@@ -4,5 +4,5 @@
 - name: Restart ccu service
   when: ccu_started is not changed
   ansible.builtin.systemd:
-    name: ccu
+    name: ccu.service
     state: restarted

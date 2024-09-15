@@ -21,34 +21,36 @@
     file: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ ccu_root }}"
     notify: Restart ccu service
-
-- name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
-  vars:
-    directory: "{{ root }}/systemd"
-    local_units: templates/systemd
-    notify: Restart ccu service
-
-- name: Symlink backup configuration
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
-    directory: "{{ root }}"
+    directory: "{{ ccu_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify:
       - Restart ccu service
 
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ ccu_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ ccu_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart ccu service
+
 - name: Start service
   ansible.builtin.systemd:
     state: started
     enabled: true
-    name: ccu.service
+    name: "{{ item }}"
     daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
   register: ccu_started
