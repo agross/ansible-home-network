@@ -60,15 +60,6 @@ netdata_config_files:
             conf_path: /data/dns-server/dnsmasq/dnsmasq.conf
             conf_dir: /data/dns-server/dnsmasq/conf.d
 
-    mysql.conf:
-      block:
-        jobs:
-          - name: teamcity
-            dsn: "root:{{ vault_netdata_mysql_teamcity_password }}@tcp(127.0.0.1:33308)/"
-
-          - name: commafeed
-            dsn: "root:{{ vault_netdata_mysql_commafeed_password }}@tcp(127.0.0.1:33309)/"
-
     vsphere.conf:
       block:
         jobs:
