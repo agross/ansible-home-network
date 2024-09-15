@@ -5,7 +5,7 @@ After=docker.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]
-WorkingDirectory={{ root }}
+WorkingDirectory={{ feedr_root }}
 
 ExecStartPre=/usr/bin/docker compose config
 ExecStart=/usr/bin/docker compose up
