@@ -1,0 +1,14 @@
+[Unit]
+Description=HBCI/FinTS updater
+BindsTo=banking.service
+
+[Timer]
+OnCalendar=10:00:00
+OnCalendar=15:00:00
+OnCalendar=18:00:00
+# Catch up when an invocation was missed.
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

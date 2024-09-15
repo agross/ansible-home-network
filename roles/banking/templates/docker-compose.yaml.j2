@@ -1,0 +1,49 @@
+volumes:
+  mariadb:
+
+services:
+  db:
+    image: mariadb:latest
+    ports:
+      - 172.16.0.3:3306:3306
+    environment:
+      MARIADB_ROOT_PASSWORD: {{ banking_mariadb_root_password }}
+      MARIADB_DATABASE: finance
+      MARIADB_USER: finance
+      MARIADB_PASSWORD: {{ banking_mariadb_finance_password }}
+      MARIADB_AUTO_UPGRADE: true
+      MARIADB_DISABLE_UPGRADE_BACKUP: true
+      # Create the mysql user with root permissions that is only able to connect
+      # via a Unix socket. Used for backups.
+      # docker exec --user mysql ...
+      MARIADB_MYSQL_LOCALHOST_USER: true
+      MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mariadb/init:/docker-entrypoint-initdb.d:ro
+      - mariadb:/var/lib/mysql
+    healthcheck:
+      test:
+        - CMD
+        - healthcheck.sh
+        - --su-mysql
+        - --connect
+        - --innodb_initialized
+      start_period: 5s
+      interval: 5s
+
+  app:
+    image: ghcr.io/nafets227/finance:1.1.1
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: finance
+      MYSQL_USER: finance
+      MYSQL_PASSWORD: {{ banking_mariadb_finance_password }}
+    volumes:
+      - ./app/data:/finance
+      - ./app/.hbci-pinfile:/finance/.hbci-pinfile:ro
+    profiles:
+      - update
+    depends_on:
+      db:
+        condition: service_healthy

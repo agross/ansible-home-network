@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+target={{ banking_root | ansible.builtin.quote }}/backups
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+  rm -rf -- "$target"
+  mkdir --parents -- "$target"
+}
+
+db() {
+  local -a exec=(docker compose exec --user mysql db)
+
+  mapfile -t dbs < <("${exec[@]}" mariadb --execute 'show databases' \
+                                          --silent \
+                                          --skip-column-names)
+
+  for db in "${dbs[@]}"; do
+    if [[ "$db" == information_schema ]] || \
+       [[ "$db" == performance_schema ]] || \
+       [[ "$db" == sys ]]; then
+      continue
+    fi
+
+    printf 'Backing up database: %s\n' "$db"
+
+    # https://serversforhackers.com/c/mysqldump-with-modern-mysql
+    "${exec[@]}" mariadb-dump --skip-lock-tables \
+                              --single-transaction \
+                              "$db" > "$target/$db.sql"
+  done
+
+  "${exec[@]}" mariadb-optimize --all-databases
+}
+
+clean-logs() {
+  find {{ banking_root | ansible.builtin.quote }}/app/data/.aqbanking \
+       -type f \
+       -name '*.log' \
+       -mtime +14 \
+       -delete
+
+  find {{ banking_root | ansible.builtin.quote }}/app/data/.aqbanking \
+       -type d \
+       -empty \
+       -delete
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+db
+clean-logs

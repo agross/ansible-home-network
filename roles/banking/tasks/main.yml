@@ -1,0 +1,42 @@
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ banking_root }}"
+    notify: Restart banking service
+    files:
+      app/.hbci-pinfile:
+        owner: 1000
+        group: 1000
+        mode: '440'
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ banking_root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart banking service
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ banking_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ banking_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart banking service
+
+- name: Start systemd units
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: banking_started

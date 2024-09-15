@@ -109,3 +109,7 @@
       tags:
         - commafeed
         - container
+    - role: banking
+      tags:
+        - banking
+        - container

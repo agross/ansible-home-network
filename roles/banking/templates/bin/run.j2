@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+printf 'Info:\nhttps://www.aquamaniac.de/rdm/projects/aqbanking/wiki/SetupPinTan\n'
+
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+
+docker compose \
+       run \
+       --interactive \
+       --entrypoint bash \
+       --user finance \
+       --rm \
+       app

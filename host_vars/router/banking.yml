@@ -1,0 +1,2 @@
+banking_mariadb_root_password: "{{ vault_banking_mariadb_root_password }}"
+banking_mariadb_finance_password: "{{ vault_banking_mariadb_finance_password }}"
