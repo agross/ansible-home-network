@@ -3,39 +3,38 @@
 
 set -euo pipefail
 
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+target={{ freshrss_root | ansible.builtin.quote }}/backups
+
 cleanup() {
   printf 'Cleaning up backup directory.\n'
-  rm -rf -- {{ root | ansible.builtin.quote }}/backups
-  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
+  rm -rf -- "$target"
+  mkdir --parents -- "$target"
 }
 
 db() {
   docker compose \
-         --project-name {{ ansible_role_name | ansible.builtin.quote }} \
          exec \
          db \
          pg_dumpall \
          --username=freshrss \
-    > {{ root | ansible.builtin.quote }}/backups/db.sql
+    > "$target/db.sql"
 }
 
 data() {
-  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
-
   docker compose \
-         --project-name {{ ansible_role_name | ansible.builtin.quote }} \
          cp \
          --archive \
          app:/var/www/FreshRSS/data \
-         {{ root | ansible.builtin.quote }}/backups/data
+         "$target/data"
 
-  find {{ root | ansible.builtin.quote }}/backups/data \
+  find "$target/data" \
        -type f \
        -name 'log*.txt' \
        -delete
 
-  rm -rf -- {{ root | ansible.builtin.quote }}/backups/data/cache \
-            {{ root | ansible.builtin.quote }}/backups/data/favicons
+  rm -rf -- "$target/data/cache" \
+            "$target/data/favicons"
 }
 
 trap cleanup ERR SIGINT SIGTERM

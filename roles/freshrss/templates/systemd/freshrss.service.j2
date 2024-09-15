@@ -3,10 +3,9 @@ Description=FreshRSS
 BindsTo=docker.service
 After=docker.service
 OnFailure=unit-status-mail@%n.service
-RequiresMountsFor={{ root }}/app
 
 [Service]
-WorkingDirectory={{ root }}
+WorkingDirectory={{ freshrss_root }}
 
 ExecStartPre=/usr/bin/docker compose config
 ExecStart=/usr/bin/docker compose up

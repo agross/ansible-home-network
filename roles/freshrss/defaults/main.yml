@@ -1,1 +1,1 @@
-root: "/data/{{ ansible_role_name }}"
+freshrss_root: /data/freshrss
