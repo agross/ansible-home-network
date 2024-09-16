@@ -3,7 +3,7 @@
   ansible.builtin.import_tasks:
     file: copy-templates.yml
   vars:
-    root: /etc/udev/rules.d
+    target: /etc/udev/rules.d
     directory: ../templates
 
 - name: Ensure fstrim service override directory exists
