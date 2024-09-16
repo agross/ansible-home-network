@@ -3,12 +3,13 @@
     file: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ netdata_root }}"
     notify: Restart netdata service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
-    directory: "{{ root }}/systemd"
+    directory: "{{ netdata_root }}/systemd"
     local_units: templates/systemd
     notify: Restart netdata service
 
@@ -17,7 +18,7 @@
   ansible.builtin.import_tasks:
     file: docker-compose-update.yml
   vars:
-    directory: "{{ root }}"
+    directory: "{{ netdata_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify: Restart netdata service

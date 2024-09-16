@@ -5,8 +5,7 @@ After=docker.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]
-WorkingDirectory={{ root }}
-Environment=COMPOSE_PROJECT_NAME='%p'
+WorkingDirectory={{ netdata_root }}
 
 ExecStartPre=/bin/sh -c \
                      'systemctl set-environment \
