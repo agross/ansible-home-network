@@ -1,4 +1,4 @@
-root: /data/iobroker
+iobroker_root: /data/iobroker
 
 iobroker_image: buanet/iobroker:custom
 

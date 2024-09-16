@@ -5,7 +5,7 @@
     state: reloaded
 
 - name: Restart iobroker healthcheck timer
-  when: iobroker_healthcheck_started is not changed
+  when: iobroker_started is not changed
   ansible.builtin.systemd:
     name: iobroker-healthcheck.timer
     state: restarted

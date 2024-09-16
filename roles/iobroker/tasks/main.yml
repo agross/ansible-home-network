@@ -3,6 +3,7 @@
     file: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ iobroker_root }}"
     notify:
       - Restart iobroker service
       - Restart iobroker healthcheck timer
@@ -37,7 +38,7 @@
 - name: Allow execution of the healthcheck script
   when: ansible_selinux.status != 'disabled'
   community.general.sefcontext:
-    target: "{{ root }}/healthcheck"
+    target: "{{ iobroker_ }}/healthcheck"
     setype: bin_t
     state: present
 
@@ -47,30 +48,20 @@
     argv:
       - restorecon
       - -iv
-      - "{{ root }}/healthcheck"
+      - "{{ iobroker_root }}/healthcheck"
   register: restorecon_result
   changed_when: restorecon_result.stdout | length > 0
-
-- name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
-  vars:
-    directory: "{{ root }}/systemd"
-    local_units: templates/systemd
-    notify:
-      - Restart iobroker service
-      - Restart iobroker healthcheck timer
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
     file: docker-compose-update.yml
   vars:
-    directory: "{{ root }}"
+    directory: "{{ iobroker_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify:
       - Restart iobroker service
-      - Restart iobroker healthcheck timer
 
 - name: Add vm.overcommit_memory sysctl for Redis
   ansible.posix.sysctl:
@@ -84,21 +75,23 @@
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/iobroker.yaml"
+    src: "{{ iobroker_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ iobroker_root }}/systemd"
+    local_units: templates/systemd
+    notify:
+      - Restart iobroker service
+      - Restart iobroker healthcheck timer
 
 - name: Start service
   ansible.builtin.systemd:
-    name: iobroker.service
     state: started
     enabled: true
+    name: "{{ item }}"
     daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
   register: iobroker_started
-
-- name: Start healthcheck timer
-  ansible.builtin.systemd:
-    name: iobroker-healthcheck.timer
-    state: started
-    enabled: true
-    daemon_reload: true
-  register: iobroker_healthcheck_started

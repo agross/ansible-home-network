@@ -4,7 +4,7 @@ BindsTo=iobroker.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]
-ExecStart={{ root }}/healthcheck
+ExecStart={{ iobroker_root }}/healthcheck
 
 [Install]
 WantedBy=multi-user.target
