@@ -8,6 +8,7 @@
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ traefik_root }}"
     notify: Restart traefik service
     files:
       systemd/traefik.service.j2:
@@ -20,17 +21,10 @@
     file: file-permissions.yml
   vars:
     files:
-      - path: "{{ root }}/conf/acme/trs-dns.json"
+      - path: "{{ traefik_root }}/conf/acme/trs-dns.json"
         mode: '600'
-      - path: "{{ root }}/conf/acme/trs-dns-staging.json"
+      - path: "{{ traefik_root }}/conf/acme/trs-dns-staging.json"
         mode: '600'
-
-- name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
-  vars:
-    directory: "{{ root }}/systemd"
-    local_units: templates/systemd
-    notify: Restart traefik service
 
 - name: Pull Traefik image
   community.docker.docker_image:
@@ -38,6 +32,13 @@
     source: pull
     force_source: "{{ docker_update is defined }}"
   notify: Restart traefik service
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ traefik_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart traefik service
 
 - name: Start systemd units
   ansible.builtin.systemd:

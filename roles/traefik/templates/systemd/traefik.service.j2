@@ -29,16 +29,16 @@ ExecStart=/usr/bin/docker container \
                           --volume /var/run/docker.sock:/var/run/docker.sock:z \
                           --privileged \
                           --volume '/etc/localtime:/etc/localtime:ro' \
-                          --volume '{{ root }}/conf/acme/:/etc/traefik/acme/' \
-                          --volume '{{ root }}/conf/traefik.yaml:/etc/traefik/traefik.yaml:ro' \
+                          --volume '{{ traefik_root }}/conf/acme/:/etc/traefik/acme/' \
+                          --volume '{{ traefik_root }}/conf/traefik.yaml:/etc/traefik/traefik.yaml:ro' \
                           --volume '{{ traefik_dynamic_file_configuration }}:/etc/traefik/conf.d/:ro' \
                           --env 'LEGO_DISABLE_CNAME_SUPPORT=true' \
-                          --env 'INWX_USERNAME={{ inwx.acme.username | mandatory }}' \
-                          --env 'INWX_PASSWORD={{ inwx.acme.password | mandatory }}' \
+                          --env 'INWX_USERNAME={{ inwx.acme.username | ansible.builtin.mandatory }}' \
+                          --env 'INWX_PASSWORD={{ inwx.acme.password | ansible.builtin.mandatory }}' \
                           --env 'INWX_PROPAGATION_TIMEOUT=0' \
                           --add-host=host.docker.internal:host-gateway \
                           --health-cmd 'traefik healthcheck' \
-                          {{ traefik_image | mandatory | quote }}
+                          {{ traefik_image | ansible.builtin.mandatory | ansible.builtin.quote }}
 
 ExecStop=/usr/bin/docker container stop '%p'
 
