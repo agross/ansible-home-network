@@ -23,8 +23,8 @@ ExecStart=/usr/bin/docker container \
                           --health-interval 5s \
                           --health-start-period 5s \
                           --publish 1883:1883 \
-                          --volume '{{ root }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro' \
-                          --volume '{{ root }}/mosquitto/auth:/mosquitto/config/auth:ro' \
+                          --volume '{{ mqtt_root }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro' \
+                          --volume '{{ mqtt_root }}/mosquitto/auth:/mosquitto/config/auth:ro' \
                           --volume '%p_data:/mosquitto/data' \
                           --volume '%p_log:/mosquitto/log' \
                           {{ mqtt_image | ansible.builtin.quote }}

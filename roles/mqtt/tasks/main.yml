@@ -13,6 +13,7 @@
     file: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ mqtt_root }}"
     notify: Restart mqtt service
     files:
       mosquitto/mosquitto.conf.j2:
@@ -30,7 +31,7 @@
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
-    directory: "{{ root }}/systemd"
+    directory: "{{ mqtt_root }}/systemd"
     local_units: templates/systemd
     notify: Restart mqtt service
 
@@ -40,7 +41,7 @@
     source: build
     force_source: true
     build:
-      path: "{{ root }}/mosquitto"
+      path: "{{ mqtt_root }}/mosquitto"
       pull: true
   notify: Restart mqtt service
 

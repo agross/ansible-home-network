@@ -1,4 +1,4 @@
-root: /data/mqtt
+mqtt_root: /data/mqtt
 
 mqtt_image: eclipse-mosquitto:with-clients
 
