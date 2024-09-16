@@ -3,13 +3,13 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME=vaultwarden
-target={{ root | ansible.builtin.quote }}/backups
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+target={{ vaultwarden_root | ansible.builtin.quote }}/backups
 
 cleanup() {
   printf 'Cleaning up backup directory.\n'
-  rm -rf -- {{ root | ansible.builtin.quote }}/backups
-  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
+  rm -rf -- "$target"
+  mkdir --parents -- "$target"
 }
 
 db() {

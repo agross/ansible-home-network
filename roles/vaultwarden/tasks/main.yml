@@ -2,6 +2,7 @@
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ vaultwarden_root }}"
     notify: Restart vaultwarden service
     files:
       .env.vaultwarden.j2:
@@ -9,47 +10,42 @@
         group: 0
         mode: '600'
 
-- name: Set SELinux file contexts
-  ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
-  vars:
-    directory: "{{ root }}/systemd"
-
-- name: Symlink systemd unit file
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/systemd/vaultwarden.service"
-    path: /etc/systemd/system/vaultwarden.service
-    force: true
-  notify: Restart vaultwarden service
-
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
-    directory: "{{ root }}"
+    directory: "{{ vaultwarden_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify:
       - Restart vaultwarden service
 
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ vaultwarden_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
 - name: Ensure the app data directory exists and is accessible by Vaultwarden
   ansible.builtin.file:
-    path: "{{ root }}/app"
+    path: "{{ vaultwarden_root }}/app"
     state: directory
     mode: ug-x,ug=rwX,o-rwx
     owner: "{{ vaultwarden_uid_gid }}"
     group: "{{ vaultwarden_uid_gid }}"
     recurse: true
 
-- name: Symlink backup configuration
-  ansible.builtin.file:
-    state: link
-    src: "{{ root }}/backup.yaml"
-    path: "/etc/borgmatic.d/vaultwarden.yaml"
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ vaultwarden_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart vaultwarden service
 
 - name: Start service
   ansible.builtin.systemd:
-    name: vaultwarden.service
     state: started
     enabled: true
+    name: "{{ item }}"
     daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
   register: vaultwarden_started
