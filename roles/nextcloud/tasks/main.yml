@@ -94,7 +94,7 @@
   ansible.builtin.file:
     state: link
     src: "{{ nextcloud_root }}/backup.yaml"
-    path: "/etc/borgmatic.d/nextcloud.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml

@@ -6,8 +6,6 @@ OnFailure=unit-status-mail@%n.service
 RequiresMountsFor={{ nextcloud_root }}/app {{ nextcloud_root }}/backups
 
 [Service]
-Environment=COMPOSE_PROJECT_NAME=%p
-
 WorkingDirectory={{ nextcloud_root }}
 
 ExecStartPre=/usr/bin/docker compose config

@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME=nextcloud
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
 
 occ=(docker compose exec --user www-data app php occ)
 target={{ nextcloud_root | ansible.builtin.quote }}/backups
