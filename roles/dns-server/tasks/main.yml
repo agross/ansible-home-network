@@ -2,18 +2,20 @@
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ dns_server_root }}"
     notify: Restart dns-server service
 
 - name: Copy templates for {{ inventory_hostname }}
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: "templates/dns-server/{{ inventory_hostname }}"
+    target: "{{ dns_server_root }}"
     notify: Restart dns-server service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
-    directory: "{{ root }}/systemd"
+    directory: "{{ dns_server_root }}/systemd"
     local_units: templates/systemd
     notify: Restart dns-server service
 
@@ -33,7 +35,7 @@
 
 - name: Create dnsmasq.leases unless it exists
   ansible.builtin.file:
-    path: "{{ root }}/dnsmasq/dnsmasq.leases"
+    path: "{{ dns_server_root }}/dnsmasq/dnsmasq.leases"
     state: touch
     access_time: preserve
     modification_time: preserve
@@ -44,7 +46,7 @@
 
 - name: Change ownership of dnscrypt-proxy directory to nobody:nogroup
   ansible.builtin.file:
-    path: "{{ root }}/dnscrypt-proxy"
+    path: "{{ dns_server_root }}/dnscrypt-proxy"
     owner: 65534
     group: 65533
     recurse: true
@@ -62,7 +64,7 @@
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
-    directory: "{{ root }}"
+    directory: "{{ dns_server_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify:

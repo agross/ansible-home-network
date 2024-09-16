@@ -1,4 +1,4 @@
-root: /data/dns-server
+dns_server_root: /data/dns-server
 
 dns_server_firewalld: []
 
