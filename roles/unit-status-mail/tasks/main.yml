@@ -55,7 +55,7 @@
   ansible.builtin.git:
     repo: https://github.com/agross/systemd-unit-status-mail.git
     version: master
-    dest: "{{ root }}"
+    dest: "{{ unit_status_mail_root }}"
     force: true
 
 - name: Install SELinux packages
@@ -68,7 +68,7 @@
 - name: Allow execution of the unit-status-mail script
   when: ansible_selinux.status != 'disabled'
   community.general.sefcontext:
-    target: "{{ root }}/unit-status-mail"
+    target: "{{ unit_status_mail_root }}/unit-status-mail"
     setype: bin_t
     state: present
 
@@ -78,7 +78,7 @@
     argv:
       - restorecon
       - -irv
-      - "{{ root }}"
+      - "{{ unit_status_mail_root }}"
   register: restorecon_result
   changed_when: restorecon_result.stdout | length > 0
 
@@ -95,7 +95,7 @@
       After=network.target
 
       [Service]
-      ExecStart={{ root | ansible.builtin.quote }}/unit-status-mail %i \
+      ExecStart={{ unit_status_mail_root | ansible.builtin.quote }}/unit-status-mail %i \
                                                    root \
                                                    'Hostname: %H' \
                                                    'Machine ID: %m' \
