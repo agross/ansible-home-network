@@ -22,7 +22,7 @@
 - name: Fail if the OTA URL is invalid
   when: not tasmota_upgrade_url is url
   ansible.builtin.fail:
-    msg: "{{ tasmota_upgrade_url  }} is not a valid URL"
+    msg: "{{ tasmota_upgrade_url }} is not a valid URL"
 
 - name: Set upgrade URL
   when: original_ota_url.json.OtaUrl != tasmota_upgrade_url
