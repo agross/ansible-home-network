@@ -5,7 +5,7 @@
 # have a constant named "hostname" with the value "myhostname", then the string
 # "{hostname}" will be replaced with "myhostname" in the configuration file.
 constants:
-  name: logger
+  name: {{ ansible_role_name }}
 
 # Where to look for files to backup, and where to store those backups.
 # See https://borgbackup.readthedocs.io/en/stable/quickstart.html and
@@ -15,7 +15,7 @@ location:
   # List of source directories to backup. Globs and tildes are expanded. Do not
   # backslash spaces in path names.
   source_directories: !retain
-    - {{ root }}/backups
+    - {{ logger_root }}/backups
 
   # Only store/extract numeric user and group identifiers. Defaults to false.
   numeric_ids: true
@@ -65,7 +65,7 @@ hooks:
   # List of one or more shell commands or scripts to execute before creating a
   # backup, run once per repository.
   before_backup:
-    - {{ root }}/backup
+    - {{ logger_root }}/backup
 
   # Configuration for a monitoring integration with Healthchecks. Create an
   # account at https://healthchecks.io (or self-host Healthchecks) if you'd like

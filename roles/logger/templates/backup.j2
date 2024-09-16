@@ -6,10 +6,10 @@ set -euo pipefail
 cleanup() {
   printf 'Cleaning up InfluxDB backup directory.\n'
   # Directory needs to be kept because it is mounted on the InfluxDB container.
-  rm -rf -- {{ root | ansible.builtin.quote }}/backups/influxdb/*
+  rm -rf -- {{ logger_root | ansible.builtin.quote }}/backups/influxdb/*
 
   printf 'Cleaning up Grafana backup directory.\n'
-  rm -rf -- {{ root | ansible.builtin.quote }}/backups/grafana
+  rm -rf -- {{ logger_root | ansible.builtin.quote }}/backups/grafana
 }
 
 influxdb() {
@@ -58,7 +58,7 @@ grafana() {
   local image='ysde/docker-grafana-backup-tool'
   {% endif %}
 
-  local target={{ root | ansible.builtin.quote }}/backups/grafana
+  local target={{ logger_root | ansible.builtin.quote }}/backups/grafana
 
   mkdir --parents -- "$target"
   chown 1337:1337 -- "$target"

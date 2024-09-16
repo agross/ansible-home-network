@@ -5,8 +5,7 @@ After=docker.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]
-WorkingDirectory={{ root }}
-Environment=COMPOSE_PROJECT_NAME='%p'
+WorkingDirectory={{ logger_root }}
 
 ExecStartPre=/usr/bin/docker compose config
 ExecStart=/usr/bin/docker compose up

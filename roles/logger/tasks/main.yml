@@ -13,6 +13,7 @@
     file: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ logger_root }}"
     notify: Restart logger service
     files:
       backup.j2:
@@ -24,19 +25,12 @@
         owner: 999
         mode: '460'
 
-- name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
-  vars:
-    directory: "{{ root }}/systemd"
-    local_units: templates/systemd
-    notify: Restart logger service
-
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
     file: docker-compose-update.yml
   vars:
-    directory: "{{ root }}"
+    directory: "{{ logger_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
     notify: Restart logger service
@@ -44,18 +38,25 @@
 - name: Symlink InfluxDB rename script
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/bin/influx-rename"
+    src: "{{ logger_root }}/bin/influx-rename"
     path: /usr/local/bin/influx-rename
 
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/backup.yaml"
-    path: /etc/borgmatic.d/logger.yaml
+    src: "{{ logger_root }}/backup.yaml"
+    path: /etc/borgmatic.d/{{ ansible_role_name }}.yaml
 
 - name: Update InfluxDB 1 to 2
   ansible.builtin.import_tasks:
     file: influxdb-upgrade-1-to-2.yml
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ logger_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart logger service
 
 - name: Start systemd units
   ansible.builtin.systemd:

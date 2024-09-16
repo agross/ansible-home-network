@@ -1,4 +1,4 @@
-root: /data/logger
+logger_root: /data/logger
 
 influxdb_init_user: admin
 influxdb_init_password:
