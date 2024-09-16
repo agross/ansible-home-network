@@ -3,19 +3,21 @@
 
 set -euo pipefail
 
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+target={{ harbor_root | ansible.builtin.quote }}/backups
+
 cleanup() {
   printf 'Cleaning up backup directory.\n'
-  rm -rf -- {{ root | ansible.builtin.quote }}/backups
-  mkdir --parents -- {{ root | ansible.builtin.quote }}/backups
+  rm -rf -- "$target"
+  mkdir --parents -- "$target"
 }
 
 db() {
   docker compose \
-         --project-name harbor \
          exec \
          postgresql \
          pg_dumpall \
-    > {{ root | ansible.builtin.quote }}/backups/db.sql
+    > "$target/db.sql"
 }
 
 trap cleanup ERR SIGINT SIGTERM

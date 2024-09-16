@@ -2,17 +2,18 @@
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
+    target: "{{ harbor_root }}"
     notify: Restart harbor service
 
 - name: Set SELinux file contexts
   ansible.builtin.import_tasks: systemd-unit-file-contexts.yml
   vars:
-    directory: "{{ root }}/systemd"
+    directory: "{{ harbor_root }}/systemd"
 
 - name: Symlink systemd unit file
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/systemd/harbor.service"
+    src: "{{ harbor_root }}/systemd/harbor.service"
     path: /etc/systemd/system/harbor.service
     force: true
   notify: Restart harbor service
@@ -20,8 +21,8 @@
 - name: Symlink systemd mount file
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/systemd/data-harbor-app.mount"
-    path: "/etc/systemd/system/data-harbor-app.mount"
+    src: "{{ harbor_root }}/systemd/data-harbor-app.mount"
+    path: /etc/systemd/system/data-harbor-app.mount
     force: true
   notify: Restart harbor service
 
@@ -151,7 +152,7 @@
 
 - name: Ensure environment files can be read by systemd
   community.general.sefcontext:
-    target: "{{ root }}/(.*\\/)?\\.env.*"
+    target: "{{ harbor_root }}/(.*\\/)?\\.env.*"
     setype: systemd_unit_file_t
     state: present
 
@@ -160,14 +161,14 @@
     argv:
       - restorecon
       - -iRv
-      - "{{ root }}"
+      - "{{ harbor_root }}"
   register: restorecon_result
   changed_when: restorecon_result.stdout | length > 0
 
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
-    src: "{{ root }}/backup.yaml"
+    src: "{{ harbor_root }}/backup.yaml"
     path: "/etc/borgmatic.d/harbor.yaml"
 
 - name: Start service

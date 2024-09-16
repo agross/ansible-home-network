@@ -5,7 +5,7 @@
 # have a constant named "hostname" with the value "myhostname", then the string
 # "{hostname}" will be replaced with "myhostname" in the configuration file.
 constants:
-  name: harbor
+  name: {{ ansible_role_name }}
 
 # Where to look for files to backup, and where to store those backups.
 # See https://borgbackup.readthedocs.io/en/stable/quickstart.html and
@@ -15,8 +15,8 @@ location:
   # List of source directories to backup. Globs and tildes are expanded. Do not
   # backslash spaces in path names.
   source_directories: !retain
-    - {{ root }}/backups
-    - {{ root }}/app
+    - {{ harbor_root }}/backups
+    - {{ harbor_root }}/app
 
   # Only store/extract numeric user and group identifiers. Defaults to false.
   numeric_ids: true
@@ -40,9 +40,9 @@ location:
   # or be an absolute path. Do not backslash spaces in path names. See the
   # output of "borg help patterns" for more details.
   exclude_patterns:
-    - {{ root }}/app/database
-    - {{ root }}/app/job_logs
-    - {{ root }}/app/trivy-adapter
+    - {{ harbor_root }}/app/database
+    - {{ harbor_root }}/app/job_logs
+    - {{ harbor_root }}/app/trivy-adapter
 
   # If true, the exclude_if_present filename is included in backups. Defaults to
   # false, meaning that the exclude_if_present filename is omitted from backups.
@@ -64,7 +64,7 @@ hooks:
   # List of one or more shell commands or scripts to execute before creating a
   # backup, run once per repository.
   before_backup:
-    - {{ root }}/backup
+    - {{ harbor_root }}/backup
 
   # Configuration for a monitoring integration with Healthchecks. Create an
   # account at https://healthchecks.io (or self-host Healthchecks) if you'd like

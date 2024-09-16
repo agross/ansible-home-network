@@ -1,8 +1,8 @@
 [Unit]
-Description=Mount {{ root }}/app
+Description=Mount {{ harbor_root }}/app
 
 [Mount]
 What=/fs/data/harbor/app
-Where={{ root }}/app
+Where={{ harbor_root }}/app
 Type=none
 Options=bind
