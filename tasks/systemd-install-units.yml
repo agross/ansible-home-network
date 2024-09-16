@@ -24,10 +24,22 @@
   ansible.builtin.set_fact:
     systemd_units_autostart: >-
       {{
-        systemd_units |
-          reject('regex', '-backup\.service$') |
-          reject('regex', '\.mount$')
+        systemd_units_autostart_yaml |
+        ansible.builtin.from_yaml |
+        default ([], true) |
+        reject('regex', '\.mount$')
       }}
+  vars:
+    # Reject service units that have a timer unit with the same name.
+    systemd_units_autostart_yaml: |
+      ---
+      {% for unit in systemd_units | default([]) %}
+      {% set is_service = unit is ansible.builtin.regex('\.service$') %}
+      {% set has_timer = systemd_units is ansible.builtin.contains(unit | ansible.builtin.regex_replace('\.service$', '.timer')) %}
+      {% if not (is_service and has_timer) %}
+      - {{ unit }}
+      {% endif %}
+      {% endfor %}
 
 - name: Symlink systemd units
   ansible.builtin.file:
