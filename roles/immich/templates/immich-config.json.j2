@@ -1,11 +1,11 @@
 {
   "ffmpeg": {
-    "crf": 23,
-    "threads": 10,
+    "crf": 28,
+    "threads": 8,
     "preset": "medium",
-    "targetVideoCodec": "h264",
+    "targetVideoCodec": "hevc",
     "acceptedVideoCodecs": [
-      "h264"
+      "hevc"
     ],
     "targetAudioCodec": "aac",
     "acceptedAudioCodecs": [
@@ -19,7 +19,7 @@
       "webm"
     ],
     "targetResolution": "original",
-    "maxBitrate": "0",
+    "maxBitrate": "12000000",
     "bframes": -1,
     "refs": 0,
     "gopSize": 0,
@@ -28,7 +28,7 @@
     "cqMode": "auto",
     "twoPass": true,
     "preferredHwDevice": "auto",
-    "transcode": "all",
+    "transcode": "bitrate",
     "tonemap": "mobius",
     "accel": "disabled",
     "accelDecode": false
