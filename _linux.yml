@@ -15,6 +15,9 @@
       tags: watchdog
     - role: kernel-cmdline
       tags: kernel-cmdline
+    - role: geerlingguy.swap
+      when: swap_managed | default(false)
+      tags: swapfile
     - role: fstrim
       tags: fstrim
     - role: filesystem
