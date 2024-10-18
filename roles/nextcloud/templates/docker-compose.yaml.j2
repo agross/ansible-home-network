@@ -8,7 +8,7 @@ networks:
 
 services:
   db:
-    image: mariadb:latest
+    image: mariadb:lts
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
 
     environment:
