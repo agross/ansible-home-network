@@ -5,7 +5,7 @@
   # Run each host as fast as possible.
   strategy: free # noqa run-once[play]
   vars:
-    fedora_release: 40
+    fedora_release: 41
   tasks:
     - name: Skip host unless it is Fedora
       when: ansible_distribution != 'Fedora'
