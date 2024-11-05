@@ -1,0 +1,13 @@
+<?php
+$CONFIG = array (
+  'mail_smtpmode' => 'smtp',
+  'mail_from_address' => 'nextcloud',
+  'mail_domain' => '{{ nextcloud_smtp_user | split('@', 1) | last }}',
+  'mail_smtphost' => 'smtp-relay.gmail.com',
+  'mail_smtpport' => '587',
+  'mail_smtpsecure' => 'tls',
+  'mail_smtpauthtype' => 'LOGIN',
+  'mail_smtpauth' => true,
+  'mail_smtpname' => '{{ nextcloud_smtp_user | ansible.builtin.mandatory }}',
+  'mail_smtppassword' => '{{ nextcloud_smtp_password | ansible.builtin.mandatory }}',
+);
