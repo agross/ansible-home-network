@@ -16,6 +16,8 @@
         name: dnf5-automatic.timer
 
 - name: Automatic updates (apt)
-  when: ansible_os_family == 'Debian'
+  when: >-
+    ansible_os_family == 'Debian'
+    and not ansible_virtualization_role == 'host'
   ansible.builtin.include_role:
     name: hifis.unattended_upgrades
