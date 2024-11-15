@@ -8,5 +8,8 @@
       tags: docker
     - role: devsec.hardening.ssh_hardening
       tags: ssh
-    - role: exploide.dnf-automatic
-      tags: dnf-automatic
+    - role: automatic-updates
+      tags:
+        - apt
+        - dnf
+        - updates

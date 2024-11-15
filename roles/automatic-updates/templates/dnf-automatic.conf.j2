@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+# https://dnf5.readthedocs.io/en/latest/dnf5_plugins/automatic.8.html
+
+[commands]
+apply_updates = {{ dnf_automatic_apply_updates | default(true) }}
+download_updates = {{ dnf_automatic_download_updates | default(true) }}
+network_online_timeout = {{ dnf_automatic_network_online_timeout | default(60) }}
+random_sleep = {{ dnf_automatic_random_sleep | default(0) }}
+upgrade_type = {{ dnf_automatic_upgrade_type | default('default') }}
+reboot = {{ dnf_automatic_reboot | default('never') }}

@@ -1,6 +1,3 @@
+# https://dnf5.readthedocs.io/en/latest/dnf5_plugins/automatic.8.html#commands-section
 dnf_automatic_upgrade_type: security
-dnf_automatic_emit_via: stdio
-dnf_automatic_email_to: root
-dnf_automatic_random_sleep: 0
-
-dnf_automatic_reboot: true
+dnf_automatic_reboot: when-needed
