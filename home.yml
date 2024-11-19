@@ -22,7 +22,7 @@
   tags: linux
   ansible.builtin.import_playbook: _linux.yml
   vars:
-    playbook_hosts: home:&linux
+    playbook_hosts: home:&linux:!synology
 
 - name: Import Fedora configuration playbook
   tags: fedora

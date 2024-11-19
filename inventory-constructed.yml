@@ -26,6 +26,11 @@ groups:
   raspi: >-
     'snd_bcm2835.enable_hdmi' in ansible_cmdline
 
+  synology: >-
+    ansible_system == 'Linux' and
+    ansible_distribution == 'OtherLinux' and
+    ansible_devices.synoboot.vendor == 'Synology'
+
   build_agents: >-
     inventory_hostname is match("agent-*")
 
