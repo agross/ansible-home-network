@@ -11,7 +11,7 @@
     - role: watchdog
       when: >-
         ansible_virtualization_role == 'guest' or
-        "'raspi' in group_names"
+        'raspi' in group_names
       tags: watchdog
     - role: kernel-cmdline
       tags: kernel-cmdline
