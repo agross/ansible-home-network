@@ -140,6 +140,9 @@ filters:
 whitelist_filters: []
 user_rules:
   - '@@||localhost^$important'
+  {% for domain in ipv6_blocked_domains | default([]) %}
+  - '||{{ domain }}^$dnstype=AAAA'
+  {% endfor %}
 dhcp:
   enabled: false
   interface_name: ""

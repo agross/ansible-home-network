@@ -7,3 +7,24 @@ dns_server_ports:
   resolved: 53531
   dnsmasq: 53532
   dnscrypt: 53533
+
+# Work around Google and streaming services identifying TunnelBroker tunnels as
+# potential ToS violations.
+# https://forums.he.net/index.php?topic=4253.0
+ipv6_blocked_domains:
+  # Google.
+  - google.de
+  - google.com
+  # YouTube.
+  - youtube.com
+  - googleapis.com
+  # Netflix domains.
+  # https://gist.github.com/jamesmacwhite/6a642cb6bad00c5cefa91ec3d742e2a6
+  - netflix.com
+  - netflix.net
+  - nflxvideo.net
+  - nflximg.net
+  - nflximg.com
+  - nflxext.com
+  - nflxsearch.net
+  - nflxso.net

@@ -1,7 +1,0 @@
-# {{ ansible_managed }}
-# vim: set ft=jinja-properties ts=2 sw=2 et:
-
-# Work around Google identifying TunnelBroker tunnels als potential ToS violations.
-# https://forums.he.net/index.php?topic=4253.0
-server=/google.de/google.com/youtube.com/googleapis.com/127.0.0.1#{{ dns_server_ports.dnscrypt | mandatory }}
-address=/google.de/google.com/youtube.com/googleapis.com/2001:db8::1
