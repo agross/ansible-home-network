@@ -26,7 +26,9 @@
       tags: ssh
     - role: networking
       when: systemd_networkd_network is defined
-      tags: [network, networking]
+      tags:
+        - network
+        - networking
     - role: postfix
       when: google_smtp_password is defined
       tags: postfix
