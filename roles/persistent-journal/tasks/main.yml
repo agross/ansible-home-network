@@ -4,7 +4,7 @@
     path: "{{ journal_directory }}"
     owner: 0
     group: systemd-journal
-    mode: '755'
+    mode: "755"
   notify: Restart systemd-journald
 
 - name: Create persisent log directory
@@ -31,4 +31,4 @@
     no_extra_spaces: true
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"

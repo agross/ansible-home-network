@@ -26,6 +26,6 @@
     dest: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
     owner: 0
     group: 0
-    mode: '600'
+    mode: "600"
   when: k3s_control_node | default(false)
   notify: Restart k3s

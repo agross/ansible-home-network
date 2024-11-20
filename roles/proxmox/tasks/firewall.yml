@@ -4,7 +4,7 @@
     state: directory
     owner: 0
     group: 33
-    mode: '755'
+    mode: "755"
 
 - name: >-
     Ensure that the firewall config file exists such that the following
@@ -16,7 +16,7 @@
     modification_time: preserve
     owner: 0
     group: 33
-    mode: '640'
+    mode: "640"
 
 # Port 22/tcp and 8006/tcp are still allowed. ICMP ping is disabled by default.
 - name: Enable cluster and nodes firewall
@@ -39,5 +39,5 @@
       IN Ping(ACCEPT) -log nolog
     owner: 0
     group: 33
-    mode: '640'
+    mode: "640"
   notify: Reload firewall

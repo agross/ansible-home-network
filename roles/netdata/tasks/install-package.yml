@@ -21,7 +21,7 @@
     path: /etc/systemd/system/netdata.service.d/
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Allow 30s for the service to stop
   ansible.builtin.copy:
@@ -31,7 +31,7 @@
     dest: /etc/systemd/system/netdata.service.d/stop-timeout.conf
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
   notify: Restart netdata service
 
 - name: Enable streaming

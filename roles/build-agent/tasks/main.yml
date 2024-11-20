@@ -32,7 +32,7 @@
     dest: /home/build-agent/agent.zip
     owner: build-agent
     group: build-agent
-    mode: '644'
+    mode: "644"
 
 - name: Create agent directory
   ansible.builtin.file:
@@ -40,7 +40,7 @@
     state: directory
     owner: build-agent
     group: build-agent
-    mode: '755'
+    mode: "755"
 
 - name: Extract agent
   ansible.builtin.unarchive:
@@ -64,7 +64,7 @@
     force: true
     owner: build-agent
     group: build-agent
-    mode: '644'
+    mode: "644"
 
 - name: Set TeamCity server URL in build agent config file
   ansible.builtin.replace:
@@ -83,8 +83,7 @@
   ansible.builtin.lineinfile:
     path: /home/build-agent/agent/conf/buildAgent.properties
     line: "{{ item }}"
-  loop:
-    "{{ teamcity_agent_properties | default([]) }}"
+  loop: "{{ teamcity_agent_properties | default([]) }}"
 
 - name: Copy build-agent systemd service
   ansible.builtin.template:
@@ -92,7 +91,7 @@
     dest: /etc/systemd/system/build-agent.service
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
 
 - name: Enable and start build-agent systemd service
   ansible.builtin.systemd:
@@ -107,7 +106,7 @@
     dest: /etc/systemd/system/xvfb.service
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
 
 - name: Enable and start xvfb systemd service
   ansible.builtin.systemd:

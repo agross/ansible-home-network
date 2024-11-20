@@ -6,7 +6,7 @@
     notify: Restart freshrss service
     files:
       .env.j2:
-        mode: '640'
+        mode: "640"
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml

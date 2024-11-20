@@ -4,7 +4,7 @@
     state: directory
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Create config file (blockinfile)
   ansible.builtin.blockinfile:
@@ -20,7 +20,7 @@
     marker: "# {mark} ANSIBLE MANAGED CONFIG BLOCK"
     owner: 0
     group: netdata
-    mode: '640'
+    mode: "640"
   loop: >-
     {{
       directory.value |
@@ -38,7 +38,7 @@
     dest: "/etc/netdata/{{ directory.key }}/{{ file.key }}"
     owner: 0
     group: netdata
-    mode: '640'
+    mode: "640"
   loop: >-
     {{
       directory.value |

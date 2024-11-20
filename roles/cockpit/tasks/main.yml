@@ -30,7 +30,7 @@
         dest: /etc/cockpit/cockpit.conf
         owner: 0
         group: 0
-        mode: '644'
+        mode: "644"
 
     # Since cockpit starts an SSH agent and calls ssh-add without arguments,
     # this key will be loaded automatically and can be used to access
@@ -65,7 +65,7 @@
         state: directory
         owner: 0
         group: 0
-        mode: '755'
+        mode: "755"
 
     - name: Copy dynamic Traefik configuration file
       ansible.builtin.template:
@@ -73,7 +73,7 @@
         dest: "{{ traefik_dynamic_file_configuration }}/cockpit.yaml"
         owner: 0
         group: 0
-        mode: '644'
+        mode: "644"
 
 - name: Authorize generated SSH key on non-Traefik hosts
   tags: cockpit

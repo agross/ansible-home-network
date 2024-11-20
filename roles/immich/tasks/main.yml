@@ -23,7 +23,7 @@
 - name: Add vm.overcommit_memory sysctl for Redis
   ansible.posix.sysctl:
     name: vm.overcommit_memory
-    value: '1'
+    value: "1"
     sysctl_file: /etc/sysctl.d/redis-vm.overcommit.conf
     sysctl_set: true
     state: present

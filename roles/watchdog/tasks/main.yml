@@ -35,7 +35,7 @@
     state: directory
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Enable watchdog timer run by systemd
   ansible.builtin.copy:
@@ -47,7 +47,7 @@
       RuntimeWatchdogSec=15s
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
   notify: Reexecute systemd
 
 - name: Reexecute systemd, if required

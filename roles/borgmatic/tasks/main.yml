@@ -26,7 +26,7 @@
 
     # Timer is installed by the package. Or run timers ourselves as the
     # pip-installed only runs the default borgmatic config.
-    borgmatic_timer: ''
+    borgmatic_timer: ""
 
     borg_source_directories:
       - /etc
@@ -40,7 +40,7 @@
 - name: Patch config file to include constant name
   ansible.builtin.lineinfile:
     path: /etc/borgmatic/config.yaml
-    insertbefore: 'location:'
+    insertbefore: "location:"
     firstmatch: true
     line: |
       constants:
@@ -49,13 +49,13 @@
 - name: Patch config file changing archive_name_format
   ansible.builtin.lineinfile:
     path: /etc/borgmatic/config.yaml
-    search_string: 'archive_name_format:'
+    search_string: "archive_name_format:"
     line: "    archive_name_format: '{hostname}-{name}-{now}'"
 
 - name: Patch config file to include match_archives
   ansible.builtin.lineinfile:
     path: /etc/borgmatic/config.yaml
-    insertafter: 'archive_name_format:'
+    insertafter: "archive_name_format:"
     firstmatch: true
     line: "    match_archives: 'sh:{{ borgmatic_server_name | default('{hostname}') }}-{name}-*'"
 
@@ -65,7 +65,7 @@
     state: directory
     owner: 0
     group: 0
-    mode: '700'
+    mode: "700"
 
 - name: OS-dependent post-installation
   ansible.builtin.include_tasks:

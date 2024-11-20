@@ -4,7 +4,6 @@ harbor_installer_version: 2.11.1
 harbor_installer_url: >-
   https://github.com/goharbor/harbor/releases/download/v{{ harbor_installer_version }}/harbor-online-installer-v{{ harbor_installer_version }}.tgz
 harbor_installer_directory: "{{ harbor_root }}/installer-{{ harbor_installer_version }}"
-
 harbor_installer_args: []
 
 harbor_installer_with:

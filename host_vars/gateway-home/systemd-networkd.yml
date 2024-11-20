@@ -4,7 +4,7 @@ systemd_networkd_apply_config: true
 
 systemd_networkd_netdev:
   he-ipv6:
-    - Match: ''
+    - Match: ""
     - NetDev:
         - Description: Hurricane Electric Tunnelbroker
         - Name: "{{ interfaces['he-ipv6'].device }}"
@@ -18,7 +18,7 @@ systemd_networkd_netdev:
         - DiscoverPathMTU: true
 
   telekom-ingress:
-    - Match: ''
+    - Match: ""
     - NetDev:
         - Description: >-
             Ingress device for Telekom uplink to allow shaping incoming traffic
@@ -33,17 +33,17 @@ systemd_networkd_netdev:
         - ListenPort: 51820
         - PrivateKey: "{{ wireguard.private_key }}"
     - WireGuardPeer:
-        - '# Peer': Android
+        - "# Peer": Android
         - PublicKey: "{{ wireguard.peers.android.public_key }}"
         - PresharedKey: "{{ wireguard.peers.android.psk }}"
         - AllowedIPs: "{{ wireguard.peers.android.allowed_ips | default([]) | join(',') }}"
     - WireGuardPeer:
-        - '# Peer': MacBook
+        - "# Peer": MacBook
         - PublicKey: "{{ wireguard.peers.mac.public_key }}"
         - PresharedKey: "{{ wireguard.peers.mac.psk }}"
         - AllowedIPs: "{{ wireguard.peers.mac.allowed_ips | default([]) | join(',') }}"
     - WireGuardPeer:
-        - '# Peer': OGD
+        - "# Peer": OGD
         - PublicKey: "{{ wireguard.peers.ogd.public_key }}"
         - PresharedKey: "{{ wireguard.peers.ogd.psk }}"
         # Add routing table entries for AllowedIPs below.
@@ -134,7 +134,7 @@ systemd_networkd_network:
 
         # To receive public IPv6 address.
         # Issues with ingress packets on he-ipv6 with replies egressing on telekom.
-        - DHCP: 'no' # ipv6
+        - DHCP: "no" # ipv6
         - IPv6AcceptRA: false # true
     - IPv6AcceptRA:
         # Request delegated prefix.
@@ -151,7 +151,7 @@ systemd_networkd_network:
     # set up in /etc/networkd-dispatcher/configured.d/telekom.
     - QDisc:
         - Parent: ingress
-        - Handle: '0xffff'
+        - Handle: "0xffff"
     # Egress qdisc.
     - CAKE:
         # This is a VDSL2 link.

@@ -23,7 +23,7 @@
     state: directory
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Publish Samba-related services via Multicast DNS
   ansible.builtin.template:
@@ -32,7 +32,7 @@
       /etc/systemd/dnssd/{{ item | ansible.builtin.basename | ansible.builtin.regex_replace('\.j2$', '') }}
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
     lstrip_blocks: true
   loop: >-
     {{

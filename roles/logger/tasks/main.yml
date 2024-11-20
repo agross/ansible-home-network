@@ -17,13 +17,13 @@
     notify: Restart logger service
     files:
       backup.j2:
-        mode: '700'
+        mode: "700"
       grafana/grafana.ini.j2:
         owner: 472
-        mode: '460'
+        mode: "460"
       telegraf/telegraf.d/influxdb.conf.j2:
         owner: 999
-        mode: '460'
+        mode: "460"
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images

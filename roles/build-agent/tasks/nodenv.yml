@@ -19,7 +19,7 @@
     line: eval "$(~/.nodenv/bin/nodenv init - bash)"
     owner: build-agent
     group: build-agent
-    mode: '644'
+    mode: "644"
   loop:
     - ~/.profile
     - ~/.bashrc

@@ -56,7 +56,7 @@
     # Rebooting would fail this task, so reboot manually later.
     - name: Run dnf system-upgrade reboot without actually rebooting
       environment:
-        DNF_SYSTEM_UPGRADE_NO_REBOOT: 'true'
+        DNF_SYSTEM_UPGRADE_NO_REBOOT: "true"
       ansible.builtin.command:
         argv:
           - dnf

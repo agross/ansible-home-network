@@ -10,4 +10,4 @@
       {% endfor %}
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"

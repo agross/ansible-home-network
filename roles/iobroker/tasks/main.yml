@@ -11,9 +11,9 @@
       backups:
         owner: 1000
         group: 1000
-        mode: '755'
+        mode: "755"
       crunchfit/.env.j2:
-        mode: '640'
+        mode: "640"
 
 - name: Copy dynamic Traefik configuration file
   when: iobroker_ports.telegram is defined
@@ -26,7 +26,7 @@
     dest: "{{ traefik_dynamic_file_configuration }}/iobroker-telegram.yaml"
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
 
 - name: Install SELinux packages
   when: ansible_selinux.status != 'disabled'
@@ -66,7 +66,7 @@
 - name: Add vm.overcommit_memory sysctl for Redis
   ansible.posix.sysctl:
     name: vm.overcommit_memory
-    value: '1'
+    value: "1"
     sysctl_file: /etc/sysctl.d/redis-vm.overcommit.conf
     sysctl_set: true
     state: present

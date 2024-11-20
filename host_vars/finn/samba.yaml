@@ -9,18 +9,18 @@ samba_shares:
     write_list: agross
     owner: agross
     group: agross
-    guest_ok: 'no'
+    guest_ok: "no"
     # Files and directories are not accessible by others.
-    create_mode: '0660'
-    force_create_mode: '0660'
-    directory_mode: '0770'
-    force_directory_mode: '0770'
+    create_mode: "0660"
+    force_create_mode: "0660"
+    directory_mode: "0770"
+    force_directory_mode: "0770"
 
     vfs_objects:
       - name: fruit
         options:
           - name: time machine
-            value: 'yes'
+            value: "yes"
       - name: streams_xattr
     mount:
       what: /dev/sdc1

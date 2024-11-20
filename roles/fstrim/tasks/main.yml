@@ -12,7 +12,7 @@
     state: directory
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Enable fstrim on all mounted file systems
   ansible.builtin.copy:
@@ -23,7 +23,7 @@
     dest: /etc/systemd/system/fstrim.service.d/all-filesystems.conf
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
 
 - name: Enable fstrim.timer
   ansible.builtin.systemd:

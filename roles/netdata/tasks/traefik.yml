@@ -10,7 +10,7 @@
         state: directory
         owner: 0
         group: 0
-        mode: '755'
+        mode: "755"
 
     - name: Copy dynamic Traefik configuration file
       ansible.builtin.copy:
@@ -31,4 +31,4 @@
         dest: "{{ traefik_dynamic_file_configuration }}/netdata.yaml"
         owner: 0
         group: 0
-        mode: '644'
+        mode: "644"

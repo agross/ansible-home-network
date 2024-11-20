@@ -23,7 +23,7 @@
     dest: /usr/local/sbin/wireguard-resolve-endpoint
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Install wireguard-resolve-endpoint service and timer
   ansible.builtin.template:
@@ -31,7 +31,7 @@
     dest: "/etc/systemd/system/{{ item | ansible.builtin.basename }}"
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
     lstrip_blocks: true
   loop:
     - wireguard-resolve-endpoint.service

@@ -18,8 +18,9 @@
     version_number: "{{ version_env_entry | first | split('=') | last }}"
 
 - name: Run upgrade
-  when: version_number is defined and
-        not version_number is version('2', '>=')
+  when: >-
+    version_number is defined and
+    not version_number is version('2', '>=')
   block:
     - name: Make sure InfluxDB 2 volumes do not exist yet
       community.docker.docker_volume_info:

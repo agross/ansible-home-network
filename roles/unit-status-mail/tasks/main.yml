@@ -28,7 +28,7 @@
       ansible.builtin.template:
         src: templates/msmtprc.j2
         dest: /etc/msmtprc
-        mode: '600'
+        mode: "600"
         owner: root
         group: root
         force: true
@@ -39,7 +39,7 @@
         dest: /etc/aliases
         regexp: "^{{ item.user | ansible.builtin.regex_escape }}:"
         line: "{{ item.user }}: {{ item.alias }}"
-        mode: '644'
+        mode: "644"
         owner: 0
         group: 0
       loop:
@@ -103,7 +103,7 @@
     dest: /etc/systemd/system/unit-status-mail@.service
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
 
 - name: Reload systemd
   ansible.builtin.systemd:

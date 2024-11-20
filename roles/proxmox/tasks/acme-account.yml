@@ -21,7 +21,7 @@
             {{ acme_account_email | mandatory | quote }}
             --directory https://acme-v02.api.letsencrypt.org/directory
         responses:
-          'Do you agree to the above terms?': 'y'
+          "Do you agree to the above terms?": "y"
         echo: true
 
 - name: Check if the INWX DNS plugin is configured
@@ -48,7 +48,7 @@
           INWX_Shared_Secret=
         owner: 0
         group: 0
-        mode: '400'
+        mode: "400"
 
     - name: Register INWX DNS plugin
       ansible.builtin.command:

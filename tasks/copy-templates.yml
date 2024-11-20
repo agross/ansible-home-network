@@ -27,10 +27,10 @@
     owner: "{{ files[item.path].owner | default(omit) }}"
     group: "{{ files[item.path].group | default(omit) }}"
     mode: "{{ files[item.path].mode | default('preserve', true) }}"
-  when:
+  when: >-
     item.state == 'file' and
-      (not item.path.endswith('.j2')) and
-      (not item.path | basename == '.gitignore')
+    (not item.path.endswith('.j2')) and
+    (not item.path | basename == '.gitignore')
   with_community.general.filetree: "{{ directory }}"
   loop_control:
     label: "{{ item.path }}"
@@ -44,10 +44,10 @@
     group: "{{ files[item.path].group | default(omit) }}"
     mode: "{{ files[item.path].mode | default('preserve', true) }}"
     lstrip_blocks: true
-  when:
+  when: >-
     item.state == 'file' and
-      item.path.endswith('.j2') and
-      (not item.path | basename == '.gitignore')
+    item.path.endswith('.j2') and
+    (not item.path | basename == '.gitignore')
   with_community.general.filetree: "{{ directory }}"
   loop_control:
     label: "{{ item.path }}"

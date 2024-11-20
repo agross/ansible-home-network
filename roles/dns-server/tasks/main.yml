@@ -41,7 +41,7 @@
     modification_time: preserve
     owner: 10000
     group: 0
-    mode: '664'
+    mode: "664"
   notify: Restart dns-server service
 
 - name: Change ownership of dnscrypt-proxy directory to nobody:nogroup

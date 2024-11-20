@@ -9,13 +9,13 @@
   ansible.builtin.get_url:
     url: "{{ harbor_installer_url }}"
     dest: "{{ harbor_installer_directory }}.tgz"
-    mode: '644'
+    mode: "644"
 
 - name: Ensure directory for extracted installer exists
   ansible.builtin.file:
     path: "{{ harbor_installer_directory }}"
     state: directory
-    mode: '755'
+    mode: "755"
 
 - name: Extract Harbor installer
   ansible.builtin.unarchive:
@@ -48,11 +48,11 @@
   ansible.builtin.copy:
     content: "{{ harbor_yml_patched | to_nice_yaml(indent=2) }}"
     dest: "{{ harbor_installer_directory }}/harbor/harbor.yml"
-    mode: '644'
+    mode: "644"
   register: harbor_yml_patched_templated
   notify: Restart harbor service
 
-- name: Regenerate docker-compose.yml  # noqa no-handler
+- name: Regenerate docker-compose.yml # noqa no-handler
   when: harbor_yml_patched_templated is changed
   block:
     - name: Run Harbor prepare script to generate docker-compose.yml
@@ -67,7 +67,7 @@
       ansible.builtin.replace:
         path: "{{ harbor_installer_directory }}/harbor/docker-compose.yml"
         regexp: container_name:.*
-        replace: ''
+        replace: ""
         backup: true
       notify: Restart harbor service
       register: docker_compose_yaml
@@ -78,7 +78,7 @@
       ansible.builtin.replace:
         path: "{{ harbor_installer_directory }}/harbor/docker-compose.yml"
         regexp: restart:.*
-        replace: 'restart: unless-stopped'
+        replace: "restart: unless-stopped"
       notify: Restart harbor service
 
     - name: Validate docker-compose.yml
@@ -125,7 +125,7 @@
   ansible.builtin.replace:
     path: "{{ harbor_installer_directory }}/harbor/common/config/nginx/nginx.conf"
     regexp: proxy_set_header\s+X-Forwarded-Proto.*
-    replace: ''
+    replace: ""
     backup: true
   notify: Restart harbor service
 

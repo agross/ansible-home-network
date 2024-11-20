@@ -4,7 +4,7 @@
     dest: "/etc/systemd/system/{{ item | ansible.builtin.basename }}"
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
     lstrip_blocks: true
   loop:
     - Debian/borgmatic.service

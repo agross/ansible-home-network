@@ -18,7 +18,7 @@
     url: "{{ kodi_release_package_url }}"
     dest: "{{ package.path }}"
     force: true
-    mode: '644'
+    mode: "644"
   changed_when: false
 
 - name: Install package via ADB

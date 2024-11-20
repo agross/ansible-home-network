@@ -2,7 +2,7 @@
   ansible.builtin.file:
     path: /etc/sudoers.d
     state: directory
-    mode: '750'
+    mode: "750"
 
 - name: Enable passwordless sudo for netdata to run smbstatus
   ansible.builtin.copy:
@@ -11,7 +11,7 @@
     dest: /etc/sudoers.d/netdata
     owner: 0
     group: 0
-    mode: '440'
+    mode: "440"
     validate: visudo -cf %s
   notify: Restart netdata service
 
@@ -21,7 +21,7 @@
     state: directory
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Enable all capabilities to run smbstatus with sudo
   ansible.builtin.copy:
@@ -32,5 +32,5 @@
     dest: "/etc/systemd/system/netdata.service.d/sudo-smbstatus.conf"
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
   notify: Restart netdata service

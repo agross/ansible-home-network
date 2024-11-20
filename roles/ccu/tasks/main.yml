@@ -8,7 +8,7 @@
   ansible.builtin.copy:
     content: eq3_char_loop
     dest: /etc/modules-load.d/eq3_char_loop.conf
-    mode: '644'
+    mode: "644"
     owner: 0
     group: 0
   notify: Reboot

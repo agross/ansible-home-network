@@ -12,15 +12,15 @@
       }}
   with_items:
     - name: relayhost
-      value: '[smtp-relay.gmail.com]:587'
+      value: "[smtp-relay.gmail.com]:587"
     - name: smtp_use_tls
-      value: 'yes'
+      value: "yes"
     - name: smtp_tls_CAfile
       value: /etc/ssl/certs/ca-certificates.crt
     - name: mydomain
       value: "{{ network.domain }}"
     - name: append_dot_mydomain
-      value: 'yes'
+      value: "yes"
     - name: local_header_rewrite_clients
       value: static:all
 
@@ -48,7 +48,7 @@
           }}
       with_items:
         - name: smtp_sasl_auth_enable
-          value: 'yes'
+          value: "yes"
         - name: smtp_sasl_password_maps
           value: hash:/etc/postfix/sasl_passwd
         - name: smtp_sasl_security_options
@@ -59,7 +59,7 @@
         dest: /etc/postfix/sasl_passwd
         owner: 0
         group: 0
-        mode: '600'
+        mode: "600"
         content: |
           [smtp-relay.gmail.com]:587 {{ google_smtp_user }}:{{ google_smtp_password }}
       notify: Create SMTP auth hash file
@@ -80,7 +80,7 @@
     line: "{{ item.user }}: {{ item.alias }}"
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
   with_items:
     - user: root
       alias: "{{ google_smtp_user }}"

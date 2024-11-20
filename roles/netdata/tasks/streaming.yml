@@ -16,7 +16,7 @@
         marker: "# {mark} ANSIBLE MANAGED streaming"
         owner: 0
         group: netdata
-        mode: '640'
+        mode: "640"
       notify: Restart netdata service
 
     - name: Enable streaming
@@ -25,6 +25,6 @@
         dest: /etc/netdata/stream.conf
         owner: 0
         group: netdata
-        mode: '640'
+        mode: "640"
         lstrip_blocks: true
       notify: Restart netdata service

@@ -9,7 +9,7 @@
     path: /etc/systemd/system/ddclient.service.d/
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
 
 - name: Enable unit-status-mail override for ddclient
   ansible.builtin.template:
@@ -17,7 +17,7 @@
     dest: /etc/systemd/system/ddclient.service.d/unit-status-mail.conf
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
 
 - name: Copy ddclient config file
   ansible.builtin.template:
@@ -25,7 +25,7 @@
     dest: /etc/ddclient.conf
     owner: ddclient
     group: ddclient
-    mode: '600'
+    mode: "600"
   notify: Restart ddclient service
 
 - name: Enable ddclient service

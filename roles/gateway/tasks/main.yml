@@ -16,4 +16,4 @@
     dest: /usr/local/bin/speed
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"

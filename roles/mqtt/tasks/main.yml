@@ -22,11 +22,11 @@
       mosquitto/auth.j2:
         owner: 1883
         group: 1883
-        mode: '640'
+        mode: "640"
       systemd/mqtt.service.j2:
         owner: 0
         group: 0
-        mode: '640'
+        mode: "640"
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml

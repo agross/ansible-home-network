@@ -11,7 +11,7 @@
     dest: /etc/systemd/system/led-heartbeat.service
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
   notify: Restart led-heartbeat service
 
 - name: Start service

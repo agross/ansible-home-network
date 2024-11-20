@@ -49,7 +49,7 @@
     dest: "/etc/systemd/system/{{ mount_unit_name }}"
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
     lstrip_blocks: true
 
 - name: Start mount unit unless automounted for {{ filesystem.where }}
@@ -69,7 +69,7 @@
         dest: "/etc/systemd/system/{{ automount_unit_name }}"
         owner: 0
         group: 0
-        mode: '644'
+        mode: "644"
         lstrip_blocks: true
 
     - name: Start automount unit for {{ filesystem.where }}

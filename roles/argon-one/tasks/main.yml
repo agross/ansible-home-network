@@ -20,7 +20,7 @@
         url: "{{ argonone_script_url }}"
         dest: "{{ script.path }}"
         force: true
-        mode: '700'
+        mode: "700"
 
     - name: Install script
       ansible.builtin.command:

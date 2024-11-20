@@ -4,7 +4,7 @@
     dest: /etc/network/interfaces
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
     lstrip_blocks: true
   notify: Reload network interfaces
 
