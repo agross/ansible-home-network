@@ -4,6 +4,10 @@
     directory: ../templates
     target: "{{ dns_server_root }}"
     notify: Restart dns-server service
+    files:
+      dnscrypt-proxy/dnscrypt-proxy.toml:
+        owner: 65534
+        group: 65534
 
 - name: Copy templates for {{ inventory_hostname }}
   ansible.builtin.import_tasks: copy-templates.yml
@@ -48,7 +52,7 @@
   ansible.builtin.file:
     path: "{{ dns_server_root }}/dnscrypt-proxy"
     owner: 65534
-    group: 65533
+    group: 65534
     recurse: true
   notify: Restart dns-server service
 
