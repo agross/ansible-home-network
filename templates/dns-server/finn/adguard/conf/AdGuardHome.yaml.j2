@@ -141,7 +141,7 @@ whitelist_filters: []
 user_rules:
   - '@@||localhost^$important'
   {% for domain in ipv6_blocked_domains | default([]) %}
-  - '||{{ domain }}^$dnstype=AAAA'
+  - '||{{ domain }}^$dnstype=AAAA,dnsrewrite=NOERROR;;'
   {% endfor %}
 dhcp:
   enabled: false
