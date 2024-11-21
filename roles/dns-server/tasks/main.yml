@@ -15,6 +15,9 @@
     directory: "templates/dns-server/{{ inventory_hostname }}"
     target: "{{ dns_server_root }}"
     notify: Restart dns-server service
+    files:
+      adguard/conf/AdGuardHome.yaml.j2:
+        mode: "600"
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
