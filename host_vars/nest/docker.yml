@@ -3,3 +3,5 @@ docker_daemon_options:
   fixed-cidr-v6: fd00:c0ff:ee::/48
   experimental: true
   ip6tables: true
+
+docker_oom_adjust: -1000

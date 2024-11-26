@@ -2,6 +2,28 @@
   ansible.builtin.include_role:
     name: geerlingguy.docker
 
+- name: Adjust Linux OOM score
+  when: docker_oom_adjust is defined
+  block:
+    - name: Ensure systemd override directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        owner: 0
+        group: 0
+        mode: "755"
+
+    - name: Copy systemd override adjusting Linux OOM score
+      ansible.builtin.copy:
+        content: |
+          [Service]
+          OOMScoreAdjust={{ docker_oom_adjust }}
+        dest: /etc/systemd/system/docker.service.d/oom-adjust.conf
+        owner: 0
+        group: 0
+        mode: "644"
+      notify: restart docker
+
 - name: Support docker management via ansible
   ansible.builtin.include_role:
     name: geerlingguy.pip
