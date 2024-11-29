@@ -42,6 +42,14 @@
     mode: "644"
   notify: Restart smartmontools service
 
+- name: Create directory for email notifier
+  ansible.builtin.file:
+    path: "{{ smartd_email_notifier | ansible.builtin.dirname }}"
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
 - name: Ensure notifications are sent using sendmail
   ansible.builtin.template:
     src: email-notifications
@@ -49,3 +57,12 @@
     owner: 0
     group: 0
     mode: "755"
+
+- name: Ensure Fedora runs the notifier script
+  when: ansible_distribution == 'Fedora'
+  ansible.builtin.lineinfile:
+    path: /etc/smartmontools/smartd.conf
+    regexp: '^(DEVICESCAN .* -M exec) [^\s]+ (.*)$'
+    backrefs: true
+    line: '\1 {{ smartd_email_notifier }} \2'
+  notify: Restart smartmontools service
