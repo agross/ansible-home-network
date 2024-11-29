@@ -4,14 +4,16 @@
     state: present
 
 - name: Include vars for operating system
-  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
-  vars:
-    params:
-      files:
+  ansible.builtin.include_vars:
+    file: "{{ file }}"
+  with_first_found:
+    - files:
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
-      paths:
+    - paths:
         - vars
+  loop_control:
+    loop_var: file
 
 - name: Create service override directory
   ansible.builtin.file:
