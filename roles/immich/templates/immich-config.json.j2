@@ -119,7 +119,9 @@
       "minScore": 0.7,
       "modelName": "buffalo_l"
     },
-    "url": "http://machine-learning:3003"
+    "urls": [
+      "http://machine-learning:3003"
+    ]
   },
   "map": {
     "darkStyle": "https://tiles.immich.cloud/v1/style/dark.json",
@@ -173,12 +175,20 @@
   },
   "server": {
     "externalDomain": "{{ immich_url | mandatory }}",
-    "loginPageMessage": ""
+    "loginPageMessage": "",
+    "publicUsers": true
   },
   "storageTemplate": {
     "enabled": true,
     "hashVerificationEnabled": true,
     "template": "{% raw %}{{album}}/{{y}}/{{MM}}/{{dd}}/{{filename}}{% endraw %}"
+  },
+  "templates": {
+    "email": {
+      "albumInviteTemplate": "",
+      "albumUpdateTemplate": "",
+      "welcomeTemplate": ""
+    }
   },
   "theme": {
     "customCss": ""
