@@ -74,12 +74,12 @@ tunnelbroker() {
                  --fail \
                  --connect-timeout 15 \
                  --user {{ he_ipv6.username | mandatory | quote }}:{{ he_ipv6.update_key | mandatory | quote }} \
-                 "https://$host/ipv4_end.php?tid={{ he_ipv6.tunnel_id | mandatory }}")"
+                 "https://$host/nic/update?hostname={{ he_ipv6.tunnel_id | mandatory }}")"
 
   printf '%s\n' "$output"
 
-  if [[ "$output" == +OK* ]] || \
-     [[ "$output" == '-ERROR: This tunnel is already associated with this IP address'* ]]; then
+  if [[ "$output" == good* ]] || \
+     [[ "$output" == nochg* ]]; then
     printf 'Successfully updated Tunnelbroker IP\n'
   else
     printf 'Failed to update Tunnelbroker IP\n'
