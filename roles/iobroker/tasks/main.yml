@@ -38,7 +38,7 @@
 - name: Allow execution of the healthcheck script
   when: ansible_selinux.status != 'disabled'
   community.general.sefcontext:
-    target: "{{ iobroker_ }}/healthcheck"
+    target: "{{ iobroker_root }}/healthcheck"
     setype: bin_t
     state: present
 
