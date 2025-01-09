@@ -1,3 +1,7 @@
 [WebService]
 Origins = https://cockpit.{{ network.domain | mandatory }} wss://cockpit.{{ network.domain | mandatory }}
 ProtocolHeader = X-Forwarded-Proto
+# https://github.com/cockpit-project/cockpit/pull/20749
+AllowMultiHost = yes
+[Session]
+WarnBeforeConnecting = false
