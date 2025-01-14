@@ -1,15 +1,15 @@
 - name: Create root directory
   ansible.builtin.file:
-    path: "{{ target | default(root) }}"
+    path: "{{ target }}"
     state: directory
-    owner: "{{ files[target | default(root)].owner | default(omit) }}"
-    group: "{{ files[target | default(root)].group | default(omit) }}"
-    mode: "{{ files[target | default(root)].mode | default('755', true) }}"
+    owner: "{{ files[target].owner | default(omit) }}"
+    group: "{{ files[target].group | default(omit) }}"
+    mode: "{{ files[target].mode | default('755', true) }}"
   notify: "{{ notify | default(omit) }}"
 
 - name: Create directories
   ansible.builtin.file:
-    path: "{{ target | default(root) }}/{{ item.path }}"
+    path: "{{ target }}/{{ item.path }}"
     state: directory
     owner: "{{ files[item.path].owner | default(omit) }}"
     group: "{{ files[item.path].group | default(omit) }}"
@@ -23,7 +23,7 @@
 - name: Copy non-template files
   ansible.builtin.copy:
     src: "{{ item.src }}"
-    dest: "{{ target | default(root) }}/{{ item.path }}"
+    dest: "{{ target }}/{{ item.path }}"
     owner: "{{ files[item.path].owner | default(omit) }}"
     group: "{{ files[item.path].group | default(omit) }}"
     mode: "{{ files[item.path].mode | default('preserve', true) }}"
@@ -39,7 +39,7 @@
 - name: Copy template files
   ansible.builtin.template:
     src: "{{ item.src }}"
-    dest: "{{ target | default(root) }}/{{ item.path | regex_replace('\\.j2$', '') }}"
+    dest: "{{ target }}/{{ item.path | regex_replace('\\.j2$', '') }}"
     owner: "{{ files[item.path].owner | default(omit) }}"
     group: "{{ files[item.path].group | default(omit) }}"
     mode: "{{ files[item.path].mode | default('preserve', true) }}"
