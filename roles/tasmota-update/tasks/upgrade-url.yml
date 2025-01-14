@@ -10,11 +10,16 @@
 - name: Determine Tasmota variant
   ansible.builtin.set_fact:
     tasmota_variant: >-
-      {{ firmware.json.StatusFWR.Version | regex_replace('.*\(release-(.*)\)$', '\1') }}
+      {{
+        firmware.json.StatusFWR.Version |
+        regex_replace('.*\(release-(.*)\)$', '\1')
+      }}
 
 - name: Determine OTA URL for variant
   ansible.builtin.set_fact:
-    tasmota_upgrade_url: "{{ latest_release.json | json_query(query) }}.gz"
+    tasmota_upgrade_url: >-
+      {{ latest_release.json | json_query(query) }}.gz
+    # noqa: jinja[invalid]
   vars:
     query: >-
       "{{ latest_release_key }}"[?variant=='{{ tasmota_variant }}'].otaurl | [0]

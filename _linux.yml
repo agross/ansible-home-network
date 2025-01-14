@@ -1,5 +1,5 @@
 - name: Linux configuration
-  hosts: "{{ playbook_hosts | mandatory }}"
+  hosts: "{{ playbook_hosts | default([]) }}"
   become: true
   gather_facts: false
   roles:

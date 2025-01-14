@@ -4,14 +4,14 @@
     return_content: true
   register: nodenv_installer
 
-- name: Run nodenv installer # noqa: command-instead-of-shell
+- name: Run nodenv installer # noqa: command-instead-of-shell partial-become[task]
   become_user: build-agent
   ansible.builtin.shell:
     cmd: bash
     stdin: "{{ nodenv_installer.content }}"
   changed_when: true
 
-- name: Add nodenv shell support
+- name: Add nodenv shell support # noqa: partial-become[task]
   become_user: build-agent
   ansible.builtin.lineinfile:
     path: "{{ item }}"
@@ -24,14 +24,14 @@
     - ~/.profile
     - ~/.bashrc
 
-- name: Install nodenv-update # noqa: latest
+- name: Install nodenv-update # noqa: latest partial-become[task]
   become_user: build-agent
   ansible.builtin.git:
     repo: https://github.com/nodenv/nodenv-update.git
     force: true
     dest: /home/build-agent/.nodenv/plugins/nodenv-update
 
-- name: Install nodenv-package-rehash # noqa: latest
+- name: Install nodenv-package-rehash # noqa: latest partial-become[task]
   become_user: build-agent
   ansible.builtin.git:
     repo: https://github.com/nodenv/nodenv-package-rehash.git

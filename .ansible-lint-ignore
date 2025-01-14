@@ -1,0 +1,9 @@
+# This file contains ignores rule violations for ansible-lint
+copy-templates.yml load-failure[filenotfounderror]
+docker-compose-update.yml load-failure[filenotfounderror]
+file-permissions.yml load-failure[filenotfounderror]
+host_vars/router/netdata.yml yaml[line-length]
+htpasswd-users.yml load-failure[filenotfounderror]
+raspi-memory-cgroups.yml load-failure[filenotfounderror]
+roles/borgmatic/tasks/main.yml yaml[line-length]
+systemd-install-units.yml load-failure[filenotfounderror]

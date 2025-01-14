@@ -1,0 +1,63 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+
+# Cancel previous runs when a new commit is pushed.
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+
+    if: ${{ github.actor != 'dependabot[bot]' }}
+
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v4
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
+        with:
+          setup_python: true
+          requirements_file: requirements.yml
+          args: --exclude .ansible
+
+  encrypted-vaults:
+    name: Ensure vaults are encrypted
+    runs-on: ubuntu-latest
+
+    if: ${{ github.actor != 'dependabot[bot]' }}
+
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v4
+
+      - name: Ensure all *.vault.yml files are encrypted
+        run: |
+          export fail="$(mktemp)"
+
+          must-be-encrypted() {
+            local file="${1?Need file}"
+
+            if [[ "$(head -n1 "$file")" != \$ANSIBLE_VAULT\;* ]]; then
+              >&2 printf 'Unencrypted vault file: %s' "$file"
+              echo 1 > "$fail"
+            fi
+          }
+
+          export -f must-be-encrypted
+
+          find . -type f \
+                 -name '*.vault.yml' \
+                 -exec bash -c 'must-be-encrypted "{}"' \;
+
+          failed="$(stat --printf=%s "$fail")"
+          if (( failed > 0 )); then
+            >&2 printf 'Found unencrypted vault files\n'
+            exit 1
+          fi

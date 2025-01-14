@@ -9,7 +9,7 @@ netdata_plugins:
 
 netdata_config_files:
   .:
-    netdata.conf: # noqa: yaml[line-length]
+    netdata.conf:
       block: |
         [global]
           access log = none
