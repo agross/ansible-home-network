@@ -2,20 +2,31 @@
   ansible.builtin.package:
     name:
       - cockpit
+    state: present
+
+- name: Install cockpit-selinux and pcp
+  when: ansible_os_family == 'RedHat'
+  ansible.builtin.package:
+    name:
       - cockpit-selinux
+      - pcp
+    state: present
+
+- name: Install deprecated cockpit-pcp on Debian
+  when: ansible_os_family == 'Debian'
+  ansible.builtin.package:
+    name:
       - cockpit-pcp
     state: present
 
-- name: Start and enable pmlogger.service for cockpit-pcp
+- name: Start and enable pmlogger.service for pcp
   ansible.builtin.systemd:
     service: pmlogger.service
     state: started
     enabled: true
 
-- name: Make cockpit available through Traefik
-  when: >-
-    traefik_host and
-    traefik_dynamic_file_configuration is defined
+- name: Configure bastion host
+  when: cockpit == 'bastion'
   block:
     - name: Enable and start cockpit socket
       ansible.builtin.systemd:
@@ -41,7 +52,7 @@
     # A password may be added to the private key using the cockpit UI,
     # but then running this module again will fail which is why we check for
     # this case in failed_when.
-    - name: Generate an SSH keypair to be able to add remote hosts
+    - name: Generate an SSH keypair to be able to connect to proxied hosts
       community.crypto.openssh_keypair:
         path: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_ed25519"
         type: ed25519
@@ -59,6 +70,30 @@
         src: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_ed25519.pub"
       register: cockpit_ssh_key
 
+    - name: Configure proxied hosts
+      ansible.builtin.template:
+        src: machines.json.j2
+        dest: /etc/cockpit/machines.d/machines.json
+        owner: 0
+        group: 0
+        mode: "644"
+
+- name: Authorize generated SSH key on proxied hosts
+  when: cockpit != 'bastion'
+  ansible.posix.authorized_key:
+    user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+    key: >-
+      {{
+        hostvars[cockpit_bastion_host].cockpit_ssh_key.content |
+        ansible.builtin.b64decode
+      }}
+
+- name: Make cockpit available through Traefik
+  when: >-
+    cockpit == 'bastion' and
+    traefik_host and
+    traefik_dynamic_file_configuration is defined
+  block:
     - name: Ensure Traefik configuration directory exists
       ansible.builtin.file:
         path: "{{ traefik_dynamic_file_configuration }}"
@@ -74,16 +109,3 @@
         owner: 0
         group: 0
         mode: "644"
-
-- name: Authorize generated SSH key on non-Traefik hosts
-  tags: cockpit
-  when: >-
-    not traefik_host and
-    hostvars[host].traefik_host and
-    'cockpit_ssh_key' in hostvars[host]
-  ansible.posix.authorized_key:
-    user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
-    key: "{{ hostvars[host].cockpit_ssh_key.content | ansible.builtin.b64decode }}"
-  loop: "{{ ansible_play_hosts }}"
-  loop_control:
-    loop_var: host

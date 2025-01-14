@@ -40,6 +40,8 @@
       tags: borgmatic
     - role: netdata
       tags: netdata
+    - role: cockpit
+      tags: cockpit
     - role: dotfiles
       tags: dotfiles
     - role: automatic-updates

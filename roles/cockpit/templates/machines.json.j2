@@ -1,0 +1,8 @@
+{
+{% for host in cockpit_proxied_hosts %}
+  "{{ hostvars[host].network_name }}": {
+    "address": "{{ hostvars[host].network_name }}",
+    "visible": "true"
+  }{{ "," if not loop.last else "" }}
+{% endfor %}
+}

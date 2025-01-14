@@ -53,6 +53,8 @@
   become: true
   gather_facts: false
   roles:
+    - role: cockpit
+      tags: cockpit
     - role: docker
       tags: docker
     - role: mqtt

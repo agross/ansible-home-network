@@ -3,8 +3,6 @@
   become: true
   gather_facts: false
   roles:
-    - role: cockpit
-      tags: cockpit
     - role: systemd-timesyncd
       tags:
         - ntp

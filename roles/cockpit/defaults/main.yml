@@ -1,0 +1,20 @@
+cockpit_proxied_hosts: >-
+  {{
+    groups[site] |
+    map('extract', hostvars) |
+    selectattr('cockpit', 'defined') |
+    rejectattr('cockpit', 'equalto', 'bastion') |
+    map(attribute = 'inventory_hostname') |
+    list
+  }}
+
+cockpit_bastion_host: >-
+  {{
+    groups[site] |
+    map('extract', hostvars) |
+    selectattr('cockpit', 'defined') |
+    selectattr('cockpit', 'equalto', 'bastion') |
+    map(attribute = 'ansible_hostname') |
+    list |
+    first
+  }}
