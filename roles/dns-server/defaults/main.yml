@@ -17,6 +17,7 @@ ipv6_blocked_domains:
   - google.com
   # YouTube.
   - youtube.com
+  - youtube-nocookie.com
   - googleapis.com
   - googlevideo.com
   # Netflix domains.
