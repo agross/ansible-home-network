@@ -44,7 +44,9 @@
   delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ device_name }}/cm?cmnd=Backlog%20{{ backlog }}
+      http://{{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}/cm?cmnd=Backlog%20{{ backlog }}
     return_content: true
   register: backlog_result
   changed_when: true

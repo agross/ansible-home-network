@@ -22,9 +22,9 @@ DeviceName {{ friendly_name }}
 {% endif %}
 MqttPort {{ mqtt_port | default(1883) }}
 {# Suffix because of https://github.com/arendst/Tasmota/issues/9282 #}
-MqttClient {{ device_name }}-client
+MqttClient {{ inventory_hostname }}-client
 
-Topic {{ device_name }}
+Topic {{ inventory_hostname }}
 FullTopic {{ mqtt_topic }}
 
 {# Update telemetry every n seconds (e.g. state and power consumption). #}

@@ -8,7 +8,9 @@
   delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ device_name }}/cm?cmnd=Upgrade%201{{ tasmota_credentials | default('') }}
+      http://{{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}/cm?cmnd=Upgrade%201{{ tasmota_credentials | default('') }}
     return_content: true
   register: status
 
@@ -16,7 +18,10 @@
   delegate_to: localhost
   ansible.builtin.wait_for:
     port: 80
-    host: "{{ device_name }}"
+    host: >-
+      {{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}
     # Less delay may report old version.
     delay: 60
 
@@ -24,7 +29,9 @@
   delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ device_name }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+      http://{{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
     return_content: true
   changed_when: false
   register: new_firmware

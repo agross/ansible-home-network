@@ -2,7 +2,9 @@
   delegate_to: localhost
   ansible.builtin.uri:
     url: >-
-      http://{{ device_name }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+      http://{{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
     return_content: true
   changed_when: false
   register: firmware
