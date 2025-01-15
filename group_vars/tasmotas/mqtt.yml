@@ -2,4 +2,10 @@ mqtt_host: mqtt
 mqtt_port: 1883
 
 mqtt_topic: >-
+  {{ inventory_hostname | ansible.builtin.regex_replace('-(home|ogd)$', '') }}
+
+mqtt_full_topic: >-
   {{ site }}/{{ room | lower | replace(' ', '-') }}/{{ function }}/%prefix%/%topic%/
+
+# Suffix because of https://github.com/arendst/Tasmota/issues/9282
+mqtt_client: "{{ mqtt_topic }}-client"

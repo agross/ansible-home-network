@@ -21,11 +21,10 @@ DeviceName {{ friendly_name }}
   MqttPassword {{ (mqtt_accounts | ansible.builtin.dict2items | first).value }}
 {% endif %}
 MqttPort {{ mqtt_port | default(1883) }}
-{# Suffix because of https://github.com/arendst/Tasmota/issues/9282 #}
-MqttClient {{ inventory_hostname }}-client
+MqttClient {{ mqtt_client }}
 
-Topic {{ inventory_hostname }}
-FullTopic {{ mqtt_topic }}
+Topic {{ mqtt_topic }}
+FullTopic {{ mqtt_full_topic }}
 
 {# Update telemetry every n seconds (e.g. state and power consumption). #}
 TelePeriod 10
