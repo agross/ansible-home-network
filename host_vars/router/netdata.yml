@@ -1,7 +1,7 @@
 netdata_install_method: package
 
 netdata_extra_packages:
-  - netdata-plugin-freeipmi
+  - netdata-freeipmi
 
 netdata_plugins:
   - target: /usr/libexec/netdata/charts.d/lsimr.chart.sh
