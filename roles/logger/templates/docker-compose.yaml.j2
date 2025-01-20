@@ -12,7 +12,7 @@ networks:
 
 services:
   influxdb:
-    image: influxdb:alpine
+    image: influxdb:2-alpine
 
     restart: unless-stopped
     env_file: ./influxdb/.env
