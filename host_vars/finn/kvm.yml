@@ -28,7 +28,7 @@ kvm:
       backup: false
     scsi2:
       storage: local-lvm
-      size: 750
+      size: 800
       discard: true
       iothread: true
       ssd: true
