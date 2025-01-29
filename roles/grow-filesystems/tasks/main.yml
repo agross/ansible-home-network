@@ -1,0 +1,45 @@
+- name: Ensure growpart is available (apt)
+  when: ansible_pkg_mgr == 'apt'
+  ansible.builtin.package:
+    name: cloud-guest-utils
+    state: present
+
+- name: Ensure growpart is available (dnf)
+  when: ansible_pkg_mgr == 'dnf'
+  ansible.builtin.package:
+    name: cloud-utils-growpart
+    state: present
+
+- name: Extend trailing partition to fill all available space
+  ansible.builtin.command:
+    argv:
+      - growpart
+      - "/dev/{{ item.key }}"
+      - "{{ item.value.partitions | length }}"
+  register: growpart_output
+  changed_when: growpart_output.stdout is match('CHANGED:')
+  failed_when: growpart_output.stdout is match('FAILED:')
+  loop: >-
+    {{
+      ansible_devices |
+      ansible.builtin.dict2items |
+      selectattr('value.partitions')
+    }}
+  loop_control:
+    label: >-
+      /dev/{{ item.key }}{{ item.value.partitions | length }}
+
+- name: Grow filesystem
+  community.general.filesystem:
+    dev: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    resizefs: true
+  loop: >-
+    {{
+      ansible_mounts |
+      rejectattr('fstype', 'equalto', 'vfat') |
+      ansible.builtin.unique(attribute = 'device')
+    }}
+  loop_control:
+    label: >-
+      {{ item.device }} fstype={{ item.fstype }} mount={{ item.mount }}

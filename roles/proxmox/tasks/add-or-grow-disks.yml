@@ -1,0 +1,56 @@
+- name: Add disks of guest {{ guest.inventory_hostname }}
+  community.general.proxmox_disk:
+    api_user: "{{ proxmox_api_user | mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_password | mandatory }}"
+    api_host: localhost
+    vmid: "{{ guest.kvm.id | mandatory }}"
+    storage: "{{ device.value.storage }}"
+    disk: "{{ device.key }}"
+    discard: >-
+      {{
+        (device.value.discard | default(false)) is truthy |
+        ansible.builtin.ternary('on', 'ignore')
+      }}
+    iothread: >-
+      {{
+        (device.value.iothread | default(false)) is truthy
+      }}
+    ssd: >-
+      {{
+        (device.value.ssd | default(false)) is truthy |
+        ansible.builtin.ternary(true, omit)
+      }}
+    backup: >-
+      {{
+        (device.value.backup | default(true)) is truthy |
+        ansible.builtin.ternary(omit, false)
+      }}
+    size: "{{ device.value.size }}"
+    state: present
+  loop: "{{ guest.kvm.scsi | default({}) | ansible.builtin.dict2items }}"
+  loop_control:
+    loop_var: device
+    label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }} device={{ device.key }} size={{ device.value.size }}G"
+
+- name: Grow existing disks of guest {{ guest.inventory_hostname }}
+  community.general.proxmox_disk:
+    api_user: "{{ proxmox_api_user | mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_password | mandatory }}"
+    api_host: localhost
+    vmid: "{{ guest.kvm.id | mandatory }}"
+    disk: "{{ device.key }}"
+    size: "{{ device.value.size }}G"
+    state: resized
+  loop: "{{ guest.kvm.scsi | default({}) | ansible.builtin.dict2items }}"
+  loop_control:
+    loop_var: device
+    label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }} device={{ device.key }} size={{ device.value.size }}G"
+  register: proxmox_resized_disks
+
+- name: Remember host with resized disks # noqa: no-handler
+  when: proxmox_resized_disks is changed
+  ansible.builtin.add_host:
+    group: needs_fs_resize
+    name: "{{ guest.inventory_hostname }}"

@@ -12,13 +12,27 @@
         # Would remove Proxmox completely.
         # https://github.com/lae/ansible-role-proxmox/issues/223
         pve_remove_old_kernels: false
-      tags: proxmox
+      tags:
+        - proxmox
+        - pve
     - role: proxmox
       tags:
         - proxmox
         - pve
+        - vms
     - role: smartmontools
       tags: smartmontools
+
+- name: Resize filesystems of VMs with resized disks
+  hosts: needs_fs_resize
+  become: true
+  roles:
+    - role: grow-filesystems
+      tags:
+        - proxmox
+        - pve
+        - vms
+        - grow-filesystems
 
 - name: Import Linux configuration playbook
   tags: linux

@@ -14,7 +14,13 @@
                 {
                   'inventory_hostname': item,
                   'inventory_hostname_short': hostvars[item].inventory_hostname_short,
-                  'kvm': hostvars[item].kvm
+                  'kvm': hostvars[item].kvm |
+                         default({}) |
+                         ansible.builtin.combine({
+                           'scsi_stringified': scsi_stringified_yaml |
+                                               ansible.builtin.from_yaml |
+                                               default ({}, true)
+                         })
                 }
               ],
               []
@@ -22,6 +28,28 @@
           )
       }}
   loop: "{{ groups['all'] | default([]) }}"
+  vars:
+    scsi_stringified_yaml: |
+      ---
+      {% for dev, settings in (hostvars[item].kvm.scsi | default({})).items() %}
+      {{ dev }}: {{
+        settings.storage
+      }}:{{
+        settings.size
+      }}{{
+        (settings.discard | default(false)) is truthy |
+        ansible.builtin.ternary(',discard=on', ',discard=ignore')
+      }}{{
+        (settings.iothread | default(false)) is truthy |
+        ansible.builtin.ternary(',iothread=1', '')
+      }}{{
+        (settings.ssd | default(false)) is truthy |
+        ansible.builtin.ternary(',ssd=1', '')
+      }}{{
+        (settings.backup | default(true)) is truthy |
+        ansible.builtin.ternary('', ',backup=0')
+      }}
+      {% endfor %}
 
 - name: Create guest VMs
   community.general.proxmox_kvm:
@@ -57,7 +85,7 @@
     ide:
       ide0: none # local:iso/Fedora-Server-netinst-x86_64-37-1.7.iso,media=cdrom
     scsihw: virtio-scsi-single
-    scsi: "{{ guest.kvm.scsi | default(omit) }}"
+    scsi: "{{ guest.kvm.scsi_stringified | default(omit) }}"
     net: "{{ guest.kvm.net | default(omit) }}"
     # According to https://pve.proxmox.com/pve-docs/api-viewer/index.html#/nodes/{node}/qemu
     # this is experimental. And it currently fails, which is why we handle
@@ -126,6 +154,13 @@
         index_var: index
         label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
       changed_when: true
+
+- name: Add new or grow existing disks
+  ansible.builtin.include_tasks: add-or-grow-disks.yml
+  loop: "{{ proxmox_kvm_guests }}"
+  loop_control:
+    loop_var: guest
+    label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
 
 - name: Install guest OS manually, if a VM was created
   ansible.builtin.meta: flush_handlers
