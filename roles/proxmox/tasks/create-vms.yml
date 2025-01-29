@@ -5,11 +5,11 @@
 
 - name: Build guest VM list
   ansible.builtin.set_fact:
-    kvm_guests: >-
+    proxmox_kvm_guests: >-
       {{
-        kvm_guests | default([]) +
+        proxmox_kvm_guests | default([]) +
           (
-            hostvars[item].kvm is defined | ternary(
+            (hostvars[item].kvm.host | default('', true) == inventory_hostname) | ternary(
               [
                 {
                   'inventory_hostname': item,
@@ -21,7 +21,7 @@
             )
           )
       }}
-  loop: "{{ groups['guest'] | default([]) }}"
+  loop: "{{ groups['all'] | default([]) }}"
 
 - name: Create guest VMs
   community.general.proxmox_kvm:
@@ -35,25 +35,25 @@
     agent: true
     protection: true
     autostart: true
-    onboot: true
+    onboot: "{{ guest.kvm.onboot | default(true) }}"
     startup: "{{ guest.kvm.startup | default(omit) }}"
     acpi: true
     kvm: true
-    balloon: "{{ guest.kvm.balloon | default(true) }}"
+    balloon: "{{ guest.kvm.balloon | default(false) }}"
     memory: "{{ guest.kvm.memory | mandatory }}"
     bios: ovmf
     efidisk0:
-      storage: local-lvm
+      storage: "{{ guest.kvm.efi_disk_storage | default('local-lvm') }}"
       format: raw
       efitype: 4m
       pre_enrolled_keys: 1
     boot: order=scsi0;ide0
-    sockets: 1
+    sockets: "{{ guest.kvm.sockets | default(1) }}"
     cores: "{{ guest.kvm.cores | mandatory }}"
     cpu: host
     machine: q35
     hotplug: disk,network,usb
-    vga: std
+    vga: "{{ guest.kvm.vga | default(omit) }}"
     ide:
       ide0: none # local:iso/Fedora-Server-netinst-x86_64-37-1.7.iso,media=cdrom
     scsihw: virtio-scsi-single
@@ -65,7 +65,7 @@
     # hostpci: "{{ guest.kvm.hostpci | default(omit) }}"
     ostype: l26
     watchdog: model=i6300esb,action=reset
-  loop: "{{ kvm_guests }}"
+  loop: "{{ proxmox_kvm_guests }}"
   loop_control:
     loop_var: guest
     label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
@@ -74,14 +74,14 @@
 
 - name: Add host PCI devices to guest
   ansible.builtin.include_tasks: create-vms-hostpci.yml
-  loop: "{{ kvm_guests }}"
+  loop: "{{ proxmox_kvm_guests }}"
   loop_control:
     loop_var: guest
     label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
 
 - name: Add host USB devices to guest
   ansible.builtin.include_tasks: create-vms-usb.yml
-  loop: "{{ kvm_guests }}"
+  loop: "{{ proxmox_kvm_guests }}"
   loop_control:
     loop_var: guest
     label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
@@ -103,7 +103,7 @@
       ansible.builtin.shell:
         cmd: >-
           qm config {{ guest.kvm.id | quote }} | grep --quiet ^rng0:
-      loop: "{{ kvm_guests }}"
+      loop: "{{ proxmox_kvm_guests }}"
       loop_control:
         loop_var: guest
         label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
@@ -120,7 +120,7 @@
           - "{{ guest.kvm.id }}"
           - -rng0
           - source=/dev/hwrng
-      loop: "{{ kvm_guests }}"
+      loop: "{{ proxmox_kvm_guests }}"
       loop_control:
         loop_var: guest
         index_var: index
