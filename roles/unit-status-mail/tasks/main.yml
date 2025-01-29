@@ -19,7 +19,7 @@
         state: present
 
     - name: Install msmtp (dnf)
-      when: ansible_pkg_mgr == 'dnf'
+      when: ansible_pkg_mgr is ansible.builtin.match('dnf')
       ansible.builtin.package:
         name: msmtp
         state: present

@@ -34,7 +34,7 @@
         state: present
 
     - name: Install SASL authentication package (dnf)
-      when: ansible_pkg_mgr == 'dnf'
+      when: ansible_pkg_mgr is ansible.builtin.match('dnf')
       ansible.builtin.package:
         name: cyrus-sasl-plain
         state: present
