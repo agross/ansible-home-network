@@ -1,6 +1,6 @@
 - name: Install requirements
   ansible.builtin.package:
-    name: "{{ requirements }}"
+    name: "{{ dotfiles_requirements }}"
     state: present
 
 - name: Clone dotfiles
@@ -34,17 +34,17 @@
 
 - name: Install useful tools
   ansible.builtin.package:
-    name: "{{ tools }}"
+    name: "{{ dotfiles_tools }}"
     state: present
 
 - name: Install useful tools (apt)
   when: ansible_pkg_mgr == 'apt'
   ansible.builtin.package:
-    name: "{{ tools_apt }}"
+    name: "{{ dotfiles_tools_apt }}"
     state: present
 
 - name: Install useful tools (dnf)
   when: ansible_pkg_mgr == 'dnf'
   ansible.builtin.package:
-    name: "{{ tools_dnf }}"
+    name: "{{ dotfiles_tools_dnf }}"
     state: present

@@ -1,6 +1,6 @@
 - name: Get version of the InfluxDB container
   community.docker.docker_container_info:
-    name: "{{ influxdb_migration_container }}"
+    name: "{{ logger_influxdb_migration_container }}"
   register: influxdb_info
 
 - name: Get InfluxDB version entry from environment
@@ -44,7 +44,7 @@
           - /var/lib/influxdb
         detach: false
         interactive: false
-        volumes_from: "{{ influxdb_migration_container }}"
+        volumes_from: "{{ logger_influxdb_migration_container }}"
 
     - name: Create temporary directory to hold the entrypoint from InfluxDB 2
       ansible.builtin.tempfile:
@@ -102,12 +102,12 @@
         interactive: false
         env:
           DOCKER_INFLUXDB_INIT_MODE: upgrade
-          DOCKER_INFLUXDB_INIT_USERNAME: "{{ influxdb_init_user }}"
-          DOCKER_INFLUXDB_INIT_PASSWORD: "{{ influxdb_init_password }}"
-          DOCKER_INFLUXDB_INIT_ORG: "{{ influxdb_init_org }}"
-          DOCKER_INFLUXDB_INIT_BUCKET: "{{ influxdb_init_bucket }}"
-          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "{{ influxdb_init_admin_token }}"
-        volumes_from: "{{ influxdb_migration_container }}"
+          DOCKER_INFLUXDB_INIT_USERNAME: "{{ logger_influxdb_init_user }}"
+          DOCKER_INFLUXDB_INIT_PASSWORD: "{{ logger_influxdb_init_password }}"
+          DOCKER_INFLUXDB_INIT_ORG: "{{ logger_influxdb_init_org }}"
+          DOCKER_INFLUXDB_INIT_BUCKET: "{{ logger_influxdb_init_bucket }}"
+          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "{{ logger_influxdb_init_admin_token }}"
+        volumes_from: "{{ logger_influxdb_migration_container }}"
         mounts:
           - type: bind
             source: "{{ influxdb_entrypoint_file }}"

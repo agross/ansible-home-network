@@ -4,14 +4,14 @@
   vars:
     directory: ../templates
     target: "{{ netdata_root }}"
-    notify: Restart netdata service
+    notify: Restart netdata service  # noqa: var-naming[no-reserved]
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ netdata_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart netdata service
+    notify: Restart netdata service # noqa: var-naming[no-reserved]
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
@@ -21,4 +21,4 @@
     directory: "{{ netdata_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify: Restart netdata service
+    notify: Restart netdata service # noqa: var-naming[no-reserved]

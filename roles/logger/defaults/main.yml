@@ -1,15 +1,15 @@
 logger_root: /data/logger
 
-influxdb_init_user: admin
-influxdb_init_password:
-influxdb_init_org:
-influxdb_init_bucket: default
-influxdb_init_admin_token:
+logger_influxdb_init_user: admin
+logger_influxdb_init_password:
+logger_influxdb_init_org:
+logger_influxdb_init_bucket: default
+logger_influxdb_init_admin_token:
 
-influxdb_backup_buckets: []
+logger_influxdb_backup_buckets: []
 
 # Container for migration from v1 to v2.
-influxdb_migration_container: "logger-influxdb-1"
+logger_influxdb_migration_container: "logger-influxdb-1"
 
 # The API key needs to have the "Admin" role.
 logger_grafana_backup_api_key:

@@ -17,7 +17,7 @@
 
 - name: Create service override directory
   ansible.builtin.file:
-    path: "/etc/systemd/system/{{ smartd_service_name }}.service.d"
+    path: "/etc/systemd/system/{{ smartmontools_service_name }}.service.d"
     state: directory
     owner: 0
     group: 0
@@ -26,7 +26,7 @@
 - name: Ensure smartmontools service errors generate notifications
   ansible.builtin.template:
     src: unit-status-mail.conf
-    dest: /etc/systemd/system/{{ smartd_service_name }}.service.d/unit-status-mail.conf
+    dest: /etc/systemd/system/{{ smartmontools_service_name }}.service.d/unit-status-mail.conf
     owner: 0
     group: 0
     mode: "644"
@@ -36,7 +36,7 @@
   when: ansible_virtualization_role == 'guest'
   ansible.builtin.template:
     src: enabled-for-virtual-host.conf
-    dest: /etc/systemd/system/{{ smartd_service_name }}.service.d/enabled-for-virtual-host.conf
+    dest: /etc/systemd/system/{{ smartmontools_service_name }}.service.d/enabled-for-virtual-host.conf
     owner: 0
     group: 0
     mode: "644"
@@ -44,7 +44,7 @@
 
 - name: Create directory for email notifier
   ansible.builtin.file:
-    path: "{{ smartd_email_notifier | ansible.builtin.dirname }}"
+    path: "{{ smartmontools_email_notifier | ansible.builtin.dirname }}"
     state: directory
     owner: 0
     group: 0
@@ -53,7 +53,7 @@
 - name: Ensure notifications are sent using sendmail
   ansible.builtin.template:
     src: email-notifications
-    dest: "{{ smartd_email_notifier }}"
+    dest: "{{ smartmontools_email_notifier }}"
     owner: 0
     group: 0
     mode: "755"
@@ -64,5 +64,5 @@
     path: /etc/smartmontools/smartd.conf
     regexp: '^(DEVICESCAN .* -M exec) [^\s]+ (.*)$'
     backrefs: true
-    line: '\1 {{ smartd_email_notifier }} \2'
+    line: '\1 {{ smartmontools_email_notifier }} \2'
   notify: Restart smartmontools service

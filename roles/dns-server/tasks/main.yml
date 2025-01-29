@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ dns_server_root }}"
-    notify: Restart dns-server service
+    notify: Restart dns-server service # noqa: var-naming[no-reserved]
     files:
       dnscrypt-proxy/dnscrypt-proxy.toml:
         owner: 65534
@@ -14,7 +14,7 @@
   vars:
     directory: "templates/dns-server/{{ inventory_hostname }}"
     target: "{{ dns_server_root }}"
-    notify: Restart dns-server service
+    notify: Restart dns-server service # noqa: var-naming[no-reserved]
     files:
       adguard/conf/AdGuardHome.yaml.j2:
         mode: "600"
@@ -24,14 +24,14 @@
   vars:
     directory: "{{ dns_server_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart dns-server service
+    notify: Restart dns-server service # noqa: var-naming[no-reserved]
 
 - name: Copy systemd-resolved config files
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: templates/systemd-resolved/resolved.conf.d
     target: /etc/systemd/resolved.conf.d
-    notify: Restart systemd-resolved service
+    notify: Restart systemd-resolved service # noqa: var-naming[no-reserved]
 
 - name: Start systemd-resolved
   ansible.builtin.systemd:
@@ -74,8 +74,7 @@
     directory: "{{ dns_server_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify:
-      - Restart dns-server service
+    notify: Restart dns-server service # noqa: var-naming[no-reserved]
 
 - name: Start systemd units
   ansible.builtin.systemd:

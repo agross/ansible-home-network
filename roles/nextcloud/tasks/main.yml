@@ -9,7 +9,7 @@
   vars:
     directory: ../templates
     target: "{{ nextcloud_root }}"
-    notify: Restart nextcloud service
+    notify: Restart nextcloud service # noqa: var-naming[no-reserved]
     files:
       app/config:
         owner: 33
@@ -64,7 +64,7 @@
     directory: "{{ nextcloud_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify: Restart nextcloud service
+    notify: Restart nextcloud service # noqa: var-naming[no-reserved]
 
 - name: Add vm.overcommit_memory sysctl for Redis
   ansible.posix.sysctl:
@@ -101,7 +101,7 @@
   vars:
     directory: "{{ nextcloud_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart nextcloud service
+    notify: Restart nextcloud service # noqa: var-naming[no-reserved]
 
 - name: Start systemd units
   ansible.builtin.systemd:

@@ -1,4 +1,4 @@
-requirements:
+dotfiles_requirements:
   - fd-find
   - fzf
   - git
@@ -7,17 +7,17 @@ requirements:
   - zsh
 
 # Technically not required but useful.
-tools:
+dotfiles_tools:
   - htop
   - mc
   - tcpdump
   - tree
   - vim
 
-tools_apt:
+dotfiles_tools_apt:
   - bind9-dnsutils
 
-tools_dnf:
+dotfiles_tools_dnf:
   - bind-utils
   # For dnf tab completion.
   - sqlite

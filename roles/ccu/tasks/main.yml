@@ -22,7 +22,7 @@
   vars:
     directory: ../templates
     target: "{{ ccu_root }}"
-    notify: Restart ccu service
+    notify: Restart ccu service # noqa: var-naming[no-reserved]
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -30,8 +30,7 @@
     directory: "{{ ccu_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify:
-      - Restart ccu service
+    notify: Restart ccu service # noqa: var-naming[no-reserved]
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -44,7 +43,7 @@
   vars:
     directory: "{{ ccu_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart ccu service
+    notify: Restart ccu service # noqa: var-naming[no-reserved]
 
 - name: Start service
   ansible.builtin.systemd:

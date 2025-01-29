@@ -13,7 +13,7 @@ cleanup() {
 }
 
 influxdb() {
-  for bucket in {{ influxdb_backup_buckets | map('ansible.builtin.quote') | join(' ') }}; do
+  for bucket in {{ logger_influxdb_backup_buckets | map('ansible.builtin.quote') | join(' ') }}; do
     docker compose \
            --project-name logger \
            exec \

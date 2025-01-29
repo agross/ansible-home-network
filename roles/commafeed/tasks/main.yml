@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ commafeed_root }}"
-    notify: Restart commafeed service
+    notify: Restart commafeed service # noqa: var-naming[no-reserved]
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -11,8 +11,7 @@
     directory: "{{ commafeed_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify:
-      - Restart commafeed service
+    notify: Restart commafeed service # noqa: var-naming[no-reserved]
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -25,7 +24,7 @@
   vars:
     directory: "{{ commafeed_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart commafeed service
+    notify: Restart commafeed service # noqa: var-naming[no-reserved]
 
 - name: Start service
   ansible.builtin.systemd:

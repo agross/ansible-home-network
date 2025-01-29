@@ -3,26 +3,26 @@
 - name: Gather installed packages
   ansible.builtin.package_facts:
 
-- name: Get package information about {{ libseccomp2_package }}
+- name: Get package information about {{ docker_libseccomp2_package }}
   when: >-
     ansible_facts.packages is defined and
-    libseccomp2_package in ansible_facts.packages
+    docker_libseccomp2_package in ansible_facts.packages
   ansible.builtin.set_fact:
     installed_package: >-
       {{
-        ansible_facts.packages[libseccomp2_package] |
+        ansible_facts.packages[docker_libseccomp2_package] |
           selectattr('version', 'defined') |
           first
       }}
 
 - name: >-
-    Install {{ libseccomp2_package }} {{ libseccomp2_install_version }}
+    Install {{ docker_libseccomp2_package }} {{ docker_libseccomp2_install_version }}
     for arch {{ installed_package.arch | default('<not installed>', true) }}
   # noqa name[template]
   when: >-
     installed_package is defined and
-    libseccomp2_install_version is defined and
-    installed_package.version is version(libseccomp2_install_version, '<')
+    docker_libseccomp2_install_version is defined and
+    installed_package.version is version(docker_libseccomp2_install_version, '<')
   ansible.builtin.apt:
     deb: >-
-      {{ libseccomp2_repo }}/{{ libseccomp2_package }}_{{ libseccomp2_install_version }}_{{ installed_package.arch }}.deb
+      {{ docker_libseccomp2_repo }}/{{ docker_libseccomp2_package }}_{{ docker_libseccomp2_install_version }}_{{ installed_package.arch }}.deb

@@ -1,5 +1,5 @@
 - name: Restart smartmontools service
   ansible.builtin.systemd:
-    name: "{{ smartd_service_name }}.service"
+    name: "{{ smartmontools_service_name }}.service"
     state: restarted
     daemon_reload: true

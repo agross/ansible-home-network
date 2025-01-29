@@ -4,7 +4,7 @@
   vars:
     directory: ../templates
     target: "{{ iobroker_root }}"
-    notify:
+    notify: # noqa: var-naming[no-reserved]
       - Restart iobroker service
       - Restart iobroker healthcheck timer
     files:
@@ -60,8 +60,7 @@
     directory: "{{ iobroker_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify:
-      - Restart iobroker service
+    notify: Restart iobroker service # noqa: var-naming[no-reserved]
 
 - name: Add vm.overcommit_memory sysctl for Redis
   ansible.posix.sysctl:
@@ -83,7 +82,7 @@
   vars:
     directory: "{{ iobroker_root }}/systemd"
     local_units: templates/systemd
-    notify:
+    notify: # noqa: var-naming[no-reserved]
       - Restart iobroker service
       - Restart iobroker healthcheck timer
 

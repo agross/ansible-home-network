@@ -1,6 +1,6 @@
-influxdb_init_password: "{{ vault_influxdb_init_password }}"
-influxdb_init_admin_token: "{{ vault_influxdb_init_admin_token }}"
-influxdb_init_org: "{{ site }}"
-influxdb_backup_buckets:
+logger_influxdb_init_password: "{{ vault_influxdb_init_password }}"
+logger_influxdb_init_admin_token: "{{ vault_influxdb_init_admin_token }}"
+logger_influxdb_init_org: "{{ site }}"
+logger_influxdb_backup_buckets:
   - iobroker/current
   - consumptions
