@@ -4,7 +4,7 @@ kvm:
   startup: order=200
   cores: 4
   memory: 4096
-  # PCI passthrough and balooning does not work together.
+  # PCI passthrough and ballooning does not work together.
   # https://forum.proxmox.com/threads/memory-ballooning-on-alpine-linux.87952/#post-385885
   # https://forum.proxmox.com/threads/ballooning-not-working-properly.93140/
   hostpci:

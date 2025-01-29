@@ -14,7 +14,9 @@
         pve_remove_old_kernels: false
       tags: proxmox
     - role: proxmox
-      tags: proxmox
+      tags:
+        - proxmox
+        - pve
     - role: smartmontools
       tags: smartmontools
 
