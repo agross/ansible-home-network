@@ -21,9 +21,27 @@
   ansible.builtin.import_tasks:
     file: tools.yml
 
+- name: Ensure Temurin Java repo is available
+  ansible.builtin.package:
+    name: adoptium-temurin-java-repository
+    state: present
+
+- name: Ensure Temurin Java repo is enabled
+  # Does not support dnf5.
+  # community.general.dnf_config_manager:
+  #   name: adoptium-temurin-java-repository
+  #   state: enabled
+  ansible.builtin.command:
+    argv:
+      - dnf
+      - config-manager
+      - setopt
+      - adoptium-temurin-java-repository.enabled=1
+  changed_when: false
+
 - name: Ensure Java is installed
   ansible.builtin.package:
-    name: java-1.8.0-openjdk
+    name: temurin-8-jdk
     state: present
 
 - name: Download minimal agent ZIP file distribution
