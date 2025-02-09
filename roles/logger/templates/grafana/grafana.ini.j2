@@ -412,11 +412,11 @@ login_maximum_inactive_lifetime_duration = 30d
 ;allowed_domains =
 ;team_ids =
 ;allowed_organizations =
-{% if grafana_github_client_id is defined %}
+{% if logger_grafana_github_client_id is defined %}
 enabled = true
 allow_sign_up = false
-client_id = {{ grafana_github_client_id }}
-client_secret = {{ grafana_github_client_secret | ansible.builtin.mandatory }}
+client_id = {{ logger_grafana_github_client_id }}
+client_secret = {{ logger_grafana_github_client_secret | ansible.builtin.mandatory }}
 {% endif%}
 
 
@@ -445,13 +445,13 @@ client_secret = {{ grafana_github_client_secret | ansible.builtin.mandatory }}
 ;api_url = https://www.googleapis.com/oauth2/v1/userinfo
 ;allowed_domains =
 ;hosted_domain =
-{% if grafana_google_client_id is defined %}
+{% if logger_grafana_google_client_id is defined %}
 enabled = true
 allow_sign_up = false
-client_id = {{ grafana_google_client_id }}
-client_secret = {{ grafana_google_client_secret | ansible.builtin.mandatory }}
-{% if grafana_google_allowed_domains is defined %}
-allowed_domains = {{ grafana_google_allowed_domains }}
+client_id = {{ logger_grafana_google_client_id }}
+client_secret = {{ logger_grafana_google_client_secret | ansible.builtin.mandatory }}
+{% if logger_grafana_google_allowed_domains is defined %}
+allowed_domains = {{ logger_grafana_google_allowed_domains }}
 {% endif %}
 {% endif %}
 
@@ -605,11 +605,11 @@ allowed_domains = {{ grafana_google_allowed_domains }}
 ;ehlo_identity = dashboard.example.com
 # SMTP startTLS policy (defaults to 'OpportunisticStartTLS')
 ;startTLS_policy = NoStartTLS
-{% if grafana_smtp_user is defined %}
+{% if logger_grafana_smtp_user is defined %}
 enabled = true
 host = smtp-relay.gmail.com:587
-user = {{ grafana_smtp_user | ansible.builtin.mandatory }}
-password = {{ grafana_smtp_password | ansible.builtin.mandatory }}
+user = {{ logger_grafana_smtp_user | ansible.builtin.mandatory }}
+password = {{ logger_grafana_smtp_password | ansible.builtin.mandatory }}
 ehlo_identity = grafana.{{ network.domain }}
 from_address = grafana@{{ ansible_hostname }}.{{ network.domain }}
 {% endif %}
