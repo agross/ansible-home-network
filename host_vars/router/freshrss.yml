@@ -1,0 +1,1 @@
+freshrss_backup_healthcheck: "{{ vault_freshrss_backup_healthcheck }}"

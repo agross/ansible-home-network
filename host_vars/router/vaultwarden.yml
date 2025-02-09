@@ -1,3 +1,5 @@
+vaultwarden_backup_healthcheck: "{{ vault_vaultwarden_backup_healthcheck }}"
+
 vaultwarden_admin_token: "{{ vault_vaultwarden_admin_token }}"
 
 vaultwarden_smtp_user: "{{ google_smtp_user }}"

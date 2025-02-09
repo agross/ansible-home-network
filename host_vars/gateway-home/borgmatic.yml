@@ -1,6 +1,3 @@
 borgmatic_encryption_passphrase: "{{ vault_borgmatic_encryption_passphrase }}"
 
 borgmatic_healthchecks_system: "{{ vault_borgmatic_healthchecks_system }}"
-borgmatic_healthchecks_harbor: "{{ vault_borgmatic_healthchecks_harbor }}"
-borgmatic_healthchecks_vaultwarden: "{{ vault_borgmatic_healthchecks_vaultwarden }}"
-borgmatic_healthchecks_nextcloud: "{{ vault_borgmatic_healthchecks_nextcloud }}"

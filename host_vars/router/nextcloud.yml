@@ -1,3 +1,5 @@
+nextcloud_backup_healthcheck: "{{ vault_nextcloud_backup_healthcheck }}"
+
 nextcloud_domain: cloud.therightstuff.de
 
 nextcloud_smtp_user: "{{ google_smtp_user }}"

@@ -72,4 +72,4 @@ hooks:
   healthchecks:
     # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors
     # or just to send logs.
-    ping_url: "{{ borgmatic_healthchecks_harbor }}"
+    ping_url: "{{ harbor_backup_healthcheck }}"
