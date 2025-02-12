@@ -8,17 +8,6 @@
     lstrip_blocks: true
   notify: Reload network interfaces
 
-- name: Ensure host IP is included in /etc/hosts
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    search_string: "{{ inventory_hostname }}"
-    line: >-
-      {{ interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}
-      {{ pve_fqdn }}
-      {{ inventory_hostname }}
-    state: present
-    backup: true
-
 - name: Ensure WebAuthn can be used
   ansible.builtin.lineinfile:
     path: /etc/pve/datacenter.cfg
