@@ -18,7 +18,7 @@
             account
             register
             {{ pve_acme_account_id | quote }}
-            {{ acme_account_email | mandatory | quote }}
+            {{ pve_acme_account_email | mandatory | quote }}
             --directory https://acme-v02.api.letsencrypt.org/directory
         responses:
           "Do you agree to the above terms?": "y"
