@@ -52,23 +52,14 @@
     # A password may be added to the private key using the cockpit UI,
     # but then running this module again will fail which is why we check for
     # this case in failed_when.
-    - name: Generate an SSH keypair to be able to connect to proxied hosts
-      community.crypto.openssh_keypair:
-        path: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_ed25519"
-        type: ed25519
-        comment: >-
-          cockpit-{{ ansible_env.SUDO_USER | default(ansible_user_id) }}-{{ ansible_hostname }}
+    - name: Set SSH key to connect to proxied hosts
+      ansible.builtin.copy:
+        dest: >-
+          /home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_{{ cockpit_ssh_key_type }}
+        content: "{{ cockpit_ssh_private_key }}"
+        mode: "600"
         owner: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
         group: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
-      register: openssh_keypair_result
-      failed_when: >-
-        openssh_keypair_result.msg is defined and
-        not 'The key is protected with a passphrase or broken' in openssh_keypair_result.msg
-
-    - name: Read SSH public key
-      ansible.builtin.slurp:
-        src: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_ed25519.pub"
-      register: cockpit_ssh_key
 
     - name: Configure proxied hosts
       ansible.builtin.template:
@@ -79,14 +70,12 @@
         mode: "644"
 
 - name: Authorize generated SSH key on proxied hosts
-  when: cockpit != 'bastion'
+  when: >-
+    cockpit != 'bastion' and
+    cockpit_ssh_public_key is defined
   ansible.posix.authorized_key:
     user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
-    key: >-
-      {{
-        hostvars[cockpit_bastion_host].cockpit_ssh_key.content |
-        ansible.builtin.b64decode
-      }}
+    key: "{{ cockpit_ssh_public_key }}"
 
 - name: Make cockpit available through Traefik
   when: >-

@@ -1,6 +1,4 @@
-cockpit: bastion
-
 cockpit_ssh_key_type: ed25519
 cockpit_ssh_private_key: "{{ vault_cockpit_ssh_private_key }}"
 cockpit_ssh_public_key: >-
-  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK9GiRwFO0TRfiCtdhUv1CwC96qOnzRIcn7+QF36+eCz cockpit
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEwto0uobpnDLL8+j/zWUTcMDxYUE3x4QuI361ouckcr cockpit
