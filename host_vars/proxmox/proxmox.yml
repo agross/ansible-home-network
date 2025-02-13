@@ -24,3 +24,6 @@ pve_fqdn: "{{ ansible_hostname }}.{{ network.domain | mandatory }}"
 
 pve_acme_account_id: default
 pve_acme_account_email: agross@therightstuff.de
+
+pve_pcie_passthrough_enabled: true
+pve_iommu_passthrough_mode: true

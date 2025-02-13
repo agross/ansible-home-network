@@ -5,15 +5,6 @@
       - --all
   changed_when: true
 
-- name: Update grub
-  ansible.builtin.command:
-    argv:
-      - update-grub
-  changed_when: true
-
-- name: Reboot because kernel parameters changed
-  ansible.builtin.reboot:
-
 - name: Reload firewall
   ansible.builtin.systemd:
     name: pve-firewall

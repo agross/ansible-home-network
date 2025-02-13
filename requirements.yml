@@ -10,6 +10,7 @@ roles:
   - name: geerlingguy.swap
   - name: hifis.unattended_upgrades
   - name: lae.proxmox
+    version: v1.9.1
   - name: xanmanning.k3s
 
 collections:

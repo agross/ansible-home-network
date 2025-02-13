@@ -1,6 +1,3 @@
-- name: Configure IOMMU for PCI passthrough
-  ansible.builtin.import_tasks: iommu.yml
-
 - name: Configure DNS
   ansible.builtin.import_tasks: dns.yml
 
