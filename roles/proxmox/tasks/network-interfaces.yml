@@ -1,6 +1,6 @@
 - name: Configure /etc/network/interfaces
   ansible.builtin.template:
-    src: "templates/{{ inventory_hostname }}/interfaces.j2"
+    src: "{{ ansible_role_name }}/{{ inventory_hostname }}/interfaces.j2"
     dest: /etc/network/interfaces
     owner: 0
     group: 0
