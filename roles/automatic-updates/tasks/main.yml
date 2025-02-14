@@ -1,6 +1,11 @@
 - name: Automatic updates (dnf)
   when: ansible_os_family == 'RedHat'
   block:
+    - name: Ensure dnf5-plugin-automatic is installed
+      ansible.builtin.package:
+        name: dnf5-plugin-automatic
+        state: present
+
     - name: Generate dnf automatic configuration
       ansible.builtin.template:
         src: dnf-automatic.conf.j2
