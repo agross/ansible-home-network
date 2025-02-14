@@ -68,18 +68,26 @@
 
 - name: Copy policies
   ansible.builtin.template:
-    src: "{{ item }}"
+    src: "{{ item.src }}"
     dest: >-
-      /etc/firewalld/policies/{{ item | ansible.builtin.basename | ansible.builtin.regex_replace('\.j2$', '') }}
+      /etc/firewalld/policies/{{
+        item.path |
+        ansible.builtin.basename |
+        ansible.builtin.regex_replace('\.j2$', '')
+      }}
     owner: 0
     group: 0
     mode: "644"
+  when: item.state == "file"
   loop: >-
     {{
-      lookup('ansible.builtin.fileglob',
-             '../templates/firewalld/' ~ inventory_hostname ~ '/*',
+      lookup("community.general.filetree",
+             "templates/" ~ ansible_role_name ~ "/" ~
+             inventory_hostname ~ "/firewalld",
              wantlist = true)
     }}
+  loop_control:
+    label: "{{ item.path }}"
   notify: Reload firewalld
 
 - name: Ensure firewalld is running
