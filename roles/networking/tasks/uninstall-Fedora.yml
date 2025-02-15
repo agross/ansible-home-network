@@ -1,14 +1,16 @@
 - name: Ensure NetworkManager is not installed
-  ansible.builtin.package:
+  ansible.builtin.dnf:
     name:
       - NetworkManager
       - NetworkManager-libnm
     state: absent
+    # Required, otherwise
+    # "installed package requires <this>, but none of the providers can be installed"
+    allowerasing: true
 
 - name: Ensure avahi is not installed
   ansible.builtin.package:
-    name:
-      - avahi
+    name: avahi
     state: absent
 
 - name: Delete NetworkManager config files
