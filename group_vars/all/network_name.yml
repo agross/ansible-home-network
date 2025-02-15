@@ -1,0 +1,8 @@
+network_name: >-
+  {{
+    inventory_hostname |
+    ansible.builtin.regex_replace(
+      '-' ~ (site | ansible.builtin.regex_escape ) ~ '$',
+      ''
+    )
+  }}
