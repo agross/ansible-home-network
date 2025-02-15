@@ -1,23 +1,22 @@
-- name: Install cockpit
-  ansible.builtin.package:
+- name: Install cockpit (dnf)
+  when: ansible_pkg_mgr is ansible.builtin.match('dnf')
+  ansible.builtin.dnf:
     name:
       - cockpit
-    state: present
-
-- name: Install cockpit-selinux and pcp
-  when: ansible_os_family == 'RedHat'
-  ansible.builtin.package:
-    name:
       - cockpit-selinux
       - pcp
     state: present
 
-- name: Install deprecated cockpit-pcp on Debian
-  when: ansible_os_family == 'Debian'
-  ansible.builtin.package:
+- name: Install cockpit (apt)
+  when: ansible_pkg_mgr == 'apt'
+  ansible.builtin.apt:
     name:
-      - cockpit-pcp
+      - cockpit
+      - cockpit-packagekit
+      - cockpit-pcp # Deprecated for future versions.
+      - cockpit-storaged
     state: present
+    install_recommends: false
 
 - name: Start and enable pmlogger.service for pcp
   ansible.builtin.systemd:
@@ -69,7 +68,7 @@
         group: 0
         mode: "644"
 
-- name: Authorize generated SSH key on proxied hosts
+- name: Authorize SSH key on proxied hosts
   when: >-
     cockpit != 'bastion' and
     cockpit_ssh_public_key is defined
