@@ -1,6 +1,19 @@
-- name: Uninstall fwupd on virtual hosts
-  when: ansible_virtualization_role == 'guest'
-  ansible.builtin.package:
+- name: Uninstall fwupd on virtual hosts (dnf)
+  when: >-
+    ansible_virtualization_role == 'guest' and
+    ansible_pkg_mgr is ansible.builtin.match('dnf')
+  ansible.builtin.dnf:
+    name: fwupd
+    state: absent
+    # Required, otherwise
+    # "installed package requires <this>, but none of the providers can be installed"
+    allowerasing: true
+
+- name: Uninstall fwupd on virtual hosts (apt)
+  when: >-
+    ansible_virtualization_role == 'guest' and
+    ansible_pkg_mgr == 'apt'
+  ansible.builtin.apt:
     name: fwupd
     state: absent
 
