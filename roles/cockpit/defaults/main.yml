@@ -7,14 +7,3 @@ cockpit_proxied_hosts: >-
     map(attribute = 'inventory_hostname') |
     list
   }}
-
-cockpit_bastion_host: >-
-  {{
-    groups[site] |
-    map('extract', hostvars) |
-    selectattr('cockpit', 'defined') |
-    selectattr('cockpit', 'equalto', 'bastion') |
-    map(attribute = 'ansible_hostname') |
-    list |
-    first
-  }}
