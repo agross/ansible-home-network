@@ -1,0 +1,37 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+auto lo
+iface lo inet loopback
+
+iface {{ interfaces.lan.device | mandatory }} inet manual
+  {% if interfaces.lan.mtu is defined %}
+  mtu {{ interfaces.lan.mtu }}
+  {% endif %}
+#LAN
+
+iface {{ interfaces.wan.device | mandatory }} inet manual
+#WAN
+
+auto vmbr0
+iface vmbr0 inet static
+  address {{ interfaces.lan.ip4.address | mandatory }}
+  gateway {{ interfaces.lan.ip4.gateway | mandatory }}
+  bridge-ports {{ interfaces.lan.device | mandatory }}
+  bridge-stp off
+  bridge-fd 0
+  {% if interfaces.lan.mtu is defined %}
+  mtu {{ interfaces.lan.mtu }}
+  {% endif %}
+#LAN
+
+iface vmbr0 inet6 static
+  address {{ interfaces.lan.ip6.address | mandatory }}
+  gateway {{ interfaces.lan.ip6.gateway | mandatory }}
+
+auto vmbr1
+iface vmbr1 inet manual
+  bridge-ports {{ interfaces.wan.device | mandatory }}
+  bridge-stp off
+  bridge-fd 0
+#WAN

@@ -1,0 +1,14 @@
+interfaces:
+  lan:
+    device: enp1s0
+    mtu: 9000
+    ip4:
+      # TODO
+      address: "{{ network.ip4 | ansible.utils.ipaddr(88) | mandatory }}"
+      gateway: "{{ network.ip4 | ansible.utils.nthhost(1) | mandatory }}"
+    ip6:
+      # TODO
+      address: "{{ network.ip6 | ansible.utils.ipaddr(88) | mandatory }}"
+      gateway: "{{ network.ip6 | ansible.utils.nthhost(1) | mandatory }}"
+  wan:
+    device: enp2s0

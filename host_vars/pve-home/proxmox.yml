@@ -1,0 +1,29 @@
+proxmox_api_user: "{{ vault_proxmox_api_user }}"
+proxmox_api_password: "{{ vault_proxmox_api_password }}"
+
+pve_groups:
+  - name: admin
+    comment: System Administrators
+pve_users:
+  # User password is the same as the Linux password.
+  - name: "{{ lookup('env', 'USER') | mandatory }}@pam"
+    email: agross@therightstuff.de
+    firstname: Alexander
+    lastname: Groß
+    groups:
+      - admin
+pve_acls:
+  - path: /
+    roles:
+      - Administrator
+    groups:
+      - admin
+pve_group: # No cluster.
+
+pve_fqdn: "{{ ansible_hostname }}.{{ network.domain | mandatory }}"
+
+pve_acme_account_id: default
+pve_acme_account_email: agross@therightstuff.de
+
+pve_pcie_passthrough_enabled: true
+pve_iommu_passthrough_mode: true
