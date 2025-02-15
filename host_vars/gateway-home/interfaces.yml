@@ -1,16 +1,16 @@
 interfaces:
   lan:
-    device: ens192
+    device: enp6s18
     ip4:
-      address: "{{ network.ip4 | ansible.utils.ipaddr(1) }}"
+      address: "{{ network.ip4 | ansible.utils.ipaddr(2) }}"
       dns: "{{ dns.servers | ansible.utils.ipv4 }}"
     ip6:
-      address: "{{ network.ip6 | ansible.utils.ipaddr(1) }}"
+      address: "{{ network.ip6 | ansible.utils.ipaddr(2) }}"
       dns: "{{ dns.servers | ansible.utils.ipv6 }}"
     zone: internal
 
   wan:
-    device: &pppoe_dev ens224
+    device: &pppoe_dev enp6s19
 
   telekom:
     device: telekom
