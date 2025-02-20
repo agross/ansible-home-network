@@ -78,9 +78,11 @@
     boot: order=scsi0;ide0
     sockets: "{{ guest.kvm.sockets | default(1) }}"
     cores: "{{ guest.kvm.cores | mandatory }}"
+    vcpus: "{{ guest.kvm.cores | mandatory }}"
+    numa_enabled: true
+    hotplug: disk,network,usb,cpu,memory
     cpu: host
     machine: q35
-    hotplug: disk,network,usb
     vga: "{{ guest.kvm.vga | default(omit) }}"
     ide:
       ide0: none # local:iso/Fedora-Server-netinst-x86_64-37-1.7.iso,media=cdrom
