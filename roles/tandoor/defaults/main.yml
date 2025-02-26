@@ -1,0 +1,1 @@
+tandoor_root: "/data/{{ ansible_role_name }}"

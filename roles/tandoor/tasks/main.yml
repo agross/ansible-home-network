@@ -1,0 +1,41 @@
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ tandoor_root }}"
+    notify: Restart tandoor service # noqa: var-naming[no-reserved]
+    files:
+      .env.j2:
+        mode: "640"
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ tandoor_root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart tandoor service # noqa: var-naming[no-reserved]
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ tandoor_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ tandoor_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart tandoor service # noqa: var-naming[no-reserved]
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: tandoor_started
