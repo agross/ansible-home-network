@@ -2,7 +2,7 @@
 Description=Mount {{ nextcloud_root }}/backups
 
 [Mount]
-What=/fs/data/nextcloud/backups
+What=/fs/nvme0/nextcloud/backups
 Where={{ nextcloud_root }}/backups
 Type=none
 Options=bind

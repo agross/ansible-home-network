@@ -14,5 +14,5 @@ Where={{ filesystem.where }}
 
 {% if not automount and filesystem.install | default(false) | bool %}
 [Install]
-WantedBy=multi-user.target
+WantedBy=local-fs.target
 {% endif %}
