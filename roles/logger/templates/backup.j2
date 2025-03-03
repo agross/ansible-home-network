@@ -25,55 +25,19 @@ influxdb() {
   done
 }
 
-{% if ansible_architecture != 'x86_64' %}
-grafana-build-backup() {
-  local image="${1?Need image}"
-
-  local temp
-  temp="$(mktemp --directory)"
-
-  pushd "$temp" > /dev/null
-
-  git clone https://github.com/ysde/grafana-backup-tool.git .
-
-  # No ARM-based variant available.
-  docker build \
-         --tag "$image" \
-         --label local=true \
-         .
-
-  popd > /dev/null
-  rm -rf -- "$temp"
-}
-{% endif %}
-
 grafana() {
-  {% if ansible_architecture != 'x86_64' %}
-  local image='ysde/docker-grafana-backup-tool:for-host-architecture-{{ ansible_architecture }}'
-
-  if [[ -z "$(docker images --filter=reference="$image" --quiet)" ]]; then
-    grafana-build-backup "$image"
-  fi
-  {% else %}
-  local image='ysde/docker-grafana-backup-tool'
-  {% endif %}
-
   local target={{ logger_root | ansible.builtin.quote }}/backups/grafana
 
   mkdir --parents -- "$target"
-  chown 1337:1337 -- "$target"
 
   docker run \
          --rm \
-         --name grafana-backup \
-         --env 'GRAFANA_URL=http://grafana:3000' \
-         --env 'GRAFANA_TOKEN={{ logger_grafana_backup_api_key }}' \
-         --env 'GRAFANA_ADMIN_ACCOUNT={{ logger_grafana_backup_admin_user }}' \
-         --env 'GRAFANA_ADMIN_PASSWORD={{ logger_grafana_backup_admin_password }}' \
-         --env 'TZ=Europe/Berlin' \
-         --network 'container:logger-grafana-1' \
-         --volume "$target:/opt/grafana-backup-tool/_OUTPUT_"  \
-         "$image"
+         --volumes-from {{ ansible_role_name | ansible.builtin.quote }}-grafana-1 \
+         alpine/sqlite:latest \
+         /var/lib/grafana/grafana.db \
+         .dump \
+    > "$target/db.sql"
+
 }
 
 trap cleanup ERR SIGINT SIGTERM
