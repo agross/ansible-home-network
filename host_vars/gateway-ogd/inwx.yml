@@ -1,4 +1,2 @@
-inwx:
-  dyndns:
-    username: "{{ vault_inwx_dyndns_username }}"
-    password: "{{ vault_inwx_dyndns_password }}"
+inwx_dyndns_username: "{{ vault_inwx_dyndns_username }}"
+inwx_dyndns_password: "{{ vault_inwx_dyndns_password }}"

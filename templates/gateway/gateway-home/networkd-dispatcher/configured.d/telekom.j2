@@ -49,7 +49,7 @@ inwx() {
   output="$(curl --resolve "$host:443:$ip" \
                  --fail \
                  --connect-timeout 15 \
-                 --user {{ inwx.dyndns.username | mandatory | quote }}:{{ inwx.dyndns.password | mandatory | quote }} \
+                 --user {{ inwx_dyndns_username | mandatory | quote }}:{{ inwx_dyndns_password | mandatory | quote }} \
                  "https://$host/nic/update?hostname={{ network.domain | mandatory }}")"
 
   printf '%s\n' "$output"
