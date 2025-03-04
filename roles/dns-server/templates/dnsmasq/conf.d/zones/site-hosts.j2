@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+{%
+  for host in groups[site] |
+    map('extract', hostvars) |
+    selectattr('interfaces.lan', 'defined') |
+    map(attribute = 'inventory_hostname') |
+    list
+%}
+host-record={{ hostvars[host].network_name }}, {{ hostvars[host].network_name }}.{{ network.domain }}, {{ hostvars[host].interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}, {{ hostvars[host].interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
+{% endfor %}

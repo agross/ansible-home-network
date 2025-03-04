@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+host-record=modem,        modem.{{ network.domain }},         192.168.100.1
+
+cname={{ network.domain }},                         gateway.{{ network.domain }}
+
+cname=traefik.{{ network.domain }},                    finn.{{ network.domain }}
+cname=adguard.{{ network.domain }},                    finn.{{ network.domain }}
+cname=cockpit.{{ network.domain }},                    finn.{{ network.domain }}
+cname=grafana.{{ network.domain }},                    finn.{{ network.domain }}
+cname=iobroker.{{ network.domain }},                   finn.{{ network.domain }}
+cname=lovelace.{{ network.domain }},                   finn.{{ network.domain }}
+cname=gast.{{ network.domain }},                       finn.{{ network.domain }}
+cname=netdata.{{ network.domain }},                    finn.{{ network.domain }}
+
+cname=mqtt,                 mqtt.{{ network.domain }}, finn.{{ network.domain }}
+cname=influxdb,         influxdb.{{ network.domain }}, finn.{{ network.domain }}
