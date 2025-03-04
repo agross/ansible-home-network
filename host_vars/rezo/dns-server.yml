@@ -1,0 +1,6 @@
+dns_server_adguard_users: "{{ vault_dns_server_adguard_users }}"
+
+dns_server_firewalld:
+  - dhcp
+  - dhcpv6
+  - dns

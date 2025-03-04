@@ -6,10 +6,10 @@ dhcp-option=option:domain-search, {{ network.domain | mandatory }}, {{ hostvars[
 dhcp-option=option6:domain-search, {{ network.domain | mandatory }}, {{ hostvars['gateway-ogd'].network.domain }}
 
 # Lease time 3 hours.
-dhcp-range={{ network.ip4 | ansible.utils.nthhost(20) | mandatory }}, {{ network.ip4 | ansible.utils.nthhost(240) | mandatory }}, 255.255.255.0, 3h
+dhcp-range={{ network.ip4 | ansible.utils.nthhost(50) | mandatory }}, {{ network.ip4 | ansible.utils.nthhost(199) | mandatory }}, 255.255.255.0, 3h
 
 # SLAAC is required for Android which does not support stateful DHCPv6.
-dhcp-range={{ network.ip6 | ansible.utils.nthhost(0x20) | mandatory }}, {{ network.ip6 | ansible.utils.nthhost(0x240) | mandatory }}, slaac, ra-names, 64, 3h
+dhcp-range={{ network.ip6 | ansible.utils.nthhost(0x50) | mandatory }}, {{ network.ip6 | ansible.utils.nthhost(199) | mandatory }}, slaac, ra-names, 64, 3h
 
 # This is the default gateway.
 dhcp-option=option:router, {{ hostvars['gateway-home'].interfaces.lan.ip4.address | ansible.utils.ipv4('address') | mandatory }}

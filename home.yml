@@ -84,6 +84,24 @@
     - role: gateway
       tags: gateway
 
+- name: Networking
+  hosts: rezo
+  become: true
+  gather_facts: false
+  roles:
+    - role: ssh
+      tags: ssh
+    - role: docker
+      tags: docker
+    - role: dns-server
+      tags:
+        - dns-server
+        - container
+    - role: traefik
+      tags:
+        - traefik
+        - container
+
 - name: Home automation
   hosts: nest
   become: true
@@ -115,10 +133,6 @@
   become: true
   gather_facts: false
   roles:
-    - role: dns-server
-      tags:
-        - dns-server
-        - container
     - role: vaultwarden
       tags:
         - vaultwarden

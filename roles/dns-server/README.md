@@ -1,3 +1,17 @@
+# DHCP Server
+
+Reference: <https://docs.pi-hole.net/docker/dhcp/>.
+
+In summary: The DHCP server needs to be able to talk to the network directly
+unless using a DHCP relay agent. The options are:
+
+* dnsmasq uses host networking
+* dnsmasq uses MACVLAN
+* dnsmasq uses docker bridge networking with a DHCP relay agent
+
+I'm not sure how well the docker network bridge with DHCPv6.
+<https://blogs.infoblox.com/ipv6-coe/dhcp-and-dhcpv6-commonalities-and-differences/>
+
 # DNS Server
 
 DNS lookups work like this:
@@ -8,9 +22,8 @@ DNS lookups work like this:
    dnsmasq.
 1. dnsmasq also runs with host networking, listening on 53000/udp.
    dnsmasq also provides DHCPv4 and v6 capabilities to LAN hosts.
-1. If dnsmasq cannot satisfy the request from DHCP information, it forwards to
-   - ARWEN (Windows Server DC, if \*.wghoch4.local was requested), or
-   - dnscrypt-proxy otherwise.
+1. If dnsmasq cannot satisfy the request from DHCP or its configuration, it
+   forwards to dnscrypt-proxy.
 1. dnscrypt-proxy is required because I want DNS traffic leaving my network to
    be encrypted and dnsmasq does not handle e.g. DNS over HTTPS (only plain
    UDP-based DNS).

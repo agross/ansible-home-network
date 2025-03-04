@@ -5,5 +5,5 @@ dns:
     # - "{{ hostvars['gateway-ogd'].network.domain | mandatory }}"
     - ogd.therightstuff.de
   servers:
-    - "{{ network.ip4 | ansible.utils.nthhost(3) | mandatory }}"
-    - "{{ network.ip6 | ansible.utils.nthhost(3) | mandatory }}"
+    - "{{ network.ip4 | ansible.utils.nthhost(4) | mandatory }}"
+    - "{{ network.ip6 | ansible.utils.nthhost(4) | mandatory }}"
