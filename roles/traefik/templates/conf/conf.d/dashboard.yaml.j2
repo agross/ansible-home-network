@@ -3,7 +3,7 @@ http:
     dashboard:
       entrypoints: https
       rule: >-
-        Host(`traefik.{{ network.domain | mandatory }}`) &&
+        Host(`{{ ansible_hostname }}.{{ network.domain | mandatory }}`) &&
         (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       middlewares:
@@ -12,7 +12,8 @@ http:
         certResolver: letsencrypt-trs-dns
         domains:
           - main: {{ network.domain }}
-            sans: "*.{{ network.domain }}"
+            sans:
+              - "*.{{ network.domain }}"
 
   middlewares:
     dashboard-auth:

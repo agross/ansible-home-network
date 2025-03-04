@@ -35,7 +35,6 @@ ExecStart=/usr/bin/docker container \
                           --env 'LEGO_DISABLE_CNAME_SUPPORT=true' \
                           --env 'INWX_USERNAME={{ inwx_acme_username | ansible.builtin.mandatory }}' \
                           --env 'INWX_PASSWORD={{ inwx_acme_password | ansible.builtin.mandatory }}' \
-                          --env 'INWX_PROPAGATION_TIMEOUT=0' \
                           --add-host=host.docker.internal:host-gateway \
                           --health-cmd 'traefik healthcheck' \
                           {{ traefik_image | ansible.builtin.mandatory | ansible.builtin.quote }}

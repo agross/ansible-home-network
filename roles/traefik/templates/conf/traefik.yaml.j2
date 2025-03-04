@@ -1,0 +1,71 @@
+providers:
+  docker:
+    # Need to configure label traefik.enable=true.
+    exposedByDefault: false
+    # All traefik-enabled containers must be on this network.
+    network: web
+  file:
+    directory: /etc/traefik/conf.d
+    watch: true
+
+api:
+  dashboard: true
+
+# docker exec traefik traefik healthcheck
+ping: {}
+
+log:
+  level: INFO
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+          permanent: true
+
+  https:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt-trs-dns
+
+certificatesResolvers:
+  letsencrypt-trs-dns:
+    acme:
+      email: agross@therightstuff.de
+      storage: /etc/traefik/acme/trs-dns.json
+      dnsChallenge:
+        provider: inwx
+        propagation:
+          # By default, the Traefik/lego provider above verifies the TXT record
+          # before letting ACME/Let's Encrypt verify.
+          # The default timeout for the TXT records to be publicly visible on the
+          # authorative INWX DNS servers is 6 minutes. During that time lego
+          # repeatedly checks if they are visible. If not, the check is retried
+          # until the timeout is reached. Otherwise, the certificate order is
+          # passed on to ACME.
+          #
+          # https://go-acme.github.io/lego/dns/inwx/
+          #
+          # LEGO_DISABLE_CNAME_SUPPORT needs to be set to true because
+          # {{ network.domain }} has a wildcard CNAME record registered in INWX
+          # DNS.
+          # _acme-challenge.{{ network.domain }} would be resolved to find the
+          # delegated domain used for certificate validations.
+          # https://letsencrypt.org/2019/10/09/onboarding-your-customers-with-lets-encrypt-and-acme.html#the-advantages-of-a-cname
+          delayBeforeChecks: 10
+
+  letsencrypt-trs-dns-staging:
+    acme:
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      email: agross@therightstuff.de
+      storage: /etc/traefik/acme/trs-dns-staging.json
+      dnsChallenge:
+        provider: inwx
+        propagation:
+          # See above.
+          delayBeforeChecks: 10
