@@ -69,6 +69,7 @@ systemd_networkd_network:
         - RequiredFamilyForOnline: ipv4
         - ActivationPolicy: always-up
     - Network:
+        - DHCP: false
         - Address: "{{ interfaces.lan.ip4.address }}"
         - Address: "{{ interfaces.lan.ip6.address }}"
         - DNS: "{{ interfaces.lan.ip4.dns }}"
