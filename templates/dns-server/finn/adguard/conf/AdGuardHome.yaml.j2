@@ -5,7 +5,7 @@ http:
   address: 0.0.0.0:30000
   session_ttl: 720h
 users:
-{% for user, password in adguard_users.items() %}
+{% for user, password in dns_server_adguard_users.items() %}
   - name: {{ user }}
     {# https://github.com/ansible/ansible/issues/36129#issuecomment-658832705 #}
     password: {{ password |

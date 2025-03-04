@@ -1,1 +1,0 @@
-adguard_users: "{{ vault_adguard_users }}"
