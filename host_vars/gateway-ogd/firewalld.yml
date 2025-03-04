@@ -13,7 +13,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=80
-          to-addr={{ hostvars.finn.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
+          to-addr={{ hostvars.finn.interfaces.lan.ip6.address }}
           to-port=80
       # HTTPS.
       - >-
@@ -21,7 +21,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=443
-          to-addr={{ hostvars.finn.interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
+          to-addr={{ hostvars.finn.interfaces.lan.ip6.address }}
           to-port=443
 
   forward_ports:
@@ -29,18 +29,10 @@ firewalld:
       # HTTP.
       - proto: tcp
         port: 80
-        toaddr: >-
-          {{
-            hostvars.finn.interfaces.lan.ip4.address |
-              ansible.utils.ipaddr('address')
-          }}
+        toaddr: "{{ hostvars.finn.interfaces.lan.ip4.address }}"
         toport: 80
       # HTTPS.
       - proto: tcp
         port: 443
-        toaddr: >-
-          {{
-            hostvars.finn.interfaces.lan.ip4.address |
-              ansible.utils.ipaddr('address')
-          }}
+        toaddr: "{{ hostvars.finn.interfaces.lan.ip4.address }}"
         toport: 443

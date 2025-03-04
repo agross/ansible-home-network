@@ -8,5 +8,5 @@
     map(attribute = 'inventory_hostname') |
     list
 %}
-host-record={{ hostvars[host].network_name }}, {{ hostvars[host].network_name }}.{{ network.domain }}, {{ hostvars[host].interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}, {{ hostvars[host].interfaces.lan.ip6.address | ansible.utils.ipaddr('address') }}
+host-record={{ hostvars[host].network_name }}, {{ hostvars[host].network_name }}.{{ network.domain }}, {{ hostvars[host].interfaces.lan.ip4.address }}, {{ hostvars[host].interfaces.lan.ip6.address }}
 {% endfor %}

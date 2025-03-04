@@ -1,3 +1,10 @@
+- name: Run validations
+  hosts: home
+  gather_facts: false
+  roles:
+    - role: validate
+      tags: validate
+
 - name: Raspberry Pi configuration
   hosts: home:&raspi
   become: true

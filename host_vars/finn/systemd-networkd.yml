@@ -8,8 +8,16 @@ systemd_networkd_network:
         - Name: "{{ interfaces.lan.device }}"
     - Network:
         - DHCP: false
-        - Address: "{{ interfaces.lan.ip4.address }}"
-        - Address: "{{ interfaces.lan.ip6.address }}"
+        - Address: >-
+            {{
+              (interfaces.lan.ip4.address ~ '/' ~ interfaces.lan.ip4.prefix) |
+              ansible.utils.ipaddr('host/prefix')
+            }}
+        - Address: >-
+            {{
+              (interfaces.lan.ip6.address ~ '/' ~ interfaces.lan.ip6.prefix) |
+              ansible.utils.ipaddr('host/prefix')
+            }}
         - DNS: "{{ interfaces.lan.ip4.dns }}"
         - DNS: "{{ interfaces.lan.ip6.dns }}"
         - DNSDefaultRoute: true
@@ -19,9 +27,5 @@ systemd_networkd_network:
         - IPv6LinkLocalAddressGenerationMode: stable-privacy
 
     - Route:
-        - Gateway: >-
-            {{
-              hostvars['gateway-ogd'].interfaces.lan.ip4.address |
-                ansible.utils.ipaddr('address')
-            }}
+        - Gateway: "{{ network_gateway.ip4 }}"
         - GatewayOnLink: true

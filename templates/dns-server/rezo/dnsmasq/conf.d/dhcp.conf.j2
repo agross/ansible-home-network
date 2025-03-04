@@ -12,4 +12,4 @@ dhcp-range={{ network.ip4 | ansible.utils.nthhost(50) | mandatory }}, {{ network
 dhcp-range={{ network.ip6 | ansible.utils.nthhost(0x50) | mandatory }}, {{ network.ip6 | ansible.utils.nthhost(199) | mandatory }}, slaac, ra-names, 64, 3h
 
 # This is the default gateway.
-dhcp-option=option:router, {{ hostvars['gateway-home'].interfaces.lan.ip4.address | ansible.utils.ipv4('address') | mandatory }}
+dhcp-option=option:router, {{ hostvars['gateway-home'].interfaces.lan.ip4.address | mandatory }}

@@ -12,7 +12,7 @@ systemd_networkd_netdev:
         - MTUBytes: 1472
     - Tunnel:
         - Independent: true
-        - Local: "{{ interfaces.lan.ip4.address | ansible.utils.ipaddr('address') }}"
+        - Local: "{{ interfaces.lan.ip4.address }}"
         - Remote: "{{ he_ipv6.tunnel.server4 }}"
         - TTL: 255
         - DiscoverPathMTU: true
@@ -60,8 +60,16 @@ systemd_networkd_network:
         - ActivationPolicy: always-up
     - Network:
         - DHCP: false
-        - Address: "{{ interfaces.lan.ip4.address }}"
-        - Address: "{{ interfaces.lan.ip6.address }}"
+        - Address: >-
+            {{
+              (interfaces.lan.ip4.address ~ '/' ~ interfaces.lan.ip4.prefix) |
+              ansible.utils.ipaddr('host/prefix')
+            }}
+        - Address: >-
+            {{
+              (interfaces.lan.ip6.address ~ '/' ~ interfaces.lan.ip6.prefix) |
+              ansible.utils.ipaddr('host/prefix')
+            }}
         - DNS: "{{ interfaces.lan.ip4.dns }}"
         - DNS: "{{ interfaces.lan.ip6.dns }}"
         - DNSDefaultRoute: true

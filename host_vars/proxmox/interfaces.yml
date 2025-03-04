@@ -3,10 +3,10 @@ interfaces:
     device: enp2s0
     mtu: 9000
     ip4:
-      address: "{{ network.ip4 | ansible.utils.ipaddr(1) | mandatory }}"
-      gateway: "{{ network.ip4 | ansible.utils.nthhost(2) | mandatory }}"
+      address: "{{ network.ip4 | ansible.utils.nthhost(1) }}"
+      prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
     ip6:
-      address: "{{ network.ip6 | ansible.utils.ipaddr(1) | mandatory }}"
-      gateway: "{{ network.ip6 | ansible.utils.nthhost(2) | mandatory }}"
+      address: "{{ network.ip6 | ansible.utils.nthhost(0x1) }}"
+      prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
   wan:
     device: enp3s0

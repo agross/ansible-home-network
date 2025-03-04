@@ -2,9 +2,11 @@ interfaces:
   lan:
     device: enp6s18
     ip4:
-      address: "{{ network.ip4 | ansible.utils.ipaddr(3) }}"
-      dns: 127.0.0.1
+      address: "{{ network.ip4 | ansible.utils.nthhost(3) }}"
+      prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv4 }}"
     ip6:
-      address: "{{ network.ip6 | ansible.utils.ipaddr(3) }}"
-      dns: ::1
+      address: "{{ network.ip6 | ansible.utils.nthhost(0x3) }}"
+      prefix: "{{ network.ip6 | ansible.utils.ipaddr('prefix') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv6 }}"
     zone: internal

@@ -1,0 +1,11 @@
+- name: Force evaluation of hostvars of all other hosts on site
+  ansible.builtin.assert:
+    that:
+      # Uncomment to see the order of evaluation. If an item fails ansible won't
+      # report the item, but rather the run_once host that was chosen.
+      # - item | length == 0
+      - hostvars[item] | to_json | length
+    quiet: true
+  loop: >-
+    {{ groups[site] }}
+  run_once: true

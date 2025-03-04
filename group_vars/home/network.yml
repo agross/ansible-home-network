@@ -10,3 +10,7 @@ network:
           ansible.utils.ipaddr(0xc0de0000000000000000) |
           ansible.utils.ipaddr('address')
       }}/64
+
+network_gateway:
+  ip4: "{{ network.ip4 | ansible.utils.nthhost(2) | mandatory }}"
+  ip6: "{{ network.ip6 | ansible.utils.nthhost(2) | mandatory }}"

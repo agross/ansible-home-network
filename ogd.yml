@@ -1,3 +1,10 @@
+- name: Run validations
+  hosts: ogd
+  gather_facts: false
+  roles:
+    - role: validate
+      tags: validate
+
 - name: Proxmox configuration
   hosts: ogd:&hypervisor
   become: true

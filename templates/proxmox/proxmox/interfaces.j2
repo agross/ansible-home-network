@@ -15,8 +15,11 @@ iface {{ interfaces.wan.device | mandatory }} inet manual
 
 auto vmbr0
 iface vmbr0 inet static
-  address {{ interfaces.lan.ip4.address | mandatory }}
-  gateway {{ interfaces.lan.ip4.gateway | mandatory }}
+  address {{
+            (interfaces.lan.ip4.address ~ '/' ~ interfaces.lan.ip4.prefix) |
+            ansible.utils.ipaddr('host/prefix')
+          }}
+  gateway {{ network_gateway.ip4 | mandatory }}
   bridge-ports {{ interfaces.lan.device | mandatory }}
   bridge-stp off
   bridge-fd 0
@@ -26,8 +29,11 @@ iface vmbr0 inet static
 #LAN
 
 iface vmbr0 inet6 static
-  address {{ interfaces.lan.ip6.address | mandatory }}
-  gateway {{ interfaces.lan.ip6.gateway | mandatory }}
+  address {{
+            (interfaces.lan.ip6.address ~ '/' ~ interfaces.lan.ip6.prefix) |
+            ansible.utils.ipaddr('host/prefix')
+          }}
+  gateway {{ network_gateway.ip6 | mandatory }}
 
 auto vmbr1
 iface vmbr1 inet manual
