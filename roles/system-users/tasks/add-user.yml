@@ -1,0 +1,63 @@
+- name: Ensure the groups the user will be member of exist
+  ansible.builtin.group:
+    name: "{{ item }}"
+  loop: "{{ [user.key] + user.value.groups }}"
+
+- name: >-
+    Add user {{ user.key }} ({{ user.value.name }})
+    (has password?: {{ user.value.password is defined and user.value.password | length > 0 }})
+  # noqa: name[template]
+  ansible.builtin.user:
+    name: "{{ user.key }}"
+    system: "{{ user.system | default(false) }}"
+    comment: "{{ user.value.name }}"
+    create_home: true
+    group: "{{ user.key }}"
+    groups: "{{ user.value.groups }}"
+    append: true
+    shell: "{{ user.value.shell | default(omit) }}"
+    password: >-
+      {{
+        user.value.password |
+        password_hash('sha512', 65534 | random(seed = inventory_hostname) | string)
+        if (user.value.password is defined and user.value.password | length > 0) else omit
+      }}
+    update_password: on_create
+  register: user_added
+
+- name: >-
+    Force password change for {{ user.key }} if a password was set during user
+    creation
+  # noqa: name[template]
+  when: >-
+    user_added is changed and
+    user.value.password is defined and
+    user.value.password | length > 0
+  ansible.builtin.command:
+    argv:
+      - passwd
+      - --expire
+      - "{{ user.key }}"
+  changed_when: true
+
+- name: Add SSH authorized keys for {{ user.key }}
+  when: user.value.public_key is defined
+  ansible.posix.authorized_key:
+    user: "{{ user.key }}"
+    state: present
+    key: "{{ user.value.public_key }}"
+
+- name: Add SSH authorized keys from GitHub for {{ user.key }}
+  when: user.value.github is defined
+  block:
+    - name: Download SSH keys from GitHub
+      ansible.builtin.uri:
+        url: "https://github.com/{{ user.value.github }}.keys"
+        return_content: true
+      register: public_keys
+
+    - name: Add SSH authorized key for {{ user.key }}
+      ansible.posix.authorized_key:
+        user: "{{ user.key }}"
+        state: present
+        key: "{{ public_keys.content }}"

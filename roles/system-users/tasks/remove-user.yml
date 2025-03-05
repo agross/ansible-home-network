@@ -1,0 +1,4 @@
+- name: Remove user {{ user.key }}
+  ansible.builtin.user:
+    name: "{{ user.key }}"
+    state: absent

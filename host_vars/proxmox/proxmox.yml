@@ -6,7 +6,7 @@ pve_groups:
     comment: System Administrators
 pve_users:
   # User password is the same as the Linux password.
-  - name: "{{ lookup('env', 'USER') | mandatory }}@pam"
+  - name: agross@pam
     email: agross@therightstuff.de
     firstname: Alexander
     lastname: Groß

@@ -1,0 +1,35 @@
+passwordless_sudo_group: ansible
+
+system_users_combined: >-
+  {{
+    system_users |
+    combine(host_system_users | default({}),
+            recursive = true,
+            list_merge = 'append_rp')
+  }}
+
+# https://www.0xf8.org/2021/03/filtering-with-ansibles-selectattr-rejectattr-when-the-tested-attribute-can-be-absent/
+system_users_to_add: >-
+  {{
+    system_users_combined |
+    ansible.builtin.dict2items |
+    rejectattr('value.state', 'defined') |
+    list |
+    ansible.builtin.union (
+      system_users_combined |
+      ansible.builtin.dict2items |
+      selectattr('value.state', 'defined') |
+      selectattr('value.state', 'equalto', 'present') |
+      list
+    ) |
+    ansible.builtin.items2dict
+  }}
+
+system_users_to_remove: >-
+  {{
+    system_users_combined |
+    ansible.builtin.dict2items |
+    selectattr('value.state', 'defined') |
+    selectattr('value.state', 'equalto', 'absent') |
+    ansible.builtin.items2dict
+  }}

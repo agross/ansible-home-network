@@ -1,0 +1,13 @@
+- name: Add user
+  ansible.builtin.include_tasks: add-user.yml
+  with_dict: "{{ system_users_to_add }}"
+  loop_control:
+    loop_var: user
+    label: "{{ user.key }}"
+
+- name: Remove user
+  ansible.builtin.include_tasks: remove-user.yml
+  with_dict: "{{ system_users_to_remove }}"
+  loop_control:
+    loop_var: user
+    label: "{{ user.key }}"

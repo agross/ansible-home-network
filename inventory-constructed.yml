@@ -21,6 +21,9 @@ groups:
   fedora: >-
     ansible_distribution == 'Fedora'
 
+  debian: >-
+    ansible_distribution == 'Debian'
+
   # Only works after ansible.builtin.package_facts was run against the host.
   # 'raspberrypi-kernel' in packages
   raspi: >-

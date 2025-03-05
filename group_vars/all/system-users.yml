@@ -1,0 +1,7 @@
+system_users:
+  agross:
+    name: Alexander Groß
+    groups:
+      - docker
+      - "{{ passwordless_sudo_group }}"
+    github: agross

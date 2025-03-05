@@ -3,6 +3,8 @@
   become: true
   gather_facts: false
   roles:
+    - role: system-users
+      tags: system-users
     - role: guest-agent
       tags: guest-agent
     - role: uninstall-firmware
