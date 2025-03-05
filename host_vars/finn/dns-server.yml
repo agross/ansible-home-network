@@ -4,3 +4,16 @@ dns_server_firewalld:
   - dhcp
   - dhcpv6
   - dns
+
+dns_server_remote_servers:
+  - server: "{{ hostvars['gateway-home'].dns.servers | first }}"
+    domains:
+      - "{{ hostvars['gateway-home'].network.domain }}"
+      - cloud.therightstuff.de
+      - bitwarden.therightstuff.de
+      - feedr.therightstuff.de
+      - feeds.therightstuff.de
+      - photos.therightstuff.de
+      - rss.therightstuff.de
+      - tandoor.therightstuff.de
+      - grossweber.com

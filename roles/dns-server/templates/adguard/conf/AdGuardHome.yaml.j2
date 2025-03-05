@@ -38,13 +38,13 @@ dns:
   upstream_dns:
     - '# dnsmasq.'
     - 127.0.0.1:{{ dns_server_ports.dnsmasq | mandatory }}
-    - '# DNS at home.'
-    {% set home = hostvars['gateway-home'].dns.servers | first %}
-    - '[/{{ hostvars.router.network.domain }}/]{{ home }}'
-    {% for domain in ['cloud', 'feedr', 'feeds', 'photos', 'rss', 'tandoor'] %}
-    - '[/{{ domain }}.therightstuff.de/]{{ home }}'
+
+    - '# Remote DNS servers.'
+    {% for remote in dns_server_remote_servers %}
+    {% for domain in remote.domains %}
+    - '[/{{ domain }}/]{{ remote.server }}'
     {% endfor %}
-    - '[/grossweber.com/]{{ home }}'
+    {% endfor %}
   upstream_dns_file: ""
   bootstrap_dns:
     - 1.1.1.1

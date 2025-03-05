@@ -5,6 +5,8 @@
     target: "{{ dns_server_root }}"
     notify: Restart dns-server service # noqa: var-naming[no-reserved]
     files:
+      adguard/conf/AdGuardHome.yaml.j2:
+        mode: "600"
       dnscrypt-proxy/dnscrypt-proxy.toml:
         owner: 65534
         group: 65534
@@ -15,9 +17,6 @@
     directory: "templates/dns-server/{{ inventory_hostname }}"
     target: "{{ dns_server_root }}"
     notify: Restart dns-server service # noqa: var-naming[no-reserved]
-    files:
-      adguard/conf/AdGuardHome.yaml.j2:
-        mode: "600"
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml

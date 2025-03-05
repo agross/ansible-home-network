@@ -4,3 +4,8 @@ dns_server_firewalld:
   - dhcp
   - dhcpv6
   - dns
+
+dns_server_remote_servers:
+  - server: "{{ hostvars['gateway-ogd'].dns.servers | first }}"
+    domains:
+      - "{{ hostvars['gateway-ogd'].network.domain }}"
