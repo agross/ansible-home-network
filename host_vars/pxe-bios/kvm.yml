@@ -1,0 +1,10 @@
+kvm:
+  host: pve-home
+  id: 2000
+  onboot: false
+  bios: seabios
+  cores: 1
+  memory: 1024
+  net:
+    net0: virtio,bridge=vmbr0,firewall=1
+  boot: order=net0

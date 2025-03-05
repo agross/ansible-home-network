@@ -9,7 +9,8 @@
       {{
         proxmox_kvm_guests | default([]) +
           (
-            (hostvars[item].kvm.host | default('', true) == inventory_hostname) | ternary(
+            (hostvars[item].kvm.host | default('', true) == inventory_hostname) |
+            ansible.builtin.ternary(
               [
                 {
                   'inventory_hostname': item,
@@ -19,7 +20,10 @@
                          ansible.builtin.combine({
                            'scsi_stringified': scsi_stringified_yaml |
                                                ansible.builtin.from_yaml |
-                                               default ({}, true)
+                                               default({}, true),
+                           'efidisk0': efidisk0_yaml |
+                                       ansible.builtin.from_yaml |
+                                       default(omit, true)
                          })
                 }
               ],
@@ -50,6 +54,14 @@
         ansible.builtin.ternary('', ',backup=0')
       }}
       {% endfor %}
+    efidisk0_yaml: |
+      ---
+      {% if (hostvars[item].kvm.bios | default('ovmf')) == 'ovmf' %}
+      storage: {{ hostvars[item].kvm.efi_disk_storage | default('local-lvm') }}
+      format: raw
+      efitype: 4m
+      pre_enrolled_keys: 1
+      {% endif %}
 
 - name: Create guest VMs
   community.general.proxmox_kvm:
@@ -69,13 +81,9 @@
     kvm: true
     balloon: "{{ guest.kvm.balloon | default(false) }}"
     memory: "{{ guest.kvm.memory | mandatory }}"
-    bios: ovmf
-    efidisk0:
-      storage: "{{ guest.kvm.efi_disk_storage | default('local-lvm') }}"
-      format: raw
-      efitype: 4m
-      pre_enrolled_keys: 1
-    boot: order=scsi0;ide0
+    bios: "{{ guest.kvm.bios | default('ovmf') }}"
+    efidisk0: "{{ guest.kvm.efidisk0 | default(omit) }}"
+    boot: "{{ guest.kvm.boot | default('order=scsi0;ide0') }}"
     sockets: "{{ guest.kvm.sockets | default(1) }}"
     cores: "{{ guest.kvm.cores | mandatory }}"
     vcpus: "{{ guest.kvm.cores | mandatory }}"
