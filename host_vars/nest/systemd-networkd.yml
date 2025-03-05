@@ -12,7 +12,7 @@ systemd_networkd_netdev:
         - Mode: bridge
 
 systemd_networkd_network:
-  ens192:
+  enp6s18:
     - Match:
         - Name: "{{ interfaces.lan.device }}"
     - Network:
