@@ -23,7 +23,7 @@ samba_shares:
             value: "yes"
       - name: streams_xattr
     mount:
-      what: /dev/sdc1
+      what: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-part1
 
 samba_users: "{{ vault_samba_users }}"
 

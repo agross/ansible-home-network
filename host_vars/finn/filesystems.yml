@@ -1,11 +1,12 @@
 filesystems:
   - crypt:
       name: data-ssd
-      device: /dev/sda1
+      device: >-
+        /dev/disk/by-id/ata-Samsung_SSD_860_EVO_M.2_1TB_S415NW0R105296Z-part1
       password: none
       opts: discard,noauto,nofail
     where: /home/agross/data/ssd
     automount: true
-  - what: /dev/sdd1
+  - what: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2-part1
     where: /home/agross/data/nvme
     automount: true
