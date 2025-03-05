@@ -1,0 +1,5 @@
+dns_cname_records:
+  - mqtt
+  - "mqtt.{{ network.domain }}"
+
+  - "influxdb.{{ network.domain }}"

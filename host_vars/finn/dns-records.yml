@@ -1,0 +1,13 @@
+dns_cname_records:
+  - mqtt
+  - "mqtt.{{ network.domain }}"
+
+  - "influxdb.{{ network.domain }}"
+
+  - "adguard.{{ network.domain }}"
+  - "cockpit.{{ network.domain }}"
+  - "grafana.{{ network.domain }}"
+  - "iobroker.{{ network.domain }}"
+  - "lovelace.{{ network.domain }}"
+  - "gast.{{ network.domain }}"
+  - "netdata.{{ network.domain }}"

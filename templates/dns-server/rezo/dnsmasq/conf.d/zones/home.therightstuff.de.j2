@@ -6,21 +6,3 @@ host-record=iob,          iob.{{ network.domain }},          172.16.0.245
 host-record=modem,        modem.{{ network.domain }},        172.16.0.250
 host-record=esxi-bmc,     esxi-bmc.{{ network.domain }},     172.16.0.253, 2001:470:1f0b:c9a::253
 host-record=esxi,         esxi.{{ network.domain }},         172.16.0.254, 2001:470:1f0b:c9a::254
-
-cname={{ network.domain }},                       gateway.{{ network.domain }}
-
-cname=adguard.{{ network.domain }},                  rezo.{{ network.domain }}
-cname=bitwarden.{{ network.domain }},              router.{{ network.domain }}
-cname=build.{{ network.domain }},                  router.{{ network.domain }}
-cname=cockpit.{{ network.domain }},                router.{{ network.domain }}
-cname=grafana.{{ network.domain }},                router.{{ network.domain }}
-cname=hp.{{ network.domain }},                     hp8620.{{ network.domain }}
-cname=hub.{{ network.domain }},                    router.{{ network.domain }}
-cname=iobroker.{{ network.domain }},               router.{{ network.domain }}
-cname=lovelace.{{ network.domain }},               router.{{ network.domain }}
-cname=netdata.{{ network.domain }},                router.{{ network.domain }}
-cname=pxe.{{ network.domain }},                    router.{{ network.domain }}
-cname=youtrack.{{ network.domain }},               router.{{ network.domain }}
-
-cname=mqtt, mqtt.{{ network.domain }},               nest.{{ network.domain }}
-cname=influxdb, influxdb.{{ network.domain }},       nest.{{ network.domain }}

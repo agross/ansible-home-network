@@ -5,8 +5,22 @@
   for host in groups[site] |
     map('extract', hostvars) |
     selectattr('interfaces.lan', 'defined') |
-    map(attribute = 'inventory_hostname') |
-    list
+    map(attribute = 'inventory_hostname')
 %}
-host-record={{ hostvars[host].network_name }}, {{ hostvars[host].network_name }}.{{ network.domain }}, {{ hostvars[host].interfaces.lan.ip4.address }}, {{ hostvars[host].interfaces.lan.ip6.address }}
+{% set hostnames = [host, hostvars[host].network_name] | unique %}
+{% set fqdns = hostnames | ansible.builtin.product([network.domain]) | map('join', '.') %}
+host-record={{ hostnames | join(', ') }}, {{ fqdns | join(', ') }}, {{ hostvars[host].interfaces.lan.ip4.address }}, {{ hostvars[host].interfaces.lan.ip6.address }}
+{% endfor %}
+
+{%
+  for host in groups[site] |
+    map('extract', hostvars) |
+    selectattr('dns_cname_records', 'defined') |
+    map(attribute = 'inventory_hostname')
+%}
+{%
+    for cname in hostvars[host].dns_cname_records | sort
+%}
+cname={{ cname }}, {{ hostvars[host].network_name }}.{{ network.domain }}
+{%   endfor %}
 {% endfor %}

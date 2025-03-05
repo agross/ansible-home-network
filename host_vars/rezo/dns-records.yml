@@ -1,0 +1,2 @@
+dns_cname_records:
+  - "adguard.{{ network.domain }}"

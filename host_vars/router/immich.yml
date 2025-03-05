@@ -1,6 +1,7 @@
 immich_backup_healthcheck: "{{ vault_immich_backup_healthcheck }}"
 
-immich_url: https://photos.therightstuff.de
+immich_domain: photos.therightstuff.de
+immich_url: "https://{{ immich_domain }}"
 
 immich_google_client_id: "{{ vault_immich_google_client_id }}"
 immich_google_client_secret: "{{ vault_immich_google_client_secret }}"
