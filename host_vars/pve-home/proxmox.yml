@@ -31,3 +31,13 @@ pve_iommu_passthrough_mode: true
 pve_zfs_enabled: true
 pve_zfs_zed_email: root
 pve_zfs_create_volumes: []
+
+# lae.proxmox has pve_zfs_options, but does not run update-initramfs after
+# setting these.
+# https://github.com/lae/ansible-role-proxmox/blob/2f9dbfa9191e0e8d5ae9f9eb9e2b88a01c6e35c7/tasks/zfs.yml#L15
+# Also, how to set multiple options in a single string?
+#
+# https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Module%20Parameters.html
+proxmox_zfs_options: |
+  # 30% of RAM.
+  options zfs zfs_arc_max={{ (ansible_memtotal_mb * 1024 * 1024 * 0.3) | int }}

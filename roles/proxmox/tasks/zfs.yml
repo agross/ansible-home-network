@@ -1,0 +1,9 @@
+- name: Set zfs kernel module options
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/zfs.conf
+    content: "{{ proxmox_zfs_options }}"
+    mode: "644"
+    owner: 0
+    group: 0
+  # From lae.proxmox.
+  notify: update-initramfs
