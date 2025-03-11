@@ -1,18 +1,43 @@
-- name: Remove 100 MB default limit
-  ansible.builtin.lineinfile:
-    path: /etc/dphys-swapfile
-    regexp: (CONF_SWAPSIZE=\d+)
-    line: '#\1'
-    backrefs: true
-    backup: true
-    state: present
-  notify: Recompute swap size
+- name: Manage swap partitions
+  when: swap_partitions is defined
+  block:
+    - name: Process partitions
+      ansible.builtin.include_tasks:
+        file: partition.yml
+      loop: "{{ swap_partitions }}"
+      loop_control:
+        loop_var: swap_partition
 
-- name: Set maximum swap size to twice the available RAM
-  ansible.builtin.lineinfile:
-    path: /etc/dphys-swapfile
-    regexp: ^CONF_MAXSWAP=
-    line: "CONF_MAXSWAP={{ ansible_memtotal_mb * 2 }}"
-    backup: true
-    state: present
-  notify: Recompute swap size
+    - name: Enable all configured swap spaces
+      ansible.builtin.command:
+        argv:
+          - swapon
+          - --all
+          - --verbose
+      register: swapon_output
+      # Already used swap spaces are reported to stderr only. Newly used on
+      # stdout.
+      changed_when: swapon_output.stdout_lines | length > 0
+
+- name: Remove limits on Raspberry Pi
+  when: >-
+    'snd_bcm2835.enable_hdmi' in ansible_cmdline
+  block:
+    - name: Remove 100 MB default limit
+      ansible.builtin.lineinfile:
+        path: /etc/dphys-swapfile
+        regexp: (CONF_SWAPSIZE=\d+)
+        line: '#\1'
+        backrefs: true
+        backup: true
+        state: present
+      notify: Recompute swap size
+
+    - name: Set maximum swap size to twice the available RAM
+      ansible.builtin.lineinfile:
+        path: /etc/dphys-swapfile
+        regexp: ^CONF_MAXSWAP=
+        line: "CONF_MAXSWAP={{ ansible_memtotal_mb * 2 }}"
+        backup: true
+        state: present
+      notify: Recompute swap size

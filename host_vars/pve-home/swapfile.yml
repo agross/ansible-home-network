@@ -1,0 +1,3 @@
+swap_partitions:
+  - /dev/disk/by-id/ata-SAMSUNG_MZ7L3480HCHQ-00A07_S664NE0RA01523-part1
+  - /dev/disk/by-id/ata-SAMSUNG_MZ7L3480HCHQ-00A07_S664NE0RA01541-part1

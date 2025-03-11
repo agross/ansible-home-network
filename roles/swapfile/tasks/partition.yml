@@ -1,0 +1,12 @@
+- name: Make swap partition if necessary
+  community.general.filesystem:
+    dev: "{{ swap_partition }}"
+    fstype: swap
+
+- name: Manage entry in fstab
+  ansible.posix.mount:
+    path: none
+    src: "{{ swap_partition }}"
+    fstype: swap
+    opts: defaults,discard,nofail
+    state: present
