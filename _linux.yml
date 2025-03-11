@@ -19,11 +19,7 @@
       tags: kernel-cmdline
     - role: hostname
       tags: hostname
-    - role: geerlingguy.swap
-      when: swap_managed | default(false)
-      tags: swapfile
     - role: swapfile
-      when: swap_partitions is defined
       tags: swapfile
     - role: fstrim
       tags: fstrim

@@ -1,3 +1,8 @@
+- name: Manage swap files
+  when: swap_managed | default(false)
+  ansible.builtin.include_role:
+    name: geerlingguy.swap
+
 - name: Manage swap partitions
   when: swap_partitions is defined
   block:
