@@ -1,7 +1,7 @@
 - name: Set zfs kernel module options
   when: proxmox_zfs_options is defined
   ansible.builtin.copy:
-    dest: /etc/modprobe.d/zfs.conf
+    dest: /etc/modprobe.d/zfs-options.conf
     content: "{{ proxmox_zfs_options }}"
     mode: "644"
     owner: 0
