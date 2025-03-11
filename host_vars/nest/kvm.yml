@@ -1,9 +1,9 @@
 kvm:
   host: pve-home
-  id: 108
+  id: 105
   startup: order=200
   cores: 8
-  memory: 8192
+  memory: 12288
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   efi_disk_storage: local-zfs
@@ -14,3 +14,8 @@ kvm:
       discard: true
       iothread: true
       ssd: true
+  usb:
+    # HomeMatic HB-RF-USB-2.
+    usb0: host=10c4:8c07
+    # Sonoff Zigbee stick.
+    usb1: host=10c4:ea60

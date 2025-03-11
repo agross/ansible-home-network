@@ -1,9 +1,17 @@
 kvm:
   host: pve-home
-  id: 109
+  id: 200
   startup: order=200
   cores: 16
-  memory: 64000
+  memory: 65536
+  numa_enabled: true
+  hotplug: disk,network,usb,cpu,memory
+  # PCI passthrough and ballooning does not work together.
+  # https://forum.proxmox.com/threads/memory-ballooning-on-alpine-linux.87952/#post-385885
+  # https://forum.proxmox.com/threads/ballooning-not-working-properly.93140/
+  hostpci:
+    hostpci0: host=0000:2d:00.0
+    hostpci1: host=0000:2e:00.0
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   efi_disk_storage: local-zfs

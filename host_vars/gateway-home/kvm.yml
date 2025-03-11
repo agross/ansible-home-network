@@ -1,6 +1,6 @@
 kvm:
   host: pve-home
-  id: 100
+  id: 102
   startup: order=100
   cores: 2
   memory: 2048

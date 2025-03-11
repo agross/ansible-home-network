@@ -1,7 +1,6 @@
 kvm:
   host: pve-home
-  id: 107
-  startup: order=any
+  id: 3001
   cores: 4
   memory: 4096
   net:
