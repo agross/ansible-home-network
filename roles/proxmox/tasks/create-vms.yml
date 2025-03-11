@@ -79,16 +79,15 @@
     startup: "{{ guest.kvm.startup | default(omit) }}"
     acpi: true
     kvm: true
-    balloon: "{{ guest.kvm.balloon | default(false) }}"
+    balloon: "{{ guest.kvm.balloon | default(omit) }}"
     memory: "{{ guest.kvm.memory | mandatory }}"
     bios: "{{ guest.kvm.bios | default('ovmf') }}"
     efidisk0: "{{ guest.kvm.efidisk0 | default(omit) }}"
     boot: "{{ guest.kvm.boot | default('order=scsi0;ide0') }}"
     sockets: "{{ guest.kvm.sockets | default(1) }}"
     cores: "{{ guest.kvm.cores | mandatory }}"
-    vcpus: "{{ guest.kvm.cores | mandatory }}"
-    numa_enabled: true
-    hotplug: disk,network,usb,cpu,memory
+    numa_enabled: "{{ guest.kvm.numa_enabled | default(false) }}"
+    hotplug: "{{ guest.kvm.hotplug | default('disk,network,usb') }}"
     cpu: host
     machine: q35
     vga: "{{ guest.kvm.vga | default(omit) }}"
