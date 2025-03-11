@@ -1,4 +1,5 @@
 - name: Set zfs kernel module options
+  when: proxmox_zfs_options is defined
   ansible.builtin.copy:
     dest: /etc/modprobe.d/zfs.conf
     content: "{{ proxmox_zfs_options }}"
@@ -7,3 +8,12 @@
     group: 0
   # From lae.proxmox.
   notify: update-initramfs
+
+- name: Enable ZFS event daemon success notifications
+  when: pve_zfs_zed_email is defined
+  ansible.builtin.lineinfile:
+    dest: /etc/zfs/zed.d/zed.rc
+    line: ZED_NOTIFY_VERBOSE=1
+    regexp: ^#?ZED_NOTIFY_VERBOSE=
+  # From lae.proxmox.
+  notify: restart zfs-zed

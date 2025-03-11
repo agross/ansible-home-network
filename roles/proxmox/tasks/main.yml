@@ -11,9 +11,7 @@
   ansible.builtin.import_tasks: acme-account.yml
 
 - name: Configure zfs
-  when:
-    - pve_zfs_enabled | ansible.builtin.bool
-    - proxmox_zfs_options is defined
+  when: pve_zfs_enabled | ansible.builtin.bool
   ansible.builtin.import_tasks: zfs.yml
 
 - name: Create VMs
