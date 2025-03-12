@@ -1,8 +1,7 @@
 # {{ ansible_managed }}
 # vim: set ft=jinja-properties ts=2 sw=2 et:
 
-host-record=ccu,          ccu.{{ network.domain }},          172.16.0.241
-host-record=iob,          iob.{{ network.domain }},          172.16.0.245
-host-record=modem,        modem.{{ network.domain }},        172.16.0.250
-host-record=esxi-bmc,     esxi-bmc.{{ network.domain }},     172.16.0.253, 2001:470:1f0b:c9a::253
-host-record=esxi,         esxi.{{ network.domain }},         172.16.0.254, 2001:470:1f0b:c9a::254
+host-record=ccu,   ccu.{{ network.domain }},   {{ network.ip4 | ansible.utils.nthhost(241) }}
+host-record=iob,   iob.{{ network.domain }},   {{ network.ip4 | ansible.utils.nthhost(245) }}
+host-record=modem, modem.{{ network.domain }}, {{ network.ip4 | ansible.utils.nthhost(250) }}
+host-record=bmc,   bmc.{{ network.domain }},   {{ network.ip4 | ansible.utils.nthhost(253) }}, {{ network.ip6 | ansible.utils.nthhost(0x253) }}
