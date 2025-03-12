@@ -3,10 +3,6 @@ netdata_install_method: package
 netdata_extra_packages:
   - netdata-freeipmi
 
-netdata_plugins:
-  - target: /usr/libexec/netdata/charts.d/lsimr.chart.sh
-    url: https://github.com/agross/netdata-lsimr/raw/master/lsimr.chart.sh
-
 netdata_config_files:
   .:
     netdata.conf:
@@ -33,24 +29,6 @@ netdata_config_files:
         allow from = {{ network.ip4 | ansible.utils.nthhost(-1) | replace('255', '*') }}
         default memory mode = ram
 
-  charts.d:
-    lsimr.conf:
-      block: |
-        lsimr_update_every=60
-
-        # The charts priority on the dashboard (above disks).
-        lsimr_priority=1500
-
-        # On ESXi:
-        # * /etc/ssh/keys-<user>/ needs to be owned by <user>
-        # * /etc/ssh/keys-<user>/authorized_keys needs to have the sticky
-        #   bit set (chmod +t), mode 0600 and be owned by <user>.
-        lsimr_ssh_identity_file=/etc/netdata/charts.d/lsimr.key
-        lsimr_ssh_host={{ vault_netdata_lsimr_ssh_host }}
-
-    lsimr.key:
-      content: "{{ vault_netdata_lsimr_ssh_keyfile }}"
-
   go.d:
     dnsmasq_dhcp.conf:
       block:
@@ -59,15 +37,6 @@ netdata_config_files:
             leases_path: /data/dns-server/dnsmasq/dnsmasq.leases
             conf_path: /data/dns-server/dnsmasq/dnsmasq.conf
             conf_dir: /data/dns-server/dnsmasq/conf.d
-
-    vsphere.conf:
-      block:
-        jobs:
-          - name: ESXi
-            url: "{{ vault_netdata_vsphere_esxi_url }}"
-            username: "{{ vault_netdata_vsphere_esxi_user }}"
-            password: "{{ vault_netdata_vsphere_esxi_password }}"
-            tls_skip_verify: true
 
   python.d:
     samba.conf:
