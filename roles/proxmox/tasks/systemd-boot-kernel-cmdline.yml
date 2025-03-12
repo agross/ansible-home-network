@@ -1,0 +1,48 @@
+- name: Determine if systemd-boot is used
+  ansible.builtin.stat:
+    path: /etc/kernel/cmdline
+  register: kernel_cmdline
+
+- name: Configure systemd-boot kernel commandline
+  when: kernel_cmdline.stat.exists
+  block:
+    - name: Collect kernel parameters
+      ansible.builtin.set_fact:
+        proxmox_kernel_cmdline: >-
+          {{
+            proxmox_kernel_parameters_yaml |
+            ansible.builtin.from_yaml |
+            default([], true) |
+            unique |
+            join(' ')
+          }}
+      vars:
+        proxmox_kernel_parameters_yaml: |
+          {% for k in proxmox_kernel_cmdline | default([]) %}
+          - {{ k }}
+          {% endfor %}
+          {% if 'GenuineIntel' in ansible_processor %}
+          - intel_iommu=on
+          {% endif %}
+          {% if pve_iommu_passthrough_mode | ansible.builtin.bool %}
+          - iommu=pt
+          {% endif %}
+          {% if pve_mediated_devices_enabled | ansible.builtin.bool %}
+          - i915.enable_gvt=1
+          - i915.enable_guc=0
+          {% endif %}
+          {% if pve_pci_device_ids | length > 0 %}
+          - vfio-pci.ids={{ pve_pci_device_ids | map(attribute='id') | join(',') }}
+          {% endif %}
+
+    - name: Set kernel parameters
+      ansible.builtin.copy:
+        content: >
+          {{ item }}
+        dest: "{{ kernel_cmdline.stat.path }}"
+        owner: 0
+        group: 0
+        mode: "644"
+      loop:
+        - "{{ proxmox_kernel_cmdline }}"
+      notify: Run proxmox-boot-tool refresh

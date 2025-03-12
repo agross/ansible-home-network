@@ -41,3 +41,10 @@ pve_zfs_create_volumes: []
 proxmox_zfs_options: |
   # 30% of RAM.
   options zfs zfs_arc_max={{ (ansible_memtotal_mb * 1024 * 1024 * 0.3) | int }}
+
+# https://docs.kernel.org/admin-guide/kernel-parameters.html
+proxmox_kernel_cmdline:
+  - root=ZFS=rpool/ROOT/pve-1
+  - boot=zfs
+  - video=800x600
+  - panic=60

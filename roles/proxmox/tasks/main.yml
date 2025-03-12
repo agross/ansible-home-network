@@ -14,5 +14,8 @@
   when: pve_zfs_enabled | ansible.builtin.bool
   ansible.builtin.import_tasks: zfs.yml
 
+- name: Configure systemd-boot kernel command line
+  ansible.builtin.import_tasks: systemd-boot-kernel-cmdline.yml
+
 - name: Create VMs
   ansible.builtin.import_tasks: create-vms.yml
