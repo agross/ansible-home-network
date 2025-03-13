@@ -1,0 +1,3 @@
+dns_host_records:
+  - "{{ interfaces.management.ip4.address }}"
+  - "{{ interfaces.management.ip6.address }}"

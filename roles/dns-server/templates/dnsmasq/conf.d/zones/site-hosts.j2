@@ -4,12 +4,15 @@
 {%
   for host in groups[site] |
     map('extract', hostvars) |
-    selectattr('interfaces.lan', 'defined') |
+    selectattr('dns_host_records', 'defined') |
     map(attribute = 'inventory_hostname')
 %}
 {% set hostnames = [host, hostvars[host].network_name] | unique %}
 {% set fqdns = hostnames | ansible.builtin.product([network.domain]) | map('join', '.') %}
-host-record={{ hostnames | join(', ') }}, {{ fqdns | join(', ') }}, {{ hostvars[host].interfaces.lan.ip4.address | default(hostvars[host].interfaces.management.ip4.address) }}, {{ hostvars[host].interfaces.lan.ip6.address | default(hostvars[host].interfaces.management.ip6.address) }}
+{% set ips = hostvars[host].dns_host_records | ansible.utils.ipaddr %}
+{% if ips | length %}
+host-record={{ hostnames | join(', ') }}, {{ fqdns | join(', ') }}, {{ ips | join(', ') }}
+{% endif %}
 {% endfor %}
 
 {%
