@@ -4,6 +4,8 @@
   gather_facts: false
   roles:
     - role: systemd-timesyncd
+      when: >-
+        'container' not in ansible_virtualization_tech_guest
       tags:
         - ntp
         - systemd-timesyncd
