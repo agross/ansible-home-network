@@ -1,0 +1,94 @@
+- name: Configure guest VM
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
+    api_host: localhost
+    node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
+    vmid: "{{ guest.kvm.id | ansible.builtin.mandatory }}"
+    name: "{{ guest.inventory_hostname | ansible.builtin.mandatory }}"
+    agent: true
+    protection: true
+    autostart: true
+    onboot: "{{ guest.kvm.onboot | default(true) }}"
+    startup: "{{ guest.kvm.startup | default(omit) }}"
+    acpi: true
+    kvm: true
+    balloon: "{{ guest.kvm.balloon | default(omit) }}"
+    memory: "{{ guest.kvm.memory | ansible.builtin.mandatory }}"
+    bios: "{{ guest.kvm.bios | default('ovmf') }}"
+    efidisk0: "{{ efidisk0 }}"
+    boot: "{{ guest.kvm.boot | default('order=scsi0;ide0') }}"
+    sockets: "{{ guest.kvm.sockets | default(1) }}"
+    cores: "{{ guest.kvm.cores | ansible.builtin.mandatory }}"
+    numa_enabled: "{{ guest.kvm.numa_enabled | default(false) }}"
+    hotplug: "{{ guest.kvm.hotplug | default('disk,network,usb') }}"
+    cpu: host
+    machine: q35
+    vga: "{{ guest.kvm.vga | default(omit) }}"
+    ide:
+      ide0: none # local:iso/Fedora-Server-netinst-x86_64-37-1.7.iso,media=cdrom
+    scsihw: virtio-scsi-single
+    scsi: "{{ scsi_stringified }}"
+    net: "{{ guest.kvm.net | default(omit) }}"
+    # According to https://pve.proxmox.com/pve-docs/api-viewer/index.html#/nodes/{node}/qemu
+    # this is experimental. And it currently fails, which is why we handle
+    # such devices manually below.
+    # hostpci: "{{ guest.kvm.hostpci | default(omit) }}"
+    ostype: l26
+    watchdog: model=i6300esb,action=reset
+  loop: "{{ proxmox_kvm_guest_configs }}"
+  loop_control:
+    loop_var: guest
+    label: "{{ guest.inventory_hostname }} id={{ guest.kvm.id }}"
+  notify: Configure guest OS manually
+  register: vm_guests_created
+  vars:
+    scsi_stringified_yaml: |
+      ---
+      {% for dev, settings in (guest.kvm.scsi | default({})).items() %}
+      {{ dev }}: {{
+        settings.storage
+      }}:{{
+        settings.size
+      }}{{
+        (settings.discard | default(false)) is truthy |
+        ansible.builtin.ternary(',discard=on', ',discard=ignore')
+      }}{{
+        (settings.iothread | default(false)) is truthy |
+        ansible.builtin.ternary(',iothread=1', '')
+      }}{{
+        (settings.ssd | default(false)) is truthy |
+        ansible.builtin.ternary(',ssd=1', '')
+      }}{{
+        (settings.backup | default(true)) is truthy |
+        ansible.builtin.ternary('', ',backup=0')
+      }}
+      {% endfor %}
+    scsi_stringified: >-
+      {{
+        scsi_stringified_yaml |
+        ansible.builtin.from_yaml |
+        default({}, true)
+      }}
+    efidisk0_yaml: |
+      ---
+      {% if (guest.kvm.bios | default('ovmf')) == 'ovmf' %}
+      storage: {{ guest.kvm.efi_disk_storage | default('local-lvm') }}
+      format: raw
+      efitype: 4m
+      pre_enrolled_keys: 1
+      {% endif %}
+    efidisk0: >-
+      {{
+        efidisk0_yaml |
+        ansible.builtin.from_yaml |
+        default(omit, true)
+      }}
+
+- name: Configure guest VM
+  ansible.builtin.import_tasks:
+    file: vm/configure.yml
+
+- name: Install guest OS manually, if a VM was created
+  ansible.builtin.meta: flush_handlers

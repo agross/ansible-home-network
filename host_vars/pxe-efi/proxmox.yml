@@ -1,10 +1,12 @@
-kvm:
+proxmox:
   host: pve-home
-  id: 2000
+  type: kvm
+  id: 2001
   onboot: false
-  bios: seabios
+  bios: ovmf
   cores: 1
   memory: 1024
   net:
     net0: virtio,bridge=vmbr0,firewall=1
+  efi_disk_storage: local-zfs
   boot: order=net0

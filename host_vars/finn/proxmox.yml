@@ -1,5 +1,6 @@
-kvm:
+proxmox:
   host: proxmox
+  type: kvm
   id: 101
   startup: order=200
   cores: 4

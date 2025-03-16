@@ -1,5 +1,6 @@
-kvm:
+proxmox:
   host: pve-home
+  type: kvm
   id: 3000
   cores: 4
   memory: 4096

@@ -1,6 +1,6 @@
 - name: Check if the default ACME account has been configured
   ansible.builtin.stat:
-    path: /etc/pve/priv/acme/{{ pve_acme_account_id | mandatory }}
+    path: /etc/pve/priv/acme/{{ pve_acme_account_id | ansible.builtin.mandatory }}
   register: acme_account
 
 - name: Register ACME account
@@ -18,7 +18,7 @@
             account
             register
             {{ pve_acme_account_id | quote }}
-            {{ pve_acme_account_email | mandatory | quote }}
+            {{ pve_acme_account_email | ansible.builtin.mandatory | quote }}
             --directory https://acme-v02.api.letsencrypt.org/directory
         responses:
           "Do you agree to the above terms?": "y"
@@ -43,8 +43,8 @@
       ansible.builtin.copy:
         dest: /tmp/inwx-auth
         content: |
-          INWX_User={{ inwx_acme_username | mandatory }}
-          INWX_Password={{ inwx_acme_password | mandatory }}
+          INWX_User={{ inwx_acme_username | ansible.builtin.mandatory }}
+          INWX_Password={{ inwx_acme_password | ansible.builtin.mandatory }}
           INWX_Shared_Secret=
         owner: 0
         group: 0

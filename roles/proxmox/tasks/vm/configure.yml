@@ -1,0 +1,50 @@
+- name: Retrieve pending guest VM config
+  community.general.proxmox_vm_info:
+    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
+    api_host: localhost
+    node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
+    type: qemu
+    config: pending
+  register: proxmox_kvm_config
+
+- name: Set hardware RNG
+  ansible.builtin.import_tasks:
+    file: hardware-rng.yml
+  vars:
+    config: "{{ proxmox_kvm_config }}"
+    guests: "{{ proxmox_kvm_guest_configs }}"
+
+- name: Set host PCI device of guest VM
+  ansible.builtin.import_tasks:
+    file: hostpci.yml
+  vars:
+    config: "{{ proxmox_kvm_config }}"
+    guests: >-
+      {{
+        proxmox_kvm_guest_configs |
+        selectattr('kvm.hostpci', 'defined')
+      }}
+
+- name: Set host USB device of guest VM
+  ansible.builtin.import_tasks:
+    file: usb.yml
+  vars:
+    config: "{{ proxmox_kvm_config }}"
+    guests: >-
+      {{
+        proxmox_kvm_guest_configs |
+        selectattr('kvm.usb', 'defined')
+      }}
+
+- name: Add new or grow existing disks
+  ansible.builtin.import_tasks:
+    file: add-or-grow-disks.yml
+  vars:
+    config: "{{ proxmox_kvm_config }}"
+    guests: >-
+      {{
+        proxmox_kvm_guest_configs |
+        selectattr('kvm.scsi', 'defined')
+      }}

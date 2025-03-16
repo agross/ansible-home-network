@@ -1,0 +1,50 @@
+proxmox_zfs_datasets: >-
+  {{
+    groups[site] |
+    map('ansible.builtin.extract', hostvars) |
+    selectattr('zfs_datasets', 'defined') |
+    selectattr('proxmox.host', 'equalto', inventory_hostname) |
+    map(attribute = 'zfs_datasets') |
+    ansible.builtin.combine |
+    ansible.builtin.dict2items
+  }}
+
+proxmox_lxc_guests: >-
+  {{
+    groups[site] |
+    map('ansible.builtin.extract', hostvars) |
+    selectattr('proxmox.type', 'defined') |
+    selectattr('proxmox.type', 'equalto', 'lxc') |
+    selectattr('proxmox.host', 'equalto', inventory_hostname) |
+    map(attribute = 'inventory_hostname')
+  }}
+
+proxmox_lxc_guest_configs: >-
+  {{
+    proxmox_lxc_guests |
+    map('ansible.builtin.extract', hostvars) |
+    ansible.builtin.items2dict(key_name = 'inventory_hostname',
+                               value_name = 'proxmox') |
+    ansible.builtin.dict2items(key_name = 'inventory_hostname',
+                               value_name = 'lxc')
+  }}
+
+proxmox_kvm_guests: >-
+  {{
+    groups[site] |
+    map('ansible.builtin.extract', hostvars) |
+    selectattr('proxmox.type', 'defined') |
+    selectattr('proxmox.type', 'equalto', 'kvm') |
+    selectattr('proxmox.host', 'equalto', inventory_hostname) |
+    map(attribute = 'inventory_hostname')
+  }}
+
+proxmox_kvm_guest_configs: >-
+  {{
+    proxmox_kvm_guests |
+    map('ansible.builtin.extract', hostvars) |
+    ansible.builtin.items2dict(key_name = 'inventory_hostname',
+                               value_name = 'proxmox') |
+    ansible.builtin.dict2items(key_name = 'inventory_hostname',
+                               value_name = 'kvm')
+  }}

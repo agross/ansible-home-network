@@ -1,0 +1,93 @@
+- name: Add disks to guest VM
+  community.general.proxmox_disk:
+    api_user: "{{ proxmox_api_user | mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_token_secret | mandatory }}"
+    api_host: localhost
+    vmid: "{{ item.0.kvm.id | mandatory }}"
+    storage: "{{ item.1.value.storage }}"
+    disk: "{{ item.1.key }}"
+    discard: >-
+      {{
+        (item.1.value.discard | default(false)) is truthy |
+        ansible.builtin.ternary('on', 'ignore')
+      }}
+    iothread: >-
+      {{
+        (item.1.value.iothread | default(false)) is truthy
+      }}
+    ssd: >-
+      {{
+        (item.1.value.ssd | default(false)) is truthy |
+        ansible.builtin.ternary(true, omit)
+      }}
+    backup: >-
+      {{
+        (item.1.value.backup | default(true)) is truthy |
+        ansible.builtin.ternary(omit, false)
+      }}
+    size: "{{ item.1.value.size }}"
+    state: present
+  loop: >-
+    {{
+      disks |
+      ansible.builtin.from_yaml |
+      ansible.builtin.subelements('scsi')
+    }}
+  loop_control:
+    label: >-
+      {{ item.0.inventory_hostname }}
+      id={{ item.0.kvm.id }}
+      device={{ item.1.key }} size={{ item.1.value.size }}G
+  vars:
+    disks: |
+      {% for guest in guests %}
+      - inventory_hostname: {{ guest.inventory_hostname }}
+        kvm: {{ guest.kvm }}
+        scsi: {{ guest.kvm.scsi | ansible.builtin.dict2items }}
+      {% endfor %}
+
+- name: Grow existing disk of guest VM
+  community.general.proxmox_disk:
+    api_user: "{{ proxmox_api_user | mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_token_secret | mandatory }}"
+    api_host: localhost
+    vmid: "{{ item.0.kvm.id | mandatory }}"
+    disk: "{{ item.1.key }}"
+    size: "{{ item.1.value.size }}G"
+    state: resized
+  loop: >-
+    {{
+      disks |
+      ansible.builtin.from_yaml |
+      ansible.builtin.subelements('scsi')
+    }}
+  loop_control:
+    label: >-
+      {{ item.0.inventory_hostname }}
+      id={{ item.0.kvm.id }}
+      device={{ item.1.key }} size={{ item.1.value.size }}G
+  vars:
+    disks: |
+      {% for guest in guests %}
+      - inventory_hostname: {{ guest.inventory_hostname }}
+        kvm: {{ guest.kvm }}
+        scsi: {{ guest.kvm.scsi | ansible.builtin.dict2items }}
+      {% endfor %}
+  register: proxmox_resized_disks
+
+- name: Remember host with resized disks # noqa: no-handler
+  when: proxmox_resized_disks is changed
+  ansible.builtin.add_host:
+    group: needs_fs_resize
+    name: "{{ item.inventory_hostname }}"
+  loop: >-
+    {{
+      proxmox_resized_disks.results |
+      selectattr('changed') |
+      map(attribute = 'item') |
+      map('first')
+    }}
+  loop_control:
+    label: "{{ item.inventory_hostname }}"

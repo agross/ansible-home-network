@@ -1,0 +1,32 @@
+- name: Set host USB device of guest VM
+  when: >-
+    (
+      config.proxmox_vms |
+      selectattr('id', 'equalto', 'qemu/' ~ item.0.kvm.id)
+    )[0].config[item.1.key] | default('') != item.1.value
+  ansible.builtin.command:
+    argv:
+      - qm
+      - set
+      - "{{ item.0.kvm.id }}"
+      - "-{{ item.1.key }}"
+      - "{{ item.1.value }}"
+  loop: >-
+    {{
+      devices |
+      ansible.builtin.from_yaml |
+      ansible.builtin.subelements('usb')
+    }}
+  loop_control:
+    label: >-
+      {{ item.0.inventory_hostname }}
+      id={{ item.0.kvm.id }}
+      {{ item.1.key }}={{ item.1.value }}
+  changed_when: true
+  vars:
+    devices: |
+      {% for guest in guests %}
+      - inventory_hostname: {{ guest.inventory_hostname }}
+        kvm: {{ guest.kvm }}
+        usb: {{ guest.kvm.usb | ansible.builtin.dict2items }}
+      {% endfor %}

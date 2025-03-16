@@ -1,0 +1,35 @@
+- name: Check if the host uses a hardware RNG
+  ansible.builtin.lineinfile:
+    path: /sys/class/misc/hw_random/rng_current
+    regexp: ^none$
+    state: absent
+  changed_when: false
+  check_mode: true
+  register: host_has_no_hwrng
+
+- name: Add hardware RNG device to guest VM
+  when:
+    - not host_has_no_hwrng.found
+    - (
+        config.proxmox_vms |
+        selectattr('id', 'equalto', 'qemu/' ~ guest.kvm.id)
+      )[0].config[device.key] | default('') != device.value
+  ansible.builtin.command:
+    argv:
+      - qm
+      - set
+      - "{{ guest.kvm.id }}"
+      - "-{{ device.key }}"
+      - "{{ device.value }}"
+  loop: "{{ guests }}"
+  loop_control:
+    loop_var: guest
+    label: >-
+      {{ guest.inventory_hostname }}
+      id={{ guest.kvm.id }}
+      {{ device.key }}={{ device.value }}
+  changed_when: true
+  vars:
+    device:
+      key: rng0
+      value: source=/dev/hwrng

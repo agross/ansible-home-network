@@ -1,0 +1,22 @@
+- name: Download SSH keys from GitHub
+  ansible.builtin.uri:
+    url: "https://github.com/{{ github_account }}.keys"
+    return_content: true
+  loop: >-
+    {{
+      guests |
+      map(attribute = 'lxc.ssh_public_key_github_account') |
+      unique
+    }}
+  loop_control:
+    loop_var: github_account
+  register: proxmox_lxc_github_ssh_keys
+
+- name: Store SSH keys in a dictionary
+  ansible.builtin.set_fact:
+    proxmox_lxc_github_ssh_keys: >-
+      {{
+        proxmox_lxc_github_ssh_keys.results |
+        ansible.builtin.items2dict(key_name = 'github_account',
+                                   value_name = 'content')
+      }}

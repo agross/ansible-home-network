@@ -1,5 +1,6 @@
-kvm:
+proxmox:
   host: pve-home
+  type: kvm
   id: 200
   startup: order=200
   cores: 16

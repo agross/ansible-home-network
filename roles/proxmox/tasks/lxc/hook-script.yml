@@ -1,0 +1,48 @@
+- name: Ensure snippets directory exists
+  ansible.builtin.file:
+    path: /var/lib/vz/snippets
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Copy hook script
+  ansible.builtin.template:
+    src: >-
+      {{ ansible_role_name }}/{{ guest.inventory_hostname }}/{{ guest.lxc.hookscript }}
+    dest: "/var/lib/vz/snippets/{{ guest.lxc.hookscript }}"
+    owner: 0
+    group: 0
+    mode: "750"
+  loop: "{{ guests }}"
+  loop_control:
+    loop_var: guest
+    label: >-
+      {{ guest.inventory_hostname }}
+      id={{ guest.lxc.id }}
+      hookscript={{ guest.lxc.hookscript }}
+
+- name: Set hook script of LXC guest
+  when: >-
+    (
+      config.proxmox_vms |
+      selectattr('id', 'equalto', 'lxc/' ~ guest.lxc.id)
+    )[0].config.hookscript | default('') != hookscript
+  ansible.builtin.command:
+    argv:
+      - pct
+      - set
+      - "{{ guest.lxc.id }}"
+      - --hookscript
+      - "{{ hookscript }}"
+  loop: "{{ guests }}"
+  loop_control:
+    loop_var: guest
+    label: >-
+      {{ guest.inventory_hostname }}
+      id={{ guest.lxc.id }}
+      hookscript={{ hookscript }}
+  vars:
+    hookscript: >-
+      {{ 'local:snippets/' ~ guest.lxc.hookscript }}
+  changed_when: true

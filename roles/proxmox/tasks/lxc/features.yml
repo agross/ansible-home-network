@@ -1,0 +1,24 @@
+- name: Set features of LXC guest
+  when: >-
+    (
+      config.proxmox_vms |
+      selectattr('id', 'equalto', 'lxc/' ~ guest.lxc.id)
+    )[0].config.features | default('') != features
+  ansible.builtin.command:
+    argv:
+      - pct
+      - set
+      - "{{ guest.lxc.id }}"
+      - --features
+      - "{{ features }}"
+  loop: "{{ guests }}"
+  loop_control:
+    loop_var: guest
+    label: >-
+      {{ guest.inventory_hostname }}
+      id={{ guest.lxc.id }}
+      features={{ features }}
+  vars:
+    features: >-
+      {{ guest.lxc.features | join(',') }}
+  changed_when: true

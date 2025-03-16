@@ -17,5 +17,16 @@
 - name: Configure systemd-boot kernel command line
   ansible.builtin.import_tasks: systemd-boot-kernel-cmdline.yml
 
-- name: Create VMs
-  ansible.builtin.import_tasks: create-vms.yml
+- name: Ensure proxmoxer is available
+  ansible.builtin.package:
+    name: python3-proxmoxer
+    state: present
+
+- name: Create ZFS datasets
+  ansible.builtin.import_tasks: create-zfs-datasets.yml
+
+- name: Create LXC guests
+  ansible.builtin.import_tasks: create-lxc.yml
+
+- name: Create VM guests
+  ansible.builtin.import_tasks: create-vm.yml

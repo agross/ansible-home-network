@@ -1,11 +1,13 @@
-kvm:
+proxmox:
   host: pve-home
-  id: 104
-  startup: order=110
+  type: kvm
+  id: 102
+  startup: order=100
   cores: 2
   memory: 2048
   net:
     net0: virtio,bridge=vmbr0,firewall=1
+    net1: virtio,bridge=vmbr1,firewall=1
   efi_disk_storage: local-zfs
   scsi:
     scsi0:

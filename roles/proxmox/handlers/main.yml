@@ -21,23 +21,34 @@
   ansible.builtin.reboot:
     msg: Networking changed, rebooting
 
-- name: Install guest OS manually
+- name: Configure guest OS manually
+  when: lxc_guests | length or vm_guests | length
   ansible.builtin.fail:
-    msg: >-
-      One or more VMs were created. Please install the guest OS manually and
-      then rerun the playbook. This is not an error, but there is no other way
-      to end a playbook in Ansible.
+    msg: |
+      One or more LXC or VM guests were created. Please install the guest OS
+      manually and then rerun the playbook. This is not an error, but there is
+      no other way to end a playbook in Ansible.
+
+      LXCs created:
+
+      {{ lxc_guests | ansible.builtin.to_nice_yaml }}
 
       Guest VMs created:
 
+      {{ vm_guests | ansible.builtin.to_nice_yaml }}
+  vars:
+    lxc_guests: >-
       {{
-        guest_vms_created.results |
-          selectattr('changed') |
-          map(attribute = 'guest.kvm.id') |
-          zip(
-            guest_vms_created.results |
-            selectattr('changed') |
-            map(attribute = 'guest.inventory_hostname_short'),
-            strict = true
-          )
+        lxc_guests_created.results |
+        selectattr('changed') |
+        selectattr('msg', 'match', 'Created\s') |
+        ansible.builtin.items2dict(key_name = 'vmid',
+                                   value_name = 'msg')
+      }}
+    vm_guests: >-
+      {{
+        vm_guests_created.results |
+        selectattr('changed') |
+        ansible.builtin.items2dict(key_name = 'vmid',
+                                   value_name = 'msg')
       }}

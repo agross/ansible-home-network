@@ -1,0 +1,21 @@
+- name: Create ZFS datasets
+  community.general.zfs:
+    name: "{{ item.key }}"
+    state: present
+    extra_zfs_properties: "{{ item.value.options | default({}, true) }}"
+  loop: "{{ proxmox_zfs_datasets }}"
+  loop_control:
+    label: "{{ item.key }}: {{ item.value.options | default({}, true) }}"
+
+- name: Set ownership of ZFS datasets
+  ansible.builtin.file:
+    path: "/{{ item.key }}"
+    owner: "{{ item.value.chown.owner | default(omit, true) }}"
+    group: "{{ item.value.chown.group | default(omit, true) }}"
+  loop: >-
+    {{
+      proxmox_zfs_datasets |
+      selectattr('value.chown', 'defined')
+    }}
+  loop_control:
+    label: "/{{ item.key }}: {{ item.value.chown }}"

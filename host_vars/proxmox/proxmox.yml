@@ -1,5 +1,6 @@
 proxmox_api_user: "{{ vault_proxmox_api_user }}"
 proxmox_api_password: "{{ vault_proxmox_api_password }}"
+proxmox_api_token_secret: "{{ vault_proxmox_api_token_secret }}"
 
 pve_groups:
   - name: admin
@@ -20,7 +21,7 @@ pve_acls:
       - admin
 pve_group: # No cluster.
 
-pve_fqdn: "{{ ansible_hostname }}.{{ network.domain | mandatory }}"
+pve_fqdn: "{{ ansible_hostname }}.{{ network.domain | ansible.builtin.mandatory }}"
 
 pve_acme_account_id: default
 pve_acme_account_email: agross@therightstuff.de

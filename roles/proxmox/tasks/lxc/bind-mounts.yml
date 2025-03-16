@@ -1,0 +1,47 @@
+- name: Set bind mount
+  when: >-
+    (
+      config.proxmox_vms |
+      selectattr('id', 'equalto', 'lxc/' ~ item.0.lxc.id)
+    )[0].config[item.1.id] | default('') != options_string
+  ansible.builtin.command:
+    argv:
+      - pct
+      - set
+      - "{{ item.0.lxc.id | ansible.builtin.mandatory }}"
+      - "-{{ item.1.id }}"
+      - "{{ options_string }}"
+  loop: >-
+    {{
+      guests |
+      ansible.builtin.subelements('lxc.mount_volumes')
+    }}
+  loop_control:
+    label: >-
+      {{ item.0.inventory_hostname }}
+      id={{ item.0.lxc.id }}
+      {{ item.1.id }}={{ options_string }}
+  changed_when: true
+  vars:
+    options_yaml: |
+      {% for k, v in (item.1.options | default({})).items() %}
+      - {{ k }}={{ v }}
+      {% endfor %}
+    options_string: >-
+      {{
+        (
+          [
+            item.1.host_path,
+            'mp=' ~ item.1.mountpoint
+          ]
+          +
+          (
+            [
+              options_yaml | ansible.builtin.from_yaml
+            ] |
+            ansible.builtin.flatten |
+            sort
+          )
+        ) |
+        join(',')
+      }}

@@ -1,0 +1,130 @@
+- name: Retrieve LXC guests
+  community.general.proxmox_vm_info:
+    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
+    api_host: localhost
+    node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
+    type: lxc
+    config: pending
+  register: proxmox_existing_lxcs
+
+- name: Download SSH public key
+  ansible.builtin.import_tasks:
+    file: lxc/ssh-public-key.yml
+  vars:
+    guests: >-
+      {{
+        proxmox_lxc_guest_configs |
+        selectattr('lxc.ssh_public_key_github_account', 'defined')
+      }}
+
+- name: Determine protected LXC guests
+  ansible.builtin.set_fact:
+    proxmox_protected_lxcs: >-
+      {{
+        proxmox_existing_lxcs.proxmox_vms |
+        selectattr('config.protection', 'defined') |
+        selectattr('config.protection', 'equalto', 1) |
+        ansible.builtin.items2dict(key_name = 'vmid', value_name = 'name') |
+        ansible.builtin.dict2items
+      }}
+
+# Re-setting even the same values will cause protection to kick in and make the
+# request fail. Deactivate protection until we are done.
+- name: Unprotect LXC guest
+  ansible.builtin.command:
+    argv:
+      - pct
+      - set
+      - "{{ item.key }}"
+      - --protection
+      - 0
+  loop: "{{ proxmox_protected_lxcs }}"
+  loop_control:
+    label: "{{ item.value }} id={{ item.key }}"
+  changed_when: true
+
+- name: Configure LXC guest
+  community.general.proxmox:
+    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
+    # Token-based auth cannot set features, mount_volumes and hookscript,
+    # even if the token is for the root user.
+    # https://forum.proxmox.com/threads/is-it-possible-to-deploy-lxc-container-through-the-api-with-bind-mounts.124543/post-542617
+    api_token_id: ansible
+    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
+    api_host: localhost
+    node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
+    vmid: "{{ guest.lxc.id | ansible.builtin.mandatory }}"
+    hostname: "{{ guest.inventory_hostname | ansible.builtin.mandatory }}"
+    onboot: "{{ guest.lxc.onboot | default(true) }}"
+    startup: "{{ guest.lxc.startup | default(omit) }}"
+    unprivileged: true
+    # ostemplate with update=false for new LXC, update=true for existing LXC.
+    ostemplate: >-
+      {{
+        (guest.lxc.ostemplate | ansible.builtin.mandatory) if
+          (
+            proxmox_existing_lxcs.proxmox_vms |
+            selectattr('vmid', 'equalto', guest.lxc.id) |
+            length == 0
+          )
+        else omit
+      }}
+    update: >-
+      {{
+        true if
+          (
+            proxmox_existing_lxcs.proxmox_vms |
+            selectattr('vmid', 'equalto', guest.lxc.id) |
+            length
+          )
+        else omit
+      }}
+    ostype: "{{ guest.lxc.ostype | default(omit) }}"
+    # mount_volumes: Does not work with token-based auth.
+    disk_volume: "{{ guest.lxc.disk_volume | default(default_disk_volume) }}"
+    password: "{{ guest.lxc.password | ansible.builtin.mandatory }}"
+    pubkey: >-
+      {{
+        guest.lxc.ssh_public_key |
+        default(proxmox_lxc_github_ssh_keys[guest.lxc.ssh_public_key_github_account]) |
+        default(omit)
+      }}
+    cpus: "{{ guest.lxc.cpus | default(omit) }}"
+    cores: "{{ guest.lxc.cores | default(omit) }}"
+    memory: "{{ guest.lxc.memory | ansible.builtin.mandatory }}"
+    swap: "{{ guest.lxc.swap | default(0) }}"
+    timezone: "{{ guest.lxc.timezone | default('host') }}"
+    netif: "{{ guest.lxc.netif | default(default_netif) }}"
+  loop: "{{ proxmox_lxc_guest_configs }}"
+  loop_control:
+    loop_var: guest
+    label: "{{ guest.inventory_hostname }} id={{ guest.lxc.id }}"
+  notify: Configure guest OS manually
+  register: lxc_guests_created
+  vars:
+    default_disk_volume:
+      storage: local-zfs
+      size: 8
+      options:
+        mountoptions: discard;noatime
+    default_netif:
+      net0: name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0,firewall=true
+
+- name: Configure LXC guest
+  ansible.builtin.import_tasks:
+    file: lxc/configure.yml
+
+- name: Protect LXC guest
+  ansible.builtin.command:
+    argv:
+      - pct
+      - set
+      - "{{ item.key }}"
+      - --protection
+      - 1
+  loop: "{{ proxmox_protected_lxcs }}"
+  loop_control:
+    label: "{{ item.value }} id={{ item.key }}"
+  changed_when: true
