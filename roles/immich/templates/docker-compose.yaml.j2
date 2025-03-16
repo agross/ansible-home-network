@@ -31,7 +31,15 @@ services:
       interval: 5s
 
   db:
+    # Update command below when upgrading. Ensure logging_collector=on is not
+    # one of the options.
     image: tensorchord/pgvecto-rs:pg16-v0.2.0
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=vectors.so
+      - -c
+      - search_path="$$user", public, vectors
     env_file:
       - .env
     environment:
