@@ -25,7 +25,7 @@
     enabled: true
 
 - name: Configure bastion host
-  when: cockpit == 'bastion'
+  when: cockpit | default('') == 'bastion'
   block:
     - name: Enable and start cockpit socket
       ansible.builtin.systemd:
@@ -70,7 +70,7 @@
 
 - name: Authorize SSH key on proxied hosts
   when: >-
-    cockpit != 'bastion' and
+    cockpit | default('') != 'bastion' and
     cockpit_ssh_public_key is defined
   ansible.posix.authorized_key:
     user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
@@ -78,7 +78,7 @@
 
 - name: Make cockpit available through Traefik
   when: >-
-    cockpit == 'bastion' and
+    cockpit | default('') == 'bastion' and
     traefik_host and
     traefik_dynamic_file_configuration is defined
   block:
