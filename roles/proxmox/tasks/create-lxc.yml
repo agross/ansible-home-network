@@ -124,7 +124,26 @@
       - "{{ item.key }}"
       - --protection
       - 1
-  loop: "{{ proxmox_protected_lxcs }}"
+  loop: >-
+    {{
+      (proxmox_protected_lxcs + protected_guests) |
+      ansible.builtin.unique(attribute = 'key')
+    }}
   loop_control:
     label: "{{ item.value }} id={{ item.key }}"
   changed_when: true
+  vars:
+    protected_guests_yaml: |
+      {% for guest in proxmox_lxc_guest_configs %}
+      - lxc: {{ guest.lxc }}
+        key: {{ guest.lxc.id }}
+        value: {{ guest.inventory_hostname }}
+      {% endfor %}
+    protected_guests: >-
+      {{
+        protected_guests_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        selectattr('lxc.protection', 'defined') |
+        selectattr('lxc.protection', 'equalto', true)
+      }}
