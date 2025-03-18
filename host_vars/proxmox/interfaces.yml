@@ -7,6 +7,6 @@ interfaces:
       prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
     ip6:
       address: "{{ network.ip6 | ansible.utils.nthhost(0x1) }}"
-      prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
+      prefix: "{{ network.ip6 | ansible.utils.ipaddr('prefix') }}"
   wan:
     device: enp3s0
