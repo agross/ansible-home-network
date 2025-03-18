@@ -17,6 +17,10 @@
 - name: Configure systemd-boot kernel command line
   ansible.builtin.import_tasks: systemd-boot-kernel-cmdline.yml
 
+- name: Install fake subscription such that package update notifications work
+  when: pve_remove_subscription_warning | ansible.builtin.bool
+  ansible.builtin.import_tasks: subscription.yml
+
 - name: Ensure proxmoxer is available
   ansible.builtin.package:
     name: python3-proxmoxer

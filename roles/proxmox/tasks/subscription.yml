@@ -1,0 +1,27 @@
+- name: Determine installed packages
+  ansible.builtin.package_facts:
+
+- name: Install fake subscription
+  when: >-
+    not 'pve-fake-subscription' in ansible_facts.packages
+  block:
+    - name: Download pve-fake-subscription.deb
+      ansible.builtin.import_tasks:
+        file: github-release.yml
+      vars:
+        url: https://api.github.com/repos/Jamesits/pve-fake-subscription/releases/latest
+        asset_name_regex: ^pve-fake-subscription_.*\.deb$
+        dest: /tmp/pve-fake-subscription.deb
+
+    - name: Install pve-fake-subscription.deb
+      ansible.builtin.apt:
+        deb: /tmp/pve-fake-subscription.deb
+
+- name: Add DNS entries blocking license checks
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: |
+      127.0.0.1 shop.maurer-it.com
+      ::1 shop.maurer-it.com
+    append_newline: true
+    prepend_newline: true

@@ -1,0 +1,28 @@
+- name: Get latest release from GitHub
+  ansible.builtin.uri:
+    url: "{{ url }}"
+    headers: "{{ github_release_request_headers | default(omit) }}"
+    return_content: true
+  register: github_release_json
+
+- name: Determine release asset binary
+  ansible.builtin.set_fact:
+    github_asset_url: >-
+      {{
+        github_release_json.json.assets |
+        selectattr('name',
+                   'ansible.builtin.search',
+                   asset_name_regex | ansible.builtin.mandatory) |
+        map(attribute = 'browser_download_url') |
+        first
+      }}
+
+- name: Download release
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ github_asset_url }}"
+    headers: "{{ github_release_request_headers | default(omit) }}"
+    dest: "{{ dest }}"
+    owner: 0
+    group: 0
+    mode: '755'
