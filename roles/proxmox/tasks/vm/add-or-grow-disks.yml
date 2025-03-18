@@ -30,8 +30,7 @@
     state: present
   loop: >-
     {{
-      disks |
-      ansible.builtin.from_yaml |
+      disk_guests |
       ansible.builtin.subelements('scsi')
     }}
   loop_control:
@@ -40,12 +39,20 @@
       id={{ item.0.kvm.id }}
       device={{ item.1.key }} size={{ item.1.value.size }}G
   vars:
-    disks: |
+    disk_guests_yaml: |
       {% for guest in guests %}
       - inventory_hostname: {{ guest.inventory_hostname }}
         kvm: {{ guest.kvm }}
         scsi: {{ guest.kvm.scsi | ansible.builtin.dict2items }}
       {% endfor %}
+    disk_guests: >-
+      {{
+        disk_guests_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
+
 
 - name: Grow existing disk of guest VM
   community.general.proxmox_disk:
@@ -59,8 +66,7 @@
     state: resized
   loop: >-
     {{
-      disks |
-      ansible.builtin.from_yaml |
+      disk_guests |
       ansible.builtin.subelements('scsi')
     }}
   loop_control:
@@ -69,12 +75,19 @@
       id={{ item.0.kvm.id }}
       device={{ item.1.key }} size={{ item.1.value.size }}G
   vars:
-    disks: |
+    disk_guests_yaml: |
       {% for guest in guests %}
       - inventory_hostname: {{ guest.inventory_hostname }}
         kvm: {{ guest.kvm }}
         scsi: {{ guest.kvm.scsi | ansible.builtin.dict2items }}
       {% endfor %}
+    disk_guests: >-
+      {{
+        disk_guests_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
   register: proxmox_resized_disks
 
 - name: Remember host with resized disks # noqa: no-handler

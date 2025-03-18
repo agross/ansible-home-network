@@ -13,8 +13,7 @@
       - "{{ item.1.value }}"
   loop: >-
     {{
-      devices |
-      ansible.builtin.from_yaml |
+      hostpci_guests |
       ansible.builtin.subelements('hostpci')
     }}
   loop_control:
@@ -24,9 +23,16 @@
       {{ item.1.key }}={{ item.1.value }}
   changed_when: true
   vars:
-    devices: |
+    hostpci_guests_yaml: |
       {% for guest in guests %}
       - inventory_hostname: {{ guest.inventory_hostname }}
         kvm: {{ guest.kvm }}
         hostpci: {{ guest.kvm.hostpci | ansible.builtin.dict2items }}
       {% endfor %}
+    hostpci_guests: >-
+      {{
+        hostpci_guests_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
