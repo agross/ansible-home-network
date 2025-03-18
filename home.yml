@@ -154,10 +154,6 @@
       tags:
         - nextcloud
         - container
-    - role: immich
-      tags:
-        - immich
-        - container
     - role: feedr
       tags:
         - feedr
@@ -178,3 +174,13 @@
       tags:
         - tandoor
         - container
+
+- name: Hosted services on tanker
+  hosts: tanker
+  become: true
+  gather_facts: false
+  roles:
+    - role: docker
+      tags: docker
+    - role: immich
+      tags: immich

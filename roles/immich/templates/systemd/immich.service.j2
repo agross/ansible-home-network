@@ -3,7 +3,6 @@ Description=Immich
 BindsTo=docker.service
 After=docker.service
 OnFailure=unit-status-mail@%n.service
-RequiresMountsFor={{ immich_root }}/app
 
 [Service]
 WorkingDirectory={{ immich_root }}

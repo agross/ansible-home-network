@@ -1,0 +1,82 @@
+proxmox:
+  host: pve-home
+  type: lxc
+  id: 1000
+  startup: order=200
+  ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
+  hookscript: lxc-fedora.sh
+  features:
+    - nesting=1
+    - fuse=1
+  password: "{{ vault_proxmox_default_root_password }}"
+  ssh_public_key_github_account: agross
+  memory: 20480
+  # Re-applying the same network config removes the gateway.
+  # Running networkctl reconfigure eth0 helps.
+  netif:
+    net0: >-
+      name={{ interfaces.lan.device }},ip={{
+        (interfaces.lan.ip4.address ~ '/' ~ interfaces.lan.ip4.prefix) |
+        ansible.utils.ipaddr('host/prefix')
+      }},gw={{
+        network_gateway.ip4
+      }},ip6={{
+        (interfaces.lan.ip6.address ~ '/' ~ interfaces.lan.ip6.prefix) |
+        ansible.utils.ipaddr('host/prefix')
+      }},gw6={{
+        network_gateway.ip6
+      }},bridge=vmbr0
+  disk_volume:
+    storage: local-zfs
+    size: 30
+    options:
+      mountoptions: discard;noatime
+  mount_volumes:
+    - id: mp0
+      host_path: /tank/immich/postgres
+      mountpoint: /data/immich/db
+      options:
+        mountoptions: discard;noatime
+    - id: mp1
+      host_path: /tank/immich/app
+      mountpoint: /data/immich/app
+      options:
+        mountoptions: discard;noatime
+    - id: mp2
+      host_path: /tank/immich/app/encoded-video
+      mountpoint: /data/immich/app/encoded-video
+      options:
+        mountoptions: discard;noatime
+    - id: mp3
+      host_path: /tank/immich/app/library
+      mountpoint: /data/immich/app/library
+      options:
+        mountoptions: discard;noatime
+
+# https://docs.ansible.com/ansible/latest/collections/community/general/zfs_module.html
+zfs_datasets:
+  tank/immich/app:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 32K
+  tank/immich/app/encoded-video:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 1M
+  tank/immich/app/library:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 512K
+  tank/immich/postgres:
+    chown:
+      owner: 100999
+      group: 100999
+    options:
+      prefetch: none
+      recordsize: 8K

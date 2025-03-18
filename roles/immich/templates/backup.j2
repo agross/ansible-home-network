@@ -8,11 +8,14 @@ target={{ immich_root | ansible.builtin.quote }}/backups
 
 cleanup() {
   printf 'Cleaning up backup directory.\n'
+
   rm -rf -- "$target"
   mkdir --parents -- "$target"
 }
 
 db() {
+  printf 'Dumping database.\n'
+
   docker compose \
          exec \
          db \
