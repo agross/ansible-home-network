@@ -30,8 +30,8 @@
       }}
 
 - name: Copy PPPoE connection service
-  ansible.builtin.copy:
-    src: templates/pppoe@.service
+  ansible.builtin.template:
+    src: templates/pppoe@.service.j2
     dest: >-
       /etc/systemd/system/pppoe-{{ interfaces.telekom.device }}@{{ pppoe_device }}.service
     owner: 0

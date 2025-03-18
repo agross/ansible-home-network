@@ -3,6 +3,11 @@
     name: firewalld
     state: present
 
+- name: Ensure firewalld is started
+  ansible.builtin.systemd_service:
+    name: firewalld
+    state: started
+
 - name: Put interfaces in firewalld zones
   ansible.posix.firewalld:
     interface: "{{ item.value.device }}"
