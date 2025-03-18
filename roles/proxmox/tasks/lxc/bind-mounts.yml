@@ -3,36 +3,49 @@
     (
       config.proxmox_vms |
       selectattr('id', 'equalto', 'lxc/' ~ item.0.lxc.id)
-    )[0].config[item.1.id] | default('') != options_string
+    )[0].config[item.1.key] | default('') != options_string
   ansible.builtin.command:
     argv:
       - pct
       - set
       - "{{ item.0.lxc.id | ansible.builtin.mandatory }}"
-      - "-{{ item.1.id }}"
+      - "-{{ item.1.key }}"
       - "{{ options_string }}"
   loop: >-
     {{
-      guests |
-      ansible.builtin.subelements('lxc.mount_volumes')
+      mount_guests |
+      ansible.builtin.subelements('mount_volumes')
     }}
   loop_control:
     label: >-
       {{ item.0.inventory_hostname }}
       id={{ item.0.lxc.id }}
-      {{ item.1.id }}={{ options_string }}
+      {{ item.1.key }}={{ options_string }}
   changed_when: true
   vars:
+    mount_guests_yaml: |
+      {% for guest in guests %}
+      - inventory_hostname: {{ guest.inventory_hostname }}
+        lxc: {{ guest.lxc }}
+        mount_volumes: {{ guest.lxc.mount_volumes | ansible.builtin.dict2items }}
+      {% endfor %}
+    mount_guests: >-
+      {{
+        mount_guests_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
     options_yaml: |
-      {% for k, v in (item.1.options | default({})).items() %}
+      {% for k, v in (item.1.value.options | default({})).items() %}
       - {{ k }}={{ v }}
       {% endfor %}
     options_string: >-
       {{
         (
           [
-            item.1.host_path,
-            'mp=' ~ item.1.mountpoint
+            item.1.value.host_path,
+            'mp=' ~ item.1.value.mountpoint
           ]
           +
           (

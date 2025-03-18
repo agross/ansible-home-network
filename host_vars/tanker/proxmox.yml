@@ -32,22 +32,22 @@ proxmox:
     options:
       mountoptions: discard;noatime
   mount_volumes:
-    - id: mp0
+    mp0:
       host_path: /tank/immich/postgres
       mountpoint: /data/immich/db
       options:
         mountoptions: discard;noatime
-    - id: mp1
+    mp1:
       host_path: /tank/immich/app
       mountpoint: /data/immich/app
       options:
         mountoptions: discard;noatime
-    - id: mp2
+    mp2:
       host_path: /tank/immich/app/encoded-video
       mountpoint: /data/immich/app/encoded-video
       options:
         mountoptions: discard;noatime
-    - id: mp3
+    mp3:
       host_path: /tank/immich/app/library
       mountpoint: /data/immich/app/library
       options:
