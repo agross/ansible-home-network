@@ -41,3 +41,14 @@
         proxmox_lxc_guest_configs |
         selectattr('lxc.mount_volumes', 'defined')
       }}
+
+- name: Set devices
+  ansible.builtin.import_tasks:
+    file: devices.yml
+  vars:
+    config: "{{ proxmox_lxc_config }}"
+    guests: >-
+      {{
+        proxmox_lxc_guest_configs |
+        selectattr('lxc.devices', 'defined')
+      }}
