@@ -60,7 +60,7 @@ firewalld:
       # HTTP.
       - proto: tcp
         port: 80
-        toaddr: "{{ hostvars.router.interfaces.lan.ip4.address}}"
+        toaddr: "{{ hostvars.router.interfaces.lan.ip4.address }}"
         toport: 80
       # HTTPS.
       - proto: tcp
