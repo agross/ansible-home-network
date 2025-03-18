@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     ports:
-      - 127.0.0.1:2283:2283
+      - 2283:2283
     depends_on:
       - redis
       - db
@@ -48,7 +48,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE --data-checksums
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql/data
     healthcheck:
       test: >-
         psql --username="$$POSTGRES_USER" --dbname="$$POSTGRES_DB" --command='SELECT 1' || exit 1;
@@ -60,5 +60,4 @@ services:
       interval: 5m
 
 volumes:
-  db-data:
   ml-model-cache:

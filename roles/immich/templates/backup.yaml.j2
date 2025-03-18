@@ -18,6 +18,11 @@ location:
     - {{ immich_root }}/backups
     - {{ immich_root }}/app
 
+  # Stay in same file system: do not cross mount points beyond the given source
+  # directories. Defaults to false. But when a database hook is used, the
+  # setting here is ignored and one_file_system is considered true.
+  one_file_system: false
+
   # Only store/extract numeric user and group identifiers. Defaults to false.
   numeric_ids: true
 
@@ -43,6 +48,8 @@ location:
     - {{ immich_root }}/app/encoded-video
     - {{ immich_root }}/app/thumbs
     - {{ immich_root }}/app/upload
+    - {{ immich_root }}/app/library/amay
+    - {{ immich_root }}/app/library/kfochtmann
 
   # If true, the exclude_if_present filename is included in backups. Defaults to
   # false, meaning that the exclude_if_present filename is omitted from backups.
