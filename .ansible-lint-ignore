@@ -2,6 +2,7 @@
 copy-templates.yml load-failure[filenotfounderror]
 docker-compose-update.yml load-failure[filenotfounderror]
 file-permissions.yml load-failure[filenotfounderror]
+github-release.yml load-failure[filenotfounderror]
 host_vars/router/netdata.yml yaml[line-length]
 htpasswd-users.yml load-failure[filenotfounderror]
 raspi-memory-cgroups.yml load-failure[filenotfounderror]
