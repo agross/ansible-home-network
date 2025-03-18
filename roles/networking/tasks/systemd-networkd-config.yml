@@ -99,3 +99,39 @@
 - name: Configure systemd-networkd
   ansible.builtin.include_role:
     name: aruhier.systemd_networkd
+
+- name: Prevent Proxmox PVE from overwriting network config files
+  when: ansible_virtualization_type == 'lxc'
+  ansible.builtin.file:
+    path: "/etc/systemd/network/.pve-ignore.{{ item }}.network"
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    owner: 0
+    group: 0
+    mode: "644"
+  loop: >-
+    {{
+      systemd_networkd_network |
+      default({}) |
+      ansible.builtin.dict2items |
+      selectattr('value.0.Match.0', 'equalto', { "# PVE Ignore": true }) |
+      map(attribute = 'key')
+    }}
+
+- name: Prevent Proxmox PVE from overwriting /etc/resolv.conf
+  when: >-
+    ansible_virtualization_type == 'lxc' and
+    systemd_networkd_network |
+    default({}) |
+    ansible.builtin.dict2items |
+    selectattr('value.0.Match.0', 'equalto', { "# PVE Ignore": true }) |
+    length > 0
+  ansible.builtin.file:
+    path: /etc/.pve-ignore.resolv.conf
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    owner: 0
+    group: 0
+    mode: "644"

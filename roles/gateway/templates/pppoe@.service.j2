@@ -7,8 +7,10 @@
 [Unit]
 Description=PPPoE connection to %J on interface %I
 Documentation=man:pppd(8)
+{% if ansible_virtualization_type != 'lxc' %}
 BindsTo=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
+{% endif %}
 After=network.target
 Before=default.target
 
