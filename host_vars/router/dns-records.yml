@@ -7,13 +7,13 @@ dns_cname_records:
   - "lovelace.{{ network.domain }}"
   - "netdata.{{ network.domain }}"
 
-  - "{{ nextcloud_domain }}"
+  - "{{ nextcloud_domain | mandatory }}"
   - kibana.cloud.therightstuff.de
   - feedr.therightstuff.de
   - feeds.therightstuff.de
   - rss.therightstuff.de
-  - "{{ immich_domain }}"
-  - "{{ vaultwarden_domain }}"
+  - "{{ immich_domain | mandatory }}"
+  - "{{ vaultwarden_domain | mandatory }}"
   - tandoor.therightstuff.de
 
   - cr.grossweber.com
