@@ -22,6 +22,8 @@
     - role: swapfile
       tags: swapfile
     - role: fstrim
+      when: >-
+        'container' not in ansible_virtualization_tech_guest
       tags: fstrim
     - role: filesystem
       tags: filesystem

@@ -12,8 +12,6 @@
   roles:
     - role: raspi-config
       tags: raspi-config
-    - role: fstrim
-      tags: fstrim
     - role: smartmontools
       tags: smartmontools
     - role: persistent-journal
