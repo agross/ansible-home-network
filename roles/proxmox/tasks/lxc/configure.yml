@@ -9,12 +9,16 @@
     config: pending
   register: proxmox_lxc_config
 
-- name: Work around systemd mounts failing
+- name: Set custom config
   ansible.builtin.import_tasks:
-    file: systemd-fix.yml
+    file: custom.yml
   vars:
     config: "{{ proxmox_lxc_config }}"
-    guests: "{{ proxmox_lxc_guest_configs }}"
+    guests: >-
+      {{
+        proxmox_lxc_guest_configs |
+        selectattr('lxc.custom', 'defined')
+      }}
 
 - name: Set features
   ansible.builtin.import_tasks:

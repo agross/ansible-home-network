@@ -150,10 +150,6 @@
       tags:
         - harbor
         - container
-    - role: nextcloud
-      tags:
-        - nextcloud
-        - container
     - role: feedr
       tags:
         - feedr
@@ -184,3 +180,5 @@
       tags: docker
     - role: immich
       tags: immich
+    - role: nextcloud
+      tags: nextcloud

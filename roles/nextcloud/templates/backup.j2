@@ -10,11 +10,14 @@ target={{ nextcloud_root | ansible.builtin.quote }}/backups
 
 cleanup() {
   printf 'Cleaning up backup directory.\n'
+
   # Directory needs to be kept because it is mounted on the Elasticsearch container.
   rm -rf -- "$target"/*.sql
 }
 
 mariadb() {
+  printf 'Dumping database.\n'
+
   local -a exec=(docker compose exec --user mysql db)
 
   mapfile -t dbs < <("${exec[@]}" mariadb --execute 'show databases' \
@@ -40,7 +43,9 @@ mariadb() {
 }
 
 elastic() {
-  local -a elastic=(docker compose exec search01)
+  printf 'Snapshotting search database.\n'
+
+  local -a elastic=(docker compose exec search)
 
   local elastic_repo=http://localhost:9200/_snapshot/nextcloud
   local snapshot_date="$(date +%Y-%m-%d-%H:%M:%S)"
