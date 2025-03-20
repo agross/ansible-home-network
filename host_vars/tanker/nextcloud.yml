@@ -4,3 +4,6 @@ nextcloud_domain: cloud.therightstuff.de
 
 nextcloud_smtp_user: "{{ google_smtp_user }}"
 nextcloud_smtp_password: "{{ vault_nextcloud_smtp_password }}"
+
+nextcloud_kibana_users:
+  agross: "{{ vault_nextcloud_kibana_users_agross }}"

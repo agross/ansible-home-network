@@ -4,7 +4,7 @@ proxmox:
   id: 200
   startup: order=200
   cores: 16
-  memory: 65536
+  memory: 32768
   numa_enabled: true
   hotplug: disk,network,usb,cpu,memory
   # PCI passthrough and ballooning does not work together.

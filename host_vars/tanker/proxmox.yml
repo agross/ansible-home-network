@@ -29,7 +29,7 @@ proxmox:
       }},bridge=vmbr0
   disk_volume:
     storage: local-zfs
-    size: 30
+    size: 50
     options:
       mountoptions: discard;noatime
   mount_volumes:
@@ -53,6 +53,33 @@ proxmox:
       mountpoint: /data/immich/app/library
       options:
         mountoptions: discard;noatime
+
+    mp4:
+      host_path: /tank/nextcloud/app
+      mountpoint: /data/nextcloud/app/data
+      options:
+        mountoptions: discard;noatime
+    mp5:
+      host_path: /tank/nextcloud/mariadb
+      mountpoint: /data/nextcloud/mariadb/data
+      options:
+        mountoptions: discard;noatime
+    mp6:
+      host_path: /tank/nextcloud/elasticsearch
+      mountpoint: /data/nextcloud/elasticsearch/data
+      options:
+        mountoptions: discard;noatime
+  custom:
+    - reason: systemd kernel mounts
+      # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
+      key: lxc.cap.drop
+      value: sys_rawio
+    - reason: Elasticsearch
+      key: lxc.prlimit.memlock
+      value: -1
+    # - reason: Valkey/Redis
+    #   key: lxc.sysctl.vm.overcommit_memory
+    #   value: 1
 
 # https://docs.ansible.com/ansible/latest/collections/community/general/zfs_module.html
 zfs_datasets:
@@ -80,4 +107,24 @@ zfs_datasets:
       group: 100999
     options:
       prefetch: none
+      recordsize: 8K
+
+  tank/nextcloud/app:
+    chown:
+      owner: 100033
+      group: 100033
+    options:
+      recordsize: 32K
+  tank/nextcloud/mariadb:
+    chown:
+      owner: 100999
+      group: 100999
+    options:
+      # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
+      recordsize: 16K
+  tank/nextcloud/elasticsearch:
+    chown:
+      owner: 101000
+      group: 100000
+    options:
       recordsize: 8K

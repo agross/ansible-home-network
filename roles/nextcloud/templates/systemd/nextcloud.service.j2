@@ -3,7 +3,6 @@ Description=Nextcloud
 BindsTo=docker.service
 After=docker.service
 OnFailure=unit-status-mail@%n.service
-RequiresMountsFor={{ nextcloud_root }}/app {{ nextcloud_root }}/backups
 
 [Service]
 WorkingDirectory={{ nextcloud_root }}

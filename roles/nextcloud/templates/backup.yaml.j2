@@ -15,7 +15,9 @@ location:
   # List of source directories to backup. Globs and tildes are expanded. Do not
   # backslash spaces in path names.
   source_directories: !retain
-    - {{ nextcloud_root }}
+    - {{ nextcloud_root }}/app
+    - {{ nextcloud_root }}/backups
+    - {{ nextcloud_root }}/valkey
 
   # Stay in same file system: do not cross mount points beyond the given source
   # directories. Defaults to false. But when a database hook is used, the

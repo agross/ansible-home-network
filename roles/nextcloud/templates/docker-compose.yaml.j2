@@ -1,6 +1,4 @@
 volumes:
-  mariadb:
-  search01:
   app:
 
 networks:
@@ -25,7 +23,8 @@ services:
       MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - mariadb:/var/lib/mysql
+      - ./mariadb/conf:/etc/mysql/conf.d:ro
+      - ./mariadb/data:/var/lib/mysql
     healthcheck:
       test:
         - CMD
@@ -36,25 +35,21 @@ services:
       start_period: 5s
       interval: 5s
 
-  redis:
-    image: redis:alpine
+  valkey:
+    image: valkey/valkey:alpine
     volumes:
-      - ./redis/data:/data:z
+      - ./valkey:/data
     healthcheck:
-      test: redis-cli ping | grep -xq PONG
+      test: valkey-cli ping | grep -xq PONG
       start_period: 5s
       interval: 5s
-    sysctls:
-      net.core.somaxconn: 512
 
   kibana:
     image: docker.elastic.co/kibana/kibana:{{ nextcloud_elk_stack_version | ansible.builtin.mandatory }}
-    networks:
-     - search
     ports:
-      - 127.0.0.1:5601:5601
+      - 8002:5601
     environment:
-      ELASTICSEARCH_HOSTS: http://search01:9200
+      ELASTICSEARCH_HOSTS: http://search:9200
       SERVER_PUBLICBASEURL: https://kibana.{{ nextcloud_domain | ansible.builtin.mandatory }}
     labels:
       traefik.enable: true
@@ -62,23 +57,17 @@ services:
       traefik.http.routers.nextcloud-kibana.rule: Host(`kibana.{{ nextcloud_domain | ansible.builtin.mandatory }}`)
       traefik.http.routers.nextcloud-kibana.middlewares: >-
         nextcloud-kibana-auth
-      traefik.http.middlewares.nextcloud-kibana-auth.basicauth.users: {{ nextcloud_kibana_auth_comma_separated}}
+      traefik.http.middlewares.nextcloud-kibana-auth.basicauth.users: {{ nextcloud_kibana_auth_comma_separated }}
     healthcheck:
       test: curl --fail --dump-header /dev/stderr http://localhost:5601/api/status || exit 1
       start_period: 5s
       interval: 5s
     depends_on:
-      search01:
+      search:
         condition: service_healthy
 
-  search01:
+  search:
     image: docker.elastic.co/elasticsearch/elasticsearch:{{ nextcloud_elk_stack_version | ansible.builtin.mandatory }}
-
-    networks:
-      default:
-        aliases:
-          - search
-      search:
     ports:
       - 127.0.0.1:9200:9200
     environment:
@@ -97,14 +86,17 @@ services:
       - path.repo=/backups
       # No security.
       - xpack.security.enabled=false
+    {% if 'container' not in ansible_virtualization_tech_guest %}
+    # Containers need this as lxc.prlimit.memlock=-1.
     ulimits:
       memlock:
         soft: -1
         hard: -1
+    {% endif %}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - search01:/usr/share/elasticsearch/data
-      - ./backups/search:/backups:z
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+      - ./backups/search:/backups
     healthcheck:
       test: curl --fail --dump-header /dev/stderr http://localhost:9200/_cat/health | tee | grep --extended-regexp '\b(green|yellow)\b'
       start_period: {{ nextcloud_upgrade_timeout | ansible.builtin.mandatory }}
@@ -116,12 +108,12 @@ services:
       /var/www/html/custom_apps/notify_push/bin/x86_64/notify_push
     restart: on-failure
     ports:
-      - 127.0.0.1:7867:7867
+      - 8001:7867
     environment:
       LOG: notify_push=trace
       DATABASE_URL: mysql://nextcloud:nextcloud@db/nextcloud
       DATABASE_PREFIX: oc_
-      REDIS_URL: redis://redis
+      REDIS_URL: redis://valkey
       NEXTCLOUD_URL: https://{{ nextcloud_domain | ansible.builtin.mandatory }}
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -144,7 +136,7 @@ services:
         condition: service_healthy
       app:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
 
   imaginary:
@@ -158,15 +150,15 @@ services:
     entrypoint: /cron.sh
     volumes:
       - app:/var/www/html
-      - ./app/custom_apps:/var/www/html/custom_apps:z
-      - ./app/config:/var/www/html/config:z
-      - ./app/data:/var/www/html/data:z
-      - ./app/themes:/var/www/html/themes:z
+      - ./app/custom_apps:/var/www/html/custom_apps
+      - ./app/config:/var/www/html/config
+      - ./app/data:/var/www/html/data
+      - ./app/themes:/var/www/html/themes
       - ./cron/www-data:/var/spool/cron/crontabs/www-data:ro,z
     depends_on:
       db:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
 
   app:
@@ -186,14 +178,14 @@ services:
       # Newer Apache versions set a 1G limit on request bodies.
       APACHE_BODY_LIMIT: 17179869184 # 1073741824 (the 1G default) * 16 = 16G
     ports:
-      - 127.0.0.1:8015:80
+      - 8000:80
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - app:/var/www/html
-      - ./app/custom_apps:/var/www/html/custom_apps:z
-      - ./app/config:/var/www/html/config:z
-      - ./app/data:/var/www/html/data:z
-      - ./app/themes:/var/www/html/themes:z
+      - ./app/custom_apps:/var/www/html/custom_apps
+      - ./app/config:/var/www/html/config
+      - ./app/data:/var/www/html/data
+      - ./app/themes:/var/www/html/themes
       - ./app/hooks/post-upgrade:/docker-entrypoint-hooks.d/post-upgrade:ro,z
     labels:
       traefik.enable: true
@@ -222,7 +214,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
-      search01:
+      search:
         condition: service_healthy

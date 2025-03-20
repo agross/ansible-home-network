@@ -1,0 +1,33 @@
+# https://linuxcontainers.org/lxc/manpages/man5/lxc.container.conf.5.html
+- name: Set custom settings of LXC guest
+  ansible.builtin.lineinfile:
+    path: >-
+      /etc/pve/nodes/{{ inventory_hostname }}/lxc/{{ item.0.lxc.id }}.conf
+    regexp: >-
+      ^{{ item.1.key | ansible.builtin.regex_escape }}:
+    line: "{{ item.1.key }}: {{ item.1.value }}"
+  loop: >-
+    {{
+      custom_guests |
+      ansible.builtin.subelements('custom')
+    }}
+  loop_control:
+    label: >-
+      {{ item.0.inventory_hostname }}
+      id={{ item.0.lxc.id }}
+      reason={{ item.1.reason }}
+      {{ item.1.key }}={{ item.1.value }}
+  vars:
+    custom_guests_yaml: |
+      {% for guest in guests %}
+      - inventory_hostname: {{ guest.inventory_hostname }}
+        lxc: {{ guest.lxc }}
+        custom: {{ guest.lxc.custom }}
+      {% endfor %}
+    custom_guests: >-
+      {{
+        custom_guests_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
