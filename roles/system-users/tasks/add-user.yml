@@ -1,64 +1,115 @@
-- name: Ensure the groups the user will be member of exist
+- name: Ensure groups exist
   ansible.builtin.group:
     name: "{{ item }}"
-  loop: "{{ [user.key] + user.value.groups }}"
+  loop: >-
+    {{
+      (
+        system_users_to_add |
+        ansible.builtin.dict2items |
+        map(attribute = 'key')
+        +
+        system_users_to_add |
+        ansible.builtin.dict2items |
+        selectattr('value.groups', 'defined') |
+        map(attribute = 'value.groups')
+      ) |
+      ansible.builtin.flatten |
+      ansible.builtin.unique |
+      sort
+    }}
 
-- name: >-
-    Add user {{ user.key }}
-    {{ '(' ~ user.value.name ~ ')' if user.value.name | default('') | length else '' }}
-    (has password?: {{ user.value.password is defined and user.value.password | length > 0 }})
-  # noqa: name[template]
+- name: Add user
   ansible.builtin.user:
     name: "{{ user.key }}"
     system: "{{ user.system | default(false) }}"
     comment: "{{ user.value.name | default(omit) }}"
     create_home: "{{ user.value.create_home | default(true) }}"
     group: "{{ user.key }}"
-    groups: "{{ user.value.groups }}"
-    append: true
+    groups: "{{ user.value.groups | default(omit) }}"
+    append: "{{ user.value.groups | default([]) | length > 0 }}"
     shell: "{{ user.value.shell | default(omit) }}"
     password: >-
       {{
         user.value.password |
         password_hash('sha512', 65534 | random(seed = inventory_hostname) | string)
-        if (user.value.password is defined and user.value.password | length > 0) else omit
+        if (user.value.password is defined and user.value.password | length)
+        else omit
       }}
     update_password: on_create
-  register: user_added
+  loop: "{{ system_users_to_add | ansible.builtin.dict2items }}"
+  loop_control:
+    loop_var: user
+    label: >-
+      {{ user.key }}
+      name={{ user.value.name | default('') }}
+      password={{ user.value.password is defined }}
+  register: users_added
 
-- name: >-
-    Force password change for {{ user.key }} if a password was set during user
-    creation
-  # noqa: name[template]
-  when: >-
-    user_added is changed and
-    user.value.password is defined and
-    user.value.password | length > 0
+- name: Force password change if a password was set during user creation
   ansible.builtin.command:
     argv:
       - passwd
       - --expire
-      - "{{ user.key }}"
+      - "{{ user.name }}"
   changed_when: true
+  loop: >-
+    {{
+      users_added.results |
+      selectattr('changed', 'equalto', true) |
+      selectattr('user.value.password', 'defined') |
+      selectattr('user.value.password', 'ansible.builtin.regex', '.')
+    }}
+  loop_control:
+    loop_var: user
+    label: "{{ user.name }}"
 
-- name: Add SSH authorized keys for {{ user.key }}
-  when: user.value.public_key is defined
+- name: Add SSH authorized keys
   ansible.posix.authorized_key:
     user: "{{ user.key }}"
     state: present
     key: "{{ user.value.public_key }}"
+  loop: >-
+    {{
+      system_users_to_add |
+      ansible.builtin.dict2items |
+      selectattr('value.public_key', 'defined')
+    }}
+  loop_control:
+    loop_var: user
+    label: >-
+      {{ user.key }}
+      public_key={{
+        user.value.public_key |
+        ansible.builtin.regex_replace('(.{1,20}).*', '\1')
+      }}{{ '...' if user.value.public_key | length > 20 }}
 
-- name: Add SSH authorized keys from GitHub for {{ user.key }}
-  when: user.value.github is defined
+- name: Add SSH authorized keys from GitHub
+  vars:
+    users: >-
+      {{
+        system_users_to_add |
+        ansible.builtin.dict2items |
+        selectattr('value.github', 'defined')
+      }}
   block:
     - name: Download SSH keys from GitHub
       ansible.builtin.uri:
         url: "https://github.com/{{ user.value.github }}.keys"
         return_content: true
+      loop: "{{ users }}"
+      loop_control:
+        loop_var: user
+        label: >-
+          {{ user.key }}
+          github={{ user.value.github }}
       register: public_keys
 
-    - name: Add SSH authorized key for {{ user.key }}
+    - name: Add SSH authorized key
       ansible.posix.authorized_key:
-        user: "{{ user.key }}"
+        user: "{{ pubkey.user.key }}"
         state: present
-        key: "{{ public_keys.content }}"
+        key: "{{ pubkey.content }}"
+      loop: "{{ public_keys.results }}"
+      loop_control:
+        loop_var: pubkey
+        label: "{{ pubkey.user.key }}"

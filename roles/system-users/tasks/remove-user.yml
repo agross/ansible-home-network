@@ -1,4 +1,8 @@
-- name: Remove user {{ user.key }}
+- name: Remove user
   ansible.builtin.user:
     name: "{{ user.key }}"
     state: absent
+  loop: "{{ system_users_to_remove | ansible.builtin.dict2items }}"
+  loop_control:
+    loop_var: user
+    label: "{{ user.key }}"
