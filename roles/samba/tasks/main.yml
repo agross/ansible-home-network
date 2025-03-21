@@ -10,6 +10,7 @@
     name: vladgh.samba.server
 
 - name: Allow Samba through firewall
+  when: interfaces.lan.zone is defined
   ansible.posix.firewalld:
     service: samba
     zone: "{{ interfaces.lan.zone }}"
@@ -36,7 +37,11 @@
     lstrip_blocks: true
   loop: >-
     {{
-      lookup('ansible.builtin.fileglob', '../templates/dnssd/*.dnssd', wantlist=true) +
-      lookup('ansible.builtin.fileglob', '../templates/dnssd/*.dnssd.j2', wantlist=true)
+      lookup('ansible.builtin.fileglob',
+             '../templates/dnssd/*.dnssd',
+             wantlist = true) +
+      lookup('ansible.builtin.fileglob',
+             '../templates/dnssd/*.dnssd.j2',
+             wantlist = true)
     }}
   notify: Restart systemd-resolved service
