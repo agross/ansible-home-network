@@ -180,3 +180,11 @@
       tags: immich
     - role: nextcloud
       tags: nextcloud
+
+- name: Hosted services on smb
+  hosts: smb
+  become: true
+  gather_facts: false
+  roles:
+    - role: samba
+      tags: samba

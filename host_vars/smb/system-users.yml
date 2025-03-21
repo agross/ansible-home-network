@@ -1,0 +1,4 @@
+host_system_users:
+  nobody:
+    groups:
+      - tape
