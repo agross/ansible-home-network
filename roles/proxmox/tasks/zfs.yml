@@ -17,3 +17,28 @@
     regexp: ^#?ZED_NOTIFY_VERBOSE=
   # From lae.proxmox.
   notify: restart zfs-zed
+
+- name: Configure Healthchecks.io notification for ZFS event daemon
+  when: pve_zfs_zed_healthcheck is defined
+  ansible.builtin.lineinfile:
+    dest: /etc/zfs/zed.d/zed.rc
+    line: "{{ item.0 }}=\"{{ item.1 }}\""
+    regexp: "^#?{{ item.0 | ansible.builtin.regex_escape }}="
+  loop: "{{ settings }}"
+  vars:
+    components: "{{ pve_zfs_zed_healthcheck | ansible.builtin.urlsplit }}"
+    settings: >-
+      {{
+        [
+          [
+            "ZED_NTFY_URL",
+            components.scheme ~ '://' ~ components.netloc
+          ],
+          [
+            "ZED_NTFY_TOPIC",
+            components.path | ansible.builtin.regex_replace('/(.*)', '\1')
+          ]
+        ]
+      }}
+  # From lae.proxmox.
+  notify: restart zfs-zed

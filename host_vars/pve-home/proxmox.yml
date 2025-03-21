@@ -31,6 +31,10 @@ pve_iommu_passthrough_mode: true
 
 pve_zfs_enabled: true
 pve_zfs_zed_email: root
+# With OnCalendar expression as per /etc/cron.d/zfsutils-linux:
+# Sun *-*-01..07 00:24:00
+# Sun *-*-08..14 00:24:00
+pve_zfs_zed_healthcheck: "{{ vault_pve_zfs_zed_healthcheck }}"
 
 # lae.proxmox has pve_zfs_options, but does not run update-initramfs after
 # setting these.
