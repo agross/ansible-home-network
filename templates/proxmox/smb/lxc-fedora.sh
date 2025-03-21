@@ -1,1 +1,1 @@
-../tanker/lxc-fedora.sh
+../lxc-fedora.sh
