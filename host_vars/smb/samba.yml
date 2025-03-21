@@ -1,0 +1,45 @@
+samba_server_min_protocol: SMB3
+
+samba_manage_directories: false
+
+# https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html
+# But only a subset is supported unless share.include_file is defined.
+samba_shares:
+  - name: Music
+    path: /shares/nextcloud/agross/files/Music
+    guest_ok: true
+
+  - name: Immich
+    path: /shares/immich
+    valid_users: agross
+
+  - name: Time Machine
+    path: /shares/time-machine
+    valid_users: agross
+    read_only: false
+    vfs_objects:
+      - name: fruit
+        options:
+          - name: time machine
+            value: "yes"
+      - name: streams_xattr
+
+samba_users: "{{ vault_samba_users }}"
+
+samba_map_to_guest: Bad User
+samba_guest_account: nobody
+
+# See roles/samba/templates.
+samba_global_include: samba-global.conf
+
+# When true, user home directories are accessible.
+samba_load_homes: false
+
+# Defaults to true for some reason.
+samba_wins_support: false
+
+samba_mitigate_cve_2017_7494: true
+
+# Let avahi choose the name for the announcement. Normally this would be the
+# all-caps NETBIOS name.
+samba_mdns_name: mdns
