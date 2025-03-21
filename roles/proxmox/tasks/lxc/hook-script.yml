@@ -8,9 +8,8 @@
 
 - name: Copy hook script
   ansible.builtin.template:
-    src: >-
-      {{ ansible_role_name }}/{{ guest.inventory_hostname }}/{{ guest.lxc.hookscript }}
-    dest: "/var/lib/vz/snippets/{{ guest.lxc.hookscript }}"
+    src: "{{ hookscript }}"
+    dest: "{{ hookscript_dest }}"
     owner: 0
     group: 0
     mode: "750"
@@ -20,7 +19,17 @@
     label: >-
       {{ guest.inventory_hostname }}
       id={{ guest.lxc.id }}
-      hookscript={{ guest.lxc.hookscript }}
+      hookscript={{ hookscript_dest }}
+  vars:
+    files:
+      - "{{ guest.lxc.hookscript }}"
+    paths:
+      - "templates/{{ ansible_role_name }}/{{ guest.inventory_hostname }}"
+      - "templates/{{ ansible_role_name }}"
+    hookscript: >-
+      {{ lookup('ansible.builtin.first_found', paths=paths, files=files) }}
+    hookscript_dest: >-
+      /var/lib/vz/snippets/{{ guest.lxc.id }}-{{ guest.lxc.hookscript }}
 
 - name: Set hook script of LXC guest
   when: >-
@@ -44,5 +53,10 @@
       hookscript={{ hookscript }}
   vars:
     hookscript: >-
-      {{ 'local:snippets/' ~ guest.lxc.hookscript }}
+      {{
+        'local:snippets/' ~
+        guest.lxc.id ~
+        '-' ~
+        guest.lxc.hookscript
+      }}
   changed_when: true
