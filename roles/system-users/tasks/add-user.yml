@@ -4,14 +4,15 @@
   loop: "{{ [user.key] + user.value.groups }}"
 
 - name: >-
-    Add user {{ user.key }} ({{ user.value.name }})
+    Add user {{ user.key }}
+    {{ '(' ~ user.value.name ~ ')' if user.value.name | default('') | length else '' }}
     (has password?: {{ user.value.password is defined and user.value.password | length > 0 }})
   # noqa: name[template]
   ansible.builtin.user:
     name: "{{ user.key }}"
     system: "{{ user.system | default(false) }}"
-    comment: "{{ user.value.name }}"
-    create_home: true
+    comment: "{{ user.value.name | default(omit) }}"
+    create_home: "{{ user.value.create_home | default(true) }}"
     group: "{{ user.key }}"
     groups: "{{ user.value.groups }}"
     append: true
