@@ -31,7 +31,6 @@ pve_iommu_passthrough_mode: true
 
 pve_zfs_enabled: true
 pve_zfs_zed_email: root
-pve_zfs_create_volumes: []
 
 # lae.proxmox has pve_zfs_options, but does not run update-initramfs after
 # setting these.
