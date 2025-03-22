@@ -9,6 +9,12 @@
   # From lae.proxmox.
   notify: update-initramfs
 
+- name: Enable ZFS event daemon trim finish notifications
+  ansible.builtin.file:
+    src: /usr/lib/zfs-linux/zed.d/trim_finish-notify.sh
+    path: /etc/zfs/zed.d/trim_finish-notify.sh
+    state: link
+
 - name: Enable ZFS event daemon success notifications
   when: pve_zfs_zed_email is defined
   ansible.builtin.lineinfile:
