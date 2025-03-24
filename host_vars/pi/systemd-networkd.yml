@@ -25,7 +25,7 @@ systemd_networkd_network:
         - MulticastDNS: true
 
         - IPv6LinkLocalAddressGenerationMode: stable-privacy
+        - IPv6AcceptRA: false
 
-    - Route:
         - Gateway: "{{ network_gateway.ip4 }}"
-        - GatewayOnLink: true
+        - Gateway: "{{ network_gateway.ip6 }}"
