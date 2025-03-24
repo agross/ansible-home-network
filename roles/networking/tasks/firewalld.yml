@@ -15,7 +15,12 @@
     immediate: true
     permanent: true
     state: enabled
-  loop: "{{ interfaces | ansible.builtin.dict2items | selectattr('value.zone', 'defined') }}"
+  loop: >-
+    {{
+      interfaces |
+      ansible.builtin.dict2items |
+      selectattr('value.zone', 'defined')
+    }}
   loop_control:
     label: "{{ item.key }}: {{ item.value.device }} -> {{ item.value.zone }}"
 
@@ -29,9 +34,9 @@
   loop: >-
     {{
       firewalld.services |
-        default({}) |
-        ansible.builtin.dict2items |
-        ansible.builtin.subelements('value')
+      default({}) |
+      ansible.builtin.dict2items |
+      ansible.builtin.subelements('value')
     }}
   loop_control:
     label: "{{ item.0.key }}: {{ item.1 }}"
@@ -47,9 +52,9 @@
   loop: >-
     {{
       firewalld.forward_ports |
-        default({}) |
-        ansible.builtin.dict2items |
-        ansible.builtin.subelements('value')
+      default({}) |
+      ansible.builtin.dict2items |
+      ansible.builtin.subelements('value')
     }}
   loop_control:
     label: "{{ item.0.key }}: {{ item.1 }}"
@@ -64,9 +69,9 @@
   loop: >-
     {{
       firewalld.rich_rules |
-        default({}) |
-        ansible.builtin.dict2items |
-        ansible.builtin.subelements('value')
+      default({}) |
+      ansible.builtin.dict2items |
+      ansible.builtin.subelements('value')
     }}
   loop_control:
     label: "{{ item.0.key }}: {{ item.1 }}"
