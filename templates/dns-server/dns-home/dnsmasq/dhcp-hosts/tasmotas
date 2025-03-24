@@ -1,0 +1,18 @@
+# vim: set ft=csv ts=2 sw=2 et:
+
+2c:f4:32:db:e3:d8, gosund-sp111-1, 7d
+d8:f1:5b:d4:98:89, gosund-sp111-2, 7d
+2c:f4:32:db:e0:e8, gosund-sp111-3, 7d
+d8:f1:5b:d4:97:a0, gosund-sp111-4, 7d
+48:55:19:18:60:36, nous-a1t-1,     7d
+c8:c9:a3:1c:ca:1b, nous-a1t-2,     7d
+98:f4:ab:f3:a3:1b, shelly1-1,      7d
+e0:98:06:95:1c:d4, shelly1-2,      7d
+98:f4:ab:f4:13:29, shelly1-3,      7d
+98:f4:ab:f4:17:05, shelly1-4,      7d
+98:f4:ab:f3:a4:12, shelly1-5,      7d
+98:f4:ab:f3:9f:b7, shelly1-6,      7d
+98:f4:ab:f4:2f:23, shelly1-7,      7d
+98:f4:ab:f4:19:9c, shelly1-8,      7d
+50:02:91:f0:df:c5, shelly1-9,      7d
+50:02:91:f0:4d:0b, shelly1-10,     7d

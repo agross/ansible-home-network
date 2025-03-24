@@ -14,6 +14,9 @@
                  wantlist = true) +
           lookup('ansible.builtin.fileglob',
                  local_units ~ '/*.mount*',
+                 wantlist = true) +
+          lookup('ansible.builtin.fileglob',
+                 local_units ~ '/*.target*',
                  wantlist = true)
         ) |
         map('basename') |

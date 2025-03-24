@@ -6,7 +6,7 @@ no-hosts
 
 # Read all the hosts files contained in the directory. New or changed files are
 # read automatically.
-hostsdir=/etc/dnsmasq.conf.d/hosts
+hostsdir={{ dns_server_root }}/dnsmasq/hosts
 
 # Do not read /etc/resolv.conf.
 no-resolv
@@ -25,12 +25,6 @@ stop-dns-rebind
 
 # Exempt 127.0.0.0/8 and ::1 from rebinding checks.
 rebind-localhost-ok
-
-# Additional hosts file. Read the specified file as well as /etc/hosts. If
-# no-hosts is given, read only the specified file.
-# This option may be repeated for more than one additional hosts file. If a
-# directory is given, then read all the files contained in that directory.
-# addn-hosts=/etc/dnsmasq.conf.d/hosts
 
 # Bogus private reverse lookups. All reverse lookups for private IP ranges (ie
 # 192.168.x.x, etc) which are not found in /etc/hosts or the DHCP leases file

@@ -1,32 +1,81 @@
 - name: Copy default templates
-  ansible.builtin.import_tasks: copy-templates.yml
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: ../templates
     target: "{{ dns_server_root }}"
     notify: Restart dns-server service # noqa: var-naming[no-reserved]
     files:
-      adguard/conf/AdGuardHome.yaml.j2:
+      adguard:
+        owner: 0
+        group: 0
+        mode: "700"
+      adguard/AdGuardHome.yaml.j2:
+        owner: 0
+        group: 0
         mode: "600"
+      dnscrypt-proxy:
+        owner: 1000
+        group: 1001
       dnscrypt-proxy/dnscrypt-proxy.toml:
-        owner: 65534
-        group: 65534
+        owner: 1001
+        group: 1001
 
 - name: Copy templates for {{ inventory_hostname }}
-  ansible.builtin.import_tasks: copy-templates.yml
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
-    directory: "templates/dns-server/{{ inventory_hostname }}"
+    directory: "templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
     target: "{{ dns_server_root }}"
     notify: Restart dns-server service # noqa: var-naming[no-reserved]
 
+- name: Ensure packages are installed
+  ansible.builtin.package:
+    name: >-
+      {{
+        dns_server_packages |
+        ansible.builtin.dict2items |
+        map(attribute = 'value.name')
+      }}
+
+- name: Download releases
+  ansible.builtin.import_tasks:
+    file: download-release.yml
+  vars:
+    assets: >-
+      {{
+        dns_server_download_assets |
+        ansible.builtin.dict2items
+      }}
+
 - name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
+  ansible.builtin.import_tasks:
+    file: systemd-install-units.yml
   vars:
     directory: "{{ dns_server_root }}/systemd"
     local_units: templates/systemd
     notify: Restart dns-server service # noqa: var-naming[no-reserved]
 
+- name: Ensure dnsmasq systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/dnsmasq.service.d
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Set dnsmasq override
+  ansible.builtin.template:
+    src: systemd/dnsmasq.service.d/override.conf
+    dest: /etc/systemd/system/dnsmasq.service.d/override.conf
+    owner: 0
+    group: 0
+    mode: "644"
+  notify: Restart dns-server service
+
 - name: Copy systemd-resolved config files
-  ansible.builtin.import_tasks: copy-templates.yml
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: templates/systemd-resolved/resolved.conf.d
     target: /etc/systemd/resolved.conf.d
@@ -39,25 +88,6 @@
     enabled: true
   register: systemd_resolved_started
 
-- name: Create dnsmasq.leases unless it exists
-  ansible.builtin.file:
-    path: "{{ dns_server_root }}/dnsmasq/dnsmasq.leases"
-    state: touch
-    access_time: preserve
-    modification_time: preserve
-    owner: 10000
-    group: 0
-    mode: "664"
-  notify: Restart dns-server service
-
-- name: Change ownership of dnscrypt-proxy directory to nobody:nogroup
-  ansible.builtin.file:
-    path: "{{ dns_server_root }}/dnscrypt-proxy"
-    owner: 65534
-    group: 65534
-    recurse: true
-  notify: Restart dns-server service
-
 - name: Allow DHCP and DNS-related services from internal network
   ansible.posix.firewalld:
     zone: internal
@@ -67,21 +97,13 @@
     state: enabled
   loop: "{{ dns_server_firewalld }}"
 
-- name: Update docker-compose images
-  ansible.builtin.import_tasks: docker-compose-update.yml
-  vars:
-    directory: "{{ dns_server_root }}"
-    pull: "{{ docker_update is defined }}"
-    build: "{{ docker_update is defined }}"
-    notify: Restart dns-server service # noqa: var-naming[no-reserved]
-
 - name: Start systemd units
   ansible.builtin.systemd:
     name: "{{ item }}"
     state: started
     enabled: true
     daemon_reload: true
-  loop: "{{ systemd_units_autostart }}"
+  loop: "{{ dns_server_units }}"
   register: dns_server_started
 
 - name: Install DNS utils

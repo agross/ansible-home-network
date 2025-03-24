@@ -1,6 +1,9 @@
 # {{ ansible_managed }}
 # vim: set ft=jinja-properties ts=2 sw=2 et:
 
+# Use the specified file to store DHCP lease information.
+dhcp-leasefile={{ dns_server_root }}/dnsmasq/dnsmasq.leases
+
 # Set the DHCP server to authoritative mode. In this mode it will barge in and
 # take over the lease for any client which broadcasts on the network, whether it
 # has a record of the lease or not. This avoids long timeouts when a machine
@@ -39,7 +42,7 @@ quiet-ra
 # Lifetime 0 means the prefix is announced, but we are not a router.
 ra-param={{ interfaces.lan.device | mandatory }}, mtu:1472, 600, 0
 
-dhcp-hostsfile=/etc/dnsmasq.conf.d/dhcp-hosts
+dhcp-hostsfile={{ dns_server_root }}/dnsmasq/dhcp-hosts
 
 # Enable DHCPv4 Rapid Commit Option specified in RFC 4039. When enabled, dnsmasq
 # will respond to a DHCPDISCOVER message including a Rapid Commit option with a

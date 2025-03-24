@@ -89,23 +89,13 @@
     - role: gateway
       tags: gateway
 
-- name: Networking
-  hosts: rezo
+- name: DNS configuration
+  hosts: dns-home
   become: true
   gather_facts: false
   roles:
-    - role: ssh
-      tags: ssh
-    - role: docker
-      tags: docker
     - role: dns-server
-      tags:
-        - dns-server
-        - container
-    - role: traefik
-      tags:
-        - traefik
-        - container
+      tags: dns-server
 
 - name: Home automation
   hosts: nest

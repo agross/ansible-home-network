@@ -1,0 +1,42 @@
+- name: Download GitHub release
+  ansible.builtin.include_tasks:
+    file: github-release.yml
+  loop: "{{ assets }}"
+  vars:
+    url: "{{ item.value.url }}"
+    asset_name_regex: "{{ item.value.asset_name_regex }}"
+    dest: "{{ item.value.tmp }}"
+
+- name: Create extraction directory
+  ansible.builtin.file:
+    path: "{{ item.value.tmp }}-extracted"
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+  loop: "{{ assets }}"
+  loop_control:
+    label: "{{ item.key }}: {{ item.value.tmp }}"
+
+- name: Extract downloaded release
+  ansible.builtin.unarchive:
+    src: "{{ item.value.tmp }}"
+    remote_src: true
+    dest: "{{ item.value.tmp }}-extracted"
+    owner: 0
+    group: 0
+  loop: "{{ assets }}"
+  loop_control:
+    label: "{{ item.key }}: {{ item.value.tmp }}"
+
+- name: Copy release binary
+  ansible.builtin.copy:
+    src: "{{ item.value.tmp }}-extracted/{{ item.value.binary }}"
+    remote_src: true
+    dest: "{{ item.value.dest }}"
+    owner: 0
+    group: 0
+    mode: "755"
+  loop: "{{ assets }}"
+  loop_control:
+    label: "{{ item.key }}: {{ item.value.dest }}"
