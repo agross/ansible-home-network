@@ -63,6 +63,14 @@
     - role: gateway
       tags: gateway
 
+- name: DNS configuration
+  hosts: dns-ogd
+  become: true
+  gather_facts: false
+  roles:
+    - role: dns-server
+      tags: dns-server
+
 - name: Hosted services
   hosts: finn
   become: true
@@ -72,10 +80,6 @@
       tags: smartmontools
     - role: docker
       tags: docker
-    - role: dns-server
-      tags:
-        - dns-server
-        - container
     - role: mqtt
       tags:
         - mqtt
