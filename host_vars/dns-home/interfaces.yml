@@ -1,0 +1,12 @@
+interfaces:
+  lan:
+    device: eth0
+    ip4:
+      address: "{{ network.ip4 | ansible.utils.nthhost(4) }}"
+      prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv4 }}"
+    ip6:
+      address: "{{ network.ip6 | ansible.utils.nthhost(0x4) }}"
+      prefix: "{{ network.ip6 | ansible.utils.ipaddr('prefix') }}"
+      dns: "{{ dns.servers | ansible.utils.ipv6 }}"
+    zone: internal

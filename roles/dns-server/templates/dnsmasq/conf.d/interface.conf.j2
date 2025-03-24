@@ -1,8 +1,8 @@
 # {{ ansible_managed }}
 # vim: set ft=jinja-properties ts=2 sw=2 et:
 
+# For DNS request.
 listen-address=127.0.0.1
-listen-address=::1
 
 # If you want dnsmasq to listen for DHCP and DNS requests only on
 # specified interfaces (and the loopback) give the name of the
@@ -13,9 +13,7 @@ listen-address=::1
 interface={{ interfaces.lan.device | mandatory }}
 
 # Do not bind to wildcard IPs.
-# If this option is enabled all of the interfaces above need to be
-# available when dnsmasq starts up. Which is rather unlikely.
-# bind-interfaces
+bind-interfaces
 
 # Enable a network mode which is a hybrid between --bind-interfaces
 # and the default. Dnsmasq binds the address of individual interfaces,

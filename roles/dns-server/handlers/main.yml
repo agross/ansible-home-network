@@ -1,7 +1,10 @@
 - name: Restart dns-server service
-  when: dns_server_started is not changed
+  when: >-
+    dns_server_started.results |
+    selectattr('item', 'equalto', 'dns-server.target') |
+    first is not changed
   ansible.builtin.systemd:
-    name: dns-server.service
+    name: dns-server.target
     state: restarted
 
 - name: Restart systemd-resolved service

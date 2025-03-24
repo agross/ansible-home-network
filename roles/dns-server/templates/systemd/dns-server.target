@@ -1,0 +1,6 @@
+[Unit]
+Description=DNS Server
+Wants=adguard.service dnsmasq.service dnscrypt-proxy.service
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+# vim: set ft=jinja-properties ts=2 sw=2 et:
+
+# Include all *.conf files.
+conf-dir={{ dns_server_root }}/dnsmasq/conf.d, *.conf

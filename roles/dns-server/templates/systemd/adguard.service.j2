@@ -1,0 +1,18 @@
+[Unit]
+Description=AdGuard Home
+Wants=network-online.target
+After=network-online.target
+PartOf=dns-server.target
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+WorkingDirectory={{ dns_server_root }}/adguard
+
+ExecStart=/data/dns-server/bin/AdGuardHome --config ./AdGuardHome.yaml --work-dir .
+ExecReload=/data/dns-server/bin/AdGuardHome --service reload
+
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

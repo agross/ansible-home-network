@@ -1,3 +1,0 @@
-traefik_users:
-  dashboard:
-    agross: "{{ vault_traefik_dashboard_password_agross }}"

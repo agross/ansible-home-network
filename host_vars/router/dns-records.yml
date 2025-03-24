@@ -1,4 +1,5 @@
 dns_cname_records:
+  - "adguard.{{ network.domain }}"
   - "build.{{ network.domain }}"
   - "cockpit.{{ network.domain }}"
   - "grafana.{{ network.domain }}"
