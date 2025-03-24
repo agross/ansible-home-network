@@ -25,12 +25,24 @@
   ansible.builtin.package:
     name: python3-proxmoxer
     state: present
+  tags:
+    - lxc
+    - vm
 
 - name: Create ZFS datasets
-  ansible.builtin.import_tasks: create-zfs-datasets.yml
+  ansible.builtin.import_tasks:
+    file: create-zfs-datasets.yml
+  tags:
+    - lxc
 
 - name: Create LXC guests
-  ansible.builtin.import_tasks: create-lxc.yml
+  ansible.builtin.import_tasks:
+    file: create-lxc.yml
+  tags:
+    - lxc
 
 - name: Create VM guests
-  ansible.builtin.import_tasks: create-vm.yml
+  ansible.builtin.import_tasks:
+    file: create-vm.yml
+  tags:
+    - vm

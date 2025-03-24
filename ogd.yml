@@ -5,41 +5,10 @@
     - role: validate
       tags: validate
 
-- name: Proxmox configuration
-  hosts: ogd:&hypervisor
-  become: true
-  gather_facts: false
-  pre_tasks:
-    - name: End play for hypervisors that are detected falsely
-      ansible.builtin.meta: end_host
-      when: hypervisor is not defined
-  roles:
-    - role: lae.proxmox
-      vars:
-        # Would remove Proxmox completely.
-        # https://github.com/lae/ansible-role-proxmox/issues/223
-        pve_remove_old_kernels: false
-      tags:
-        - proxmox
-        - pve
-    - role: proxmox
-      tags:
-        - proxmox
-        - pve
-        - vms
-    - role: smartmontools
-      tags: smartmontools
-
-- name: Resize filesystems of VMs with resized disks
-  hosts: needs_fs_resize
-  become: true
-  roles:
-    - role: grow-filesystems
-      tags:
-        - proxmox
-        - pve
-        - vms
-        - grow-filesystems
+- name: Import Proxmox configuration playbook
+  ansible.builtin.import_playbook: _proxmox.yml
+  vars:
+    playbook_hosts: ogd:&hypervisor
 
 - name: Import Linux configuration playbook
   tags: linux
