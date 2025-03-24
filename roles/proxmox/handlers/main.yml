@@ -40,6 +40,7 @@
     lxc_guests: >-
       {{
         lxc_guests_created.results |
+        default([]) |
         selectattr('changed') |
         selectattr('msg', 'match', 'Created\s') |
         ansible.builtin.items2dict(key_name = 'vmid',
@@ -48,6 +49,7 @@
     vm_guests: >-
       {{
         vm_guests_created.results |
+        default([]) |
         selectattr('changed') |
         ansible.builtin.items2dict(key_name = 'vmid',
                                    value_name = 'msg')
