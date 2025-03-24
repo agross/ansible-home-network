@@ -83,7 +83,12 @@
       }}
     ostype: "{{ guest.lxc.ostype | default(omit) }}"
     # mount_volumes: Does not work with token-based auth.
-    disk_volume: "{{ guest.lxc.disk_volume | default(default_disk_volume) }}"
+    disk_volume: >-
+      {{
+        guest.lxc.disk_volume |
+        default(proxmox_lxc_default_disk_volume) |
+        ansible.builtin.mandatory
+      }}
     password: "{{ guest.lxc.password | ansible.builtin.mandatory }}"
     pubkey: >-
       {{
@@ -104,11 +109,6 @@
   notify: Configure guest OS manually
   register: lxc_guests_created
   vars:
-    default_disk_volume:
-      storage: local-zfs
-      size: 8
-      options:
-        mountoptions: discard;noatime
     default_netif:
       net0: name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0,firewall=true
 

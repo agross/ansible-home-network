@@ -2,6 +2,12 @@ proxmox_api_user: "{{ vault_proxmox_api_user }}"
 proxmox_api_password: "{{ vault_proxmox_api_password }}"
 proxmox_api_token_secret: "{{ vault_proxmox_api_token_secret }}"
 
+proxmox_lxc_default_disk_volume:
+  storage: local-zfs
+  size: 8
+  options:
+    mountoptions: discard;noatime
+
 pve_groups:
   - name: admin
     comment: System Administrators
