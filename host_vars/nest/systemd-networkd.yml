@@ -34,12 +34,12 @@ systemd_networkd_network:
         - MulticastDNS: true
 
         - IPv6LinkLocalAddressGenerationMode: stable-privacy
+        - IPv6AcceptRA: false
+
+        - Gateway: "{{ network_gateway.ip4 }}"
+        - Gateway: "{{ network_gateway.ip6 }}"
 
         - MACVLAN: iobroker
-
-    - Route:
-        - Gateway: "{{ network_gateway.ip4 }}"
-        - GatewayOnLink: true
 
   iobroker:
     - Match:
