@@ -3,13 +3,3 @@ docker_daemon_options:
   fixed-cidr-v6: fd00:c0ff:ee::/48
   experimental: true
   ip6tables: true
-  # Use docker-based DNS server for the default bridge network instead of
-  # the ones from /etc/resolv.conf if the host runs the dns-server role.
-  # On hosts running the dns-server role localhost addresses (127.0.0.1 and
-  # ::1) are added to /etc/resolv.conf by systemd-resolved. Since localhost
-  # addresses cannot be accessed from inside a docker container, docker
-  # would fall back to Google DNS servers.
-  # Containers running on a custom network receive the network-specific DNS
-  # provided by docker.
-  dns:
-    - 172.17.0.1

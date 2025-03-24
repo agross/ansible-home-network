@@ -4,6 +4,7 @@ dns_server_firewalld:
   - dhcp
   - dhcpv6
   - dns
+  - http
 
 dns_server_remote_servers:
   - server: "{{ hostvars['gateway-home'].dns.servers | first }}"
