@@ -6,4 +6,4 @@ dns:
     - home.therightstuff.de
   servers:
     - "{{ network.ip4 | ansible.utils.nthhost(3) | mandatory }}"
-    - "{{ network.ip6 | ansible.utils.nthhost(3) | mandatory }}"
+    - "{{ network.ip6 | ansible.utils.nthhost(0x3) | mandatory }}"
