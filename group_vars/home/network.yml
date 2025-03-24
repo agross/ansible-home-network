@@ -13,4 +13,4 @@ network:
 
 network_gateway:
   ip4: "{{ network.ip4 | ansible.utils.nthhost(2) | mandatory }}"
-  ip6: "{{ network.ip6 | ansible.utils.nthhost(2) | mandatory }}"
+  ip6: "{{ network.ip6 | ansible.utils.nthhost(0x2) | mandatory }}"
