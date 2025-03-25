@@ -6,7 +6,8 @@ proxmox:
   memory: 4096
   net:
     net0: virtio,bridge=vmbr0,firewall=1
-  efi_disk_storage: local-zfs
+  efi_disk:
+    storage: local-zfs
   scsi:
     scsi0:
       storage: local-zfs

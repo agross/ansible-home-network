@@ -8,7 +8,8 @@ proxmox:
   net:
     net0: virtio,bridge=vmbr0,firewall=1
     net1: virtio,bridge=vmbr1,firewall=1
-  efi_disk_storage: local-zfs
+  efi_disk:
+    storage: local-zfs
   scsi:
     scsi0:
       storage: local-zfs

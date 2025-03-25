@@ -74,10 +74,10 @@
     efidisk0_yaml: |
       ---
       {% if (guest.kvm.bios | default('ovmf')) == 'ovmf' %}
-      storage: {{ guest.kvm.efi_disk_storage | default('local-lvm') }}
+      storage: {{ guest.kvm.efi_disk.storage | default('local-lvm') }}
       format: raw
       efitype: 4m
-      pre_enrolled_keys: 1
+      pre_enrolled_keys: {{ guest.kvm.efi_disk.pre_enrolled_keys | default('1') }}
       {% endif %}
     efidisk0: >-
       {{
