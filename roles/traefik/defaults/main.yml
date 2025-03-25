@@ -11,3 +11,6 @@ traefik_arch_to_package_suffix:
 traefik_firewalld:
   - http
   - https
+  - http3
+
+traefik_entrypoint_config: {}

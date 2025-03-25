@@ -42,13 +42,12 @@ entryPoints:
     http2:
       maxConcurrentStreams: 250
     http3: {}
-    # For compatibility with Immich.
-    # https://immich.app/docs/administration/reverse-proxy/#traefik-proxy-example-config
-    transport:
-      respondingTimeouts:
-        readTimeout: 600s
-        idleTimeout: 600s
-        writeTimeout: 600s
+    {{
+      traefik_entrypoint_config |
+      ansible.builtin.to_nice_yaml(indent = 2, sort_keys = false) |
+      indent(4)
+      if traefik_entrypoint_config.keys() | length > 0
+    }}
 
 certificatesResolvers:
   letsencrypt:

@@ -1,10 +1,6 @@
 dns_cname_records:
   - "build.{{ network.domain }}"
-  - "cockpit.{{ network.domain }}"
-  - "grafana.{{ network.domain }}"
   - "hub.{{ network.domain }}"
-  - "iobroker.{{ network.domain }}"
-  - "lovelace.{{ network.domain }}"
   - "netdata.{{ network.domain }}"
 
   - feedr.therightstuff.de
