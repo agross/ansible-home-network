@@ -15,7 +15,8 @@ proxmox:
     hostpci1: host=0000:2e:00.0
   net:
     net0: virtio,bridge=vmbr0,firewall=1
-  efi_disk_storage: local-zfs
+  efi_disk:
+    storage: local-zfs
   scsi:
     scsi0:
       storage: local-zfs

@@ -8,5 +8,7 @@ proxmox:
   memory: 1024
   net:
     net0: virtio,bridge=vmbr0,firewall=1
-  efi_disk_storage: local-zfs
+  efi_disk:
+    storage: local-zfs
+    pre_enrolled_keys: 0
   boot: order=net0
