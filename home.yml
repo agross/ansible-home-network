@@ -66,6 +66,14 @@
     - role: dns-server
       tags: dns-server
 
+- name: Reverse proxy configuration
+  hosts: proxy-home
+  become: true
+  gather_facts: false
+  roles:
+    - role: traefik
+      tags: traefik
+
 - name: Home automation
   hosts: nest
   become: true

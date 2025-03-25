@@ -1,11 +1,13 @@
 - name: Generate htpasswd-compatible Traefik dashboard users
-  ansible.builtin.import_tasks: htpasswd-users.yml
+  ansible.builtin.import_tasks:
+    file: htpasswd-users.yml
   vars:
     users: "{{ traefik_users.dashboard }}"
     fact: traefik_dashboard_users
 
 - name: Copy templates
-  ansible.builtin.import_tasks: copy-templates.yml
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
   vars:
     directory: ../templates
     target: "{{ traefik_root }}"
@@ -13,28 +15,22 @@
     files:
       systemd/traefik.service.j2:
         mode: "600"
-      conf/conf.d/dashboard.yaml.j2:
+      conf.d/dashboard.yaml.j2:
         mode: "600"
 
-- name: Set permissions on files containing TLS keys
-  ansible.builtin.import_tasks:
-    file: file-permissions.yml
-  vars:
-    files:
-      - path: "{{ traefik_root }}/conf/acme/trs-dns.json"
-        mode: "600"
-      - path: "{{ traefik_root }}/conf/acme/trs-dns-staging.json"
-        mode: "600"
+- name: Install Traefik using docker compose
+  when: traefik_install_method == 'docker'
+  ansible.builtin.include_tasks:
+    file: install-docker.yml
 
-- name: Pull Traefik image
-  community.docker.docker_image:
-    name: "{{ traefik_image | ansible.builtin.mandatory }}"
-    source: pull
-    force_source: "{{ docker_update is defined }}"
-  notify: Restart traefik service
+- name: Install Traefik using package manager
+  when: traefik_install_method == 'bare-metal'
+  ansible.builtin.include_tasks:
+    file: install-bare-metal.yml
 
 - name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
+  ansible.builtin.import_tasks:
+    file: systemd-install-units.yml
   vars:
     directory: "{{ traefik_root }}/systemd"
     local_units: templates/systemd
@@ -49,13 +45,11 @@
   loop: "{{ systemd_units_autostart }}"
   register: traefik_started
 
-- name: Allow HTTP and HTTPS through firewall
+- name: Allow Traefik services through firewall
   ansible.posix.firewalld:
     service: "{{ item }}"
     zone: "{{ interfaces.lan.zone }}"
     immediate: true
     permanent: true
     state: enabled
-  with_items:
-    - http
-    - https
+  loop: "{{ traefik_firewalld }}"

@@ -1,11 +1,18 @@
+{% if traefik_install_method == 'docker' %}
+{% set config_root_dir = '/etc/traefik/' %}
+{% else %}
+{% set config_root_dir = traefik_root %}
+{% endif %}
 providers:
+  {% if traefik_install_method == 'docker' %}
   docker:
     # Need to configure label traefik.enable=true.
     exposedByDefault: false
     # All traefik-enabled containers must be on this network.
     network: web
+  {% endif %}
   file:
-    directory: /etc/traefik/conf.d
+    directory: {{ config_root_dir }}/conf.d
     watch: true
 
 api:
@@ -32,12 +39,28 @@ entryPoints:
     http:
       tls:
         certResolver: letsencrypt-trs-dns
+    http2:
+      maxConcurrentStreams: 250
+    http3: {}
+    # For compatibility with Immich.
+    # https://immich.app/docs/administration/reverse-proxy/#traefik-proxy-example-config
+    transport:
+      respondingTimeouts:
+        readTimeout: 600s
+        idleTimeout: 600s
+        writeTimeout: 600s
 
 certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: agross@therightstuff.de
+      storage: {{ config_root_dir }}/conf/acme/letsencrypt.json
+      tlsChallenge: {}
+
   letsencrypt-trs-dns:
     acme:
       email: agross@therightstuff.de
-      storage: /etc/traefik/acme/trs-dns.json
+      storage: {{ config_root_dir }}/conf/acme/trs-dns.json
       dnsChallenge:
         provider: inwx
         propagation:
@@ -58,14 +81,9 @@ certificatesResolvers:
           # delegated domain used for certificate validations.
           # https://letsencrypt.org/2019/10/09/onboarding-your-customers-with-lets-encrypt-and-acme.html#the-advantages-of-a-cname
           delayBeforeChecks: 10
-
-  letsencrypt-trs-dns-staging:
-    acme:
-      caServer: https://acme-staging-v02.api.letsencrypt.org/directory
-      email: agross@therightstuff.de
-      storage: /etc/traefik/acme/trs-dns-staging.json
-      dnsChallenge:
-        provider: inwx
-        propagation:
-          # See above.
-          delayBeforeChecks: 10
+        # Use these DNS servers to find the SOA of the requesting domain.
+        # The internal DNS might paint a different picture that is not usable.
+        resolvers:
+          - ns.inwx.de
+          - ns2.inwx.de
+          - ns3.inwx.eu

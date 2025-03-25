@@ -1,0 +1,6 @@
+- name: Pull Traefik image
+  community.docker.docker_image:
+    name: "{{ traefik_image | ansible.builtin.mandatory }}"
+    source: pull
+    force_source: "{{ docker_update is defined }}"
+  notify: Restart traefik service

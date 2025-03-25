@@ -1,0 +1,7 @@
+dns_cname_records:
+  - "adguard.{{ network.domain }}"
+
+  - "{{ nextcloud_domain | mandatory }}"
+  - "kibana.{{ nextcloud_domain | mandatory }}"
+
+  - "{{ immich_domain | mandatory }}"
