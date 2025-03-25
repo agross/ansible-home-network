@@ -11,8 +11,9 @@ http:
       tls:
         certResolver: letsencrypt-trs-dns
         domains:
-          - main: {{ network.domain }}
+          - main: therightstuff.de
             sans:
+              - "*.therightstuff.de"
               - "*.{{ network.domain }}"
 
   middlewares:

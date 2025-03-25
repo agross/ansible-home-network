@@ -11,6 +11,7 @@ dns_server_remote_servers:
     domains:
       - "{{ hostvars['gateway-home'].network.domain }}"
       - cloud.therightstuff.de
+      - kibana.cloud.therightstuff.de
       - bitwarden.therightstuff.de
       - feedr.therightstuff.de
       - feeds.therightstuff.de

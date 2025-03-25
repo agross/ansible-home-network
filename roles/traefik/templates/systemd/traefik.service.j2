@@ -1,10 +1,24 @@
 [Unit]
 Description=Traefik
+{% if traefik_install_method == 'docker' %}
 BindsTo=docker.service
 After=docker.service
+{% endif %}
 OnFailure=unit-status-mail@%n.service
 
 [Service]
+{% if traefik_install_method == 'bare-metal' %}
+Environment=LEGO_DISABLE_CNAME_SUPPORT=true
+Environment=INWX_USERNAME={{ inwx_acme_username | ansible.builtin.mandatory }}
+Environment=INWX_PASSWORD={{ inwx_acme_password | ansible.builtin.mandatory }}
+
+ExecStart={{ traefik_root | ansible.builtin.quote }}/bin/traefik \
+          --configFile {{ traefik_root | ansible.builtin.quote }}/conf/traefik.yaml
+
+ExecReload=/usr/bin/kill -HUP $MAINPID
+{% endif %}
+
+{% if traefik_install_method == 'docker' %}
 # docker stop/rm just in case the container has not been removed (e.g. the
 # system crashed).
 ExecStartPre=-/usr/bin/docker container stop '%p'
@@ -40,10 +54,10 @@ ExecStart=/usr/bin/docker container \
                           {{ traefik_image | ansible.builtin.mandatory | ansible.builtin.quote }}
 
 ExecStop=/usr/bin/docker container stop '%p'
+{% endif %}
 
-# Restart 2 seconds after docker run exited with an error status.
 Restart=always
-RestartSec=2s
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target

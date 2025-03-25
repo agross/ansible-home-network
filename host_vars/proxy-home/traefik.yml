@@ -1,0 +1,10 @@
+traefik_install_method: bare-metal
+
+traefik_firewalld:
+  - http
+  - https
+  - http3
+
+traefik_users:
+  dashboard:
+    agross: "{{ vault_traefik_dashboard_password_agross }}"
