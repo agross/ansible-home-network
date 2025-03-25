@@ -1,54 +1,20 @@
 # {{ ansible_managed }}
 # vim: set ft=jinja-properties ts=2 sw=2 et:
 
-# Enable the TFTP.
-enable-tftp={{ interfaces.lan.device | mandatory }}
+{% set tftp_server = hostvars['router'].interfaces.lan.ip4.address | mandatory %}
 
-# Serve files from this directory.
-# tftp-root=/tftpboot
-
-# Match PXE clients.
-dhcp-vendorclass=set:pxe, PXEClient
+# Standard PC BIOS.
 dhcp-match=set:bios, option:client-arch, 0
-dhcp-match=set:efi-x86, option:client-arch, 6
-dhcp-match=set:efi-x86_64, option:client-arch, 7
+dhcp-boot=tag:bios, netboot.xyz.kpxe, , {{ tftp_server }}
 
-# Send TFTP server address to PXE clients.
-# This option appears to be ignored.
-# dhcp-option=tag:pxe, option:tftp-server, 172.16.0.3
+# 64-bit x86 EFI.
+dhcp-match=set:efi64-1, option:client-arch, 7
+dhcp-boot=tag:efi64-1, netboot.xyz.efi, , {{ tftp_server }}
 
-# BIOS.
-# dhcp-boot=tag:pxe, tag:bios, arch/bios/lpxelinux.0
-# Support iPXE (e.g. with VirtualBox) and http (lpxelinux instead of pxelinux.0).
-# dhcp-option=tag:pxe, tag:bios, option6:bootfile-url, http://pxe.home.therightstuff.de/arch/bios/lpxelinux.0
+# 64-bit x86 EFI (obsolete).
+dhcp-match=set:efi64-2, option:client-arch, 9
+dhcp-boot=tag:efi64-2, netboot.xyz.efi, , {{ tftp_server }}
 
-# UEFI, x86.
-# dhcp-boot=tag:pxe, tag:efi-x86, arch/efi32/syslinux.efi
-# dhcp-option=tag:pxe, tag:efi-x86, option6:bootfile-url, http://pxe.home.therightstuff.de/arch/efi32/syslinux.efi
-
-# UEFI, x86-64.
-# dhcp-boot=tag:pxe, tag:efi-x86_64, arch/efi64/syslinux.efi
-# dhcp-option=tag:pxe, tag:efi-x86_64, option6:bootfile-url, http://pxe.home.therightstuff.de/arch/efi64/syslinux.efi
-
-# This option is first and will be the default if there is no input from the user.
-pxe-prompt="Choose:"
-
-# The known types are x86PC, PC98, IA64_EFI, Alpha, Arc_x86,
-# Intel_Lean_Client, IA32_EFI, X86-64_EFI, Xscale_EFI,
-# BC_EFI, ARM32_EFI and ARM64_EFI.
-
-pxe-service=x86PC, "PXE Linux (BIOS)", arch/bios/lpxelinux.0
-pxe-service=x86PC, "Boot from local disk"
-
-# Below: The boot menu is not displayed when booting on VMware ESXi!
-pxe-service=IA32_EFI, "PXE Linux (EFI x86)", arch/efi32/syslinux.efi
-pxe-service=IA32_EFI, "PXE Linux (EFI x86) (same as above, but required for some clients)", arch/efi32/syslinux.efi
-pxe-service=IA32_EFI, "Boot from local disk"
-
-pxe-service=BC_EFI, "PXE Linux (EFI BC)", arch/efi64/syslinux.efi
-pxe-service=BC_EFI, "PXE Linux (EFI BC) (same as above, but required for some clients)", arch/efi64/syslinux.efi
-pxe-service=BC_EFI, "Boot from local disk"
-
-pxe-service=X86-64_EFI, "PXE Linux (EFI x86-64)", arch/efi64/syslinux.efi
-pxe-service=X86-64_EFI, "PXE Linux (EFI x86-64) (same as above, but required for some clients)", arch/efi64/syslinux.efi
-pxe-service=X86-64_EFI, "Boot from local disk"
+# 64-bit UEFI for arm64.
+dhcp-match=set:efi64-3, option:client-arch, B
+dhcp-boot=tag:efi64-3, netboot.xyz-arm64.efi, , {{ tftp_server }}
