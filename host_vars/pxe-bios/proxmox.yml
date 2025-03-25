@@ -5,7 +5,7 @@ proxmox:
   onboot: false
   bios: seabios
   cores: 1
-  memory: 1024
+  memory: 2048
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   boot: order=net0

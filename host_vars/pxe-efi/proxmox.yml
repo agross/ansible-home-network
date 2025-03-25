@@ -5,7 +5,7 @@ proxmox:
   onboot: false
   bios: ovmf
   cores: 1
-  memory: 1024
+  memory: 2048
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   efi_disk:
