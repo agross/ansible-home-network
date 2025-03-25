@@ -5,6 +5,7 @@
       - cockpit
       - cockpit-selinux
       - pcp
+      - python3-pcp
     state: present
 
 - name: Install cockpit (apt)
