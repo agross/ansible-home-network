@@ -105,8 +105,6 @@
   become: true
   gather_facts: false
   roles:
-    - role: samba
-      tags: samba
     - role: vaultwarden
       tags:
         - vaultwarden
