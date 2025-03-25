@@ -47,21 +47,6 @@ firewalld:
           port=10222
           to-addr={{ hostvars.router.interfaces.lan.ip6.address }}
           to-port=10222
-      # FTP.
-      - >-
-        rule family=ipv6
-        forward-port
-          protocol=tcp
-          port=21
-          to-addr={{ network.ip6 | ansible.utils.nthhost(0x10) }}
-          to-port=21
-      - >-
-        rule family=ipv6
-        forward-port
-          protocol=tcp
-          port=10021
-          to-addr={{ network.ip6 | ansible.utils.nthhost(0x10) }}
-          to-port=10021
 
   forward_ports:
     external:
@@ -90,12 +75,3 @@ firewalld:
         port: 10222
         toaddr: "{{ hostvars.router.interfaces.lan.ip4.address }}"
         toport: 10222
-      # FTP.
-      - proto: tcp
-        port: 21
-        toaddr: "{{ network.ip4 | ansible.utils.nthhost(10) }}"
-        toport: 21
-      - proto: tcp
-        port: 10021
-        toaddr: "{{ network.ip4 | ansible.utils.nthhost(10) }}"
-        toport: 10021
