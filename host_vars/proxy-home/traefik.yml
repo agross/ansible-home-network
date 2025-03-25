@@ -1,10 +1,38 @@
 traefik_install_method: bare-metal
 
-traefik_firewalld:
-  - http
-  - https
-  - http3
-
 traefik_users:
   dashboard:
     agross: "{{ vault_traefik_dashboard_password_agross }}"
+
+traefik_entrypoint_config:
+  # For compatibility with Immich.
+  # https://immich.app/docs/administration/reverse-proxy/#traefik-proxy-example-config
+  transport:
+    respondingTimeouts:
+      readTimeout: 600s
+      idleTimeout: 600s
+      writeTimeout: 600s
+  # For compatibility with Nextcloud Push which acts as a reverse proxy,
+  # issuing requests to the main Nextcloud server through the public URL.
+  forwardedHeaders:
+    trustedIPs:
+      - >-
+        {{
+          (
+            hostvars.tanker.interfaces.lan.ip4.address ~
+            '/'
+            ~
+            hostvars.tanker.interfaces.lan.ip4.prefix
+          ) |
+          ansible.utils.ipaddr('host/prefix')
+        }}
+      - >-
+        {{
+          (
+            hostvars.tanker.interfaces.lan.ip6.address ~
+            '/'
+            ~
+            hostvars.tanker.interfaces.lan.ip6.prefix
+          ) |
+          ansible.utils.ipaddr('host/prefix')
+        }}
