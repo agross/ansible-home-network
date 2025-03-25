@@ -17,7 +17,5 @@
 
 - name: Install netdata using package manager
   when: netdata_install_method == 'package'
-  block:
-    - name: Install netdata using package manager
-      ansible.builtin.include_tasks:
-        file: install-package.yml
+  ansible.builtin.include_tasks:
+    file: install-package.yml
