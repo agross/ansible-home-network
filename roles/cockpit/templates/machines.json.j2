@@ -1,7 +1,7 @@
 {
 {% for host in cockpit_proxied_hosts %}
-  "{{ hostvars[host].network_name }}": {
-    "address": "{{ hostvars[host].network_name }}",
+  "{{ hostvars[host].ansible_hostname }}": {
+    "address": "{{ hostvars[host].ansible_hostname }}",
     "visible": "true"
   }{{ "," if not loop.last else "" }}
 {% endfor %}
