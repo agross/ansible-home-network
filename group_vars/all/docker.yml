@@ -5,8 +5,14 @@ docker_users:
 
 # IPv6 support with NAT for containers, so they are not exposed to the
 # internet.
-docker_daemon_options:
+docker_daemon_options_default:
   ipv6: true
   fixed-cidr-v6: fd00:c0ff:ee::/48
   experimental: true
   ip6tables: true
+
+# https://www.reddit.com/r/Proxmox/comments/1ehurup/
+docker_daemon_options_for_lxc_on_zfs:
+  storage-driver: fuse-overlayfs
+
+docker_daemon_options: "{{ docker_daemon_options_default }}"
