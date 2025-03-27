@@ -109,10 +109,6 @@
       tags:
         - vaultwarden
         - container
-    - role: harbor
-      tags:
-        - harbor
-        - container
     - role: feedr
       tags:
         - feedr
@@ -161,3 +157,11 @@
   roles:
     - role: docker
       tags: docker
+    - role: traefik
+      tags:
+        - traefik
+        - container
+    - role: harbor
+      tags:
+        - harbor
+        - container

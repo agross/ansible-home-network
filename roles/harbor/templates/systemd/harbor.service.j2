@@ -3,7 +3,6 @@ Description=Harbor
 BindsTo=docker.service
 After=docker.service
 OnFailure=unit-status-mail@%n.service
-RequiresMountsFor={{ harbor_root }}/app
 
 [Service]
 WorkingDirectory={{ harbor_installer_directory }}/harbor

@@ -9,6 +9,5 @@ dns_cname_records:
   - "{{ vaultwarden_domain | mandatory }}"
   - tandoor.therightstuff.de
 
-  - cr.grossweber.com
   - gitea.grossweber.com
   - gitlab.grossweber.com
