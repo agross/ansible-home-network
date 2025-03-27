@@ -1,0 +1,29 @@
+traefik_users:
+  dashboard:
+    agross: "{{ vault_traefik_dashboard_password_agross }}"
+
+
+traefik_https_entrypoint_config:
+  # We're behind proxy-home's Traefik for public users.
+  forwardedHeaders:
+    trustedIPs:
+      - >-
+        {{
+          (
+            hostvars['proxy-home'].interfaces.lan.ip4.address ~
+            '/'
+            ~
+            hostvars['proxy-home'].interfaces.lan.ip4.prefix
+          ) |
+          ansible.utils.ipaddr('host/prefix')
+        }}
+      - >-
+        {{
+          (
+            hostvars['proxy-home'].interfaces.lan.ip6.address ~
+            '/'
+            ~
+            hostvars['proxy-home'].interfaces.lan.ip6.prefix
+          ) |
+          ansible.utils.ipaddr('host/prefix')
+        }}

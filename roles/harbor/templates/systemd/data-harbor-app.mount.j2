@@ -1,8 +1,0 @@
-[Unit]
-Description=Mount {{ harbor_root }}/app
-
-[Mount]
-What=/fs/nvme0/harbor/app
-Where={{ harbor_root }}/app
-Type=none
-Options=bind

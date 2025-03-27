@@ -32,13 +32,15 @@
 - name: Combine harbor config with defaults from harbor.yml.tmpl
   ansible.builtin.set_fact:
     harbor_yml_patched: >-
-      {{ harbor_yml.content |
-           b64decode |
-           from_yaml |
-           combine(harbor_config, recursive = true) |
-           dict2items |
-           rejectattr('key', 'in', harbor_config_reject) |
-           items2dict }}
+      {{
+        harbor_yml.content |
+        ansible.builtin.b64decode |
+        ansible.builtin.from_yaml |
+        ansible.builtin.combine(harbor_config, recursive = true) |
+        ansible.builtin.dict2items |
+        rejectattr('key', 'in', harbor_config_reject) |
+        ansible.builtin.items2dict
+      }}
 
 - name: Display config
   ansible.builtin.debug:
@@ -46,7 +48,7 @@
 
 - name: Write combined config to harbor.yml
   ansible.builtin.copy:
-    content: "{{ harbor_yml_patched | to_nice_yaml(indent=2) }}"
+    content: "{{ harbor_yml_patched | ansible.builtin.to_nice_yaml(indent=2) }}"
     dest: "{{ harbor_installer_directory }}/harbor/harbor.yml"
     mode: "644"
   register: harbor_yml_patched_templated
@@ -55,6 +57,19 @@
 - name: Regenerate docker-compose.yml # noqa no-handler
   when: harbor_yml_patched_templated is changed
   block:
+    - name: Get secretkey file system entry
+      ansible.builtin.stat:
+        path: "{{ harbor_root }}/app/secret/keys/secretkey"
+      register: harbor_secret_key
+
+    - name: Remove secret key if it is a directory
+      when: >-
+        harbor_secret_key.stat.isdir is defined and
+        harbor_secret_key.stat.isdir
+      ansible.builtin.file:
+        path: "{{ harbor_root }}/app/secret/keys/secretkey"
+        state: absent
+
     - name: Run Harbor prepare script to generate docker-compose.yml
       ansible.builtin.command:
         argv: "{{ ['./prepare'] + harbor_installer_arguments }}"
@@ -117,6 +132,16 @@
       ansible.builtin.file:
         path: "{{ docker_compose_yaml['backup_file'] }}"
         state: absent
+
+- name: Copy docker-compose.override.yml that includes Traefik labels
+  ansible.builtin.template:
+    src: templates/docker-compose.override.yml.j2
+    dest: "{{ harbor_installer_directory }}/harbor/docker-compose.override.yml"
+    owner: 0
+    group: 0
+    mode: '644'
+    lstrip_blocks: true
+  notify: Restart harbor service
 
 # https://www.claudiokuenzler.com/blog/958/running-harbor-registry-behind-reverse-proxy-solve-docker-push-errors
 - name: >-
