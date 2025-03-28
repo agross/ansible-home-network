@@ -8,9 +8,12 @@ traefik_arch_to_package_suffix:
   arm64: arm64
   x86_64: amd64
 
-traefik_firewalld:
+traefik_firewalld_ports: []
+
+traefik_firewalld_services:
   - http
   - https
   - http3
 
-traefik_entrypoint_config: {}
+traefik_entrypoints: {}
+traefik_https_entrypoint_config: {}

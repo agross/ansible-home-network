@@ -52,4 +52,13 @@
     immediate: true
     permanent: true
     state: enabled
-  loop: "{{ traefik_firewalld }}"
+  loop: "{{ traefik_firewalld_services }}"
+
+- name: Allow Traefik ports through firewall
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    zone: "{{ interfaces.lan.zone }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  loop: "{{ traefik_firewalld_ports }}"

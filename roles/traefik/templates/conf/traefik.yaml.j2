@@ -43,11 +43,17 @@ entryPoints:
       maxConcurrentStreams: 250
     http3: {}
     {{
-      traefik_entrypoint_config |
+      traefik_https_entrypoint_config |
       ansible.builtin.to_nice_yaml(indent = 2, sort_keys = false) |
       indent(4)
-      if traefik_entrypoint_config.keys() | length > 0
+      if traefik_https_entrypoint_config.keys() | length > 0
     }}
+  {{
+    traefik_entrypoints |
+    ansible.builtin.to_nice_yaml(indent = 2, sort_keys = false) |
+    indent(2)
+    if traefik_entrypoints.keys() | length > 0
+  }}
 
 certificatesResolvers:
   letsencrypt:

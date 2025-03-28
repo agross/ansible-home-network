@@ -4,7 +4,24 @@ traefik_users:
   dashboard:
     agross: "{{ vault_traefik_dashboard_password_agross }}"
 
-traefik_entrypoint_config:
+traefik_firewalld_ports:
+  - 9090/tcp
+  - 9777/udp
+
+traefik_entrypoints:
+  kodi-wss:
+    address: ":9090"
+    http:
+      tls:
+        certResolver: letsencrypt-trs-dns
+    http2:
+      maxConcurrentStreams: 250
+    http3: {}
+
+  kodi-eventserver:
+    address: :9777/udp
+
+traefik_https_entrypoint_config:
   # For compatibility with Immich.
   # https://immich.app/docs/administration/reverse-proxy/#traefik-proxy-example-config
   transport:
