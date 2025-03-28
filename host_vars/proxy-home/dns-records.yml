@@ -11,3 +11,5 @@ dns_cname_records:
   - "iobroker.{{ network.domain }}"
   - "lovelace.{{ network.domain }}"
   - "telegram.{{ network.domain }}"
+
+  - "kodi.{{ network.domain }}"
