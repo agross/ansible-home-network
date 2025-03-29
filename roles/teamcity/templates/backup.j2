@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+target={{ teamcity_root | ansible.builtin.quote }}/app/backup
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+
+  rm -rf -- "$target"/*
+}
+
+teamcity() {
+  printf 'Creating TeamCity backup.\n'
+
+  docker compose \
+         exec \
+         app \
+         /opt/teamcity/bin/maintainDB.sh \
+         backup \
+         --include-database \
+         --include-config \
+         --include-supplementary-data \
+         --include-personal-changes
+}
+
+extract() {
+  printf 'Extracting TeamCity backup.\n'
+
+  unzip -q "$target"/*.zip -d "$target/teamcity"
+  rm "$target"/*.zip
+
+  printf 'Extracting Hub backup.\n'
+
+  unzip -q {{ teamcity_root | ansible.builtin.quote }}/hub/backups/*.zip \
+        -d "$target/hub"
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+teamcity
+extract

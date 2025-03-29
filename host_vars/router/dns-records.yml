@@ -1,6 +1,4 @@
 dns_cname_records:
-  - "build.{{ network.domain }}"
-  - "hub.{{ network.domain }}"
   - "netdata.{{ network.domain }}"
 
   - feedr.therightstuff.de
