@@ -95,7 +95,7 @@
     immediate: true
     permanent: true
     state: enabled
-  loop: "{{ dns_server_firewalld }}"
+  loop: "{{ dns_server_firewalld_services }}"
 
 - name: Start systemd units
   ansible.builtin.systemd:
