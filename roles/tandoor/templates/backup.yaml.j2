@@ -39,10 +39,7 @@ location:
   # tildes are expanded. Note that a glob pattern must either start with a glob
   # or be an absolute path. Do not backslash spaces in path names. See the
   # output of "borg help patterns" for more details.
-  exclude_patterns:
-    - {{ immich_root }}/app/encoded-video
-    - {{ immich_root }}/app/thumbs
-    - {{ immich_root }}/app/upload
+  # exclude_patterns:
 
   # If true, the exclude_if_present filename is included in backups. Defaults to
   # false, meaning that the exclude_if_present filename is omitted from backups.
