@@ -1,0 +1,2 @@
+teamcity_domain: "build.{{ network.domain }}"
+teamcity_hub_domain: "hub.{{ network.domain }}"

@@ -1,0 +1,44 @@
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ teamcity_root }}"
+    notify: Restart teamcity service # noqa: var-naming[no-reserved]
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ teamcity_root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart teamcity service # noqa: var-naming[no-reserved]
+
+
+- name: Ensure unzip is installed (used for backup script)
+  ansible.builtin.package:
+    name: unzip
+    state: present
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ teamcity_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ teamcity_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart teamcity service # noqa: var-naming[no-reserved]
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: teamcity_started
