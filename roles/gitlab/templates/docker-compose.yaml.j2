@@ -1,0 +1,85 @@
+networks:
+  default:
+  web:
+    external: true
+
+services:
+  app:
+    image: gitlab/gitlab-ce
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['initial_root_password'] = '{{ gitlab_initial_root_password }}'
+
+        external_url 'https://{{ gitlab_domain }}'
+        gitlab_rails['gitlab_ssh_host'] = '{{ gitlab_domain }}'
+        gitlab_rails['gitlab_shell_ssh_port'] = {{ gitlab_ssh_port }}
+
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['real_ip_trusted_addresses'] = [
+          '10.0.0.0/8',
+          '172.16.0.0/12',
+          '192.168.0.0/16',
+          {% for proxy in gitlab_trusted_proxies %}
+          '{{ proxy }}',
+          {% endfor %}
+          ]
+        nginx['real_ip_header'] = 'X-Forwarded-For'
+        nginx['real_ip_recursive'] = 'on'
+
+        gitlab_rails['gitlab_email_from'] = 'gitlab@grossweber.com'
+        gitlab_rails['gitlab_email_display_name'] = 'GitLab'
+        gitlab_rails['gitlab_email_reply_to'] = 'no-reply@grossweber.com'
+
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = '{{ gitlab_smtp_server }}'
+        gitlab_rails['smtp_port'] = 587
+        gitlab_rails['smtp_user_name'] = '{{ gitlab_smtp_user_name }}'
+        gitlab_rails['smtp_password'] = '{{ gitlab_smtp_password }}'
+        gitlab_rails['smtp_domain'] = '{{ gitlab_smtp_user_name | split('@', 1) | last }}'
+        gitlab_rails['smtp_authentication'] = 'login'
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['smtp_tls'] = false
+        gitlab_rails['smtp_openssl_verify_mode'] = 'peer'
+
+        # Disable unused services.
+        nginx['status'] = { "enable" => false }
+        monitoring_role['enable'] = false
+        prometheus['enable'] = false
+        prometheus_monitoring['enable'] = false
+        alertmanager['enable'] = false
+        node_exporter['enable'] = false
+        redis_exporter['enable'] = false
+        postgres_exporter['enable'] = false
+        letsencrypt['enable'] = false
+
+        # https://docs.gitlab.com/omnibus/settings/memory_constrained_envs/
+        puma['worker_processes'] = 0
+        sidekiq['concurrency'] = 3
+
+        gitaly['env'] = {
+          'GITALY_COMMAND_SPAWN_MAX_PARALLEL' => '2'
+        }
+
+        gitlab_rails['env'] = {
+          'MALLOC_CONF' => 'dirty_decay_ms:1000,muzzy_decay_ms:1000'
+        }
+
+        gitaly['env'] = {
+          'MALLOC_CONF' => 'dirty_decay_ms:1000,muzzy_decay_ms:1000'
+        }
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.gitlab.entrypoints: https
+      traefik.http.routers.gitlab.rule: Host(`{{ gitlab_domain | ansible.builtin.mandatory }}`)
+      traefik.http.services.gitlab.loadbalancer.server.port: 80
+    networks:
+      - web
+    ports:
+      # Regardless of the use of Traefik for HTTP, the SHH port must be published.
+      - {{ gitlab_ssh_port }}:22
+    volumes:
+      - ./app/config:/etc/gitlab
+      - ./app/logs:/var/log/gitlab
+      - ./app/data:/var/opt/gitlab
+    shm_size: 256m

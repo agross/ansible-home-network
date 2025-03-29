@@ -165,3 +165,7 @@
       tags:
         - harbor
         - container
+    - role: gitlab
+      tags:
+        - gitlab
+        - container
