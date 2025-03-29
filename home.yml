@@ -121,10 +121,6 @@
       tags:
         - commafeed
         - container
-    - role: banking
-      tags:
-        - banking
-        - container
     - role: tandoor
       tags:
         - tandoor
@@ -168,4 +164,8 @@
     - role: gitlab
       tags:
         - gitlab
+        - container
+    - role: banking
+      tags:
+        - banking
         - container

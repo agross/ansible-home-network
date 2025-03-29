@@ -1,11 +1,8 @@
-volumes:
-  mariadb:
-
 services:
   db:
     image: mariadb:lts
     ports:
-      - 172.16.0.3:3306:3306
+      - 3306:3306
     environment:
       MARIADB_ROOT_PASSWORD: {{ banking_mariadb_root_password }}
       MARIADB_DATABASE: finance
@@ -21,7 +18,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./mariadb/init:/docker-entrypoint-initdb.d:ro
-      - mariadb:/var/lib/mysql
+      - ./mariadb/data:/var/lib/mysql
     healthcheck:
       test:
         - CMD
