@@ -40,3 +40,13 @@
     daemon_reload: true
   loop: "{{ systemd_units_autostart }}"
   register: banking_started
+
+- name: Allow banking services through firewall
+  when: interfaces.lan.zone is defined
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    zone: "{{ interfaces.lan.zone }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  loop: "{{ banking_firewalld_services }}"
