@@ -8,13 +8,13 @@ http:
       service: api@internal
       middlewares:
         - dashboard-auth
+      {% if not traefik_generate_wildcard_cert %}
+      # There is no wildcard certificate generated and HTTP or TLS challenges
+      # are unlikely to succeed. Use Traefik's default certificate for the
+      # dashboard.
       tls:
-        certResolver: letsencrypt-trs-dns
-        domains:
-          - main: therightstuff.de
-            sans:
-              - "*.therightstuff.de"
-              - "*.{{ network.domain }}"
+        certResolver:
+      {% endif %}
 
   middlewares:
     dashboard-auth:
