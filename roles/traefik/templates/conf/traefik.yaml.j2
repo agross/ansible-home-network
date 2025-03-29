@@ -1,8 +1,3 @@
-{% if traefik_install_method == 'docker' %}
-{% set config_root_dir = '/etc/traefik/' %}
-{% else %}
-{% set config_root_dir = traefik_root %}
-{% endif %}
 providers:
   {% if traefik_install_method == 'docker' %}
   docker:
@@ -12,7 +7,7 @@ providers:
     network: web
   {% endif %}
   file:
-    directory: {{ config_root_dir }}/conf.d
+    directory: {{ traefik_config_root_dir }}/conf.d
     watch: true
 
 api:
@@ -38,7 +33,7 @@ entryPoints:
     address: ":443"
     http:
       tls:
-        certResolver: letsencrypt-trs-dns
+        certResolver: {{ traefik_cert_resolver }}
     http2:
       maxConcurrentStreams: 250
     http3: {}
@@ -59,13 +54,14 @@ certificatesResolvers:
   letsencrypt:
     acme:
       email: agross@therightstuff.de
-      storage: {{ config_root_dir }}/conf/acme/letsencrypt.json
+      storage: {{ traefik_config_root_dir }}/acme/letsencrypt.json
       tlsChallenge: {}
 
-  letsencrypt-trs-dns:
+  {% if traefik_acme_inwx %}
+  letsencrypt-dns:
     acme:
       email: agross@therightstuff.de
-      storage: {{ config_root_dir }}/conf/acme/trs-dns.json
+      storage: {{ traefik_config_root_dir }}/acme/letsencrypt-dns.json
       dnsChallenge:
         provider: inwx
         propagation:
@@ -92,3 +88,4 @@ certificatesResolvers:
           - ns.inwx.de
           - ns2.inwx.de
           - ns3.inwx.eu
+  {% endif %}

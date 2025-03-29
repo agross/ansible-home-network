@@ -4,6 +4,34 @@ traefik_image: traefik:latest
 
 traefik_install_method: docker
 
+traefik_config_root_dir: >-
+  {{
+    '/etc/traefik' if traefik_install_method == 'docker'
+    else traefik_root
+  }}
+
+traefik_cert_sans: []
+
+traefik_acme_inwx: >-
+  {{
+    inwx_acme_username is defined and
+    inwx_acme_username | length > 0 and
+    inwx_acme_password is defined and
+    inwx_acme_password | length > 0
+  }}
+
+traefik_cert_resolver: >-
+  {{
+    'letsencrypt-dns' if traefik_acme_inwx
+    else 'letsencrypt'
+  }}
+
+traefik_generate_wildcard_cert: >-
+  {{
+    traefik_cert_resolver == 'letsencrypt-dns' and
+    traefik_cert_sans | length > 0
+  }}
+
 traefik_arch_to_package_suffix:
   arm64: arm64
   x86_64: amd64

@@ -1,3 +1,7 @@
+traefik_cert_sans:
+  - "{{ network.domain }}"
+  - "*.{{ network.domain }}"
+
 traefik_users:
   dashboard:
     agross: "{{ vault_traefik_dashboard_password_agross }}"

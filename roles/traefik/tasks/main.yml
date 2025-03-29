@@ -15,7 +15,7 @@
     files:
       systemd/traefik.service.j2:
         mode: "600"
-      conf.d/dashboard.yaml.j2:
+      conf.d/traefik/dashboard.yaml.j2:
         mode: "600"
 
 - name: Install Traefik using docker compose
@@ -46,6 +46,7 @@
   register: traefik_started
 
 - name: Allow Traefik services through firewall
+  when: interfaces.lan.zone is defined
   ansible.posix.firewalld:
     service: "{{ item }}"
     zone: "{{ interfaces.lan.zone }}"
@@ -55,6 +56,7 @@
   loop: "{{ traefik_firewalld_services }}"
 
 - name: Allow Traefik ports through firewall
+  when: interfaces.lan.zone is defined
   ansible.posix.firewalld:
     port: "{{ item }}"
     zone: "{{ interfaces.lan.zone }}"

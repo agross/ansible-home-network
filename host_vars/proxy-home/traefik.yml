@@ -1,5 +1,10 @@
 traefik_install_method: bare-metal
 
+traefik_cert_sans:
+  - therightstuff.de
+  - "*.therightstuff.de"
+  - "*.{{ network.domain }}"
+
 traefik_users:
   dashboard:
     agross: "{{ vault_traefik_dashboard_password_agross }}"
@@ -13,7 +18,7 @@ traefik_entrypoints:
     address: ":9090"
     http:
       tls:
-        certResolver: letsencrypt-trs-dns
+        certResolver: letsencrypt-dns
     http2:
       maxConcurrentStreams: 250
     http3: {}
