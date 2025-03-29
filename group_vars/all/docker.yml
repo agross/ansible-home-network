@@ -11,6 +11,12 @@ docker_daemon_options_default:
   experimental: true
   ip6tables: true
 
+  # https://docs.docker.com/engine/logging/drivers/json-file/
+  log-driver: json-file
+  log-opts:
+    max-size: "1m"
+    max-file: "3"
+
 # https://www.reddit.com/r/Proxmox/comments/1ehurup/
 docker_daemon_options_for_lxc_on_zfs:
   storage-driver: fuse-overlayfs
