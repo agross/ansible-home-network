@@ -3,10 +3,10 @@ roles:
   - name: borgbase.ansible_role_borgbackup
     version: v1.0.1
   - name: geerlingguy.docker
-    version: 6.0.4
+    version: 7.4.7
   - name: geerlingguy.postfix
   - name: geerlingguy.pip
-    version: 2.2.0
+    version: 3.1.0
   - name: geerlingguy.swap
   - name: hifis.unattended_upgrades
   - name: lae.proxmox
