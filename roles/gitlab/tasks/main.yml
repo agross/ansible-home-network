@@ -1,0 +1,62 @@
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ gitlab_root }}"
+    notify: Restart gitlab service # noqa: var-naming[no-reserved]
+    files:
+      docker-compose.yaml:
+        owner: 0
+        group: 0
+        mode: "640"
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ gitlab_root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart gitlab service # noqa: var-naming[no-reserved]
+
+# - name: Symlink backup configuration
+#   ansible.builtin.file:
+#     state: link
+#     src: "{{ gitlab_root }}/backup.yaml"
+#     path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Add vm.overcommit_memory sysctl for Redis
+  when: >-
+    'container' not in ansible_virtualization_tech_guest
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: "1"
+    sysctl_file: /etc/sysctl.d/redis-vm.overcommit.conf
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ gitlab_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart gitlab service # noqa: var-naming[no-reserved]
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: gitlab_started
+
+- name: Allow GitLab ports through firewall
+  when: interfaces.lan.zone is defined
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    zone: "{{ interfaces.lan.zone }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  loop: "{{ gitlab_firewalld_ports }}"

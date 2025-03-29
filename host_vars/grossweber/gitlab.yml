@@ -1,0 +1,7 @@
+gitlab_domain: gitlab.grossweber.com
+
+gitlab_initial_root_password: "{{ vault_gitlab_initial_root_password }}"
+
+gitlab_smtp_server: smtp-relay.gmail.com
+gitlab_smtp_user_name: "{{ vault_gitlab_smtp_user_name }}"
+gitlab_smtp_password: "{{ vault_gitlab_smtp_password }}"

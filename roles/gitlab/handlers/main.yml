@@ -1,0 +1,5 @@
+- name: Restart gitlab service
+  when: gitlab_started is not changed
+  ansible.builtin.systemd:
+    name: gitlab.service
+    state: reloaded

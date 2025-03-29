@@ -1,0 +1,8 @@
+gitlab_root: "/data/{{ ansible_role_name }}"
+
+gitlab_ssh_port: 10022
+
+gitlab_trusted_proxies: []
+
+gitlab_firewalld_services:
+  - "{{ gitlab_ssh_port }}"
