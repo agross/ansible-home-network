@@ -8,5 +8,3 @@ dns_cname_records:
   - rss.therightstuff.de
   - "{{ vaultwarden_domain | mandatory }}"
   - tandoor.therightstuff.de
-
-  - gitea.grossweber.com

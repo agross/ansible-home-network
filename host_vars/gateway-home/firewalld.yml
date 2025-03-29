@@ -39,14 +39,6 @@ firewalld:
           port={{ gitlab_ssh_port }}
           to-addr={{ hostvars.grossweber.interfaces.lan.ip6.address }}
           to-port={{ gitlab_ssh_port }}
-      # Gitea SSH.
-      - >-
-        rule family=ipv6
-        forward-port
-          protocol=tcp
-          port=10222
-          to-addr={{ hostvars.router.interfaces.lan.ip6.address }}
-          to-port=10222
 
   forward_ports:
     external:
@@ -70,8 +62,3 @@ firewalld:
         port: "{{ gitlab_ssh_port }}"
         toaddr: "{{ hostvars.grossweber.interfaces.lan.ip4.address }}"
         toport: "{{ gitlab_ssh_port }}"
-      # Gitea SSH.
-      - proto: tcp
-        port: 10222
-        toaddr: "{{ hostvars.router.interfaces.lan.ip4.address }}"
-        toport: 10222
