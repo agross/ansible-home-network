@@ -13,3 +13,6 @@ dns_cname_records:
   - "telegram.{{ network.domain }}"
 
   - "kodi.{{ network.domain }}"
+
+  - "{{ teamcity_domain | ansible.builtin.mandatory }}"
+  - "{{ teamcity_hub_domain | ansible.builtin.mandatory }}"

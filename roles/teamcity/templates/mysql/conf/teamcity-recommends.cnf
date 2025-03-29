@@ -1,0 +1,21 @@
+[mysqld]
+# https://confluence.jetbrains.com/display/TCD10/How+To...#HowTo...-innodb_file_per_table
+innodb_file_per_table = 1
+
+# https://confluence.jetbrains.com/display/TCD10/How+To...#HowTo...-innodb_flush_log_at_trx_commit
+#
+# If set to 1, InnoDB will flush (fsync) the transaction logs to the
+# disk at each commit, which offers full ACID behavior. If you are
+# willing to compromise this safety, and you are running small
+# transactions, you may set this to 0 or 2 to reduce disk I/O to the
+# logs. Value 0 means that the log is only written to the log file and
+# the log file flushed to disk approximately once per second. Value 2
+# means the log is written to the log file at each commit, but the log
+# file is only flushed to disk approximately once per second.
+innodb_flush_log_at_trx_commit = 2
+
+# https://confluence.jetbrains.com/display/TCD10/How+To...#HowTo...-max_connections
+max_connections = 100
+
+character-set-server=utf8mb4
+collation-server=utf8mb4_bin

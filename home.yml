@@ -169,3 +169,7 @@
       tags:
         - banking
         - container
+    - role: teamcity
+      tags:
+        - teamcity
+        - container

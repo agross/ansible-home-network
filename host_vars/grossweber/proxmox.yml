@@ -29,7 +29,7 @@ proxmox:
       }},bridge=vmbr0
   disk_volume:
     storage: local-zfs
-    size: 10
+    size: 20
     options:
       mountoptions: discard;noatime
   mount_volumes:
@@ -68,6 +68,32 @@ proxmox:
     mp6:
       host_path: /tank/grossweber/banking/mariadb
       mountpoint: /data/banking/mariadb/data
+      options:
+        mountoptions: discard;noatime
+
+    mp7:
+      host_path: /tank/grossweber/teamcity/app
+      mountpoint: /data/teamcity/app
+      options:
+        mountoptions: discard;noatime
+    mp8:
+      host_path: /tank/grossweber/teamcity/mysql
+      mountpoint: /data/teamcity/mysql/data
+      options:
+        mountoptions: discard;noatime
+    mp9:
+      host_path: /tank/grossweber/teamcity/hub/backups
+      mountpoint: /data/teamcity/hub/backups
+      options:
+        mountoptions: discard;noatime
+    mp10:
+      host_path: /tank/grossweber/teamcity/hub/conf
+      mountpoint: /data/teamcity/hub/conf
+      options:
+        mountoptions: discard;noatime
+    mp11:
+      host_path: /tank/grossweber/teamcity/hub/data
+      mountpoint: /data/teamcity/hub/data
       options:
         mountoptions: discard;noatime
   custom:
@@ -112,6 +138,30 @@ zfs_datasets:
       group: 100998
 
   tank/grossweber/banking/mariadb:
+    chown:
+      owner: 100999
+      group: 100999
+    options:
+      # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
+      recordsize: 16K
+
+  tank/grossweber/teamcity/app:
+    chown:
+      owner: 101000
+      group: 101000
+  tank/grossweber/teamcity/hub/backups:
+    chown:
+      owner: 113001
+      group: 113001
+  tank/grossweber/teamcity/hub/conf:
+    chown:
+      owner: 113001
+      group: 113001
+  tank/grossweber/teamcity/hub/data:
+    chown:
+      owner: 113001
+      group: 113001
+  tank/grossweber/teamcity/mysql:
     chown:
       owner: 100999
       group: 100999
