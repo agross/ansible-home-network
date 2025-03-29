@@ -1,7 +1,7 @@
 proxmox:
   host: pve-home
   type: lxc
-  id: 101
+  id: 104
   protection: true
   startup: order=100
   ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
