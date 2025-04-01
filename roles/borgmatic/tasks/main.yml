@@ -14,14 +14,16 @@
     borg_encryption_passphrase: >-
       {{ borgmatic_encryption_passphrase | ansible.builtin.mandatory }}
 
-    borg_repository: >-
-      ssh://{{
-        borgmatic_ssh_host | ansible.builtin.mandatory
-      }}/volume2/NetBackup/borg/{{
-        site | ansible.builtin.mandatory
-      }}/{{
-        borgmatic_server_name | default(ansible_hostname)
-      }}
+    borg_repository:
+      - label: default
+        path: >-
+          ssh://{{
+            borgmatic_ssh_host | ansible.builtin.mandatory
+          }}/volume2/NetBackup/borg/{{
+            site | ansible.builtin.mandatory
+          }}/{{
+            borgmatic_server_name | default(ansible_hostname)
+          }}
 
     borgmatic_relocated_repo_access_is_ok: true
     borg_remote_path: /usr/local/bin/borg
