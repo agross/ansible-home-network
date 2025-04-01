@@ -1,0 +1,42 @@
+proxmox:
+  host: pve-home
+  type: lxc
+  id: 3002
+  protection: true
+  ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
+  hookscript: lxc-fedora.sh
+  features:
+    - nesting=1
+    - fuse=1
+  password: "{{ vault_proxmox_default_root_password }}"
+  ssh_public_key_github_account: agross
+  memory: 10240
+  # Re-applying the same network config removes the gateway.
+  # Running networkctl reconfigure eth0 helps.
+  netif:
+    net0: >-
+      name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0
+  disk_volume:
+    storage: local-zfs
+    size: 5
+    options:
+      mountoptions: discard;noatime
+  mount_volumes:
+    mp0:
+      host_path: /tank/grossweber/teamcity/agent/docker
+      mountpoint: /var/lib/docker
+      options:
+        mountoptions: discard;noatime
+  custom:
+    - reason: systemd kernel mounts
+      # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
+      key: lxc.cap.drop
+      value: sys_rawio
+
+zfs_datasets:
+  tank/grossweber/teamcity/agent/docker:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 8K
