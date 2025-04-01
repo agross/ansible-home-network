@@ -11,7 +11,7 @@ proxmox:
     - fuse=1
   password: "{{ vault_proxmox_default_root_password }}"
   ssh_public_key_github_account: agross
-  memory: 20480
+  memory: 25600
   # Re-applying the same network config removes the gateway.
   # Running networkctl reconfigure eth0 helps.
   netif:
