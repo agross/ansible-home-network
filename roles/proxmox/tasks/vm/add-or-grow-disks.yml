@@ -53,7 +53,6 @@
         list
       }}
 
-
 - name: Grow existing disk of guest VM
   community.general.proxmox_disk:
     api_user: "{{ proxmox_api_user | mandatory }}"
