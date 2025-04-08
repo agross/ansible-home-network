@@ -23,6 +23,14 @@ firewalld:
           port=443
           to-addr={{ hostvars.finn.interfaces.lan.ip6.address }}
           to-port=443
+      # HTTP/3.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=udp
+          port=443
+          to-addr={{ hostvars.finn.interfaces.lan.ip6.address }}
+          to-port=443
 
   forward_ports:
     external:
@@ -33,6 +41,11 @@ firewalld:
         toport: 80
       # HTTPS.
       - proto: tcp
+        port: 443
+        toaddr: "{{ hostvars.finn.interfaces.lan.ip4.address }}"
+        toport: 443
+      # HTTP/3.
+      - proto: udp
         port: 443
         toaddr: "{{ hostvars.finn.interfaces.lan.ip4.address }}"
         toport: 443
