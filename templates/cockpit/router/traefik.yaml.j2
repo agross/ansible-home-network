@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}:
+      entrypoints: https
+      rule: Host(`cockpit.{{ network.domain }}`)
+      service: {{ ansible_role_name }}
+
+  services:
+    {{ ansible_role_name }}:
+      loadBalancer:
+        serversTransport: no-verify
+        servers:
+          - url: https://{{ interfaces.lan.ip4.address }}:9090

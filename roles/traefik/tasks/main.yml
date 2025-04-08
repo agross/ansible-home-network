@@ -18,6 +18,13 @@
       conf.d/traefik/dashboard.yaml.j2:
         mode: "600"
 
+- name: Copy templates for {{ inventory_hostname }}
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: "templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
+    target: "{{ traefik_dynamic_file_configuration }}"
+
 - name: Install Traefik using docker compose
   when: traefik_install_method == 'docker'
   ansible.builtin.include_tasks:

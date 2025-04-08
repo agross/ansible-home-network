@@ -1,7 +1,8 @@
+traefik_dynamic_file_configuration: /data/traefik/conf.d
+
 traefik_users:
   dashboard:
     agross: "{{ vault_traefik_dashboard_password_agross }}"
-
 
 traefik_https_entrypoint_config:
   # We're behind proxy-home's Traefik for public users.

@@ -1,2 +1,1 @@
 traefik_host: "{{ traefik_users is defined }}"
-traefik_dynamic_file_configuration: /data/traefik/conf.d

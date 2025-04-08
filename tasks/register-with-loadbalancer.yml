@@ -1,0 +1,27 @@
+- name: Template Traefik configuration
+  when: src | length > 0
+  ansible.builtin.template:
+    src: "{{ src }}"
+    dest: >-
+      {{
+        hostvars[item].traefik_dynamic_file_configuration
+      }}/{{
+        dest | default(ansible_role_name ~ '.yaml')
+      }}
+    lstrip_blocks: true
+    owner: 0
+    group: 0
+    mode: "640"
+  vars:
+    templates:
+      - "{{ template | default(omit) }}"
+      - "../roles/{{ ansible_role_name }}/templates/traefik.yaml.j2"
+      - "../templates/{{ ansible_role_name }}/{{ inventory_hostname }}/traefik.yaml.j2"
+      - "../templates/{{ ansible_role_name }}/traefik.yaml.j2"
+    src: "{{ lookup('ansible.builtin.first_found', templates, skip=true) }}"
+  delegate_to: "{{ item }}"
+  loop: >-
+    {{
+      groups[site] |
+      ansible.builtin.intersect(groups['loadbalancer'])
+    }}

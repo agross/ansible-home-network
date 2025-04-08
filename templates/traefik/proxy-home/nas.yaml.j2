@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    nas:
+      entrypoints: https
+      rule: Host(`nas.{{ network.domain }}`)
+      service: nas
+
+  services:
+    nas:
+      loadBalancer:
+        serversTransport: no-verify
+        servers:
+          - url: https://{{ network.ip4 | ansible.utils.nthhost(10) }}:5001

@@ -1,0 +1,34 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}:
+      entrypoints: https
+      rule: Host(`iobroker.home.therightstuff.de`)
+      service: {{ ansible_role_name }}
+
+    {{ ansible_role_name }}-lovelace:
+      entrypoints: https
+      rule: Host(`lovelace.home.therightstuff.de`)
+      service: {{ ansible_role_name }}-lovelace
+
+    {{ ansible_role_name }}-telegram:
+      entrypoints: https
+      rule: Host(`telegram.home.therightstuff.de`)
+      service: {{ ansible_role_name }}-telegram
+
+  services:
+    {{ ansible_role_name }}:
+      loadBalancer:
+        servers:
+          - url: http://{{ iobroker_ip4 }}:8081
+
+    {{ ansible_role_name }}-lovelace:
+      loadBalancer:
+        servers:
+          - url: http://{{ iobroker_ip4 }}:8091
+
+    {{ ansible_role_name }}-telegram:
+      loadBalancer:
+        serversTransport: no-verify
+        servers:
+          - url: https://{{ iobroker_ip4 }}:8443

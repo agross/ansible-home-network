@@ -59,7 +59,7 @@ services:
       traefik.http.routers.iobroker-telegram.entrypoints: https
       traefik.http.routers.iobroker-telegram.rule: Host(`telegram.{{ network.domain }}`)
       traefik.http.routers.iobroker-telegram.service: iobroker-telegram
-      traefik.http.services.iobroker-telegram.loadbalancer.serverstransport: iobroker-telegram@file
+      traefik.http.services.iobroker-telegram.loadbalancer.serverstransport: no-verify@file
       traefik.http.services.iobroker-telegram.loadbalancer.server.port: {{ iobroker_ports.telegram }}
       traefik.http.services.iobroker-telegram.loadbalancer.server.scheme: https
       {% endif %}

@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}:
+      entrypoints: https
+      rule: Host(`{{ teamcity_domain }}`)
+      service: {{ ansible_role_name }}
+
+    {{ ansible_role_name }}-hub:
+      entrypoints: https
+      rule: Host(`{{ teamcity_hub_domain }}`)
+      service: {{ ansible_role_name }}-hub
+
+  services:
+    {{ ansible_role_name }}:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8111
+
+    {{ ansible_role_name }}-hub:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8110

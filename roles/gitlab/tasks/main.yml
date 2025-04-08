@@ -60,3 +60,7 @@
     permanent: true
     state: enabled
   loop: "{{ gitlab_firewalld_ports }}"
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

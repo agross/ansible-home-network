@@ -15,7 +15,6 @@
     build: "{{ docker_update is defined }}"
     notify: Restart teamcity service # noqa: var-naming[no-reserved]
 
-
 - name: Ensure unzip is installed (used for backup script)
   ansible.builtin.package:
     name: unzip
@@ -42,3 +41,7 @@
     daemon_reload: true
   loop: "{{ systemd_units_autostart }}"
   register: teamcity_started
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

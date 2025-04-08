@@ -1,0 +1,51 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    kodi:
+      entrypoints: https
+      rule: Host(`kodi.{{ network.domain }}`)
+      service: kodi
+      middlewares:
+        - kodi-ipallowlist
+
+    kodi-wss:
+      entrypoints: kodi-wss
+      rule: Host(`kodi.{{ network.domain }}`)
+      service: kodi-wss
+      middlewares:
+        - kodi-ipallowlist
+
+  middlewares:
+    kodi-ipallowlist:
+      ipAllowList:
+        sourceRange:
+          - 127.0.0.1/32
+          - {{ network.ip4 }}
+          - {{ network.ip6 }}
+          - {{ hostvars['gateway-ogd'].network.ip4 }}
+          - {{ hostvars['gateway-ogd'].network.ip6 }}
+          - fe80::/10
+          - fc00::/7
+
+  services:
+    kodi:
+      loadBalancer:
+        servers:
+          - url: http://firetv:8081
+
+    kodi-wss:
+      loadBalancer:
+        servers:
+          - url: http://firetv:9091
+
+udp:
+  routers:
+    kodi-eventserver:
+      entrypoints: kodi-eventserver
+      service: kodi-eventserver
+
+  services:
+    kodi-eventserver:
+      loadBalancer:
+        servers:
+          - address: firetv:9777

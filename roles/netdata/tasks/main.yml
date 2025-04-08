@@ -6,10 +6,6 @@
   ansible.builtin.import_tasks:
     file: configure.yml
 
-- name: Configure Traefik integration
-  ansible.builtin.import_tasks:
-    file: traefik.yml
-
 - name: Start service
   ansible.builtin.systemd:
     name: netdata.service
@@ -17,3 +13,8 @@
     enabled: true
     daemon_reload: true
   register: netdata_started
+
+- name: Register with loadbalancer
+  when: netdata_stream_destination | default('', true) == inventory_hostname
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 http:
   routers:
     cockpit:
@@ -6,13 +7,9 @@ http:
       rule: Host(`cockpit.{{ network.domain | mandatory }}`)
       service: cockpit
 
-  serversTransports:
-    cockpit:
-      insecureSkipVerify: true
-
   services:
     cockpit:
       loadBalancer:
-        serversTransport: cockpit
+        serversTransport: no-verify
         servers:
           - url: https://host.docker.internal:9090/

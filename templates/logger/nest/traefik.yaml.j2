@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}-grafana:
+      entrypoints: https
+      rule: Host(`grafana.{{ network.domain }}`)
+      service: {{ ansible_role_name }}-grafana
+
+  services:
+    {{ ansible_role_name }}-grafana:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:3000

@@ -1,5 +1,7 @@
 traefik_install_method: bare-metal
 
+traefik_dynamic_file_configuration: /data/traefik/conf.d
+
 traefik_cert_sans:
   - therightstuff.de
   - "*.therightstuff.de"

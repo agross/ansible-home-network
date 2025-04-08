@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}-adguard:
+      entrypoints: https
+      rule: Host(`adguard.{{ network.domain }}`)
+      service: {{ ansible_role_name }}-adguard
+
+  services:
+    {{ ansible_role_name }}-adguard:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}

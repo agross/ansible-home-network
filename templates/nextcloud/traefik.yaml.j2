@@ -1,0 +1,60 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}:
+      entrypoints: https
+      rule: Host(`{{ nextcloud_domain }}`)
+      service: {{ ansible_role_name }}
+      middlewares:
+        - {{ ansible_role_name }}-well-known-replace
+        - security-headers@file
+
+    {{ ansible_role_name }}-push:
+      entrypoints: https
+      rule: Host(`{{ nextcloud_domain }}`) && PathPrefix(`/push`)
+      service: {{ ansible_role_name }}-push
+      middlewares:
+        - {{ ansible_role_name }}-push-stripprefix
+
+    {{ ansible_role_name }}-kibana:
+      entrypoints: https
+      rule: Host(`kibana.{{ nextcloud_domain }}`)
+      service: {{ ansible_role_name }}-kibana
+      middlewares:
+        - {{ ansible_role_name }}-kibana-auth
+
+  middlewares:
+    {{ ansible_role_name }}-well-known-replace:
+      redirectregex:
+        regex: https://(.*)/.well-known/(?:card|cal)dav
+        replacement: https://${1}/remote.php/dav/
+        permanent: true
+
+    {{ ansible_role_name }}-push-stripprefix:
+      stripprefix:
+        prefixes: /push
+
+    {{ ansible_role_name }}-kibana-auth:
+      basicauth:
+        users:
+          {{
+            nextcloud_kibana_auth |
+            ansible.builtin.to_nice_yaml(indent = 2) |
+            indent(10)
+          }}
+
+  services:
+    {{ ansible_role_name }}:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8000
+
+    {{ ansible_role_name }}-push:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8001
+
+    {{ ansible_role_name }}-kibana:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8002
