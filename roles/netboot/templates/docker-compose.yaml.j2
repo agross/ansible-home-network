@@ -1,0 +1,15 @@
+{% set nginx_port = 80 %}
+{% set web_port = 3000 %}
+services:
+  app:
+    image: netbootxyz/netbootxyz
+    volumes:
+      - ./app/config:/config
+      - ./app/assets:/assets
+    environment:
+      NGINX_PORT: {{ nginx_port }}
+      WEB_APP_PORT: {{ web_port }}
+    ports:
+      - 69:69/udp # tftp
+      - 3000:{{ nginx_port }}
+      - 3001:{{ web_port }}

@@ -1,0 +1,5 @@
+- name: Restart netboot service
+  when: netboot_started is not changed
+  ansible.builtin.systemd:
+    name: netboot.service
+    state: reloaded

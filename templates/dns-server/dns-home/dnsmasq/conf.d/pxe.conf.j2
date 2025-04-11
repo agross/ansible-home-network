@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 # vim: set ft=jinja-properties ts=2 sw=2 et:
 
-{% set tftp_server = hostvars['router'].interfaces.lan.ip4.address | mandatory %}
+{% set tftp_server = hostvars.tanker.interfaces.lan.ip4.address | mandatory %}
 
 # Standard PC BIOS.
 dhcp-match=set:bios, option:client-arch, 0

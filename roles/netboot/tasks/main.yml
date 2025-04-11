@@ -1,0 +1,42 @@
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ netboot_root }}"
+    notify: Restart netboot service # noqa: var-naming[no-reserved]
+    files:
+      .env.j2:
+        mode: "640"
+
+# Enable update with: ansible-playbook --extra-vars docker_update=42
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ netboot_root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart netboot service # noqa: var-naming[no-reserved]
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ netboot_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ netboot_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart netboot service # noqa: var-naming[no-reserved]
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: netboot_started

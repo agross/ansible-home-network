@@ -137,6 +137,8 @@
       tags: immich
     - role: nextcloud
       tags: nextcloud
+    - role: netboot
+      tags: netboot
 
 - name: Hosted services on smb
   hosts: smb
