@@ -1,1 +1,86 @@
+# These vars cannot be role defaults (roles/borgmatic/defaults/main.yml) as they
+# for some reason do not get picked up.
+
+borgmatic_version: ">=2.0.0"
+
+# Prevent borgbase.ansible_role_borgbackup from installing timers. We do this
+# ourselves in postinstall.
+borgmatic_timer: ""
+borgmatic_backup_time: 01:00
+
+borg_one_file_system: false
+borgmatic_store_atime: false
+borgmatic_relocated_repo_access_is_ok: true
+
 borgmatic_ssh_host: nas.home.therightstuff.de
+
+borg_repository: >-
+  ssh://{{
+    borgmatic_ssh_host | ansible.builtin.mandatory
+  }}/volume2/NetBackup/borg/{{
+    site | ansible.builtin.mandatory
+  }}/{{
+    borgmatic_server_name | default(ansible_hostname)
+  }}
+
+borg_remote_path: /usr/local/bin/borg
+
+borg_ssh_key_name: borg-backup
+borg_ssh_command: >-
+  ssh
+  -o User=backup
+  -i "{{ borg_ssh_key_file_path }}"
+  -o StrictHostKeyChecking=accept-new
+
+borg_source_directories:
+  - /etc
+
+borgmatic_hooks:
+  healthchecks:
+    ping_url: "{{ borgmatic_system_backup_healthcheck }}"
+
+borgmatic_custom_config:
+  # Constants to use in the configuration file. Within option values, all
+  # occurrences of the constant name in curly braces will be replaced with the
+  # constant value. For example, if you have a constant named "app_name" with
+  # the value "myapp", then the string "{app_name}" will be replaced with
+  # "myapp" in the configuration file.
+  constants:
+    name: system
+
+  # A Borg pattern for filtering down the archives used by borgmatic actions
+  # that operate on multiple archives. For Borg 1.x, use a shell pattern here
+  # and see the output of "borg help placeholders" for details. For Borg 2.x,
+  # see the output of "borg help match-archives". If match_archives is not
+  # specified, borgmatic defaults to deriving the match_archives value from
+  # archive_name_format.
+  match_archives: "sh:{{ borgmatic_server_name | default('{hostname}') }}-{name}-*"
+
+  # Name of the archive to create. Borg placeholders can be used. See the output
+  # of "borg help placeholders" for details. Defaults to
+  # "{hostname}-{now:%Y-%m-%dT%H:%M:%S.%f}" with Borg 1 and "{hostname}" with
+  # Borg 2, as Borg 2 does not require unique archive names; identical archive
+  # names form a common "series" that can be targeted together. When running
+  # actions like repo-list, info, or check, borgmatic automatically tries to
+  # match only archives created with this name format.
+  archive_name_format: "{hostname}-{name}-{now}"
+
+  # Only store/extract numeric user and group identifiers. Defaults to false.
+  numeric_ids: true
+
+  # If true, the exclude_if_present filename is included in backups. Defaults to
+  # false, meaning that the exclude_if_present filename is omitted from backups.
+  keep_exclude_tags: true
+
+  # If true, then source directories (and root pattern paths) must exist. If
+  # they don't, an error is raised. Defaults to false.
+  source_directories_must_exist: true
+
+  # Configuration for a monitoring integration with Healthchecks. Create an
+  # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
+  # to use this service. See borgmatic monitoring documentation for details.
+  healthchecks:
+    # Number of bytes of borgmatic logs to send to Healthchecks, ideally the
+    # same as PING_BODY_LIMIT configured on the Healthchecks server. Set to 0 to
+    # send all logs and disable this truncation. Defaults to 100000.
+    ping_body_limit: 0

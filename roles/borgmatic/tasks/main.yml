@@ -8,67 +8,23 @@
     loop_var: file
 
 - name: Install borgmatic
-  ansible.builtin.include_role:
+  # Import so vars are exposed, we need borgmatic_config_name for validation.
+  ansible.builtin.import_role:
     name: borgbase.ansible_role_borgbackup
   vars:
-    borg_encryption_passphrase: >-
-      {{ borgmatic_encryption_passphrase | ansible.builtin.mandatory }}
+    # borgmatic_encryption_passphrase determines if this role is installed. We
+    # need to map it to borgbase.ansible_role_borgbackup's equivalent.
+    borg_encryption_passphrase: "{{ borgmatic_encryption_passphrase }}"
 
-    borg_repository:
-      - label: default
-        path: >-
-          ssh://{{
-            borgmatic_ssh_host | ansible.builtin.mandatory
-          }}/volume2/NetBackup/borg/{{
-            site | ansible.builtin.mandatory
-          }}/{{
-            borgmatic_server_name | default(ansible_facts.hostname)
-          }}
-
-    borgmatic_relocated_repo_access_is_ok: true
-    borg_remote_path: /usr/local/bin/borg
-
-    borg_ssh_key_name: borg-backup
-    borg_ssh_command: >-
-      ssh
-      -o User=backup
-      -i "{{ borg_ssh_key_file_path }}"
-      -o StrictHostKeyChecking=accept-new
-
-    # Timer is installed by the package. Or run timers ourselves as the
-    # pip-installed only runs the default borgmatic config.
-    borgmatic_timer: ""
-
-    borg_source_directories:
-      - /etc
-
-    borgmatic_hooks:
-      healthchecks:
-        ping_url: "{{ borgmatic_system_backup_healthcheck }}"
-
-    borgmatic_store_atime: false
-
-- name: Patch config file to include constant name
-  ansible.builtin.lineinfile:
-    path: /etc/borgmatic/config.yaml
-    insertbefore: "location:"
-    firstmatch: true
-    line: |
-      constants:
-        name: system
-
-- name: Patch config file changing archive_name_format
-  ansible.builtin.lineinfile:
-    path: /etc/borgmatic/config.yaml
-    search_string: "archive_name_format:"
-    line: "    archive_name_format: '{hostname}-{name}-{now}'"
-
-- name: Patch config file to include match_archives
-  ansible.builtin.lineinfile:
-    path: /etc/borgmatic/config.yaml
-    insertafter: "archive_name_format:"
-    firstmatch: true
-    line: "    match_archives: 'sh:{{ borgmatic_server_name | default('{hostname}') }}-{name}-*'"
+- name: Validate config file
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - --config
+      - "/etc/borgmatic/{{ borgmatic_config_name }}"
+      - config
+      - validate
+  changed_when: false
 
 - name: Ensure /etc/borgmatic.d exists
   ansible.builtin.file:

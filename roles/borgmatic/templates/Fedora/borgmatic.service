@@ -4,7 +4,7 @@
 # CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_NET_RAW
 CapabilityBoundingSet=~
 
-# No sleep at before running the backup.
+# No sleep before running the backup.
 ExecStartPre=
 
 # More verbose output.
