@@ -10,7 +10,7 @@ proxmox:
     - nesting=1
   password: "{{ vault_proxmox_default_root_password }}"
   ssh_public_key_github_account: agross
-  memory: 512
+  memory: 1024
   netif:
     net0: >-
       name={{ interfaces.lan.device }},ip={{
