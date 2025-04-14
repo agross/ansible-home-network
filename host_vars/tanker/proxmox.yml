@@ -82,6 +82,12 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp9:
+      host_path: /tank/freshrss/postgres
+      mountpoint: /data/freshrss/db
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -152,8 +158,16 @@ zfs_datasets:
 
   tank/feedr/postgres:
     chown:
-      owner: 100999
-      group: 100999
+      owner: 100070
+      group: 100070
+    options:
+      prefetch: none
+      recordsize: 8K
+
+  tank/freshrss/postgres:
+    chown:
+      owner: 100070
+      group: 100070
     options:
       prefetch: none
       recordsize: 8K

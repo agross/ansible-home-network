@@ -109,10 +109,6 @@
       tags:
         - vaultwarden
         - container
-    - role: freshrss
-      tags:
-        - freshrss
-        - container
     - role: tandoor
       tags:
         - tandoor
@@ -135,6 +131,8 @@
       tags: commafeed
     - role: feedr
       tags: feedr
+    - role: freshrss
+      tags: freshrss
 
 - name: Hosted services on smb
   hosts: smb
