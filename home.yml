@@ -100,15 +100,6 @@
         - logger
         - container
 
-- name: Hosted services
-  hosts: router
-  become: true
-  gather_facts: false
-  roles:
-    - role: vaultwarden
-      tags:
-        - vaultwarden
-        - container
 - name: Hosted services on tanker
   hosts: tanker
   become: true
@@ -130,6 +121,8 @@
       tags: freshrss
     - role: tandoor
       tags: tandoor
+    - role: vaultwarden
+      tags: vaultwarden
 
 - name: Hosted services on smb
   hosts: smb

@@ -99,6 +99,17 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp12:
+      host_path: /tank/vaultwarden/app
+      mountpoint: /data/vaultwarden/app
+      options:
+        mountoptions: discard;noatime
+    mp13:
+      host_path: /tank/vaultwarden/mariadb
+      mountpoint: /data/vaultwarden/mariadb/data
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -196,3 +207,12 @@ zfs_datasets:
     options:
       prefetch: none
       recordsize: 8K
+
+  tank/vaultwarden/app:
+    chown:
+      owner: 101000
+      group: 101000
+  tank/vaultwarden/mariadb:
+    chown:
+      owner: 100999
+      group: 100999

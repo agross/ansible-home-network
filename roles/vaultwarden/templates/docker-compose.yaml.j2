@@ -1,6 +1,5 @@
 volumes:
   vaultwarden:
-  mariadb:
 
 services:
   db:
@@ -22,7 +21,7 @@ services:
       MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - mariadb:/var/lib/mysql
+      - ./mariadb/data:/var/lib/mysql
     healthcheck:
       test:
         - CMD
@@ -38,7 +37,7 @@ services:
     restart: unless-stopped
     user: {{ vaultwarden_uid_gid | ansible.builtin.mandatory }}:{{ vaultwarden_uid_gid }}
     ports:
-      - 127.0.0.1:3011:80
+      - 4004:80
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./app:/data/
