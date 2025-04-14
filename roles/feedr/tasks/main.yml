@@ -1,3 +1,9 @@
+- name: Generate htpasswd-compatible users
+  ansible.builtin.import_tasks: htpasswd-users.yml
+  vars:
+    users: "{{ feedr_users }}"
+    fact: feedr_auth
+
 - name: Copy templates
   ansible.builtin.import_tasks:
     file: copy-templates.yml
@@ -41,3 +47,7 @@
     daemon_reload: true
   loop: "{{ systemd_units_autostart }}"
   register: feedr_started
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

@@ -1,3 +1,6 @@
-feedr_commafeed_api: https://feeds.therightstuff.de/rest
+feedr_commafeed_api: "https://{{ commafeed_domain }}/rest"
 feedr_commafeed_user: "{{ vault_feedr_commafeed_user }}"
 feedr_commafeed_password: "{{ vault_feedr_commafeed_password }}"
+
+feedr_users:
+  agross: "{{ vault_feedr_users_agross }}"

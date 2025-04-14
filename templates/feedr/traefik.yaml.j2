@@ -1,0 +1,25 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}:
+      entrypoints: https
+      rule: Host(`{{ feedr_domain }}`)
+      service: {{ ansible_role_name }}
+      middlewares:
+        - {{ ansible_role_name }}-auth
+
+  middlewares:
+    {{ ansible_role_name }}-auth:
+      basicauth:
+        users:
+          {{
+            feedr_auth |
+            ansible.builtin.to_nice_yaml(indent = 2) |
+            indent(10)
+          }}
+
+  services:
+    {{ ansible_role_name }}:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:4001

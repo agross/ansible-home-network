@@ -1,1 +1,1 @@
-feedr_root: /data/feedr
+feedr_root: "/data/{{ ansible_role_name }}"
