@@ -109,11 +109,6 @@
       tags:
         - vaultwarden
         - container
-    - role: tandoor
-      tags:
-        - tandoor
-        - container
-
 - name: Hosted services on tanker
   hosts: tanker
   become: true
@@ -133,6 +128,8 @@
       tags: feedr
     - role: freshrss
       tags: freshrss
+    - role: tandoor
+      tags: tandoor
 
 - name: Hosted services on smb
   hosts: smb

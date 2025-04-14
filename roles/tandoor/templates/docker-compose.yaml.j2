@@ -1,5 +1,4 @@
 volumes:
-  db:
   nginx-conf:
   nginx-static:
 
@@ -11,7 +10,7 @@ services:
     environment:
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
     volumes:
-      - db:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql/data
     healthcheck:
       test:
         - CMD-SHELL
@@ -51,7 +50,7 @@ services:
   nginx:
     image: nginx:mainline-alpine
     ports:
-      - "127.0.0.1:8088:80"
+      - 4003:80
     volumes:
       - ./app/media:/media:ro
       - nginx-static:/static:ro

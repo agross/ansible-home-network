@@ -88,6 +88,17 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp10:
+      host_path: /tank/tandoor/app
+      mountpoint: /data/tandoor/app
+      options:
+        mountoptions: discard;noatime
+    mp11:
+      host_path: /tank/tandoor/postgres
+      mountpoint: /data/tandoor/db
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -165,6 +176,20 @@ zfs_datasets:
       recordsize: 8K
 
   tank/freshrss/postgres:
+    chown:
+      owner: 100070
+      group: 100070
+    options:
+      prefetch: none
+      recordsize: 8K
+
+  tank/tandoor/app:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 32K
+  tank/tandoor/postgres:
     chown:
       owner: 100070
       group: 100070
