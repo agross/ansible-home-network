@@ -69,6 +69,13 @@ proxmox:
       mountpoint: /data/nextcloud/elasticsearch/data
       options:
         mountoptions: discard;noatime
+
+    mp7:
+      host_path: /tank/commafeed/mysql
+      mountpoint: /data/commafeed/mysql/data
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -128,3 +135,11 @@ zfs_datasets:
       group: 100000
     options:
       recordsize: 8K
+
+  tank/commafeed/mysql:
+    chown:
+      owner: 100999
+      group: 100999
+    options:
+      # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
+      recordsize: 16K

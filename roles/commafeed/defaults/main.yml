@@ -1,1 +1,1 @@
-commafeed_root: /data/commafeed
+commafeed_root: "/data/{{ ansible_role_name }}"

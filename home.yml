@@ -117,10 +117,6 @@
       tags:
         - freshrss
         - container
-    - role: commafeed
-      tags:
-        - commafeed
-        - container
     - role: tandoor
       tags:
         - tandoor
@@ -139,6 +135,8 @@
       tags: nextcloud
     - role: netboot
       tags: netboot
+    - role: commafeed
+      tags: commafeed
 
 - name: Hosted services on smb
   hosts: smb

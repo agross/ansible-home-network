@@ -1,6 +1,3 @@
-volumes:
-  mariadb:
-
 services:
   db:
     image: mariadb:lts
@@ -20,8 +17,7 @@ services:
       MARIADB_MYSQL_LOCALHOST_USER: true
       MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - mariadb:/var/lib/mysql
+      - ./mysql/data:/var/lib/mysql
     healthcheck:
       test:
         - CMD
@@ -43,7 +39,7 @@ services:
       COMMAFEED_USERS_ALLOW_REGISTRATIONS: false
       COMMAFEED_DATABASE_CLEANUP_MAX_FEED_CAPACITY: 1500
     ports:
-      - 127.0.0.1:8082:8082
+      - 4000:8082
     depends_on:
       db:
         condition: service_healthy
