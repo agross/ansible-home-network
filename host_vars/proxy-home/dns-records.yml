@@ -16,3 +16,9 @@ dns_cname_records:
 
   - "{{ teamcity_domain | ansible.builtin.mandatory }}"
   - "{{ teamcity_hub_domain | ansible.builtin.mandatory }}"
+
+  - "{{ commafeed_domain | ansible.builtin.mandatory }}"
+  - "{{ feedr_domain | ansible.builtin.mandatory }}"
+  - "{{ freshrss_domain | ansible.builtin.mandatory }}"
+  - "{{ tandoor_domain | ansible.builtin.mandatory }}"
+  - "{{ vaultwarden_domain | ansible.builtin.mandatory }}"

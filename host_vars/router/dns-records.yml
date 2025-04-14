@@ -1,8 +1,2 @@
 dns_cname_records:
   - "netdata.{{ network.domain }}"
-
-  - feedr.therightstuff.de
-  - feeds.therightstuff.de
-  - rss.therightstuff.de
-  - "{{ vaultwarden_domain | mandatory }}"
-  - tandoor.therightstuff.de
