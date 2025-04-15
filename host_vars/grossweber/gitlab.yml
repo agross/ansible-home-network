@@ -1,3 +1,5 @@
+gitlab_backup_healthcheck: "{{ vault_gitlab_backup_healthcheck }}"
+
 gitlab_domain: gitlab.grossweber.com
 
 gitlab_initial_root_password: "{{ vault_gitlab_initial_root_password }}"

@@ -18,11 +18,11 @@
     build: "{{ docker_update is defined }}"
     notify: Restart gitlab service # noqa: var-naming[no-reserved]
 
-# - name: Symlink backup configuration
-#   ansible.builtin.file:
-#     state: link
-#     src: "{{ gitlab_root }}/backup.yaml"
-#     path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ gitlab_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
 
 - name: Add vm.overcommit_memory sysctl for Redis
   when: >-

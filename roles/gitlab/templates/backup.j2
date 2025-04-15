@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+target={{ gitlab_root | ansible.builtin.quote }}/app/data/backups
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+
+  rm -rf -- "$target"/*
+}
+
+app() {
+  printf 'Creating GitLab backup.\n'
+
+  docker compose \
+         exec \
+         app \
+         gitlab-backup create STRATEGY=copy SKIP=tar COMPRESS_CMD=tee
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+app
