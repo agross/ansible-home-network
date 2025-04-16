@@ -1,0 +1,49 @@
+scrape_configs:
+  - job_name: node
+    static_configs:
+      - targets:
+          - host.docker.internal:9100
+        labels:
+          instance: tanker
+      - targets:
+          - proxy-home:9100
+        labels:
+          instance: proxy-home
+      - targets:
+          - dns-home:9100
+        labels:
+          instance: dns-home
+      - targets:
+          - pve-home:9100
+        labels:
+          instance: pve-home
+      - targets:
+          - grossweber:9100
+        labels:
+          instance: grossweber
+      - targets:
+          - router:9100
+        labels:
+          instance: router
+      - targets:
+          - gateway-home:9100
+        labels:
+          instance: gateway-home
+      - targets:
+          - nest:9100
+        labels:
+          instance: nest
+
+  - job_name: ipmi
+    static_configs:
+      - targets:
+          - pve-home:9290
+        labels:
+          instance: pve-home
+
+  - job_name: smartctl
+    static_configs:
+      - targets:
+          - pve-home:9633
+        labels:
+          instance: pve-home

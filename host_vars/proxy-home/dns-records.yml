@@ -22,3 +22,4 @@ dns_cname_records:
   - "{{ freshrss_domain | ansible.builtin.mandatory }}"
   - "{{ tandoor_domain | ansible.builtin.mandatory }}"
   - "{{ vaultwarden_domain | ansible.builtin.mandatory }}"
+  - "{{ prometheus_domain | ansible.builtin.mandatory }}"

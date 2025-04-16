@@ -1,0 +1,4 @@
+_node_exporter_version: latest
+
+ipmi_exporter_system_user: root
+smartctl_exporter_system_user: root

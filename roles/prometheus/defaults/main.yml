@@ -1,0 +1,3 @@
+prometheus_root: "/data/{{ ansible_role_name }}"
+
+prometheus_scrape_interval: 1m

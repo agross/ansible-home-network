@@ -1,0 +1,59 @@
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ prometheus_root }}"
+    notify: Restart prometheus service # noqa: var-naming[no-reserved]
+    files:
+      docker-compose.yaml.j2:
+        owner: 0
+        group: 0
+        mode: '640'
+      backup.j2:
+        mode: '750'
+        owner: 0
+        group: 0
+      restore.j2:
+        mode: '750'
+        owner: 0
+        group: 0
+
+- name: Ensure jq is installed (used for backup script)
+  ansible.builtin.package:
+    name: jq
+    state: present
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ prometheus_root }}"
+    pull: "{{ docker_update is defined }}"
+    build: "{{ docker_update is defined }}"
+    notify: Restart prometheus service # noqa: var-naming[no-reserved]
+
+- name: Symlink systemd unit
+  ansible.builtin.file:
+    state: link
+    src: "{{ prometheus_root }}/systemd/{{ ansible_role_name }}.service"
+    path: "/etc/systemd/system/{{ ansible_role_name }}.service"
+    force: true
+  notify: Restart prometheus service
+
+- name: Start systemd unit
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ ansible_role_name }}.service"
+    daemon_reload: true
+  register: prometheus_started
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ prometheus_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

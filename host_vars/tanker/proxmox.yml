@@ -108,6 +108,17 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp14:
+      host_path: /tank/prometheus/app
+      mountpoint: /data/prometheus/app
+      options:
+        mountoptions: discard;noatime
+    mp15:
+      host_path: /tank/prometheus/app/data
+      mountpoint: /data/prometheus/app/data
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -214,3 +225,12 @@ zfs_datasets:
     chown:
       owner: 100999
       group: 100999
+
+  tank/prometheus/app:
+    chown:
+      owner: 100000
+      group: 100000
+  tank/prometheus/app/data:
+    chown:
+      owner: 165534
+      group: 165534

@@ -1,0 +1,22 @@
+[Unit]
+Description=Prometheus
+BindsTo=docker.service
+After=docker.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+Environment=COMPOSE_PROJECT_NAME=%p
+
+WorkingDirectory={{ prometheus_root }}
+
+ExecStartPre=/usr/bin/docker compose config
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose stop
+ExecReload=/usr/bin/docker compose up --detach
+
+# Restart 30 seconds after docker run exited with an error status.
+Restart=always
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target

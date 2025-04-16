@@ -45,6 +45,8 @@
       tags: borgmatic
     - role: netdata
       tags: netdata
+    - role: node-exporter
+      tags: node-exporter
     - role: cockpit
       tags: cockpit
     - role: dotfiles

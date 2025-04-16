@@ -123,6 +123,8 @@
       tags: tandoor
     - role: vaultwarden
       tags: vaultwarden
+    - role: prometheus
+      tags: prometheus
 
 - name: Hosted services on smb
   hosts: smb

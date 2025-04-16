@@ -1,0 +1,5 @@
+node_exporter_extras:
+  - role: prometheus.prometheus.smartctl_exporter
+    port: 9633
+  - role: prometheus.prometheus.ipmi_exporter
+    port: 9290

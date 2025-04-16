@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+# cd into script directory.
+cd -- "$(cd "$(dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
+
+role={{ ansible_role_name | ansible.builtin.quote }}
+compose=(docker compose --project-name "$role")
+
+prometheus() {
+  "${compose[@]}" down \
+                  --volumes \
+                  prometheus
+
+  "${compose[@]}" create \
+                  prometheus
+
+  "${compose[@]}" cp \
+                  {{ prometheus_root | ansible.builtin.quote }}/backups/*/. \
+                  prometheus:/prometheus
+
+  # Files must have the right permissions, otherwise creating snapshots
+  # (i.e. for the next backup) will fail. Docker copies files with root:root
+  # ownership by default.
+  "${compose[@]}" exec \
+                  --user root \
+                  prometheus \
+                  chown \
+                  -R nobody:nobody \
+                  /prometheus
+}
+
+if systemctl is-active "$role" > /dev/null; then
+  start_stop=
+fi
+
+if [[ -v start_stop ]]; then
+  systemctl stop "$role"
+fi
+
+prometheus
+
+if [[ -v start_stop ]]; then
+  systemctl start "$role"
+fi
