@@ -1,0 +1,7 @@
+- name: Linux-like configuration
+  hosts: "{{ playbook_hosts | default([]) }}"
+  become: true
+  gather_facts: false
+  roles:
+    - role: node-exporter
+      tags: node-exporter

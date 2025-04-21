@@ -1,0 +1,27 @@
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ node_exporter_root }}"
+
+- name: Start docker composition
+  ansible.builtin.command:
+    chdir: "{{ node_exporter_root }}"
+    argv: "{{ argv }}"
+  vars:
+    argv_yaml: |
+      {% for docker in [docker_compose | default(['docker', 'compose'])] | ansible.builtin.flatten %}
+      - {{ docker }}
+      {% endfor %}
+      - up
+      - --detach
+    argv: >-
+      {{
+        argv_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
+  register: docker_compose_up
+  changed_when: >-
+    'is up-to-date' not in docker_compose_up.stderr

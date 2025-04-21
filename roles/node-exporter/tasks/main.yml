@@ -1,32 +1,9 @@
-- name: Install node-exporter
-  ansible.builtin.import_role:
-    name: prometheus.prometheus.node_exporter
+- name: Install using package manager
+  when: node_exporter_install_method | default('package') == 'package'
+  ansible.builtin.import_tasks:
+    file: install-package.yml
 
-- name: Allow node-exporter service through firewall
-  when: interfaces.lan.zone is defined
-  ansible.posix.firewalld:
-    service: prometheus-node-exporter
-    zone: "{{ interfaces.lan.zone }}"
-    immediate: true
-    permanent: true
-    state: enabled
-
-- name: Install extra exporters
-  ansible.builtin.include_role:
-    name: "{{ role.role }}"
-  loop: "{{ node_exporter_extras | default([]) }}"
-  loop_control:
-    loop_var: role
-
-# TODO: /etc/pve/nodes/pve-home/host.fw
-- name: Allow extra exporters ports through firewall
-  when: interfaces.lan.zone is defined
-  ansible.posix.firewalld:
-    port: "{{ role.port }}"
-    zone: "{{ interfaces.lan.zone }}"
-    immediate: true
-    permanent: true
-    state: enabled
-  loop: "{{ node_exporter_extras | default([]) }}"
-  loop_control:
-    loop_var: role
+- name: Install using docker
+  when: node_exporter_install_method | default('package') == 'docker'
+  ansible.builtin.import_tasks:
+    file: "install-docker.yml"

@@ -1,0 +1,2 @@
+node_exporter_root: /volume1/docker/node-exporter
+node_exporter_install_method: docker

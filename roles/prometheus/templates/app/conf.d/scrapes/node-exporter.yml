@@ -33,6 +33,10 @@ scrape_configs:
           - nest:9100
         labels:
           instance: nest
+      - targets:
+          - nas:9100
+        labels:
+          instance: nas
 
   - job_name: ipmi
     static_configs:
