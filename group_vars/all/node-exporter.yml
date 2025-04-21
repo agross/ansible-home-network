@@ -2,3 +2,9 @@ _node_exporter_version: latest
 
 ipmi_exporter_system_user: root
 smartctl_exporter_system_user: root
+
+node_exporter_enabled_collectors:
+  - systemd
+  - diskstats:
+      # https://github.com/prometheus/node_exporter/blob/38d32a397720dfdaf547429ea1b40ab8cfa57e85/collector/diskstats_linux.go#L38
+      device-exclude: ^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+|zd\d.*$
