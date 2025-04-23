@@ -2,11 +2,21 @@
   ansible.builtin.import_role:
     name: prometheus.prometheus.node_exporter
 
+- name: Get firewalld info
+  ansible.posix.firewalld_info:
+  register: firewalld_info
+  failed_when: false
+
 - name: Allow node-exporter service through firewall
-  when: interfaces.lan.zone is defined
+  when: >-
+    'firewalld_info' in firewalld_info
   ansible.posix.firewalld:
     service: prometheus-node-exporter
-    zone: "{{ interfaces.lan.zone }}"
+    zone: >-
+      {{
+        interfaces.lan.zone |
+        default(firewalld_info.firewalld_info.default_zone)
+      }}
     immediate: true
     permanent: true
     state: enabled
@@ -20,10 +30,15 @@
 
 # TODO: /etc/pve/nodes/pve-home/host.fw
 - name: Allow extra exporters ports through firewall
-  when: interfaces.lan.zone is defined
+  when: >-
+    'firewalld_info' in firewalld_info
   ansible.posix.firewalld:
     port: "{{ role.port }}"
-    zone: "{{ interfaces.lan.zone }}"
+    zone: >-
+      {{
+        interfaces.lan.zone |
+        default(firewalld_info.firewalld_info.default_zone)
+      }}
     immediate: true
     permanent: true
     state: enabled
