@@ -1,5 +1,7 @@
 logger_backup_healthcheck: "{{ vault_logger_backup_healthcheck }}"
 
+logger_grafana_admin_password: "{{ vault_logger_grafana_admin_password }}"
+
 logger_grafana_google_client_id: "{{ vault_logger_grafana_google_client_id }}"
 logger_grafana_google_client_secret: "{{ vault_logger_grafana_google_client_secret }}"
 logger_grafana_google_allowed_domains: "{{ vault_logger_grafana_google_allowed_domains }}"

@@ -37,7 +37,6 @@ grafana() {
          /var/lib/grafana/grafana.db \
          .dump \
     > "$target/db.sql"
-
 }
 
 trap cleanup ERR SIGINT SIGTERM

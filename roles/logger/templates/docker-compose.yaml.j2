@@ -15,7 +15,9 @@ services:
     image: influxdb:2-alpine
 
     restart: unless-stopped
-    env_file: ./influxdb/.env
+    environment:
+      INFLUXD_LOG_LEVEL: error
+      INFLUXD_REPORTING_DISABLED: true
     labels:
       traefik.enable: 'true'
       traefik.http.routers.influxdb.entrypoints: https
@@ -49,6 +51,49 @@ services:
     image: grafana/grafana
 
     restart: unless-stopped
+    environment:
+      # The configuration values in the grafana.ini:
+      # https://github.com/grafana/grafana/blob/main/conf/sample.ini
+      # can be overridden by environment variables prefixed with "GF_", e.g.
+      # GF_SECURITY_ADMIN_USER: not-admin
+      GF_LOG_MODE: console
+      GF_LOG_LEVEL: warn
+      # GF_LOG_FILTERS: ngalert.notifier.telegram.client:debug
+
+      GF_SERVER_ROOT_URL: https://{{ logger_grafana_domain | ansible.builtin.mandatory }}
+
+      GF_SECURITY_ADMIN_PASSWORD: "{{ logger_grafana_admin_password }}"
+
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_USERS_ALLOW_ORG_CREATE: false
+
+      GF_AUTH_LOGIN_MAXIMUM_INACTIVE_LIFETIME_DURATION: 30d
+
+      {% if logger_grafana_github_client_id is defined %}
+      GF_AUTH_GITHUB_ENABLED: true
+      GF_AUTH_GITHUB_ALLOW_SIGN_UP: false
+      GF_AUTH_GITHUB_CLIENT_ID: {{ logger_grafana_github_client_id }}
+      GF_AUTH_GITHUB_CLIENT_SECRET: {{ logger_grafana_github_client_secret | ansible.builtin.mandatory }}
+      {% endif%}
+
+      {% if logger_grafana_google_client_id is defined %}
+      GF_AUTH_GOOGLE_ENABLED: true
+      GF_AUTH_GOOGLE_ALLOW_SIGN_UP: false
+      GF_AUTH_GOOGLE_CLIENT_ID: {{ logger_grafana_google_client_id }}
+      GF_AUTH_GOOGLE_CLIENT_SECRET: {{ logger_grafana_google_client_secret | ansible.builtin.mandatory }}
+      {% if logger_grafana_google_allowed_domains is defined %}
+      GF_AUTH_GOOGLE_ALLOWED_DOMAINS: {{ logger_grafana_google_allowed_domains }}
+      {% endif %}
+      {% endif %}
+
+      {% if logger_grafana_smtp_user is defined %}
+      GF_SMTP_ENABLED: true
+      GF_SMTP_HOST: smtp-relay.gmail.com:587
+      GF_SMTP_USER: {{ logger_grafana_smtp_user | ansible.builtin.mandatory }}
+      GF_SMTP_PASSWORD: {{ logger_grafana_smtp_password | ansible.builtin.mandatory }}
+      GF_SMTP_EHLO_IDENTITY: {{ logger_grafana_domain }}
+      GF_SMTP_FROM_ADDRESS: grafana@{{ ansible_hostname }}.{{ network.domain }}
+      {% endif %}
     labels:
       traefik.enable: 'true'
       traefik.http.routers.grafana.entrypoints: https
@@ -64,7 +109,6 @@ services:
     {% endif %}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - grafana-data:/var/lib/grafana
     healthcheck:
       test:

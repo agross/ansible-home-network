@@ -1,4 +1,4 @@
-logger_root: /data/logger
+logger_root: "/data/{{ ansible_role_name }}"
 
 logger_influxdb_init_user: admin
 logger_influxdb_init_password:

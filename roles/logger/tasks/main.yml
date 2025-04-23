@@ -18,12 +18,11 @@
     files:
       backup.j2:
         mode: "700"
-      grafana/grafana.ini.j2:
-        owner: 472
-        mode: "460"
+      docker-compose.yaml.j2:
+        mode: "640"
       telegraf/telegraf.d/influxdb.conf.j2:
         owner: 999
-        mode: "460"
+        mode: "640"
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images

@@ -1,0 +1,1 @@
+logger_grafana_domain: grafana.{{ network.domain }}
