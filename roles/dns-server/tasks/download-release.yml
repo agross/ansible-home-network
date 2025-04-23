@@ -37,6 +37,7 @@
     owner: 0
     group: 0
     mode: "755"
+  notify: Restart dns-server service
   loop: "{{ assets }}"
   loop_control:
     label: "{{ item.key }}: {{ item.value.dest }}"
