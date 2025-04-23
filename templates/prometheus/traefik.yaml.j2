@@ -5,6 +5,20 @@ http:
       entrypoints: https
       rule: Host(`{{ prometheus_domain }}`)
       service: {{ ansible_role_name }}
+      middlewares:
+        - {{ ansible_role_name }}-ipallowlist
+
+  middlewares:
+    {{ ansible_role_name }}-ipallowlist:
+      ipAllowList:
+        sourceRange:
+          - 127.0.0.1/32
+          - {{ network.ip4 }}
+          - {{ network.ip6 }}
+          - {{ hostvars['gateway-ogd'].network.ip4 }}
+          - {{ hostvars['gateway-ogd'].network.ip6 }}
+          - fe80::/10
+          - fc00::/7
 
   services:
     {{ ansible_role_name }}:
