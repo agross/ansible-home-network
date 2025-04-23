@@ -1,0 +1,5 @@
+- name: Restart zfs_exporter service
+  when: zfs_exporter_started is not changed
+  ansible.builtin.systemd_service:
+    name: "{{ zfs_exporter_service }}"
+    state: restarted

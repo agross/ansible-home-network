@@ -13,3 +13,8 @@ scrape_configs:
     file_sd_configs:
       - files:
         - smartctl/*.yml
+
+  - job_name: zfs
+    file_sd_configs:
+      - files:
+        - zfs/*.yml

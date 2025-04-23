@@ -1,0 +1,5 @@
+zfs_exporter_arch_to_package_suffix:
+  arm64: arm64
+  x86_64: amd64
+
+zfs_exporter_service: "{{ ansible_role_name }}.service"

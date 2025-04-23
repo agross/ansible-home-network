@@ -5,3 +5,6 @@ node_exporter_extras:
   - role: prometheus.prometheus.ipmi_exporter
     port: 9290
     job: ipmi
+  - role: zfs_exporter
+    port: 9134
+    job: zfs

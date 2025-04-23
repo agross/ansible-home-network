@@ -1,0 +1,27 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Prometheus ZFS Exporter
+After=network-online.target
+
+[Service]
+Type=simple
+User=node-exp
+Group=node-exp
+ExecStart=/usr/local/bin/zfs_exporter
+
+SyslogIdentifier=zfs_exporter
+Restart=always
+RestartSec=1
+StartLimitInterval=0
+
+ProtectHome=yes
+NoNewPrivileges=yes
+
+ProtectSystem=strict
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=yes
+
+[Install]
+WantedBy=multi-user.target

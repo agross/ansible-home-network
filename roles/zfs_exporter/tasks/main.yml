@@ -1,0 +1,76 @@
+- name: Download GitHub release
+  ansible.builtin.include_tasks:
+    file: github-release.yml
+  vars:
+    url: https://api.github.com/repos/pdf/zfs_exporter/releases/latest
+    asset_name_regex: >-
+      ^zfs_exporter-.*\.{{
+        ansible_system | lower | ansible.builtin.regex_escape
+      }}-{{
+        zfs_exporter_arch_to_package_suffix[ansible_architecture] |
+        ansible.builtin.regex_escape
+      }}\.tar\.gz$
+    dest: /tmp/zfs_exporter.tar.gz
+
+- name: Create extraction directory
+  ansible.builtin.file:
+    path: /tmp/zfs_exporter.tar.gz-extracted
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Extract downloaded release
+  ansible.builtin.unarchive:
+    src: /tmp/zfs_exporter.tar.gz
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+      - --show-stored-names
+    dest: /tmp/zfs_exporter.tar.gz-extracted
+    owner: 0
+    group: 0
+
+- name: Ensure target directory exists
+  ansible.builtin.file:
+    path: /usr/local/bin/
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Copy release binary
+  ansible.builtin.copy:
+    src: /tmp/zfs_exporter.tar.gz-extracted/zfs_exporter
+    remote_src: true
+    dest: /usr/local/bin/
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Template systemd service
+  ansible.builtin.template:
+    src: zfs_exporter.service.j2
+    dest: /etc/systemd/system/zfs_exporter.service
+    lstrip_blocks: true
+    owner: 0
+    group: 0
+    mode: "644"
+
+- name: Template systemd service
+  ansible.builtin.template:
+    src: zfs_exporter.service.j2
+    dest: "/etc/systemd/system/{{ zfs_exporter_service }}"
+    lstrip_blocks: true
+    owner: 0
+    group: 0
+    mode: "644"
+  notify: Restart zfs_exporter service
+
+- name: Start systemd service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ zfs_exporter_service }}"
+    daemon_reload: true
+  register: zfs_exporter_started
