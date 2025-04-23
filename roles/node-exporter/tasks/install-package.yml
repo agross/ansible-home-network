@@ -5,17 +5,34 @@
   loop_control:
     label: "{{ item.role }}"
 
+- name: Get Proxmox firewall info
+  ansible.builtin.stat:
+    path: "/etc/pve/nodes/{{ ansible_hostname }}/host.fw"
+  register: proxmox_firewall
+
+- name: Allow exporter port through Proxmox firewall
+  when: proxmox_firewall.stat.exists
+  ansible.builtin.lineinfile:
+    path: "{{ proxmox_firewall.stat.path }}"
+    search_string: "# {{ item.role }}"
+    line: "IN ACCEPT -p tcp -dport {{ item.port }} -log nolog # {{ item.role }}"
+  loop: >-
+    {{
+      node_exporter_roles | selectattr('port', 'defined')
+    }}
+  loop_control:
+    label: "port={{ item.port }}"
+
 - name: Get firewalld info
   ansible.posix.firewalld_info:
   register: firewalld_info
   failed_when: false
 
-# TODO: /etc/pve/nodes/pve-home/host.fw
-- name: Allow exporter through firewall
+- name: Allow exporter through firewalld
   when: >-
     'firewalld_info' in firewalld_info
   block:
-    - name: Allow exporter service through firewall
+    - name: Allow exporter service through firewalld
       ansible.posix.firewalld:
         service: "{{ item.firewalld_service }}"
         zone: >-
@@ -33,7 +50,7 @@
       loop_control:
         label: "firewalld_service={{ item.firewalld_service }}"
 
-    - name: Allow exporter port through firewall
+    - name: Allow exporter port through firewalld
       ansible.posix.firewalld:
         port: "{{ item.port }}"
         zone: >-
