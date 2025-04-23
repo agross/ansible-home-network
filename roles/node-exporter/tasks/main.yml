@@ -7,3 +7,30 @@
   when: node_exporter_install_method | default('package') == 'docker'
   ansible.builtin.import_tasks:
     file: "install-docker.yml"
+
+- name: Register exporters with Prometheus
+  ansible.builtin.template:
+    src: exporter.yaml.j2
+    dest: >-
+      {{
+        hostvars[item.0].prometheus_dynamic_file_configuration
+      }}/{{
+        item.1.job
+      }}/{{
+        inventory_hostname
+      }}.yml
+    lstrip_blocks: true
+    owner: 0
+    group: 0
+    mode: "644"
+  vars:
+    job_port: "{{ item.1.port }}"
+  delegate_to: "{{ item.0 }}"
+  loop: >-
+    {{
+      groups[site] |
+      ansible.builtin.intersect(groups['prometheus']) |
+      ansible.builtin.product(node_exporter_roles)
+    }}
+  loop_control:
+    label: "job={{ item.1.job }} port={{ item.1.port }}"

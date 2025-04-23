@@ -1,47 +1,52 @@
-- name: Install node-exporter
-  ansible.builtin.import_role:
-    name: prometheus.prometheus.node_exporter
+- name: Install exporter role
+  ansible.builtin.include_role:
+    name: "{{ item.role }}"
+  loop: "{{ node_exporter_roles }}"
+  loop_control:
+    label: "{{ item.role }}"
 
 - name: Get firewalld info
   ansible.posix.firewalld_info:
   register: firewalld_info
   failed_when: false
 
-- name: Allow node-exporter service through firewall
-  when: >-
-    'firewalld_info' in firewalld_info
-  ansible.posix.firewalld:
-    service: prometheus-node-exporter
-    zone: >-
-      {{
-        interfaces.lan.zone |
-        default(firewalld_info.firewalld_info.default_zone)
-      }}
-    immediate: true
-    permanent: true
-    state: enabled
-
-- name: Install extra exporters
-  ansible.builtin.include_role:
-    name: "{{ role.role }}"
-  loop: "{{ node_exporter_extras | default([]) }}"
-  loop_control:
-    loop_var: role
-
 # TODO: /etc/pve/nodes/pve-home/host.fw
-- name: Allow extra exporters ports through firewall
+- name: Allow exporter through firewall
   when: >-
     'firewalld_info' in firewalld_info
-  ansible.posix.firewalld:
-    port: "{{ role.port }}"
-    zone: >-
-      {{
-        interfaces.lan.zone |
-        default(firewalld_info.firewalld_info.default_zone)
-      }}
-    immediate: true
-    permanent: true
-    state: enabled
-  loop: "{{ node_exporter_extras | default([]) }}"
-  loop_control:
-    loop_var: role
+  block:
+    - name: Allow exporter service through firewall
+      ansible.posix.firewalld:
+        service: "{{ item.firewalld_service }}"
+        zone: >-
+          {{
+            interfaces.lan.zone |
+            default(firewalld_info.firewalld_info.default_zone)
+          }}
+        immediate: true
+        permanent: true
+        state: enabled
+      loop: >-
+        {{
+          node_exporter_roles | selectattr('firewalld_service', 'defined')
+        }}
+      loop_control:
+        label: "firewalld_service={{ item.firewalld_service }}"
+
+    - name: Allow exporter port through firewall
+      ansible.posix.firewalld:
+        port: "{{ item.port }}"
+        zone: >-
+          {{
+            interfaces.lan.zone |
+            default(firewalld_info.firewalld_info.default_zone)
+          }}
+        immediate: true
+        permanent: true
+        state: enabled
+      loop: >-
+        {{
+          node_exporter_roles | rejectattr('firewalld_service', 'defined')
+        }}
+      loop_control:
+        label: "port={{ item.port }}"

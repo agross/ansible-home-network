@@ -1,0 +1,4 @@
+- targets:
+    - {{ ansible_hostname }}:{{ job_port }}
+  labels:
+    instance: {{ ansible_hostname }}

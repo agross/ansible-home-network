@@ -1,1 +1,3 @@
 prometheus_backup_healthcheck: 42
+
+prometheus_dynamic_file_configuration: /data/prometheus/app/conf.d/scrapes

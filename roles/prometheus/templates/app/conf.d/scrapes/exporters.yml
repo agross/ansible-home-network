@@ -1,0 +1,15 @@
+scrape_configs:
+  - job_name: node
+    file_sd_configs:
+      - files:
+        - node/*.yml
+
+  - job_name: ipmi
+    file_sd_configs:
+      - files:
+        - ipmi/*.yml
+
+  - job_name: smartctl
+    file_sd_configs:
+      - files:
+        - smartctl/*.yml
