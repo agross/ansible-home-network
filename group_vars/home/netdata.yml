@@ -1,2 +1,0 @@
-netdata_stream_destination: router
-netdata_stream_api_key: "{{ vault_netdata_stream_api_key }}"

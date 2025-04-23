@@ -1,2 +1,0 @@
-netdata_extra_args: >-
-  -W set global 'update every' 15

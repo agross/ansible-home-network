@@ -43,8 +43,6 @@
     - role: borgmatic
       when: borgmatic_encryption_passphrase is defined
       tags: borgmatic
-    - role: netdata
-      tags: netdata
     - role: cockpit
       tags: cockpit
     - role: dotfiles

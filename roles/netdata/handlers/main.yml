@@ -1,5 +1,0 @@
-- name: Restart netdata service
-  when: netdata_started is not changed
-  ansible.builtin.systemd:
-    name: netdata.service
-    state: restarted

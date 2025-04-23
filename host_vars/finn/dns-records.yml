@@ -10,4 +10,3 @@ dns_cname_records:
   - "iobroker.{{ network.domain }}"
   - "lovelace.{{ network.domain }}"
   - "gast.{{ network.domain }}"
-  - "netdata.{{ network.domain }}"
