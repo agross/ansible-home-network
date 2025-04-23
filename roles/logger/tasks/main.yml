@@ -4,10 +4,6 @@
   register: stat_docker_socket
   changed_when: false
 
-- name: Get group owning the docker socket
-  ansible.builtin.set_fact:
-    docker_group: "{{ stat_docker_socket.stat.gid }}"
-
 - name: Copy templates
   ansible.builtin.import_tasks:
     file: copy-templates.yml
@@ -19,9 +15,6 @@
       backup.j2:
         mode: "700"
       docker-compose.yaml.j2:
-        mode: "640"
-      telegraf/telegraf.d/influxdb.conf.j2:
-        owner: 999
         mode: "640"
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
