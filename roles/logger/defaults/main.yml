@@ -10,8 +10,3 @@ logger_influxdb_backup_buckets: []
 
 # Container for migration from v1 to v2.
 logger_influxdb_migration_container: "logger-influxdb-1"
-
-# The API key needs to have the "Admin" role.
-logger_grafana_backup_api_key:
-logger_grafana_backup_admin_user:
-logger_grafana_backup_admin_password:

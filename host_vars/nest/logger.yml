@@ -12,11 +12,6 @@ logger_grafana_github_client_secret: "{{ vault_logger_grafana_github_client_secr
 logger_grafana_smtp_user: "{{ google_smtp_user }}"
 logger_grafana_smtp_password: "{{ vault_logger_grafana_smtp_password }}"
 
-# The API key needs to have the "Admin" role.
-logger_grafana_backup_api_key: "{{ vault_logger_grafana_api_key }}"
-logger_grafana_backup_admin_user: "{{ vault_logger_grafana_admin_user }}"
-logger_grafana_backup_admin_password: "{{ vault_logger_grafana_admin_password }}"
-
 logger_influxdb_init_password: "{{ vault_logger_influxdb_init_password }}"
 logger_influxdb_init_admin_token: "{{ vault_logger_influxdb_init_admin_token }}"
 logger_influxdb_init_org: "{{ site }}"
