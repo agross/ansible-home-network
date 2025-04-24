@@ -20,7 +20,7 @@ prometheus() {
 
   snapshot="$( \
     "${compose[@]}" exec \
-                    prometheus \
+                    app \
                     wget \
                     --post-data '' \
                     -O - \
@@ -29,11 +29,11 @@ prometheus() {
   )"
 
   "${compose[@]}" cp \
-                  "prometheus:/prometheus/snapshots/$snapshot" \
+                  "app:/prometheus/snapshots/$snapshot" \
                   "$target"
 
   "${compose[@]}" exec \
-                  prometheus \
+                  app \
                   rm -r /prometheus/snapshots
 }
 
