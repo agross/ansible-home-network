@@ -2,3 +2,6 @@
     - {{ ansible_hostname | lower }}:{{ job_port }}
   labels:
     instance: {{ ansible_hostname | lower }}
+    {% if ansible_virtualization_role == 'guest' %}
+    virt: {{ ansible_virtualization_type }}
+    {% endif %}
