@@ -9,6 +9,7 @@ services:
     image: mariadb:lts
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
 
+    mem_limit: 5120m
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: true
       MARIADB_DATABASE: nextcloud
