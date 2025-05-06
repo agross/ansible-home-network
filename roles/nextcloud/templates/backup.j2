@@ -39,7 +39,8 @@ mariadb() {
                               "$db" > "$target/$db.sql"
   done
 
-  "${exec[@]}" mariadb-optimize --all-databases
+  "${exec[@]}" mariadb-check --check --medium-check --all-databases
+  "${exec[@]}" mariadb-check --analyze --all-databases
 }
 
 elastic() {
