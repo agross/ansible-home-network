@@ -31,7 +31,6 @@ services:
       - ./hub/backups:/opt/hub/backups
       - ./hub/conf:/opt/hub/conf
       - ./hub/data:/opt/hub/data
-      # - ./logs:/opt/hub/logs
     tmpfs:
       - /hub/temp:rw,noexec,nosuid,size=65536k
       - /opt/hub/logs:rw,noexec,nosuid,size=65536k,uid=13001,gid=13001
@@ -53,9 +52,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./app:/data/teamcity_server/datadir
-      # - ./logs:/opt/teamcity/logs
     tmpfs:
-      - /opt/teamcity/logs:rw,noexec,nosuid,size=65536k,uid=1000,gid=1000
+      - /opt/teamcity/logs:rw,noexec,nosuid,size=128m,uid=1000,gid=1000
     depends_on:
       db:
         condition: service_healthy
