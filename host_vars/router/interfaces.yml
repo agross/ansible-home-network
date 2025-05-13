@@ -1,6 +1,6 @@
 interfaces:
   lan:
-    device: enp6s18
+    device: ens18
     ip4:
       address: "{{ network.ip4 | ansible.utils.nthhost(3) }}"
       prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"

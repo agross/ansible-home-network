@@ -1,6 +1,6 @@
 interfaces:
   lan:
-    device: enp6s18
+    device: ens18
     ip4:
       address: "{{ network.ip4 | ansible.utils.nthhost(2) }}"
       prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
@@ -12,7 +12,7 @@ interfaces:
     zone: internal
 
   wan:
-    device: &pppoe_dev enp6s19
+    device: &pppoe_dev ens19
     ip4:
       address: 192.168.100.2/24
     # Only accessible host is the modem. This allows access from the internal
