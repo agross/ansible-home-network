@@ -1,6 +1,8 @@
 # vim: set ft=jinja-properties ts=2 sw=2 et:
 
-daemon=5m                           # Check every 5 minutes.
+daemon=1m                           # Check every minute.
+verbose=yes                         # Logging.
+debug=yes
 min-error-interval=1s               # After errors, allow new attempts after 1s.
 syslog=yes                          # Log update messages to syslog.
 mail=root                           # Mail all messages to root.

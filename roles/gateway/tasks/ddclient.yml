@@ -11,6 +11,14 @@
     group: 0
     mode: "755"
 
+- name: Enable ExecStart override for ddclient
+  ansible.builtin.template:
+    src: ddclient/start.conf
+    dest: /etc/systemd/system/ddclient.service.d/start.conf
+    owner: 0
+    group: 0
+    mode: "644"
+
 - name: Enable unit-status-mail override for ddclient
   ansible.builtin.template:
     src: unit-status-mail.conf
@@ -29,7 +37,7 @@
 
 - name: Copy ddclient config file
   ansible.builtin.template:
-    src: ddclient.conf.j2
+    src: ddclient/ddclient.conf.j2
     dest: /etc/ddclient/ddclient.conf
     owner: ddclient
     group: ddclient
