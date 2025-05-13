@@ -1,5 +1,5 @@
 - name: Upgrade all Fedora hosts
-  hosts: all
+  hosts: fedora
   become: true
   gather_facts: true
   # Run each host as fast as possible.
