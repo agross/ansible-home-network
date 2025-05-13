@@ -19,10 +19,18 @@
     group: 0
     mode: "644"
 
+- name: Ensure /etc/ddclient exists
+  ansible.builtin.file:
+    path: /etc/ddclient
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
 - name: Copy ddclient config file
   ansible.builtin.template:
     src: ddclient.conf.j2
-    dest: /etc/ddclient.conf
+    dest: /etc/ddclient/ddclient.conf
     owner: ddclient
     group: ddclient
     mode: "600"
