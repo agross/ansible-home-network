@@ -2,6 +2,7 @@
 
 [Unit]
 Description=Prometheus ZFS Exporter
+Documentation=https://github.com/pdf/zfs_exporter
 After=network-online.target
 
 [Service]
@@ -15,13 +16,13 @@ Restart=always
 RestartSec=1
 StartLimitInterval=0
 
-ProtectHome=yes
-NoNewPrivileges=yes
+ProtectHome=true
+NoNewPrivileges=true
 
 ProtectSystem=strict
 ProtectControlGroups=true
 ProtectKernelModules=true
-ProtectKernelTunables=yes
+ProtectKernelTunables=true
 
 [Install]
 WantedBy=multi-user.target
