@@ -1,0 +1,39 @@
+- name: Ensure pip and venv are installed
+  ansible.builtin.package:
+    name:
+      - python3-pip
+      - python3-venv
+
+- name: Install exporter
+  ansible.builtin.pip:
+    name: prometheus-pve-exporter
+    virtualenv: "{{ pve_exporter_root }}"
+    virtualenv_command: "{{ ansible_python.executable }} -m venv"
+
+- name: Template config file
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: /etc/proxmox-pve-exporter.yml
+    lstrip_blocks: true
+    owner: node-exp
+    group: 0
+    mode: "440"
+  notify: Restart pve_exporter service
+
+- name: Template systemd service
+  ansible.builtin.template:
+    src: pve_exporter.service.j2
+    dest: "/etc/systemd/system/{{ pve_exporter_service }}"
+    lstrip_blocks: true
+    owner: 0
+    group: 0
+    mode: "644"
+  notify: Restart pve_exporter service
+
+- name: Start systemd service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ pve_exporter_service }}"
+    daemon_reload: true
+  register: pve_exporter_started

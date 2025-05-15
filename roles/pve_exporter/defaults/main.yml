@@ -1,0 +1,3 @@
+pve_exporter_service: "{{ ansible_role_name }}.service"
+
+pve_exporter_root: /opt/prometheus-pve-exporter

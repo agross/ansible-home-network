@@ -1,0 +1,5 @@
+- name: Restart pve_exporter service
+  when: pve_exporter_started is not changed
+  ansible.builtin.systemd_service:
+    name: "{{ pve_exporter_service }}"
+    state: restarted

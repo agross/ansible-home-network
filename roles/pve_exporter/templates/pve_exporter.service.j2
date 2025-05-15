@@ -1,0 +1,29 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Prometheus exporter for Proxmox Virtual Environment
+Documentation=https://github.com/prometheus-pve/prometheus-pve-exporter
+After=network-online.target
+
+[Service]
+Type=simple
+User=node-exp
+Group=node-exp
+ExecStart={{ pve_exporter_root | ansible.builtin.quote }}/bin/pve_exporter --config.file /etc/proxmox-pve-exporter.yml
+
+SyslogIdentifier=pve_exporter
+Restart=always
+RestartSec=1
+StartLimitInterval=0
+
+ProtectHome=true
+NoNewPrivileges=true
+
+ProtectSystem=strict
+PrivateTmp=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+
+[Install]
+WantedBy=multi-user.target
