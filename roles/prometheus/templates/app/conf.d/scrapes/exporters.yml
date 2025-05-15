@@ -9,6 +9,19 @@ scrape_configs:
       - files:
         - ipmi/*.yml
 
+  - job_name: pve
+    file_sd_configs:
+      - files:
+        - pve/*.yml
+    metrics_path: /pve
+    params:
+      module:
+        - default
+      cluster:
+        - '1'
+      node:
+        - '1'
+
   - job_name: smartctl
     file_sd_configs:
       - files:
