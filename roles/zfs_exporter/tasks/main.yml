@@ -51,15 +51,6 @@
 - name: Template systemd service
   ansible.builtin.template:
     src: zfs_exporter.service.j2
-    dest: /etc/systemd/system/zfs_exporter.service
-    lstrip_blocks: true
-    owner: 0
-    group: 0
-    mode: "644"
-
-- name: Template systemd service
-  ansible.builtin.template:
-    src: zfs_exporter.service.j2
     dest: "/etc/systemd/system/{{ zfs_exporter_service }}"
     lstrip_blocks: true
     owner: 0
