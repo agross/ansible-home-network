@@ -16,6 +16,10 @@ api:
 # docker exec traefik traefik healthcheck
 ping: {}
 
+metrics:
+  prometheus:
+    addRoutersLabels: true
+
 log:
   level: INFO
 

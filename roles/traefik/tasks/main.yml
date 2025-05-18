@@ -71,3 +71,11 @@
     permanent: true
     state: enabled
   loop: "{{ traefik_firewalld_ports }}"
+
+- name: Register Prometheus scrape
+  ansible.builtin.import_tasks:
+    file: register-prometheus-scrape.yml
+  vars:
+    app: "{{ ansible_role_name }}"
+    scrapes:
+      - "{{ ansible_hostname }}:8080"

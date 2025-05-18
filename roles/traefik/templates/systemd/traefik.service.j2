@@ -43,6 +43,7 @@ ExecStart=/usr/bin/docker container \
                           --publish 80:80 \
                           --publish 443:443/tcp \
                           --publish 443:443/udp \
+                          --publish 8080:8080/tcp \
                           --volume /var/run/docker.sock:/var/run/docker.sock:z \
                           --privileged \
                           --volume '/etc/localtime:/etc/localtime:ro' \

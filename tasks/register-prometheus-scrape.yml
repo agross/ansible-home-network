@@ -1,0 +1,32 @@
+- name: Register Prometheus scrape
+  ansible.builtin.copy:
+    content: |
+      - targets:
+          - {{ item.1 }}
+        labels:
+          instance: {{ ansible_hostname | lower }}
+          app: {{ app }}
+    dest: >-
+      {{
+        hostvars[item.0].prometheus_dynamic_file_configuration
+      }}/{{
+        job
+      }}/{{
+        inventory_hostname
+      }}-{{
+        app
+       }}.yml
+    owner: 0
+    group: 0
+    mode: "644"
+  vars:
+    job: app
+  delegate_to: "{{ item.0 }}"
+  loop: >-
+    {{
+      groups[site] |
+      ansible.builtin.intersect(groups['prometheus']) |
+      ansible.builtin.product(scrapes)
+    }}
+  loop_control:
+    label: "job={{ job }} scrape={{ item.1 }}"

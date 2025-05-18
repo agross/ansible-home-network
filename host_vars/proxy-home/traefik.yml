@@ -12,6 +12,7 @@ traefik_users:
     agross: "{{ vault_traefik_dashboard_password_agross }}"
 
 traefik_firewalld_ports:
+  - 8080/tcp
   - 9090/tcp
   - 9777/udp
 
