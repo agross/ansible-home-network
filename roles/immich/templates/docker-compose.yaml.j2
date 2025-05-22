@@ -31,15 +31,7 @@ services:
       interval: 5s
 
   db:
-    # Update command below when upgrading. Ensure logging_collector=on is not
-    # one of the options.
-    image: tensorchord/pgvecto-rs:pg16-v0.2.0
-    command:
-      - postgres
-      - -c
-      - shared_preload_libraries=vectors.so
-      - -c
-      - search_path="$$user", public, vectors
+    image: ghcr.io/immich-app/postgres:16-vectorchord0.3.0-pgvectors0.2.0
     env_file:
       - .env
     environment:
@@ -47,17 +39,10 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE --data-checksums
+      # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
+      # DB_STORAGE_TYPE: 'HDD'
     volumes:
       - ./db:/var/lib/postgresql/data
-    healthcheck:
-      test: >-
-        psql --username="$$POSTGRES_USER" --dbname="$$POSTGRES_DB" --command='SELECT 1' || exit 1;
-        failures="$$(psql --username="$$POSTGRES_USER" --dbname="$$POSTGRES_DB" --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')";
-        echo "Checksum failure count is $$failures";
-        [ "$$failures" = 0 ] || exit 1
-      start_interval: 5s
-      start_period: 1m
-      interval: 5m
 
 volumes:
   ml-model-cache:
