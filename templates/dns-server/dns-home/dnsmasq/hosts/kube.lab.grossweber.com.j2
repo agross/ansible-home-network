@@ -1,0 +1,11 @@
+# The IP addresses of the kube-* DHCP hosts.
+{{ network.ip4 | ansible.utils.nthhost(201) }} kube.lab.grossweber.com
+{{ network.ip4 | ansible.utils.nthhost(202) }} kube.lab.grossweber.com
+{{ network.ip4 | ansible.utils.nthhost(203) }} kube.lab.grossweber.com
+{{ network.ip4 | ansible.utils.nthhost(204) }} kube.lab.grossweber.com
+{{ network.ip4 | ansible.utils.nthhost(205) }} kube.lab.grossweber.com
+{{ network.ip6 | ansible.utils.nthhost(0x201) }} kube.lab.grossweber.com
+{{ network.ip6 | ansible.utils.nthhost(0x202) }} kube.lab.grossweber.com
+{{ network.ip6 | ansible.utils.nthhost(0x203) }} kube.lab.grossweber.com
+{{ network.ip6 | ansible.utils.nthhost(0x204) }} kube.lab.grossweber.com
+{{ network.ip6 | ansible.utils.nthhost(0x205) }} kube.lab.grossweber.com
