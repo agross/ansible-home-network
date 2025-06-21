@@ -11,7 +11,7 @@ create-swap() {
   printf 'Creating swap...\n'
   trap 'cleanup-swap $?' ERR INT EXIT TERM
 
-  swapfile="$(mktemp --suffix=influx-rename-swap)"
+  swapfile="$(mktemp --suffix=influx-rename-swap --tmpdir=/)"
 
   fallocate -l 5G -- "$swapfile"
   chmod 600 -- "$swapfile"
