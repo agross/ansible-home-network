@@ -6,9 +6,23 @@ http:
       rule: Host(`nas.{{ network.domain }}`)
       service: nas
 
+    nas-letsencrypt:
+      entrypoints: https
+      rule: Host(`nas.{{ network.domain }}`) && PathPrefix(`/.well-known/acme-challenge/`)
+      service: nas-letsencrypt
+
   services:
     nas:
       loadBalancer:
         serversTransport: no-verify
         servers:
           - url: https://{{ network.ip4 | ansible.utils.nthhost(10) }}:5001
+
+    # /.well-known/acme-challenge/ is only accessible through the nginx server
+    # listening on port 80 or 443.
+    # See /etc/nginx/nginx.conf.run on the NAS.
+    nas-letsencrypt:
+      loadBalancer:
+        serversTransport: no-verify
+        servers:
+          - url: https://{{ network.ip4 | ansible.utils.nthhost(10) }}:443
