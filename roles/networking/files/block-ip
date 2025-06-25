@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -exuo pipefail
+
+ip="${1?Need IP}"
+ipset=blocked-ips
+fwcmd=(firewall-cmd --permanent)
+
+if ! "${fwcmd[@]}" --info-ipset="$ipset" 2> /dev/null; then
+  "${fwcmd[@]}" --new-ipset="$ipset" --type hash:ip
+  firewall-cmd --reload
+fi
+
+# Drop regular traffic targeting the machine.
+firewall-cmd --zone=drop --add-source="ipset:$ipset"
+
+# Drop traffic targeting docker networks.
+firewall-cmd --ipset="$ipset" --add-entry="$ip"
+
+table=filter
+chain=DOCKER-USER
+priority=0
+args="--match set --match-set $ipset src --jump DROP"
+
+firewall-cmd --direct --add-chain ipv4 "$table" "$chain"
+# shellcheck disable=SC2086
+firewall-cmd --direct --add-rule ipv4 "$table" "$chain" "$priority" $args
+
+firewall-cmd --runtime-to-permanent

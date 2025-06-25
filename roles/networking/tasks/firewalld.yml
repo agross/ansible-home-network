@@ -92,13 +92,24 @@
   loop: >-
     {{
       lookup("community.general.filetree",
-             "templates/" ~ ansible_role_name ~ "/" ~
-             inventory_hostname ~ "/firewalld",
+             "templates/" ~
+             ansible_role_name ~
+             "/" ~
+             inventory_hostname ~
+             "/firewalld",
              wantlist = true)
     }}
   loop_control:
     label: "{{ item.path }}"
   notify: Reload firewalld
+
+- name: Copy script to block IPv4 addresses
+  ansible.builtin.copy:
+    src: files/block-ip
+    dest: /usr/local/bin/block-ip
+    owner: 0
+    group: 0
+    mode: '755'
 
 - name: Ensure firewalld is running
   ansible.builtin.systemd:
