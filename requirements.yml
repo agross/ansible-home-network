@@ -1,7 +1,7 @@
 roles:
   - name: aruhier.systemd_networkd
   - name: borgbase.ansible_role_borgbackup
-    version: v1.0.1
+    version: v1.1.2
   - name: geerlingguy.docker
     version: 7.4.7
   - name: geerlingguy.postfix
@@ -16,7 +16,9 @@ roles:
 collections:
   - name: ansible.posix
   - name: community.general
-    version: ">=10.3.0"
+    version: ">=11.0.0"
+  - name: community.proxmox
+    version: ">=1.0.1"
   - name: community.docker
   - name: devsec.hardening
     version: "8.8.0"

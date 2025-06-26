@@ -1,5 +1,5 @@
 - name: Add disks to guest VM
-  community.general.proxmox_disk:
+  community.proxmox.proxmox_disk:
     api_user: "{{ proxmox_api_user | mandatory }}"
     api_token_id: ansible
     api_token_secret: "{{ proxmox_api_token_secret | mandatory }}"
@@ -54,7 +54,7 @@
       }}
 
 - name: Grow existing disk of guest VM
-  community.general.proxmox_disk:
+  community.proxmox.proxmox_disk:
     api_user: "{{ proxmox_api_user | mandatory }}"
     api_token_id: ansible
     api_token_secret: "{{ proxmox_api_token_secret | mandatory }}"

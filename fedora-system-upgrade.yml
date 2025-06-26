@@ -65,7 +65,7 @@
           - reboot
       changed_when: false
 
-    - name: Reboot
+    - name: Reboot to upgrade system
       ansible.builtin.reboot:
         post_reboot_delay: 30
 
