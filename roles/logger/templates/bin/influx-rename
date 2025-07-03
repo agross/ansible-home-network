@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+influxdb=(docker compose \
+                 --project-name logger \
+                 exec \
+                 influxdb)
+
 create-swap() {
   if (( EUID != 0 )); then
     >&2 printf 'Please run as root in order to use temporary swap space.\n'
@@ -28,13 +33,12 @@ cleanup-swap() {
   fi
 }
 
-rename() {
-  bucket="${1?Need bucket}"
-  from="${2?Need measurement that is copied from}"
-  to="${3?Need measurement that is copied to}"
+rename-one() {
+  local bucket="${1?Need bucket}"
+  local from="${2?Need measurement that is copied from}"
+  local to="${3?Need measurement that is copied to}"
 
-  create-swap
-
+  local copy
   copy=$(cat <<EOF
     from(bucket: "$bucket")
     |> range(start: 0, stop: now())
@@ -51,25 +55,64 @@ EOF
          "$to" \
          "$bucket"
 
-  docker compose \
-         --project-name logger \
-         exec \
-         influxdb \
-         influx query "$copy"
+  "${influxdb[@]}" influx query "$copy"
 
   printf 'Dropping measurement "%s" (bucket: %s)...\n' \
          "$from" \
          "$bucket"
 
-  docker compose \
-         --project-name logger \
-         exec \
-         influxdb \
-         influx delete \
-               --bucket "$bucket" \
-               --start 1970-01-01T00:00:00Z \
-               --stop "$(date +'%Y-%m-%dT%H:%M:%SZ')" \
-               --predicate "_measurement=\"$from\""
+  "${influxdb[@]}" influx delete \
+                          --bucket "$bucket" \
+                          --start 1970-01-01T00:00:00Z \
+                          --stop "$(date +'%Y-%m-%dT%H:%M:%SZ')" \
+                          --predicate "_measurement=\"$from\""
 }
+
+rename() {
+  if [[ "${1-}" == --prefix ]]; then
+    shift
+    local prefix=
+  fi
+
+  local bucket="${1?Need bucket}"
+  local from="${2?Need measurement that is copied from}"
+  local to="${3?Need measurement that is copied to}"
+
+  if [[ -v prefix ]]; then
+    printf 'Determining measurements prefixed "%s"...\n' \
+           "$from"
+
+    local measurements_query
+    measurements_query=$(cat <<EOF
+      import "influxdata/influxdb/schema"
+      import "strings"
+
+      schema.measurements(bucket: "$bucket")
+      |> filter(fn: (r) => strings.hasPrefix(v: r._value, prefix: "$from"))
+EOF
+)
+
+    local -a measurements
+    mapfile -t -s 4 measurements < <("${influxdb[@]}" influx query --raw "$measurements_query")
+
+    local source suffix target
+    for source in "${measurements[@]}"; do
+      # ,,0,What we are interested in\r
+      source="${source:4:-1}"
+
+      # Last line: a single \r.
+      [[ -z "$source" ]] && break
+
+      suffix="${source:${#from}}"
+      target="$to$suffix"
+
+      rename-one "$bucket" "$source" "$target"
+    done
+  else
+    rename-one "$bucket" "$from" "$to"
+  fi
+}
+
+create-swap
 
 rename "${@}"
