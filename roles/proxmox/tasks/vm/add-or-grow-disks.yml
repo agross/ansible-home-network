@@ -89,17 +89,26 @@
       }}
   register: proxmox_resized_disks
 
+# ansible.builtin.add_host does not use the host loop, so it would only see
+# proxmox_resized_disks from the first host in the loop. Hence the involved
+# mapping of all hosts' vars in the loop.
+#
+# https://stackoverflow.com/a/57209874/149264
 - name: Remember host with resized disks # noqa: no-handler
-  when: proxmox_resized_disks is changed
   ansible.builtin.add_host:
     group: needs_fs_resize
-    name: "{{ item.inventory_hostname }}"
+    name: "{{ item }}"
+  changed_when: false
   loop: >-
     {{
-      proxmox_resized_disks.results |
+      ansible_play_hosts |
+      map('ansible.builtin.extract', hostvars, ['proxmox_resized_disks', 'results']) |
+      ansible.builtin.flatten |
       selectattr('changed') |
       map(attribute = 'item') |
-      map('first')
+      map('first') |
+      map(attribute = 'inventory_hostname') |
+      ansible.builtin.unique
     }}
   loop_control:
-    label: "{{ item.inventory_hostname }}"
+    label: "{{ item }}"
