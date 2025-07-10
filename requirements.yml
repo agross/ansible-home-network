@@ -16,7 +16,9 @@ roles:
 collections:
   - name: ansible.posix
   - name: community.general
-    version: ">=10.3.0,<11.0.0"
+    version: ">=11.0.0"
+  - name: community.proxmox
+    version: ">=1.0.1"
   - name: community.docker
   - name: devsec.hardening
     version: "8.8.0"

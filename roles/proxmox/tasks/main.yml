@@ -21,10 +21,20 @@
   when: pve_remove_subscription_warning | ansible.builtin.bool
   ansible.builtin.import_tasks: subscription.yml
 
-- name: Ensure proxmoxer is available
+- name: Ensure pip is installed
   ansible.builtin.package:
-    name: python3-proxmoxer
-    state: present
+    name:
+      - python3-pip
+  tags:
+    - lxc
+    - vm
+
+- name: Ensure proxmoxer and requests are installed
+  ansible.builtin.pip:
+    name:
+      - proxmoxer>=2.0
+      - requests
+    break_system_packages: true
   tags:
     - lxc
     - vm
