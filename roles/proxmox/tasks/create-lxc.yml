@@ -1,5 +1,5 @@
 - name: Retrieve LXC guests
-  community.proxmox.proxmox_vm_info:
+  community.general.proxmox_vm_info:
     api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
     api_token_id: ansible
     api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
@@ -46,7 +46,7 @@
   changed_when: true
 
 - name: Configure LXC guest
-  community.proxmox.proxmox:
+  community.general.proxmox:
     api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
     # Token-based auth cannot set features, mount_volumes and hookscript,
     # even if the token is for the root user.
