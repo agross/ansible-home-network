@@ -79,8 +79,8 @@
       - restorecon
       - -irv
       - "{{ unit_status_mail_root }}"
-  register: restorecon_result
-  changed_when: restorecon_result.stdout | length > 0
+  register: unit_status_mail_restorecon_result
+  changed_when: unit_status_mail_restorecon_result.stdout | length > 0
 
 - name: Install systemd service
   ansible.builtin.copy:

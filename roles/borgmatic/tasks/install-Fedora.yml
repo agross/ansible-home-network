@@ -1,6 +1,6 @@
 - name: Set installation method to 'package'
   ansible.builtin.set_fact:
-    borg_install_method: package
+    borg_install_method: package # noqa: var-naming[no-role-prefix]
 
 - name: Ensure borgmatic is installed
   ansible.builtin.dnf:

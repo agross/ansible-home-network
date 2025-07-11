@@ -22,7 +22,7 @@
 
 - name: Determine network interface for the PPPoE connection
   ansible.builtin.set_fact:
-    pppoe_device: >-
+    gateway_pppoe_device: >-
       {{
         interfaces.telekom.pppoe.device
         ~ (interfaces.telekom.pppoe.vlan | default(None) | ansible.builtin.ternary('.', ''))
@@ -33,14 +33,15 @@
   ansible.builtin.template:
     src: templates/pppoe@.service.j2
     dest: >-
-      /etc/systemd/system/pppoe-{{ interfaces.telekom.device }}@{{ pppoe_device }}.service
+      /etc/systemd/system/pppoe-{{ interfaces.telekom.device }}@{{ gateway_pppoe_device }}.service
     owner: 0
     group: 0
     mode: "644"
 
 - name: Enable and start PPPoE connection service
   ansible.builtin.systemd:
-    name: pppoe-{{ interfaces.telekom.device }}@{{ pppoe_device }}.service
+    name: >-
+      pppoe-{{ interfaces.telekom.device }}@{{ gateway_pppoe_device }}.service
     state: started
     no_block: true
     enabled: true

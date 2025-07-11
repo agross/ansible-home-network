@@ -5,11 +5,11 @@
 
 - name: Set installation method to 'pip'
   ansible.builtin.set_fact:
-    borg_install_method: pip
+    borg_install_method: pip # noqa: var-naming[no-role-prefix]
 
 - name: Set dependent Python packages
   ansible.builtin.set_fact:
-    borg_dependent_python_packages:
+    borg_dependent_python_packages: # noqa: var-naming[no-role-prefix]
       - cython
       - pkgconfig
       - pyfuse3

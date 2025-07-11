@@ -1,6 +1,11 @@
 - name: Set share path fact
   ansible.builtin.set_fact:
-    share_path: "{{ share.path | default([samba_shares_root, share.name] | join('/')) }}"
+    samba_share_path: >-
+      {{
+        share.path |
+        default([samba_shares_root, share.name] |
+        join('/'))
+      }}
 
 - name: Get mount unit file name
   ansible.builtin.command:
@@ -8,14 +13,14 @@
       - systemd-escape
       - --path
       - --suffix=mount
-      - "{{ share_path }}"
+      - "{{ samba_share_path }}"
   changed_when: false
-  register: mount_file_name
+  register: samba_mount_file_name
 
 - name: Create mount unit
   ansible.builtin.template:
     src: mount.j2
-    dest: "/etc/systemd/system/{{ mount_file_name.stdout_lines | first }}"
+    dest: "/etc/systemd/system/{{ samba_mount_file_name.stdout_lines | first }}"
     owner: 0
     group: 0
     mode: "644"
@@ -23,7 +28,7 @@
 
 - name: Install and start mount unit as a dependency of smb.service
   ansible.builtin.systemd:
-    unit: "{{ mount_file_name.stdout_lines | first }}"
+    unit: "{{ samba_mount_file_name.stdout_lines | first }}"
     enabled: true
     state: started
   notify: Restart SMB services
@@ -38,17 +43,17 @@
 - name: Set SELinux file context
   when: ansible_selinux.status != 'disabled'
   block:
-    - name: Set SELinux file contexts below {{ share_path }}
+    - name: Set SELinux file contexts below {{ samba_share_path }}
       community.general.sefcontext:
-        target: "{{ share_path }}(/.*)?"
+        target: "{{ samba_share_path }}(/.*)?"
         setype: samba_share_t
         state: present
 
-    - name: Apply SELinux file context to filesystem below {{ share_path }}
+    - name: Apply SELinux file context to filesystem below {{ samba_share_path }}
       ansible.builtin.command:
         argv:
           - restorecon
           - -irv
-          - "{{ share_path }}"
-      register: restorecon_result
-      changed_when: restorecon_result.stdout | length > 0
+          - "{{ samba_share_path }}"
+      register: samba_restorecon_result
+      changed_when: samba_restorecon_result.stdout | length > 0

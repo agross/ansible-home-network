@@ -1,10 +1,10 @@
 - name: Determine if systemd-boot is used
   ansible.builtin.stat:
     path: /etc/kernel/cmdline
-  register: kernel_cmdline
+  register: proxmox_etc_kernel_cmdline
 
 - name: Configure systemd-boot kernel commandline
-  when: kernel_cmdline.stat.exists
+  when: proxmox_etc_kernel_cmdline.stat.exists
   block:
     - name: Collect kernel parameters
       ansible.builtin.set_fact:
@@ -39,7 +39,7 @@
       ansible.builtin.copy:
         content: >
           {{ item }}
-        dest: "{{ kernel_cmdline.stat.path }}"
+        dest: "{{ proxmox_etc_kernel_cmdline.stat.path }}"
         owner: 0
         group: 0
         mode: "644"

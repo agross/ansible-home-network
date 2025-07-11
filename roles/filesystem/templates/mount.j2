@@ -1,7 +1,7 @@
 [Unit]
 Description=Mount {{ filesystem.where }}
 {% if filesystem.crypt is defined %}
-Wants={{ crypt_device_name }}
+Wants={{ filesystem_crypt_device_name }}
 {% endif %}
 
 [Mount]
@@ -12,7 +12,7 @@ What={{ filesystem.what }}
 {% endif %}
 Where={{ filesystem.where }}
 
-{% if not automount and filesystem.install | default(false) | bool %}
+{% if not filesystem_automount and filesystem.install | default(false) | bool %}
 [Install]
 WantedBy=local-fs.target
 {% endif %}

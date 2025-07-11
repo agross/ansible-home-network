@@ -39,7 +39,7 @@
   vars:
     lxc_guests: >-
       {{
-        lxc_guests_created.results |
+        proxmox_lxc_guests_created.results |
         default([]) |
         selectattr('changed') |
         selectattr('msg', 'match', 'Created\s') |
@@ -48,7 +48,7 @@
       }}
     vm_guests: >-
       {{
-        vm_guests_created.results |
+        proxmox_vm_guests_created.results |
         default([]) |
         selectattr('changed') |
         ansible.builtin.items2dict(key_name = 'vmid',

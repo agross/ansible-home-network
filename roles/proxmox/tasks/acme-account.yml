@@ -1,10 +1,10 @@
 - name: Check if the default ACME account has been configured
   ansible.builtin.stat:
     path: /etc/pve/priv/acme/{{ pve_acme_account_id | ansible.builtin.mandatory }}
-  register: acme_account
+  register: proxmox_acme_account
 
 - name: Register ACME account
-  when: not acme_account.stat.exists
+  when: not proxmox_acme_account.stat.exists
   block:
     - name: Install required packages for unattended setup
       ansible.builtin.package:
@@ -32,12 +32,12 @@
       - plugin
       - config
       - inwx-dns
-  register: inwx_dns_plugin
+  register: proxmox_inwx_dns_plugin
   changed_when: false
   failed_when: false
 
 - name: Configure INWX DNS plugin
-  when: inwx_dns_plugin.rc != 0
+  when: proxmox_inwx_dns_plugin.rc != 0
   block:
     - name: Create file with INWX authentication data
       ansible.builtin.copy:
@@ -79,11 +79,11 @@
       - get
       - -property
       - acme
-  register: acme_account
+  register: proxmox_acme_account
   changed_when: false
 
 - name: Configure default ACME account
-  when: not 'account=' ~ pve_acme_account_id in acme_account.stdout
+  when: not 'account=' ~ pve_acme_account_id in proxmox_acme_account.stdout
   ansible.builtin.command:
     argv:
       - pvenode
@@ -101,11 +101,11 @@
       - get
       - -property
       - acmedomain0
-  register: acme_domain
+  register: proxmox_acme_domain
   changed_when: false
 
 - name: Configure ACME domain
-  when: not pve_fqdn ~ ',plugin=inwx-dns' in acme_domain.stdout
+  when: not pve_fqdn ~ ',plugin=inwx-dns' in proxmox_acme_domain.stdout
   ansible.builtin.command:
     argv:
       - pvenode
@@ -124,7 +124,8 @@
       - acme
       - cert
       - order
-  register: acme_order
+  register: proxmox_acme_order
   failed_when: >-
-    acme_order.rc != 0 and not 'Custom certificate exists' in acme_order.stderr
-  changed_when: acme_order.rc == 0
+    proxmox_acme_order.rc != 0 and
+    not 'Custom certificate exists' in proxmox_acme_order.stderr
+  changed_when: proxmox_acme_order.rc == 0

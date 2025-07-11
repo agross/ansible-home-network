@@ -1,32 +1,32 @@
 - name: Get version of the InfluxDB container
   community.docker.docker_container_info:
     name: "{{ logger_influxdb_migration_container }}"
-  register: influxdb_info
+  register: logger_influxdb_info
 
 - name: Get InfluxDB version entry from environment
-  when: influxdb_info.exists and 'Env' in influxdb_info.container.Config
+  when: logger_influxdb_info.exists and 'Env' in logger_influxdb_info.container.Config
   ansible.builtin.set_fact:
-    version_env_entry: >-
+    logger_version_env_entry: >-
       {{
-        influxdb_info.container.Config.Env |
-          select('match', 'INFLUXDB_VERSION=')
+        logger_influxdb_info.container.Config.Env |
+        select('match', 'INFLUXDB_VERSION=')
       }}
 
 - name: Get InfluxDB version number from version entry
-  when: version_env_entry | default([], true) | length
+  when: logger_version_env_entry | default([], true) | length
   ansible.builtin.set_fact:
-    version_number: "{{ version_env_entry | first | split('=') | last }}"
+    logger_version_number: "{{ logger_version_env_entry | first | split('=') | last }}"
 
 - name: Run upgrade
   when: >-
-    version_number is defined and
-    not version_number is version('2', '>=')
+    logger_version_number is defined and
+    not logger_version_number is version('2', '>=')
   block:
     - name: Make sure InfluxDB 2 volumes do not exist yet
       community.docker.docker_volume_info:
         name: "logger_influxdb2-{{ item }}"
-      register: influxdb_volume_info
-      failed_when: influxdb_volume_info.exists
+      register: logger_influxdb_volume_info
+      failed_when: logger_influxdb_volume_info.exists
       loop:
         - config
         - data
@@ -50,7 +50,7 @@
       ansible.builtin.tempfile:
         state: directory
         suffix: influxdb-entrypoint
-      register: influxdb_entrypoint
+      register: logger_influxdb_entrypoint
 
     - name: Extract entypoint from InfluxDB 2 image
       community.docker.docker_container:
@@ -67,27 +67,27 @@
         interactive: false
         mounts:
           - type: bind
-            source: "{{ influxdb_entrypoint.path }}"
+            source: "{{ logger_influxdb_entrypoint.path }}"
             target: /extracted-entrypoint
 
     - name: Set entrypoint file name
       ansible.builtin.set_fact:
-        influxdb_entrypoint_file: >-
-          {{ [influxdb_entrypoint.path, 'entrypoint.sh'] | join('/') }}
+        logger_influxdb_entrypoint_file: >-
+          {{ [logger_influxdb_entrypoint.path, 'entrypoint.sh'] | join('/') }}
 
     - name: Remove the requirement to run the InfluxDB 2 server after upgrading
       ansible.builtin.lineinfile:
-        path: "{{ influxdb_entrypoint_file }}"
+        path: "{{ logger_influxdb_entrypoint_file }}"
         regexp: "{{ '^\\s*' ~ ('exec influxd \"${@}\"' | regex_escape) }}"
         state: absent
-      register: entrypoint_patched
+      register: logger_entrypoint_patched
 
     - name: Verify that the InfluxDB 2 entrypoint has been patched
       ansible.builtin.fail:
         msg: >-
-          Unable to modify the InfluxDB 2 entrypoint at {{ influxdb_entrypoint_file }}
+          Unable to modify the InfluxDB 2 entrypoint at {{ logger_influxdb_entrypoint_file }}
           to not run InfluxDB 2 after upgrading data.
-      when: entrypoint_patched is not changed
+      when: logger_entrypoint_patched is not changed
 
     - name: Stop logger service
       ansible.builtin.systemd:
@@ -110,7 +110,7 @@
         volumes_from: "{{ logger_influxdb_migration_container }}"
         mounts:
           - type: bind
-            source: "{{ influxdb_entrypoint_file }}"
+            source: "{{ logger_influxdb_entrypoint_file }}"
             target: /entrypoint.sh
           - type: volume
             source: logger_influxdb2-config
@@ -118,8 +118,8 @@
           - type: volume
             source: logger_influxdb2-data
             target: /var/lib/influxdb2
-      register: migration
-      failed_when: "'Upgrade successfully completed' not in migration.container.Output"
+      register: logger_migration
+      failed_when: "'Upgrade successfully completed' not in logger_migration.container.Output"
 
     - name: Remove migration container
       community.docker.docker_container:

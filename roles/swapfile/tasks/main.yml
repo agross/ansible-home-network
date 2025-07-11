@@ -19,10 +19,10 @@
           - swapon
           - --all
           - --verbose
-      register: swapon_output
+      register: swapfile_swapon_output
       # Already used swap spaces are reported to stderr only. Newly used on
       # stdout.
-      changed_when: swapon_output.stdout_lines | length > 0
+      changed_when: swapfile_swapon_output.stdout_lines | length > 0
 
 - name: Remove limits on Raspberry Pi
   when: >-

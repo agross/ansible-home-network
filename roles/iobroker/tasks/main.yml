@@ -36,8 +36,8 @@
       - restorecon
       - -iv
       - "{{ iobroker_root }}/healthcheck"
-  register: restorecon_result
-  changed_when: restorecon_result.stdout | length > 0
+  register: iobroker_restorecon_result
+  changed_when: iobroker_restorecon_result.stdout | length > 0
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images

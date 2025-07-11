@@ -6,10 +6,10 @@
     - name: Check the existence of /boot/config.txt
       ansible.builtin.stat:
         path: /boot/config.txt
-      register: boot_config
+      register: watchdog_boot_config
 
     - name: Enable watchdog boot config
-      when: boot_config.stat.exists
+      when: watchdog_boot_config.stat.exists
       ansible.builtin.lineinfile:
         path: /boot/config.txt
         line: dtparam=watchdog=on

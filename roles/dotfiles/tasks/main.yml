@@ -24,8 +24,8 @@
             ternary('/home/' ~ ansible_env.SUDO_USER, ansible_user_dir)
         }}/.dotfiles/bootstrap
       - --force
-  register: bootstrapper
-  changed_when: "'] Linked' in bootstrapper.stdout"
+  register: dotfiles_bootstrapper
+  changed_when: "'] Linked' in dotfiles_bootstrapper.stdout"
 
 - name: Change shell to zsh
   ansible.builtin.user:

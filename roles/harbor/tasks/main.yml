@@ -85,7 +85,7 @@
         replace: ""
         backup: true
       notify: Restart harbor service
-      register: docker_compose_yaml
+      register: harbor_docker_compose_yaml
 
     - name: >-
         Replace "restart: always" with "restart: unless-stopped"
@@ -115,22 +115,22 @@
           - --file
           - "{{ harbor_installer_directory }}/harbor/docker-compose.yml"
           - pull
-      register: docker_compose_pull
-      changed_when: "'Pull complete' in docker_compose_pull.stderr"
+      register: harbor_docker_compose_pull
+      changed_when: "'Pull complete' in harbor_docker_compose_pull.stderr"
 
   rescue:
     - name: Restore backup file because validation failed
-      when: docker_compose_yaml is defined
+      when: harbor_docker_compose_yaml is defined
       ansible.builtin.copy:
         remote_src: true
-        src: "{{ docker_compose_yaml['backup_file'] }}"
+        src: "{{ harbor_docker_compose_yaml['backup_file'] }}"
         dest: "{{ harbor_installer_directory }}/harbor/docker-compose.yml"
         mode: preserve
   always:
     - name: Delete backup file
-      when: docker_compose_yaml is defined
+      when: harbor_docker_compose_yaml is defined
       ansible.builtin.file:
-        path: "{{ docker_compose_yaml['backup_file'] }}"
+        path: "{{ harbor_docker_compose_yaml['backup_file'] }}"
         state: absent
 
 - name: Copy docker-compose.override.yml that includes Traefik labels

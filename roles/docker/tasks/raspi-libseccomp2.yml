@@ -8,7 +8,7 @@
     ansible_facts.packages is defined and
     docker_libseccomp2_package in ansible_facts.packages
   ansible.builtin.set_fact:
-    installed_package: >-
+    docker_installed_package: >-
       {{
         ansible_facts.packages[docker_libseccomp2_package] |
           selectattr('version', 'defined') |
@@ -17,12 +17,20 @@
 
 - name: >-
     Install {{ docker_libseccomp2_package }} {{ docker_libseccomp2_install_version }}
-    for arch {{ installed_package.arch | default('<not installed>', true) }}
+    for arch {{ docker_installed_package.arch | default('<not installed>', true) }}
   # noqa name[template]
   when: >-
-    installed_package is defined and
+    docker_installed_package is defined and
     docker_libseccomp2_install_version is defined and
-    installed_package.version is version(docker_libseccomp2_install_version, '<')
+    docker_installed_package.version is version(docker_libseccomp2_install_version, '<')
   ansible.builtin.apt:
     deb: >-
-      {{ docker_libseccomp2_repo }}/{{ docker_libseccomp2_package }}_{{ docker_libseccomp2_install_version }}_{{ installed_package.arch }}.deb
+      {{
+        docker_libseccomp2_repo
+      }}/{{
+        docker_libseccomp2_package
+      }}_{{
+        docker_libseccomp2_install_version
+      }}_{{
+        docker_installed_package.arch
+      }}.deb

@@ -1,9 +1,3 @@
-- name: Stat docker socket
-  ansible.builtin.stat:
-    path: /var/run/docker.sock
-  register: stat_docker_socket
-  changed_when: false
-
 - name: Copy templates
   ansible.builtin.import_tasks:
     file: copy-templates.yml

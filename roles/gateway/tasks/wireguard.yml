@@ -44,4 +44,4 @@
     state: started
     enabled: true
     daemon_reload: true
-  register: wireguard_resolve_endpoint_timer_started
+  register: gateway_wireguard_resolve_endpoint_timer_started
