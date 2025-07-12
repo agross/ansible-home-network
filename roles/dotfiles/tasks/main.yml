@@ -10,8 +10,8 @@
     version: master
     dest: >-
       {{
-        ('SUDO_USER' in ansible_env) |
-          ternary('/home/' ~ ansible_env.SUDO_USER, ansible_user_dir)
+        '/home/' ~ ansible_env.SUDO_USER if 'SUDO_USER' in ansible_env
+        else ansible_user_dir
       }}/.dotfiles
 
 - name: Bootstrap dotfiles
@@ -20,8 +20,8 @@
     argv:
       - >-
         {{
-          ('SUDO_USER' in ansible_env) |
-            ternary('/home/' ~ ansible_env.SUDO_USER, ansible_user_dir)
+          '/home/' ~ ansible_env.SUDO_USER if 'SUDO_USER' in ansible_env
+          else ansible_user_dir
         }}/.dotfiles/bootstrap
       - --force
   register: dotfiles_bootstrapper
