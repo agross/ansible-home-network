@@ -1,5 +1,5 @@
 proxmox:
-  host: proxmox
+  host: pve-ogd
   type: lxc
   id: 104
   protection: true

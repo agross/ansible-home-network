@@ -1,0 +1,10 @@
+node_exporter_extras:
+  - role: prometheus.prometheus.smartctl_exporter
+    port: 9633
+    job: smartctl
+  - role: pve_exporter
+    port: 9221
+    job: pve
+  - role: zfs_exporter
+    port: 9134
+    job: zfs
