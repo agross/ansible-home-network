@@ -1,28 +1,11 @@
-- name: Set up encrypted volume
+- name: Ensure crypttab entry exists
   when: filesystem.crypt is defined
-  block:
-    - name: Ensure crypttab entry exists
-      community.general.crypttab:
-        name: "{{ filesystem.crypt.name }}"
-        backing_device: "{{ filesystem.crypt.device }}"
-        password: "{{ filesystem.crypt.password | default('-') }}"
-        opts: "{{ filesystem.crypt.opts }}"
-        state: present
-
-    - name: Get mount unit file name for /dev/mapper/{{ filesystem.crypt.name }}
-      when: filesystem.crypt is defined
-      ansible.builtin.command:
-        argv:
-          - systemd-escape
-          - --suffix=device
-          - --path
-          - "/dev/mapper/{{ filesystem.crypt.name }}"
-      changed_when: false
-      register: filesystem_crypt_device_name
-
-    - name: Set facts
-      ansible.builtin.set_fact:
-        filesystem_crypt_device_name: "{{ filesystem_crypt_device_name.stdout_lines | first }}"
+  community.general.crypttab:
+    name: "{{ filesystem.crypt.name }}"
+    backing_device: "{{ filesystem.crypt.device }}"
+    password: "{{ filesystem.crypt.password | default('-') }}"
+    opts: "{{ filesystem.crypt.opts }}"
+    state: present
 
 - name: Get mount unit file name for {{ filesystem.where }}
   ansible.builtin.command:
@@ -35,7 +18,7 @@
 
 - name: Set facts
   ansible.builtin.set_fact:
-    filesystem_automount: >-
+    filesystem_create_automount: >-
       {{
         filesystem.automount is defined and
         filesystem.automount | default(false) | bool == true
@@ -55,7 +38,9 @@
     lstrip_blocks: true
 
 - name: Start mount unit unless automounted for {{ filesystem.where }}
-  when: not filesystem_automount
+  when: >-
+    not filesystem_create_automount and
+    filesystem.install | default(false) | bool
   ansible.builtin.systemd:
     unit: "{{ filesystem_mount_unit_name }}"
     enabled: true
@@ -63,7 +48,7 @@
     daemon_reload: true
 
 - name: Create and start automount unit
-  when: filesystem_automount
+  when: filesystem_create_automount
   block:
     - name: Create automount unit for {{ filesystem.where }}
       ansible.builtin.template:

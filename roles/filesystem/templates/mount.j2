@@ -1,8 +1,5 @@
 [Unit]
 Description=Mount {{ filesystem.where }}
-{% if filesystem.crypt is defined %}
-Wants={{ filesystem_crypt_device_name }}
-{% endif %}
 
 [Mount]
 {% if filesystem.crypt is defined %}
@@ -11,8 +8,11 @@ What=/dev/mapper/{{ filesystem.crypt.name }}
 What={{ filesystem.what }}
 {% endif %}
 Where={{ filesystem.where }}
+{% if filesystem.options is defined %}
+Options={{ filesystem.options }}
+{% endif %}
 
-{% if not filesystem_automount and filesystem.install | default(false) | bool %}
+{% if not filesystem_create_automount and filesystem.install | default(false) | bool %}
 [Install]
 WantedBy=local-fs.target
 {% endif %}
