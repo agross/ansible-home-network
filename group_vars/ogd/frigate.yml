@@ -1,0 +1,2 @@
+frigate_domain: "frigate.{{ network.domain }}"
+frigate_go2rtc_domain: "go2rtc.{{ network.domain }}"

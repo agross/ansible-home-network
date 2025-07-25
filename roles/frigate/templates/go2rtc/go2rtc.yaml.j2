@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/AlexxIT/go2rtc/master/website/schema.json
+
+log:
+  level: warn
+  exec: debug # Useful for ffmpeg debugging.
+  # webrtc: debug
+  # api: trace
+  # ngrok: info
+  # rtsp: warn
+  # streams: error
+
+ffmpeg:
+  vaapi_input: >-
+    -hwaccel vaapi
+    -hwaccel_output_format vaapi
+
+    -avoid_negative_ts make_zero
+    -fflags +genpts+discardcorrupt
+    -use_wallclock_as_timestamps 1
+
+    -flags low_delay
+    -timeout 5000000
+    -rtsp_flags prefer_tcp
+    -i {input}
+
+  reolink_h265_to_h264: >-
+    -c:v h264_vaapi
+    -vf scale_vaapi=-2:1080
+    -noautoscale
+    -g 50
+    -bf 0
+    -profile:v high
+    -level:v 4.1
+    -sei:v 0
+
+# For Reolink cameras:
+# - Preview_01_main == h265
+# - Preview_01_sub == h264
+
+# ffmpeg:* is for transcoding to WebRTC-supported formats (h264) at a resolution
+# that the Intel hardware encoder supports (<4096 pixels in any dimension).
+streams:
+  east:
+    - rtsp://{{ frigate_camera_user | urlencode }}:{{ frigate_camera_password | default('') | urlencode }}@east.cam.{{ network.domain }}:554/Preview_01_main
+    # - ffmpeg:east#video=h264#audio=opus#hardware#height=1080
+  east-h264:
+    - ffmpeg:east#input=vaapi_input#video=reolink_h265_to_h264#audio=opus
+  east-preview:
+    - rtsp://{{ frigate_camera_user | urlencode }}:{{ frigate_camera_password | default('') | urlencode }}@east.cam.{{ network.domain }}:554/Preview_01_sub
+
+  south:
+    - rtsp://{{ frigate_camera_user | urlencode }}:{{ frigate_camera_password | default('') | urlencode }}@south.cam.{{ network.domain }}:554/Preview_01_main
+    # - ffmpeg:south#video=h264#audio=opus#hardware#height=1080
+  south-h264:
+    - ffmpeg:south#input=vaapi_input#video=reolink_h265_to_h264#audio=opus
+  south-h264-working-manual:
+    - >-
+      exec:ffmpeg
+      -hide_banner
+
+      -hwaccel vaapi
+      -hwaccel_output_format vaapi
+
+      -avoid_negative_ts make_zero
+      -fflags +genpts+discardcorrupt
+      -use_wallclock_as_timestamps 1
+
+      -flags low_delay
+      -timeout 5000000
+      -rtsp_flags prefer_tcp
+      -i rtsp://127.0.0.1:8554/south
+
+      -c:v h264_vaapi
+      -vf scale_vaapi=-2:1080
+      -noautoscale
+      -g 50
+      -bf 0
+      -profile:v high
+      -level:v 4.1
+      -sei:v 0
+
+      -c:a libopus
+      -application:a lowdelay
+      -min_comp 0
+
+      -rtsp_transport tcp
+      -f rtsp
+      {output}
+  south-preview:
+    - rtsp://{{ frigate_camera_user | urlencode }}:{{ frigate_camera_password | default('') | urlencode }}@south.cam.{{ network.domain }}:554/Preview_01_sub
+
+  west:
+    - rtsp://{{ frigate_camera_user | urlencode }}:{{ frigate_camera_password | default('') | urlencode }}@west.cam.{{ network.domain }}:554/Preview_01_main
+    # - ffmpeg:west#video=h264#audio=opus#hardware#height=1080
+  west-h264:
+    - ffmpeg:west#input=vaapi_input#video=reolink_h265_to_h264#audio=opus
+  west-preview:
+    - rtsp://{{ frigate_camera_user | urlencode }}:{{ frigate_camera_password | default('') | urlencode }}@west.cam.{{ network.domain }}:554/Preview_01_sub
+
+webrtc:
+  candidates:
+    - {{ interfaces.lan.ip4.address }}:8555
+    - stun:8555 # Dynamic public IP address.

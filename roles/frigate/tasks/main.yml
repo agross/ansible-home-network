@@ -1,0 +1,66 @@
+- name: Install Gasket driver for Coral Edge TPU
+  ansible.builtin.import_tasks:
+    file: coral-edge-tpu-support.yml
+
+- name: Enable reading Intel GPU performance counters from inside LXC container
+  delegate_to: "{{ hostvars[inventory_hostname].proxmox.host }}"
+  ansible.posix.sysctl:
+    name: kernel.perf_event_paranoid
+    value: "0"
+    sysctl_file: /etc/sysctl.d/igpu-kernel.perf_event_paranoid.conf
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Install Intel GPU tools
+  ansible.builtin.package:
+    name: intel-gpu-tools
+    state: present
+
+- name: Download custom go2rtc release
+  ansible.builtin.include_tasks:
+    file: github-release.yml
+  vars:
+    url: https://api.github.com/repos/AlexxIT/go2rtc/releases
+    release: "{{ frigate_go2rtc_release_version }}"
+    asset_name_regex: "^{{ frigate_go2rtc_release_file | ansible.builtin.regex_escape }}$"
+    # Placing a custom binary into the config directory makes Frigate use it.
+    dest: "{{ frigate_root }}/app/go2rtc"
+
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ frigate_root }}"
+    notify: Restart frigate service # noqa: var-naming[no-reserved]
+
+# Enable update with: ansible-playbook --extra-vars docker_update=42
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ frigate_root }}"
+    pull: true
+    build: true
+    notify: Restart frigate service # noqa: var-naming[no-reserved]
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ frigate_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart frigate service # noqa: var-naming[no-reserved]
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: frigate_started
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

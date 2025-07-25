@@ -56,6 +56,16 @@
     - role: samba
       tags: samba
 
+- name: Hosted services on argus
+  hosts: argus
+  become: true
+  gather_facts: false
+  roles:
+    - role: docker
+      tags: docker
+    - role: frigate
+      tags: frigate
+
 - name: Hosted services
   hosts: finn
   become: true

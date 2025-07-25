@@ -1,0 +1,59 @@
+proxmox:
+  host: pve-ogd
+  type: lxc
+  id: 106
+  protection: true
+  startup: order=100
+  ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
+  hookscript: lxc-fedora.sh
+  features:
+    - nesting=1
+    - fuse=1
+  password: "{{ vault_proxmox_default_root_password }}"
+  ssh_public_key_github_account: agross
+  memory: 4096
+  netif:
+    net0: >-
+      name={{ interfaces.lan.device }},ip={{
+        (interfaces.lan.ip4.address ~ '/' ~ interfaces.lan.ip4.prefix) |
+        ansible.utils.ipaddr('host/prefix')
+      }},gw={{
+        network_gateway.ip4
+      }},ip6={{
+        (interfaces.lan.ip6.address ~ '/' ~ interfaces.lan.ip6.prefix) |
+        ansible.utils.ipaddr('host/prefix')
+      }},gw6={{
+        network_gateway.ip6
+      }},bridge=vmbr0
+  disk_volume:
+    storage: local-zfs
+    size: 5
+    options:
+      mountoptions: discard;noatime
+  mount_volumes:
+    mp0:
+      host_path: /rpool/tank/frigate/media
+      mountpoint: /data/frigate/media
+      options:
+        mountoptions: discard;noatime
+  custom:
+    - reason: systemd kernel mounts
+      # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
+      key: lxc.cap.drop
+      value: sys_rawio
+
+    - reason: Hardware video acceleration
+      key: dev0
+      value: /dev/dri/renderD128,mode=0666
+
+    - reason: Coral Edge TPU
+      key: dev1
+      value: /dev/apex_0,mode=0666
+
+zfs_datasets:
+  rpool/tank/frigate/media:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 1M

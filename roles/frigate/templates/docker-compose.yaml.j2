@@ -1,0 +1,88 @@
+services:
+  app:
+    image: ghcr.io/blakeblackshear/frigate:0.15.2
+    restart: unless-stopped
+    stop_grace_period: 30s
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/apex_0:/dev/apex_0
+    cap_add:
+      - CAP_PERFMON # Intel GPU performance counters.
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./app:/config
+      - ./media:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    shm_size: 256m
+    environment:
+      FRIGATE_MQTT_USER: {{ frigate_mqtt_user }}
+      FRIGATE_MQTT_PASSWORD: {{ frigate_mqtt_password }}
+      {% if frigate_camera_password | default('', true) | string | length > 0 %}
+      FRIGATE_RTSP_USER: {{ frigate_camera_user | urlencode }}
+      FRIGATE_RTSP_PASSWORD: {{ frigate_camera_password | urlencode }}
+      {% endif %}
+    ports:
+      - 1984:1984 # go2rtc UI.
+      # - 5000:5000 # Unauthenticated UI.
+      - 8971:8971 # Frigate UI.
+      - 8554:8554 # RTSP.
+      - 8555:8555/tcp # WebRTC over TCP.
+      - 8555:8555/udp # WebRTC over UDP.
+
+  notify:
+    image: ghcr.io/0x2142/frigate-notify:v0.5.2
+    restart: unless-stopped
+    # Uncomment below if REST API server is enabled
+    # ports:
+    #   - "8000:8000"
+    environment:
+      TZ: Europe/Berlin
+
+      FN_LOGLEVEL: info
+
+      FN_FRIGATE__SERVER: http://app:5000
+      FN_FRIGATE__STARTUP_CHECK__ATTEMPTS: 5
+      FN_FRIGATE__STARTUP_CHECK__INTERVAL: 30
+      FN_FRIGATE__PUBLIC_URL: https://{{ frigate_domain }}
+
+      FN_FRIGATE__MQTT__ENABLED: true
+      FN_FRIGATE__MQTT__SERVER: mqtt
+      FN_FRIGATE__MQTT__USERNAME: {{ frigate_notify_mqtt_user }}
+      FN_FRIGATE__MQTT__PASSWORD: {{ frigate_notify_mqtt_password }}
+      FN_FRIGATE__MQTT__CLIENTID: frigate-notify-{{ ansible_hostname }}
+      FN_FRIGATE__MQTT__TOPIC_PREFIX: {{ frigate_mqtt_topic_prefix }}
+
+      FN_MONITOR__ENABLED: true
+      FN_MONITOR__URL: {{ frigate_notify_healthcheck_url }}
+
+      FN_ALERTS__SMTP__ENABLED: false
+      FN_ALERTS__SMTP__SERVER: smtp-relay.gmail.com
+      FN_ALERTS__SMTP__PORT: 587
+      FN_ALERTS__SMTP__TLS: true
+      FN_ALERTS__SMTP__USER: "{{ frigate_notify_smtp_user }}"
+      FN_ALERTS__SMTP__PASSWORD: {{ frigate_notify_smtp_password }}
+      FN_ALERTS__SMTP__RECIPIENT: "{{ frigate_notify_smtp_user }}"
+
+      FN_ALERTS__TELEGRAM__ENABLED: true
+      FN_ALERTS__TELEGRAM__TOKEN: {{ frigate_notify_telegram_token }}
+      FN_ALERTS__TELEGRAM__CHATID: {{ frigate_notify_telegram_chat_id }}
+      FN_ALERTS__TELEGRAM__SEND_CLIP: true
+
+  go2rtc:
+    profiles:
+      - just-for-debugging
+    image: ghcr.io/alexxit/go2rtc:1.9.9
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      - ./go2rtc:/config
+    ports:
+      - 1984:1984
+      - 8554:8554 # RTSP.
+      - 8555:8555/tcp # WebRTC over TCP.
+      - 8555:8555/udp # WebRTC over UDP.

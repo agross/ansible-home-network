@@ -1,0 +1,57 @@
+- name: Query gasket-dkms package status
+  delegate_to: "{{ hostvars[inventory_hostname].proxmox.host }}"
+  ansible.builtin.command:
+    argv:
+      - dpkg-query
+      - --status
+      - gasket-dkms
+  failed_when: false
+  changed_when: false
+  register: frigate_gasket_dkms_status
+
+- name: Install gasket-dkms
+  when: frigate_gasket_dkms_status.rc != 0
+  block:
+    - name: Clone builder
+      become: false
+      ansible.builtin.git:
+        repo: https://github.com/jnicolson/gasket-builder.git
+        version: main
+        dest: /tmp/gasket-builder
+
+    - name: Build Debian package for Gasket driver
+      become: false
+      community.docker.docker_image_build:
+        path: /tmp/gasket-builder
+        name: gasket-builder-name-should-not-be-required-but-is
+        rebuild: always
+        outputs:
+          - type=local,dest=/tmp/gasket-builder
+
+    - name: Download Debian package for Gasket driver
+      become: false
+      ansible.builtin.fetch:
+        src: /tmp/gasket-builder/gasket-dkms_1.0-18_all.deb
+        dest: /tmp/gasket-driver/
+      register: frigate_gasket_driver_deb
+
+    - name: Install Debian package on Proxmox host
+      delegate_to: "{{ hostvars[inventory_hostname].proxmox.host }}"
+      block:
+        - name: Upload Debian package for Gasket driver to Proxmox host of target machine
+          ansible.builtin.copy:
+            src: "{{ frigate_gasket_driver_deb.dest }}"
+            dest: /tmp/gasket-dkms.deb
+            owner: 0
+            group: 0
+            mode: "644"
+
+        - name: Install Proxmox headers
+          ansible.builtin.apt:
+            name: pve-headers
+            state: present
+
+        - name: Install Debian package for Gasket driver to Proxmox host of target machine
+          ansible.builtin.apt:
+            deb: /tmp/gasket-dkms.deb
+            state: present

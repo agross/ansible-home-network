@@ -1,0 +1,15 @@
+frigate_camera_password: "{{ vault_frigate_camera_password }}"
+
+frigate_mqtt_user: frigate
+frigate_mqtt_password: "{{ vault_frigate_mqtt_password }}"
+
+frigate_notify_mqtt_user: frigate-notify
+frigate_notify_mqtt_password: "{{ vault_frigate_notify_mqtt_password }}"
+
+frigate_notify_healthcheck_url: "{{ vault_frigate_notify_healthcheck_url }}"
+
+frigate_notify_smtp_user: "{{ google_smtp_user }}"
+frigate_notify_smtp_password: "{{ vault_frigate_notify_smtp_password }}"
+
+frigate_notify_telegram_token: "{{ vault_frigate_notify_telegram_token }}"
+frigate_notify_telegram_chat_id: "{{ vault_frigate_notify_telegram_chat_id }}"

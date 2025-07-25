@@ -31,6 +31,22 @@ firewalld:
           port=443
           to-addr={{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}
           to-port=443
+      # WebRTC over TCP.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port=8555
+          to-addr={{ hostvars.argus.interfaces.lan.ip6.address }}
+          to-port=8555
+      # WebRTC over UDP.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=udp
+          port=8555
+          to-addr={{ hostvars.argus.interfaces.lan.ip6.address }}
+          to-port=8555
 
   forward_ports:
     external:
@@ -49,3 +65,13 @@ firewalld:
         port: 443
         toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}"
         toport: 443
+      # WebRTC over TCP.
+      - proto: tcp
+        port: 8555
+        toaddr: "{{ hostvars.argus.interfaces.lan.ip4.address }}"
+        toport: 8555
+      # WebRTC over UDP.
+      - proto: udp
+        port: 8555
+        toaddr: "{{ hostvars.argus.interfaces.lan.ip4.address }}"
+        toport: 8555

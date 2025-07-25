@@ -1,0 +1,7 @@
+- name: Restart frigate service
+  when: frigate_started is not changed
+  ansible.builtin.systemd:
+    name: frigate.service
+    # Most times the config changes, so a restart is required.
+    # If the image was updated, a restart is what would have happened anyway.
+    state: restarted

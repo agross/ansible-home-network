@@ -1,0 +1,246 @@
+# yaml-language-server: $schema=https://demo.frigate.video/api/config/schema.json
+
+# https://docs.frigate.video/configuration/reference
+# https://www.reddit.com/r/frigate_nvr/comments/1ak5j2q/
+
+mqtt:
+  enabled: true
+  host: mqtt
+  topic_prefix: {{ frigate_mqtt_topic_prefix }}
+  client_id: frigate-{{ ansible_hostname }}
+  user: "{FRIGATE_MQTT_USER}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
+
+logger:
+  default: info
+  # logs:
+  #   frigate.record.maintainer: debug
+
+auth:
+  cookie_secure: true
+  trusted_proxies:
+    - {{ network.ip4 }}
+  # Does not work with IPv6, at least not until 0.16.
+  # failed_login_rate_limit: 1/second;5/minute;20/hour
+
+ui:
+  time_format: 24hour
+
+detectors:
+  coral:
+    type: edgetpu
+    device: pci
+
+detect:
+  enabled: true
+  # My cameras support 4 or 7 fps on the sub stream, the default would be 5.
+  fps: 7
+
+record:
+  enabled: true
+  alerts:
+    retain:
+      days: 60
+      mode: motion
+  detections:
+    retain:
+      days: 60
+      mode: motion
+
+birdseye:
+  enabled: true
+  mode: continuous
+
+# The ffmpeg process are listed under "ffmpeg_cmds" on
+# https://frigate.ogd.therightstuff.de/api/config
+ffmpeg:
+  # ffmpeg 6.1.2 in the go2rtc 1.9.9 image works, but the default ffmpeg 7.0 causes:
+  # Error while filtering: Cannot allocate memory
+  path: "5.0"
+  hwaccel_args: preset-vaapi
+  input_args: >-
+    -hwaccel vaapi
+    -hwaccel_output_format vaapi
+
+    -avoid_negative_ts make_zero
+    -fflags +genpts+discardcorrupt
+    -use_wallclock_as_timestamps 1
+    -flags low_delay
+
+    -timeout 5000000
+    -rtsp_flags prefer_tcp
+  output_args:
+    # I have 2 RLC-1240A cameras with a main stream resolution of 4512x2512,
+    # which is more than the <=4096px the Intel GPU supports. Downscale the
+    # recorded stream to 4k (3880x2160). -noautoscale also needs to be applied:
+    # # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
+    record: >-
+      -f segment
+      -segment_time 10
+      -segment_format mp4
+      -reset_timestamps 1
+      -strftime 1
+
+      -c:v h264_vaapi
+      -vf scale_vaapi=-2:2160
+      -noautoscale
+      -g 50
+      -bf 0
+      -profile:v high
+      -level:v 4.1
+      -sei:v 0
+
+      -c:a
+      copy
+
+cameras:
+  east:
+    enabled: true
+    webui_url: https://east.cam.{{ network.domain }}
+
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/east-preview
+          input_args: preset-rtsp-generic
+          roles:
+            - detect
+        - path: rtsp://127.0.0.1:8554/east
+          roles:
+            - record
+
+    motion:
+      mask: 0.42,0.074,0.42,0.014,0,0.014,0,0.074
+
+    live:
+      stream_name: east
+
+  south:
+    enabled: true
+    webui_url: http://south.cam.{{ network.domain }}
+
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/south-preview
+          roles:
+            - detect
+        - path: rtsp://127.0.0.1:8554/south
+          roles:
+            - record
+
+      output_args:
+        # Same as ffmpeg.output_args.record, but without scaling because the
+        # resolution is 3840x2160.
+        record: >-
+          -f segment
+          -segment_time 10
+          -segment_format mp4
+          -reset_timestamps 1
+          -strftime 1
+
+          -c:v h264_vaapi
+          -noautoscale
+          -g 50
+          -bf 0
+          -profile:v high
+          -level:v 4.1
+          -sei:v 0
+
+          -c:a
+          copy
+
+    onvif:
+      host: south.cam.{{ network.domain }}
+      port: 8000
+      user: "{FRIGATE_RTSP_USER}"
+      password: "{FRIGATE_RTSP_PASSWORD}"
+
+    motion:
+      mask: 0.30,0.07,0.30,0.02,0,0.02,0,0.07
+
+    live:
+      stream_name: south
+
+  west:
+    enabled: true
+    webui_url: http://west.cam.{{ network.domain }}
+
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/west-preview
+          roles:
+            - detect
+        - path: rtsp://127.0.0.1:8554/west
+          roles:
+            - record
+
+    motion:
+      mask: 0.42,0.074,0.42,0.014,0,0.014,0,0.074
+
+    live:
+      stream_name: west
+
+# For Reolink cameras:
+# - Preview_01_main == h265
+# - Preview_01_sub == h264
+
+# ffmpeg:* is for transcoding to WebRTC-supported formats (h264) at a resolution
+# that the Intel hardware encoder supports (<=4096 pixels in any dimension).
+go2rtc:
+  log:
+    level: warn
+    # Useful for ffmpeg debugging.
+    # exec: debug
+
+  # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
+  ffmpeg:
+    vaapi_input: >-
+      -hwaccel vaapi
+      -hwaccel_output_format vaapi
+
+      -avoid_negative_ts make_zero
+      -fflags +genpts+discardcorrupt
+      -use_wallclock_as_timestamps 1
+      -flags low_delay
+
+      -timeout 5000000
+      -rtsp_flags prefer_tcp
+      -i {input}
+
+    h265_to_h264_1080p: >-
+      -c:v h264_vaapi
+      -vf scale_vaapi=-2:1080
+      -noautoscale
+      -g 50
+      -bf 0
+      -profile:v high
+      -level:v 4.1
+      -sei:v 0
+
+  streams:
+    east:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@east.cam.{{ network.domain }}:554/Preview_01_main
+      # - ffmpeg:east#video=h264#audio=opus#hardware#height=1080
+    east-h264:
+      - ffmpeg:east#input=vaapi_input#video=h265_to_h264_1080p#audio=opus
+    east-preview:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@east.cam.{{ network.domain }}:554/Preview_01_sub
+
+    south:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@south.cam.{{ network.domain }}:554/Preview_01_main
+      # - ffmpeg:south#video=h264#audio=opus#hardware#height=1080
+    south-h264:
+      - ffmpeg:south#input=vaapi_input#video=h265_to_h264_1080p#audio=opus
+    south-preview:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@south.cam.{{ network.domain }}:554/Preview_01_sub
+
+    west:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@west.cam.{{ network.domain }}:554/Preview_01_main
+      # - ffmpeg:west#video=h264#audio=opus#hardware#height=1080
+    west-h264:
+      - ffmpeg:west#input=vaapi_input#video=h265_to_h264_1080p#audio=opus
+    west-preview:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@west.cam.{{ network.domain }}:554/Preview_01_sub
+  webrtc:
+    candidates:
+      - {{ interfaces.lan.ip4.address }}:8555
+      - stun:8555 # Dynamic public IP address.

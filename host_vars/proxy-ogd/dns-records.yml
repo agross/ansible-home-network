@@ -8,5 +8,6 @@ dns_cname_records:
   # - "gast.{{ network.domain }}"
   # - "telegram.{{ network.domain }}"
 
-  # - "{{ frigate_domain | ansible.builtin.mandatory }}"
+  - "{{ frigate_domain | ansible.builtin.mandatory }}"
+  - "{{ frigate_go2rtc_domain | ansible.builtin.mandatory }}"
   # - "{{ prometheus_domain | ansible.builtin.mandatory }}"

@@ -1,0 +1,5 @@
+# vim: set ft=csv ts=2 sw=2 et:
+
+ec:71:db:b2:e0:4d, east-cam, 7d
+ec:71:db:f0:9e:c7, south-cam, 7d
+ec:71:db:5d:ae:e3, west-cam, 7d

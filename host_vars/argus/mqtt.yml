@@ -1,0 +1,7 @@
+mqtt_accounts: >-
+  {{
+    {
+      frigate_mqtt_user: frigate_mqtt_password,
+      frigate_notify_mqtt_user: frigate_notify_mqtt_password,
+    }
+  }}

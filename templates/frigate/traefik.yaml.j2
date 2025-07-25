@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    {{ ansible_role_name }}:
+      entrypoints: https
+      rule: Host(`{{ frigate_domain }}`)
+      service: {{ ansible_role_name }}
+
+    {{ ansible_role_name }}-go2rtc:
+      entrypoints: https
+      rule: Host(`go2rtc.{{ network.domain }}`)
+      service: {{ ansible_role_name }}-go2rtc
+
+  services:
+    {{ ansible_role_name }}:
+      loadBalancer:
+        serversTransport: no-verify
+        servers:
+          - url: https://{{ interfaces.lan.ip4.address }}:8971
+
+    {{ ansible_role_name }}-go2rtc:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:1984
