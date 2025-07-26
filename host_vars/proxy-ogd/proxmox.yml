@@ -1,0 +1,31 @@
+proxmox:
+  host: pve-ogd
+  type: lxc
+  id: 105
+  protection: true
+  startup: order=100
+  ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
+  hookscript: lxc-fedora.sh
+  features:
+    - nesting=1
+  password: "{{ vault_proxmox_default_root_password }}"
+  ssh_public_key_github_account: agross
+  memory: 1024
+  netif:
+    net0: >-
+      name={{ interfaces.lan.device }},ip={{
+        (interfaces.lan.ip4.address ~ '/' ~ interfaces.lan.ip4.prefix) |
+        ansible.utils.ipaddr('host/prefix')
+      }},gw={{
+        network_gateway.ip4
+      }},ip6={{
+        (interfaces.lan.ip6.address ~ '/' ~ interfaces.lan.ip6.prefix) |
+        ansible.utils.ipaddr('host/prefix')
+      }},gw6={{
+        network_gateway.ip6
+      }},bridge=vmbr0
+  custom:
+    - reason: systemd kernel mounts
+      # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
+      key: lxc.cap.drop
+      value: sys_rawio

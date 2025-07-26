@@ -1,0 +1,15 @@
+traefik_install_method: bare-metal
+
+traefik_dynamic_file_configuration: /data/traefik/conf.d
+
+traefik_cert_sans:
+  - therightstuff.de
+  - "*.therightstuff.de"
+  - "*.{{ network.domain }}"
+
+traefik_users:
+  dashboard:
+    agross: "{{ vault_traefik_dashboard_password_agross }}"
+
+traefik_firewalld_ports:
+  - 8080/tcp

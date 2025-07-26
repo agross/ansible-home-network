@@ -4,8 +4,6 @@ dns_cname_records:
 
   - "influxdb.{{ network.domain }}"
 
-  - "adguard.{{ network.domain }}"
-  - "cockpit.{{ network.domain }}"
   - "grafana.{{ network.domain }}"
   - "iobroker.{{ network.domain }}"
   - "lovelace.{{ network.domain }}"

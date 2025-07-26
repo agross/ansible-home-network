@@ -1,0 +1,12 @@
+dns_cname_records:
+  - "adguard.{{ network.domain }}"
+  - "cockpit.{{ network.domain }}"
+
+  # - "{{ logger_grafana_domain | ansible.builtin.mandatory }}"
+  # - "iobroker.{{ network.domain }}"
+  # - "lovelace.{{ network.domain }}"
+  # - "gast.{{ network.domain }}"
+  # - "telegram.{{ network.domain }}"
+
+  # - "{{ frigate_domain | ansible.builtin.mandatory }}"
+  # - "{{ prometheus_domain | ansible.builtin.mandatory }}"

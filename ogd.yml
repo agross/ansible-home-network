@@ -40,6 +40,14 @@
     - role: dns-server
       tags: dns-server
 
+- name: Reverse proxy configuration
+  hosts: proxy-ogd
+  become: true
+  gather_facts: false
+  roles:
+    - role: traefik
+      tags: traefik
+
 - name: Hosted services on yard
   hosts: yard
   become: true
