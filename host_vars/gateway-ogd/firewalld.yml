@@ -13,7 +13,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=80
-          to-addr={{ hostvars.finn.interfaces.lan.ip6.address }}
+          to-addr={{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}
           to-port=80
       # HTTPS.
       - >-
@@ -21,7 +21,7 @@ firewalld:
         forward-port
           protocol=tcp
           port=443
-          to-addr={{ hostvars.finn.interfaces.lan.ip6.address }}
+          to-addr={{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}
           to-port=443
       # HTTP/3.
       - >-
@@ -29,7 +29,7 @@ firewalld:
         forward-port
           protocol=udp
           port=443
-          to-addr={{ hostvars.finn.interfaces.lan.ip6.address }}
+          to-addr={{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}
           to-port=443
 
   forward_ports:
@@ -37,15 +37,15 @@ firewalld:
       # HTTP.
       - proto: tcp
         port: 80
-        toaddr: "{{ hostvars.finn.interfaces.lan.ip4.address }}"
+        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}"
         toport: 80
       # HTTPS.
       - proto: tcp
         port: 443
-        toaddr: "{{ hostvars.finn.interfaces.lan.ip4.address }}"
+        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}"
         toport: 443
       # HTTP/3.
       - proto: udp
         port: 443
-        toaddr: "{{ hostvars.finn.interfaces.lan.ip4.address }}"
+        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}"
         toport: 443
