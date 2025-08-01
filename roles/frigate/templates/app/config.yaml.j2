@@ -72,8 +72,8 @@ ffmpeg:
   output_args:
     # I have 2 RLC-1240A cameras with a main stream resolution of 4512x2512,
     # which is more than the <=4096px the Intel GPU supports. Downscale the
-    # recorded stream to 4k (3880x2160). -noautoscale also needs to be applied:
-    # # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
+    # recorded stream to 1080p (1940x1080). -noautoscale also needs to be applied:
+    # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
     record: >-
       -f segment
       -segment_time 10
@@ -82,7 +82,7 @@ ffmpeg:
       -strftime 1
 
       -c:v h264_vaapi
-      -vf scale_vaapi=-2:2160
+      -vf scale_vaapi=-2:1080
       -noautoscale
       -g 50
       -bf 0
@@ -126,27 +126,6 @@ cameras:
         - path: rtsp://127.0.0.1:8554/south
           roles:
             - record
-
-      output_args:
-        # Same as ffmpeg.output_args.record, but without scaling because the
-        # resolution is 3840x2160.
-        record: >-
-          -f segment
-          -segment_time 10
-          -segment_format mp4
-          -reset_timestamps 1
-          -strftime 1
-
-          -c:v h264_vaapi
-          -noautoscale
-          -g 50
-          -bf 0
-          -profile:v high
-          -level:v 4.1
-          -sei:v 0
-
-          -c:a
-          copy
 
     onvif:
       host: south.cam.{{ network.domain }}
