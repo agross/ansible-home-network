@@ -45,3 +45,4 @@
     owner: 0
     group: 0
     mode: "755"
+  notify: Restart traefik service
