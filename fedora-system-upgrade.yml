@@ -2,8 +2,6 @@
   hosts: fedora
   become: true
   gather_facts: true
-  # Run each host as fast as possible.
-  strategy: free # noqa run-once[play]
   vars:
     fedora_release: 42
   tasks:
