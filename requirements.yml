@@ -10,7 +10,7 @@ roles:
   - name: geerlingguy.swap
   - name: hifis.unattended_upgrades
   - name: lae.proxmox
-    version: v1.9.1
+    version: v1.9.4
   - name: xanmanning.k3s
 
 collections:
@@ -21,7 +21,7 @@ collections:
     version: ">=1.0.1"
   - name: community.docker
   - name: devsec.hardening
-    version: "8.8.0"
+    version: "10.3.0"
   - name: prometheus.prometheus
     version: ">=0.26.1"
   - name: vladgh.samba

@@ -1,0 +1,2 @@
+mqtt_accounts:
+  shelly1minigen3-1: "{{ vault_mqtt_accounts_shelly1minigen3_1 }}"

@@ -1,39 +1,19 @@
 proxmox:
-  host: proxmox
+  host: pve-ogd
   type: kvm
-  id: 101
+  id: 103
   startup: order=200
-  cores: 4
-  memory: 4096
-  # PCI passthrough and ballooning does not work together.
-  # https://forum.proxmox.com/threads/memory-ballooning-on-alpine-linux.87952/#post-385885
-  # https://forum.proxmox.com/threads/ballooning-not-working-properly.93140/
-  hostpci:
-    # SATA controller.
-    hostpci0: host=0000:00:12
+  cores: 8
+  memory: 8192
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   scsi:
     scsi0:
-      storage: local-lvm
+      storage: local-zfs
       size: 100
       discard: true
       iothread: true
       ssd: true
-    scsi1:
-      storage: local-lvm
-      size: 300
-      discard: true
-      iothread: true
-      ssd: true
-      backup: false
-    scsi2:
-      storage: local-lvm
-      size: 800
-      discard: true
-      iothread: true
-      ssd: true
-      backup: false
   usb:
     # Sonoff Zigbee stick.
     usb0: host=10c4:ea60

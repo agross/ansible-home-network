@@ -1,7 +1,11 @@
 - name: Show firmware version
   ansible.builtin.debug:
     msg: >-
-      Upgrading from {{ firmware.json.StatusFWR.Version }} to {{ latest_release_version }}
+      Upgrading from {{
+        tasmota_update_current_firmware.json.StatusFWR.Version
+      }} to {{
+        tasmota_update_latest_release_version
+      }}
   changed_when: false
 
 - name: Upgrade
@@ -17,11 +21,11 @@
 - name: Wait for reboot
   delegate_to: localhost
   ansible.builtin.wait_for:
-    port: 80
     host: >-
       {{
         hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
       }}
+    port: 80
     # Less delay may report old version.
     delay: 60
 
@@ -34,11 +38,16 @@
       }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
     return_content: true
   changed_when: false
-  register: new_firmware
+  register: tasmota_update_new_firmware
 
 - name: Show new firmware version
   ansible.builtin.debug:
     msg: >-
-      Upgraded from {{ firmware.json.StatusFWR.Version }} to {{ new_firmware.json.StatusFWR.Version }}
+      Upgraded from {{
+        tasmota_update_current_firmware.json.StatusFWR.Version
+      }} to {{
+        tasmota_update_new_firmware.json.StatusFWR.Version
+      }}
   changed_when: >-
-    firmware.json.StatusFWR.Version is version(new_firmware.json.StatusFWR.Version, '!=')
+    tasmota_update_current_firmware.json.StatusFWR.Version
+      is version(tasmota_update_new_firmware.json.StatusFWR.Version, '!=')

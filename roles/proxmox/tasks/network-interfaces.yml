@@ -1,3 +1,22 @@
+# https://pve.proxmox.com/pve-docs/pve-admin-guide.html#network_override_device_names
+# Link files need to be prefixed with a 2-digit number < 99 because the default
+# initramfs receives /usr/lib/systemd/network/99-default.link as a fallback.
+- name: Configure stable network interface names
+  when: systemd_networkd_link is defined
+  ansible.builtin.template:
+    src: systemd_networkd_config.j2
+    dest: "/etc/systemd/network/{{ item.key }}.link"
+    owner: 0
+    group: systemd-network
+    mode: "640"
+  loop: "{{ systemd_networkd_link | ansible.builtin.dict2items }}"
+  loop_control:
+    label: "name: {{ item.key }}"
+  # From lae.proxmox.
+  notify:
+    - update-initramfs
+    - Reboot because networking changed
+
 - name: Configure /etc/network/interfaces
   ansible.builtin.template:
     src: "{{ ansible_role_name }}/{{ inventory_hostname }}/interfaces.j2"
@@ -6,7 +25,7 @@
     group: 0
     mode: "644"
     lstrip_blocks: true
-  notify: Reload network interfaces
+  notify: Reboot because networking changed
 
 - name: Ensure WebAuthn can be used
   ansible.builtin.lineinfile:

@@ -1,0 +1,10 @@
+filesystems:
+  - crypt:
+      name: media
+      device: >-
+        /dev/disk/by-id/nvme-Samsung_SSD_980_PRO_2TB_S69ENL0T905084Y-part1
+      password: none
+      opts: discard,noauto,nofail
+    where: /home/agross/media
+    automount: false
+    install: false

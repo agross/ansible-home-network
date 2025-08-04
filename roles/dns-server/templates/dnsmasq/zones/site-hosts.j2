@@ -3,7 +3,7 @@
 
 {%
   for host in groups[site] |
-    map('extract', hostvars) |
+    map('ansible.builtin.extract', hostvars) |
     selectattr('dns_host_records', 'defined') |
     map(attribute = 'inventory_hostname')
 %}

@@ -1,0 +1,60 @@
+proxmox_api_user: "{{ vault_proxmox_api_user }}"
+proxmox_api_password: "{{ vault_proxmox_api_password }}"
+proxmox_api_token_secret: "{{ vault_proxmox_api_token_secret }}"
+
+proxmox_lxc_default_disk_volume:
+  storage: local-zfs
+  size: 8
+  options:
+    mountoptions: discard;noatime
+
+pve_groups:
+  - name: admin
+    comment: System Administrators
+pve_users:
+  # User password is the same as the Linux password.
+  - name: agross@pam
+    email: agross@therightstuff.de
+    firstname: Alexander
+    lastname: Groß
+    groups:
+      - admin
+pve_acls:
+  - path: /
+    roles:
+      - Administrator
+    groups:
+      - admin
+pve_group: # No cluster.
+
+pve_fqdn: "{{ ansible_hostname }}.{{ network.domain | ansible.builtin.mandatory }}"
+
+pve_acme_account_id: default
+pve_acme_account_email: agross@therightstuff.de
+
+pve_pcie_passthrough_enabled: true
+pve_iommu_passthrough_mode: true
+
+pve_zfs_enabled: true
+pve_zfs_zed_email: root
+# With OnCalendar expression as per /etc/cron.d/zfsutils-linux:
+# Sun *-*-01..07 00:24:00
+# Sun *-*-08..14 00:24:00
+pve_zfs_zed_healthcheck: "{{ vault_pve_zfs_zed_healthcheck }}"
+
+# lae.proxmox has pve_zfs_options, but does not run update-initramfs after
+# setting these.
+# https://github.com/lae/ansible-role-proxmox/blob/2f9dbfa9191e0e8d5ae9f9eb9e2b88a01c6e35c7/tasks/zfs.yml#L15
+# Also, how to set multiple options in a single string?
+#
+# https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Module%20Parameters.html
+proxmox_zfs_options: |
+  # 30% of RAM.
+  options zfs zfs_arc_max={{ (ansible_memtotal_mb * 1024 * 1024 * 0.3) | int }}
+
+# https://docs.kernel.org/admin-guide/kernel-parameters.html
+proxmox_kernel_cmdline:
+  - root=ZFS=rpool/ROOT/pve-1
+  - boot=zfs
+  - video=800x600
+  - panic=60

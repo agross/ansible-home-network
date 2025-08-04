@@ -1,9 +1,9 @@
 proxmox:
   host: pve-ogd
   type: lxc
-  id: 104
+  id: 108
   protection: true
-  startup: order=100
+  startup: order=200
   ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
   hookscript: lxc-fedora.sh
   features:
@@ -24,8 +24,33 @@ proxmox:
       }},gw6={{
         network_gateway.ip6
       }},bridge=vmbr0
+  disk_volume:
+    storage: local-zfs
+    size: 5
+    options:
+      mountoptions: discard;noatime
+  mount_volumes:
+    mp0:
+      host_path: /rpool/tank/time-machine
+      mountpoint: /shares/time-machine
+      options:
+        mountoptions: discard;noatime
+    mp1:
+      host_path: /home/agross/media
+      mountpoint: /home/agross/media
+      options:
+        mountoptions: discard;noatime;nodev;noexec;nosuid
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
       key: lxc.cap.drop
       value: sys_rawio
+
+zfs_datasets:
+  rpool/tank/time-machine:
+    chown:
+      owner: 101000
+      group: 101001
+    options:
+      recordsize: 2M
+      quota: 400G

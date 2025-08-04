@@ -1,3 +1,17 @@
+- name: Ensure Traefik dynamic file configuration directory exists
+  ansible.builtin.file:
+    path: "{{ hostvars[item].traefik_dynamic_file_configuration }}"
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+  delegate_to: "{{ item }}"
+  loop: >-
+    {{
+      groups[site] |
+      ansible.builtin.intersect(groups['loadbalancer'])
+    }}
+
 - name: Template Traefik configuration
   when: src | length > 0
   ansible.builtin.template:

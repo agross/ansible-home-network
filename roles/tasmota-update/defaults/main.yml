@@ -1,2 +1,16 @@
+tasmota_update_version_info:
+  tasmota: https://ota.tasmota.com/tasmota/release/release.php
+  tasmota32: https://ota.tasmota.com/tasmota32/release/release.php
+
 tasmota_user: admin
-tasmota_version_info: https://ota.tasmota.com/tasmota/release/release.php
+
+tasmota_credentials: >-
+  {{
+    '&user=' ~
+    tasmota_user | urlencode | replace('/', '%2F') ~
+    '&password=' ~
+    tasmota_password | urlencode | replace('/', '%2F') if
+      (tasmota_password | default('', true) | string | length) > 0
+    else
+      ''
+  }}

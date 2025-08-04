@@ -2,15 +2,56 @@
   delegate_to: localhost
   run_once: true
   ansible.builtin.uri:
-    url: "{{ tasmota_version_info }}"
+    url: "{{ item.value }}"
     return_content: true
   changed_when: false
-  register: latest_release
+  loop: "{{ tasmota_update_version_info | ansible.builtin.dict2items }}"
+  register: tasmota_update_latest_release
 
-- name: Determine latest Tasmota release version
-  run_once: true
+- name: Get current firmware information
+  delegate_to: localhost
+  ansible.builtin.uri:
+    url: >-
+      http://{{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+    return_content: true
+  changed_when: false
+  register: tasmota_update_current_firmware
+
+- name: Determine Tasmota variant
   ansible.builtin.set_fact:
-    latest_release_key: >-
-      {{ latest_release.json | list | first }}
-    latest_release_version: >-
-      {{ latest_release.json | list | first | regex_replace('^.*-', '') }}
+    tasmota_update_tasmota_variant: >-
+      {{
+        tasmota_update_current_firmware.json.StatusFWR.Version |
+        ansible.builtin.regex_replace('.*\(release-(.*)\)$', '\1')
+      }}
+
+- name: Determine latest Tasmota release version for variant
+  ansible.builtin.set_fact:
+    tasmota_update_latest_release_key: >-
+      {{
+        tasmota_update_latest_release.results |
+        selectattr('item.key', 'equalto', tasmota_update_tasmota_variant) |
+        map(attribute = 'json') |
+        first |
+        list |
+        first
+      }}
+    tasmota_update_latest_release_version: >-
+      {{
+        tasmota_update_latest_release.results |
+        selectattr('item.key', 'equalto', tasmota_update_tasmota_variant) |
+        map(attribute = 'json') |
+        first |
+        list |
+        first |
+        ansible.builtin.regex_replace('^release-', '')
+      }}
+
+- name: Remove host if no update is required
+  ansible.builtin.meta: end_host
+  when: >-
+    tasmota_update_current_firmware.json.StatusFWR.Version |
+    ansible.builtin.regex_replace('\(.*', '')
+    is version(tasmota_update_latest_release_version, '>=')
