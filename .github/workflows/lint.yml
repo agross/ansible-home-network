@@ -14,7 +14,12 @@ jobs:
     name: Ansible Lint
     runs-on: ubuntu-latest
 
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (
+        github.event_name != 'pull_request' ||
+        github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      )
 
     steps:
       - name: Get latest code
@@ -31,7 +36,12 @@ jobs:
     name: Ensure vaults are encrypted
     runs-on: ubuntu-latest
 
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (
+        github.event_name != 'pull_request' ||
+        github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      )
 
     steps:
       - name: Get latest code
