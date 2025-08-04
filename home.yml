@@ -131,6 +131,8 @@
       tags: vaultwarden
     - role: prometheus
       tags: prometheus
+    - role: renovate
+      tags: renovate
 
 - name: Hosted services on smb
   hosts: smb

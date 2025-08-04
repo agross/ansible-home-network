@@ -23,3 +23,5 @@ dns_cname_records:
   - "{{ tandoor_domain | ansible.builtin.mandatory }}"
   - "{{ vaultwarden_domain | ansible.builtin.mandatory }}"
   - "{{ prometheus_domain | ansible.builtin.mandatory }}"
+
+  - "{{ renovate_domain | mandatory }}"

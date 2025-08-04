@@ -119,6 +119,17 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp16:
+      host_path: /tank/renovate/app
+      mountpoint: /data/renovate/app
+      options:
+        mountoptions: discard;noatime
+    mp17:
+      host_path: /tank/renovate/postgres
+      mountpoint: /data/renovate/db
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -234,3 +245,15 @@ zfs_datasets:
     chown:
       owner: 165534
       group: 165534
+
+  tank/renovate/app:
+    chown:
+      owner: 112021
+      group: 112021
+  tank/renovate/postgres:
+    chown:
+      owner: 100999
+      group: 100999
+    options:
+      prefetch: none
+      recordsize: 8K

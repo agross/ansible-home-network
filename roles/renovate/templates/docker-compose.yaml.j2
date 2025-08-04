@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: renovate
+      POSTGRES_PASSWORD: renovate
+      POSTGRES_DB: renovate
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD
+        - psql
+        - --username=renovate
+        - --dbname=renovate
+        - --command=select 1
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  app:
+    image: ghcr.io/mend/renovate-ce:11.0.0
+    ports:
+      - 8080:8080
+    environment:
+      MEND_RNV_DATA_HANDLER_TYPE: postgresql
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: renovate
+      PGUSER: renovate
+      PGPASSWORD: renovate
+
+      MEND_RNV_LICENSE_KEY: {{ renovate_license_key }}
+
+      MEND_RNV_ACCEPT_TOS: "Y"
+
+      MEND_RNV_PLATFORM: github
+      MEND_RNV_GITHUB_APP_ID: {{ renovate_github_app_id }}
+      MEND_RNV_GITHUB_APP_KEY: |
+        {{ renovate_github_app_key | indent(8) }}
+
+      MEND_RNV_WEBHOOK_SECRET: {{ renovate_webhook_secret }}
+
+      MEND_RNV_WORKER_CLEANUP: 0 0 * * *
+
+      # Server API config.
+
+      # Set to 'true' to log all incoming API requests to DEBUG logger.
+      MEND_RNV_REQUEST_LOGGER_ENABLED: true
+
+      MEND_RNV_API_ENABLE_PROMETHEUS_METRICS: true
+
+      # Enable incoming API calls.
+      MEND_RNV_API_SERVER_SECRET: {{ renovate_api_server_secret }}
+      MEND_RNV_API_ENABLED: true
+      MEND_RNV_API_ENABLE_SYSTEM: true
+      MEND_RNV_API_ENABLE_JOBS: false
+
+      # Persist job logs.
+      # MEND_RNV_LOG_HISTORY_DIR: /logs
+      MEND_RNV_LOG_HISTORY_TTL_DAYS: 5
+
+      # Enable repository cache to speed up subsequent jobs on a repo.
+      RENOVATE_REPOSITORY_CACHE: enabled
+    # volumes:
+    #   - ./app/logs:/logs

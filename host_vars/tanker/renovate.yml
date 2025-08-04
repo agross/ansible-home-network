@@ -1,0 +1,7 @@
+renovate_license_key: "{{ vault_renovate_license_key }}"
+
+renovate_github_app_id: "{{ vault_renovate_github_app_id }}"
+renovate_github_app_key: "{{ vault_renovate_github_app_key }}"
+
+renovate_webhook_secret: "{{ vault_renovate_webhook_secret }}"
+renovate_api_server_secret: "{{ vault_renovate_api_server_secret }}"

@@ -1,0 +1,42 @@
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ renovate_root }}"
+    notify: Restart renovate service # noqa: var-naming[no-reserved]
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ renovate_root }}"
+    pull: true
+    build: true
+    notify: Restart renovate service # noqa: var-naming[no-reserved]
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ renovate_root }}/systemd"
+    local_units: templates/systemd
+    notify: Restart renovate service # noqa: var-naming[no-reserved]
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: renovate_started
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml
+
+- name: Register Prometheus scrape
+  ansible.builtin.import_tasks:
+    file: register-prometheus-scrape.yml
+  vars:
+    app: "{{ ansible_role_name }}"
+    scrapes:
+      - "https://{{ renovate_domain }}"
