@@ -28,8 +28,8 @@
     file: docker-compose-update.yml
   vars:
     directory: "{{ prometheus_root }}"
-    pull: "{{ docker_update is defined }}"
-    build: "{{ docker_update is defined }}"
+    pull: true
+    build: true
     notify: Restart prometheus service # noqa: var-naming[no-reserved]
 
 - name: Symlink systemd unit
