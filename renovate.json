@@ -12,6 +12,16 @@
   "docker-compose": {
     "managerFilePatterns": ["/(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$/"]
   },
+  "customManagers": [
+    {
+      "description": "Magic comments",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/).+\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_version:\\s*(?<currentValue>.+?)\\s"
+      ]
+    }
+  ],
   "packageRules": [
     {
       "description": "No license purchased for newer versions",
