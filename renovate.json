@@ -18,7 +18,7 @@
       "customType": "regex",
       "managerFilePatterns": ["/(^|/).+\\.ya?ml$/"],
       "matchStrings": [
-        "# renovate: (?<datasource>[a-z-]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_version:\\s*(?<currentValue>.+?)\\s"
+        "# renovate: (?<datasource>[a-z-]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?\\w+?:\\s*(?<currentValue>.+?)\\s"
       ]
     }
   ],
@@ -28,6 +28,11 @@
       "matchPackageNames": ["jetbrains/teamcity-server"],
       "matchManagers": ["docker-compose"],
       "enabled": false
+    },
+    {
+      "description": "Strange versioning scheme: Z-Stack_3.x.0_coordinator_20240710",
+      "matchPackageNames": ["Koenkk/Z-Stack-firmware"],
+      "versioning": "regex:_(?<major>\\d+)$"
     }
   ]
 }

@@ -1,0 +1,19 @@
+- name: Determine download URL
+  ansible.builtin.include_tasks:
+    file: github-release.yml
+  vars:
+    url: "{{ item.url }}"
+    release: "{{ item.release }}"
+    asset_name_regex: "{{ item.asset_name_regex }}"
+
+- name: Patch firmware info with URL
+  ansible.builtin.set_fact:
+    iobroker_device_firmware: >-
+      {{
+        iobroker_device_firmware |
+        default({}) |
+        combine(firmware | ansible.builtin.from_yaml, recursive = true)
+      }}
+  vars:
+    firmware: >-
+      "{{ item.url ~ item.release ~ item.asset_name_regex }}": {{ github_asset_url }}

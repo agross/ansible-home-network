@@ -8,8 +8,12 @@ iobroker_devices:
     usb: true
     zigbee:
       type: sonoff
-      firmware: >-
-        https://github.com/Koenkk/Z-Stack-firmware/raw/Z-Stack_3.x.0_coordinator_20240710/coordinator/Z-Stack_3.x.0/bin/CC1352P2_CC2652P_launchpad_coordinator_20240710.zip
+      firmware:
+        url: https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
+        # renovate: github-releases=Koenkk/Z-Stack-firmware
+        release: Z-Stack_3.x.0_coordinator_20240710
+        asset_name_regex: >-
+          ^CC1352P2_CC2652P_launchpad_coordinator
 
 iobroker_ports:
   iobroker: 8081

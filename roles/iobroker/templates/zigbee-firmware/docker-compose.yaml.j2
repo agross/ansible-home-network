@@ -2,16 +2,27 @@ services:
   ti-cc-tool:
     {%
       set dev = iobroker_devices |
-        selectattr('zigbee', 'defined') |
+        selectattr('zigbee.firmware.url', 'defined') |
         first |
-        default({ 'host': '', 'container': '', 'zigbee': { 'firmware': '' } })
+        default(false)
+    %}
+    {% if dev %}
+    {%
+      set key = dev.zigbee.firmware.url ~
+        dev.zigbee.firmware.release ~
+        dev.zigbee.firmware.asset_name_regex
+    %}
+    {%
+      set firmware_url = (iobroker_device_firmware | default([]))[key] | default(false)
     %}
     image: ckware/ti-cc-tool:2024-03-19
     user: root
     devices:
       - {{ dev.host }}:{{ dev.container }}:rw
+    {% if firmware_url %}
     environment:
-      FIRMWARE_URL: {{ dev.zigbee.firmware }}
+      FIRMWARE_URL: {{ firmware_url }}
+    {% endif %}
     command:
       - -ewv
       - -p
@@ -19,3 +30,4 @@ services:
       {% if dev.zigbee.type | default('') == 'sonoff' %}
       - --bootloader-sonoff-usb
       {% endif %}
+    {% endif %}

@@ -21,6 +21,7 @@
       }}
 
 - name: Download release
+  when: dest is defined
   become: true
   ansible.builtin.get_url:
     url: "{{ github_asset_url }}"

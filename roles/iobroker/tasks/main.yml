@@ -1,3 +1,13 @@
+- name: Determine device firmware URL
+  ansible.builtin.include_tasks:
+    file: zigbee-firmware-url.yml
+  loop: >-
+    {{
+      iobroker_devices |
+      selectattr('zigbee.firmware.url', 'defined') |
+      map(attribute = 'zigbee.firmware')
+    }}
+
 - name: Copy templates
   ansible.builtin.import_tasks:
     file: copy-templates.yml
