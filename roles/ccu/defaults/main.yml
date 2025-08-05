@@ -4,5 +4,3 @@ ccu_root: /data/ccu
 # - HM-MOD-RPI-PCB or
 # - RPI-RF-MOD
 ccu_gpio_header_transceiver: false
-
-ccu_image: ghcr.io/jens-maus/raspberrymatic:latest
