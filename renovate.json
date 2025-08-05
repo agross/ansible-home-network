@@ -11,5 +11,13 @@
   ],
   "docker-compose": {
     "managerFilePatterns": ["/(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$/"]
-  }
+  },
+  "packageRules": [
+    {
+      "description": "No license purchased for newer versions",
+      "matchPackageNames": ["jetbrains/teamcity-server"],
+      "matchManagers": ["docker-compose"],
+      "enabled": false
+    }
+  ]
 }
