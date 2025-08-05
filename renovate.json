@@ -30,6 +30,12 @@
       "enabled": false
     },
     {
+      "description": "Incompatible with TeamCity https://youtrack.jetbrains.com/issue/TW-42495/TeamCity-service-cannot-be-registered-in-Hub-if-Guest-user-is-banned#focus=Comments-27-8784002.0-0",
+      "matchPackageNames": ["jetbrains/hub"],
+      "matchManagers": ["docker-compose"],
+      "enabled": false
+    },
+    {
       "description": "Strange versioning scheme: Z-Stack_3.x.0_coordinator_20240710",
       "matchPackageNames": ["Koenkk/Z-Stack-firmware"],
       "versioning": "regex:_(?<major>\\d+)$"
