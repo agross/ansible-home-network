@@ -4,7 +4,7 @@ traefik_root: "/data/{{ ansible_role_name }}"
 traefik_image_version: traefik:v3.4.5
 
 # renovate: datasource=github-releases packageName=traefik/traefik
-traefik_github_release_version: v3.4.5
+traefik_github_release_version: v3.5.0
 
 traefik_install_method: docker
 
