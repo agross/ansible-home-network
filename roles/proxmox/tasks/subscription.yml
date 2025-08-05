@@ -9,13 +9,16 @@
       ansible.builtin.import_tasks:
         file: github-release.yml
       vars:
-        url: https://api.github.com/repos/Jamesits/pve-fake-subscription/releases/latest
+        url: https://api.github.com/repos/Jamesits/pve-fake-subscription/releases
+        release: "{{ proxmox_pve_fake_subscription_release_version }}"
         asset_name_regex: ^pve-fake-subscription_.*\.deb$
-        dest: /tmp/pve-fake-subscription.deb
+        dest: >-
+          /tmp/pve-fake-subscription-{{ proxmox_pve_fake_subscription_release_version }}.deb
 
     - name: Install pve-fake-subscription.deb
       ansible.builtin.apt:
-        deb: /tmp/pve-fake-subscription.deb
+        deb: >-
+          /tmp/pve-fake-subscription-{{ proxmox_pve_fake_subscription_release_version }}.deb
 
 - name: Add DNS entries blocking license checks
   ansible.builtin.blockinfile:
