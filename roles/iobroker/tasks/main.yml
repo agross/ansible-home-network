@@ -39,14 +39,13 @@
   register: iobroker_restorecon_result
   changed_when: iobroker_restorecon_result.stdout | length > 0
 
-# Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
     file: docker-compose-update.yml
   vars:
     directory: "{{ iobroker_root }}"
-    pull: "{{ docker_update is defined }}"
-    build: "{{ docker_update is defined }}"
+    pull: true
+    build: true
     notify: Restart iobroker service # noqa: var-naming[no-reserved]
 
 - name: Add vm.overcommit_memory sysctl for Redis

@@ -22,7 +22,7 @@ networks:
 
 services:
   redis:
-    image: redis:alpine
+    image: redis:8.2-alpine
 
     restart: unless-stopped
     environment:
@@ -41,11 +41,7 @@ services:
       net.core.somaxconn: 512
 
   app:
-    image: {{ iobroker_image }}
-    pull_policy: never
-    build:
-      context: ./iobroker/docker
-
+    image: buanet/iobroker:v11.0.0
     restart: unless-stopped
     env_file: ./iobroker/.env
     hostname: iobroker
