@@ -12,8 +12,8 @@
   ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
     directory: "{{ freshrss_root }}"
-    pull: "{{ docker_update is defined }}"
-    build: "{{ docker_update is defined }}"
+    pull: true
+    build: true
     notify: Restart freshrss service # noqa: var-naming[no-reserved]
 
 - name: Symlink backup configuration
