@@ -8,10 +8,10 @@ dns_server_adguard_arch_to_package_suffix:
   arm64: arm64
   x86_64: amd64
 
-# renovate: datasource=github-releases depName=AdGuard packageName=AdguardTeam/AdGuardHome
+# renovate: github-releases=AdguardTeam/AdGuardHome depName=AdGuard
 dns_server_adguard_release_version: v0.107.64
 
-# renovate: datasource=github-releases depName=DNSCrypt-Proxy packageName=DNSCrypt/dnscrypt-proxy
+# renovate: github-releases=DNSCrypt/dnscrypt-proxy depName=DNSCrypt-Proxy
 dns_server_dnscrypt_release_version: 2.1.12
 
 dns_server_download_assets:

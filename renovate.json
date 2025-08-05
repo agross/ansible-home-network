@@ -18,16 +18,7 @@
       "customType": "regex",
       "managerFilePatterns": ["/(^|/).+\\.ya?ml$/"],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_version:\\s*(?<currentValue>.+?)\\s"
-      ]
-    },
-    {
-      "description": "Magic comments (docker image:tag)",
-      "customType": "regex",
-      "managerFilePatterns": ["/(^|/).+\\.ya?ml$/"],
-      "datasourceTemplate": "docker",
-      "matchStrings": [
-        "# renovate: datasource=docker(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_version:\\s*(?<packageName>.+?):(?<currentValue>.+?)\\s"
+        "# renovate: (?<datasource>[a-z-]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_version:\\s*(?<currentValue>.+?)\\s"
       ]
     }
   ],

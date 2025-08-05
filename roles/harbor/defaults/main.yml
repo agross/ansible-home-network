@@ -1,6 +1,6 @@
 harbor_root: "/data/{{ ansible_role_name }}"
 
-# renovate: datasource=github-releases depName=Harbor packageName=goharbor/harbor
+# renovate: github-releases=goharbor/harbor depName=Harbor
 harbor_installer_version: v2.12.2
 
 harbor_installer_url: >-
