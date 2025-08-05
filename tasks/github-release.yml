@@ -9,7 +9,10 @@
   ansible.builtin.set_fact:
     github_asset_url: >-
       {{
-        github_release_json.json.assets |
+        (
+          github_release_json.json |
+          selectattr('tag_name', 'equalto', release | ansible.builtin.mandatory)
+        )[0].assets |
         selectattr('name',
                    'ansible.builtin.search',
                    asset_name_regex | ansible.builtin.mandatory) |

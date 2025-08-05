@@ -2,7 +2,8 @@
   ansible.builtin.include_tasks:
     file: github-release.yml
   vars:
-    url: https://api.github.com/repos/traefik/traefik/releases/latest
+    url: https://api.github.com/repos/traefik/traefik/releases
+    release: "{{ traefik_github_release_version }}"
     asset_name_regex: >-
       ^traefik_v3\..*_{{
         ansible_system | lower | ansible.builtin.regex_escape
