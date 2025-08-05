@@ -2,7 +2,8 @@
   ansible.builtin.include_tasks:
     file: github-release.yml
   vars:
-    url: https://api.github.com/repos/pdf/zfs_exporter/releases/latest
+    url: https://api.github.com/repos/pdf/zfs_exporter/releases
+    release: "{{ zfs_exporter_release_version }}"
     asset_name_regex: >-
       ^zfs_exporter-.*\.{{
         ansible_system | lower | ansible.builtin.regex_escape
@@ -10,11 +11,11 @@
         zfs_exporter_arch_to_package_suffix[ansible_architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
-    dest: /tmp/zfs_exporter.tar.gz
+    dest: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz"
 
 - name: Create extraction directory
   ansible.builtin.file:
-    path: /tmp/zfs_exporter.tar.gz-extracted
+    path: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz-extracted"
     state: directory
     owner: 0
     group: 0
@@ -22,12 +23,12 @@
 
 - name: Extract downloaded release
   ansible.builtin.unarchive:
-    src: /tmp/zfs_exporter.tar.gz
+    src: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz"
     remote_src: true
     extra_opts:
       - --strip-components=1
       - --show-stored-names
-    dest: /tmp/zfs_exporter.tar.gz-extracted
+    dest: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz-extracted"
     owner: 0
     group: 0
 
@@ -41,7 +42,8 @@
 
 - name: Copy release binary
   ansible.builtin.copy:
-    src: /tmp/zfs_exporter.tar.gz-extracted/zfs_exporter
+    src: >-
+      /tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz-extracted/zfs_exporter
     remote_src: true
     dest: /usr/local/bin/
     owner: 0
