@@ -1,9 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "rebaseWhen": "behind-base-branch",
+  "extends": [
+    "config:recommended",
+    ":approveMajorUpdates",
+    ":disableDigestUpdates",
+    ":disableRateLimiting",
+    ":enableVulnerabilityAlerts",
+    ":rebaseStalePrs",
+    ":semanticCommitsDisabled"
+  ],
   "docker-compose": {
-    "managerFilePatterns": [
-      "/(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$/"
-    ]
+    "managerFilePatterns": ["/(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$/"]
   }
 }
