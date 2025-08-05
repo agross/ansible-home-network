@@ -36,7 +36,7 @@ services:
       - /opt/hub/logs:rw,noexec,nosuid,size=65536k,uid=13001,gid=13001
 
   app:
-    image: jetbrains/teamcity-server:2023.05.6
+    image: jetbrains/teamcity-server:2025.03.3
     mem_limit: 3072m
     ports:
       - 8111:8111
