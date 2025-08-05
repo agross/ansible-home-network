@@ -9,8 +9,8 @@
   ansible.builtin.import_tasks: docker-compose-update.yml
   vars:
     directory: "{{ commafeed_root }}"
-    pull: "{{ docker_update is defined }}"
-    build: "{{ docker_update is defined }}"
+    pull: true
+    build: true
     notify: Restart commafeed service # noqa: var-naming[no-reserved]
 
 - name: Symlink backup configuration
