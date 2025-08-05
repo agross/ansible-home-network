@@ -68,7 +68,7 @@ services:
         condition: service_healthy
 
   search:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.0
     ports:
       - 127.0.0.1:9200:9200
     environment:
