@@ -30,6 +30,12 @@
       "enabled": false
     },
     {
+      "description": "Newer versions seem incompatible with TeamCity",
+      "matchPackageNames": ["jetbrains/hub"],
+      "matchManagers": ["docker-compose"],
+      "enabled": false
+    },
+    {
       "description": "Strange versioning scheme: Z-Stack_3.x.0_coordinator_20240710",
       "matchPackageNames": ["Koenkk/Z-Stack-firmware"],
       "versioning": "regex:_(?<major>\\d+)$"
