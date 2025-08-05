@@ -8,9 +8,16 @@ dns_server_adguard_arch_to_package_suffix:
   arm64: arm64
   x86_64: amd64
 
+# renovate: datasource=github-releases depName=AdGuard packageName=AdguardTeam/AdGuardHome
+dns_server_adguard_release_version: v0.107.64
+
+# renovate: datasource=github-releases depName=DNSCrypt-Proxy packageName=DNSCrypt/dnscrypt-proxy
+dns_server_dnscrypt_release_version: 2.1.12
+
 dns_server_download_assets:
   adguard:
-    url: https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest
+    url: https://api.github.com/repos/AdguardTeam/AdGuardHome/releases
+    release: "{{ dns_server_adguard_release_version }}"
     asset_name_regex: >-
       ^AdGuardHome_{{
         ansible_system | lower | ansible.builtin.regex_escape
@@ -18,18 +25,19 @@ dns_server_download_assets:
         dns_server_adguard_arch_to_package_suffix[ansible_architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
-    tmp: /tmp/adguard.tar.gz
+    tmp: "/tmp/adguard-{{ dns_server_adguard_release_version }}.tar.gz"
     binary: AdGuardHome/AdGuardHome
     dest: "{{ dns_server_root }}/bin/AdGuardHome"
   dnscrypt:
-    url: https://api.github.com/repos/DNSCrypt/dnscrypt-proxy/releases/latest
+    url: https://api.github.com/repos/DNSCrypt/dnscrypt-proxy/releases
+    release: "{{ dns_server_dnscrypt_release_version }}"
     asset_name_regex: >-
       ^dnscrypt-proxy-{{
         ansible_system | lower | ansible.builtin.regex_escape
       }}_{{
         ansible_architecture | ansible.builtin.regex_escape
       }}-.*\.tar\.gz$
-    tmp: /tmp/dnscrypt-proxy.tar.gz
+    tmp: "/tmp/dnscrypt-proxy-{{ dns_server_dnscrypt_release_version }}.tar.gz"
     binary: >-
       {{ ansible_system | lower }}-{{ ansible_architecture }}/dnscrypt-proxy
     dest: "{{ dns_server_root }}/bin/dnscrypt-proxy"

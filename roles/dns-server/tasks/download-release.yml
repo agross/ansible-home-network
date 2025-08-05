@@ -4,6 +4,7 @@
   loop: "{{ assets }}"
   vars:
     url: "{{ item.value.url }}"
+    release: "{{ item.value.release }}"
     asset_name_regex: "{{ item.value.asset_name_regex }}"
     dest: "{{ item.value.tmp }}"
 
