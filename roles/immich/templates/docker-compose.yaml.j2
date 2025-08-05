@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    image: ghcr.io/immich-app/immich-server:v1.137.3
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./app:/data
@@ -15,14 +15,14 @@ services:
       - db
 
   machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    image: ghcr.io/immich-app/immich-machine-learning:v1.137.3
     volumes:
       - ml-model-cache:/cache
     env_file:
       - .env
 
   redis:
-    image: redis:alpine
+    image: redis:8.2-alpine
     volumes:
       - ./redis:/data
     healthcheck:
