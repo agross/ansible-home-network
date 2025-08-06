@@ -49,6 +49,7 @@
     owner: 0
     group: 0
     mode: "755"
+  notify: Restart zfs_exporter service
 
 - name: Template systemd service
   ansible.builtin.template:
