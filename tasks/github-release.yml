@@ -1,4 +1,4 @@
-- name: Get latest release from GitHub
+- name: Get release information from GitHub
   ansible.builtin.uri:
     url: "{{ url }}"
     headers: "{{ github_release_request_headers | default(omit) }}"
@@ -20,7 +20,7 @@
         first
       }}
 
-- name: Download release
+- name: Download release asset
   when: dest is defined
   become: true
   ansible.builtin.get_url:
