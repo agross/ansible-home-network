@@ -3,6 +3,7 @@
   become: true
   gather_facts: true
   vars:
+    # renovate: custom.fedora=Server depName=Fedora Server
     fedora_release: 42
   tasks:
     - name: Skip host unless it is Fedora

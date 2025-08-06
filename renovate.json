@@ -18,10 +18,19 @@
       "customType": "regex",
       "managerFilePatterns": ["/(^|/).+\\.ya?ml$/"],
       "matchStrings": [
-        "# renovate: (?<datasource>[a-z-]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?\\w+?:\\s*(?<currentValue>.+?)\\s"
+        "# renovate: (?<datasource>[a-z-.]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?\\w+?:\\s*(?<currentValue>.+?)\\s"
       ]
     }
   ],
+  "customDatasources": {
+    "fedora": {
+      "defaultRegistryUrlTemplate": "https://fedoraproject.org/releases.json",
+      "format": "json",
+      "transformTemplates": [
+        "{ \"releases\": $[variant=\"{{ packageName }}\"][subvariant=\"{{ packageName }}\"][arch=\"x86_64\"].{ \"version\": version, \"isStable\": true, \"sourceUrl\": link, \"changelogUrl\": \"https://fedoraproject.org/wiki/Releases/\" & version & \"/ChangeSet\" }, \"sourceUrl\": \"https://fedoraproject.org/releases.json\", \"homepage\": \"https://fedoraproject.org\" }"
+      ]
+    }
+  },
   "packageRules": [
     {
       "description": "No license purchased for newer versions",
