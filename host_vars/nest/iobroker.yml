@@ -17,7 +17,7 @@ iobroker_devices:
       firmware:
         url: https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
         # renovate: github-releases=Koenkk/Z-Stack-firmware
-        release: Z-Stack_3.x.0_coordinator_20240710
+        release: Z-Stack_3.x.0_router_20250403
         asset_name_regex: >-
           ^CC1352P2_CC2652P_launchpad_coordinator
 
