@@ -1,0 +1,29 @@
+- name: Get current firmware information
+  delegate_to: localhost
+  ansible.builtin.uri:
+    url: >-
+      http://{{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+    return_content: true
+  changed_when: false
+  register: tasmota_update_current_firmware
+
+- name: Determine Tasmota version and variant
+  ansible.builtin.set_fact:
+    tasmota_update_current_firmware_version: >-
+      {{
+        tasmota_update_current_firmware.json.StatusFWR.Version |
+        ansible.builtin.regex_replace('\(.*', '')
+      }}
+    tasmota_update_tasmota_variant: >-
+      {{
+        tasmota_update_current_firmware.json.StatusFWR.Version |
+        ansible.builtin.regex_replace('.*\(release-(.*)\)$', '\1')
+      }}
+
+- name: Remove host if no update is required
+  ansible.builtin.meta: end_host
+  when: >-
+    tasmota_update_current_firmware_version
+    is version(tasmota_update_version, '>=')

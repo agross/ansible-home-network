@@ -3,8 +3,11 @@
     msg: >-
       Upgrading from {{
         tasmota_update_current_firmware.json.StatusFWR.Version
-      }} to {{
-        tasmota_update_latest_release_version
+      }}
+      ({{
+        tasmota_update_current_firmware_version
+      }}) to {{
+        tasmota_update_version
       }}
   changed_when: false
 
@@ -50,4 +53,4 @@
       }}
   changed_when: >-
     tasmota_update_current_firmware.json.StatusFWR.Version
-      is version(tasmota_update_new_firmware.json.StatusFWR.Version, '!=')
+    is version(tasmota_update_new_firmware.json.StatusFWR.Version, '!=')

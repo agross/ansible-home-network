@@ -1,6 +1,6 @@
 - name: Get latest release
   ansible.builtin.import_tasks:
-    file: latest-release.yml
+    file: update-required.yml
 
 - name: Determine upgrade URL
   ansible.builtin.import_tasks:

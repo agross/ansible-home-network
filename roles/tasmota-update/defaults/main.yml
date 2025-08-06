@@ -1,6 +1,19 @@
-tasmota_update_version_info:
-  tasmota: https://ota.tasmota.com/tasmota/release/release.php
-  tasmota32: https://ota.tasmota.com/tasmota32/release/release.php
+# renovate: github-releases=arendst/Tasmota
+tasmota_update_version: 15.0.1
+
+tasmota_update_ota_release:
+  tasmota: >-
+    http://ota.tasmota.com/tasmota/release-{{
+      tasmota_update_version
+    }}/{{
+      tasmota_update_ota_file | default('tasmota.bin.gz')
+    }}
+  tasmota32: >-
+    http://ota.tasmota.com/tasmota32/release-{{
+      tasmota_update_version
+    }}/{{
+      tasmota_update_ota_file | default('tasmota32.bin')
+    }}
 
 tasmota_user: admin
 

@@ -13,24 +13,9 @@
   ansible.builtin.set_fact:
     tasmota_update_ota_url: >-
       {{
-        tasmota_update_latest_release.results |
-        selectattr('item.key', 'equalto', tasmota_update_tasmota_variant) |
-        map(attribute = 'json') |
-        first |
-        community.general.json_query(url_query)
+        tasmota_update_ota_release[tasmota_update_tasmota_variant]
       }}
-  vars:
-    url_query: >-
-      "{{
-        tasmota_update_latest_release_key
-      }}"[?variant=='{{
-        tasmota_update_tasmota_variant
-      }}'].otaurl | [0]
-
-- name: Fail if the OTA URL is invalid
-  when: not tasmota_update_ota_url is url
-  ansible.builtin.fail:
-    msg: "{{ tasmota_update_ota_url }} is not a valid URL"
+  failed_when: not tasmota_update_ota_url is url
 
 - name: Set upgrade URL
   when: tasmota_update_original_ota_url.json.OtaUrl != tasmota_update_ota_url
@@ -44,8 +29,6 @@
       }}{{
         tasmota_credentials | default('')
       }}
-    return_content: true
-  register: ota_url
 
 - name: Show upgrade URL
   ansible.builtin.debug:
