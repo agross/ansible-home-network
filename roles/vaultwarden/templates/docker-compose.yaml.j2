@@ -35,7 +35,7 @@ services:
   app:
     image: vaultwarden/server:1.34.3-alpine
     restart: unless-stopped
-    user: {{ vaultwarden_uid_gid | ansible.builtin.mandatory }}:{{ vaultwarden_uid_gid }}
+    user: "{{ vaultwarden_uid_gid | ansible.builtin.mandatory }}:{{ vaultwarden_uid_gid }}"
     ports:
       - 4004:80
     volumes:
