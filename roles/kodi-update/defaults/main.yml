@@ -1,1 +1,14 @@
-kodi_release_url: https://kodi.tv/download/android
+# renovate: github-releases=xbmc/xbmc versioning=loose
+kodi_update_version: 21.2-Omega
+
+kodi_update_version_nosuffix: >-
+  {{
+    kodi_update_version |
+    ansible.builtin.split('-') |
+    first
+  }}
+
+kodi_update_release_url: >-
+  https://mirrors.kodi.tv/releases/android/arm64-v8a/kodi-{{
+  kodi_update_version
+  }}-arm64-v8a.apk?https=1

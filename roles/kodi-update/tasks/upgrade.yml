@@ -1,7 +1,8 @@
-- name: Show firmware version
+- name: Show current and target version
   ansible.builtin.debug:
     msg: >-
-      Upgrading from {{ installed_version }} to {{ latest_release_version }}
+      Upgrading from {{ kodi_update_installed_version }} to
+      {{ kodi_update_version_nosuffix }}
   changed_when: false
 
 - name: Create temporary file for package download
@@ -9,14 +10,14 @@
   ansible.builtin.tempfile:
     state: file
     suffix: .apk
-  register: package
+  register: kodi_update_package
   changed_when: false
 
 - name: Download package
   delegate_to: localhost
   ansible.builtin.get_url:
-    url: "{{ kodi_release_package_url }}"
-    dest: "{{ package.path }}"
+    url: "{{ kodi_update_release_url }}"
+    dest: "{{ kodi_update_package.path }}"
     force: true
     mode: "644"
   changed_when: false
@@ -28,5 +29,5 @@
       - adb
       - install
       - -r
-      - "{{ package.path }}"
+      - "{{ kodi_update_package.path }}"
   changed_when: true

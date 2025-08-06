@@ -12,22 +12,22 @@
   ansible.builtin.shell: # noqa risky-shell-pipe
     cmd: >-
       adb shell dumpsys package packages |
-        grep -E 'Package \[|versionName' |
-        grep -A 1 org.xbmc.kodi
-  register: installed_packages
+      grep -E 'Package \[|versionName' |
+      grep -A 1 org.xbmc.kodi
+  register: kodi_update_installed_packages
   changed_when: false
 
 - name: Determine installed version
   ansible.builtin.set_fact:
-    installed_version: >-
+    kodi_update_installed_version: >-
       {{
-        installed_packages.stdout_lines[1] |
-          regex_replace('.*versionName=', '')
+        kodi_update_installed_packages.stdout_lines[1] |
+        ansible.builtin.regex_replace('.*versionName=', '')
       }}
 
 - name: Remove host if no update is required
   ansible.builtin.meta: end_host
   when: >-
-    installed_version is defined and
-    latest_release_version is defined and
-    installed_version is version(latest_release_version, '>=')
+    kodi_update_installed_version is defined and
+    kodi_update_version_nosuffix is defined and
+    kodi_update_installed_version is version(kodi_update_version_nosuffix, '>=')
