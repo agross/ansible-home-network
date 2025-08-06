@@ -50,8 +50,9 @@
       "versioning": "regex:(?<compatibility>\\w+)_(?<major>\\d+)$"
     },
     {
-      "description": "Updates require manual backup and restore",
+      "description": "Major updates require manual backup and restore",
       "matchPackageNames": ["postgres"],
+      "matchUpdateTypes": ["major"],
       "enabled": false
     }
   ]
