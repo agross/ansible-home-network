@@ -164,7 +164,6 @@ go2rtc:
   streams:
     east:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@east.cam.{{ network.domain }}:554/Preview_01_main
-      # - ffmpeg:east#video=h264#audio=opus#hardware#height=1080
     east-h264:
       - ffmpeg:east#input=vaapi_input#video=h265_to_h264_1080p#audio=opus
     east-preview:
@@ -172,7 +171,6 @@ go2rtc:
 
     south:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@south.cam.{{ network.domain }}:554/Preview_01_main
-      # - ffmpeg:south#video=h264#audio=opus#hardware#height=1080
     south-h264:
       - ffmpeg:south#input=vaapi_input#video=h265_to_h264_1080p#audio=opus
     south-preview:
@@ -180,7 +178,6 @@ go2rtc:
 
     west:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@west.cam.{{ network.domain }}:554/Preview_01_main
-      # - ffmpeg:west#video=h264#audio=opus#hardware#height=1080
     west-h264:
       - ffmpeg:west#input=vaapi_input#video=h265_to_h264_1080p#audio=opus
     west-preview:
