@@ -40,7 +40,7 @@ quiet-ra
 # Advertise path MTU as reported by "ip address show he-ipv6".
 # Interval 600s
 # Lifetime 0 means the prefix is announced, but we are not a router.
-ra-param={{ interfaces.lan.device | mandatory }}, mtu:1472, 600, 0
+ra-param={{ interfaces.lan.device | mandatory }}, mtu:1472, {{ '600s' | community.general.to_seconds | int }}, 0
 
 dhcp-hostsfile={{ dns_server_root }}/dnsmasq/dhcp-hosts
 
