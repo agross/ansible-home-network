@@ -13,6 +13,6 @@ http:
         referrerPolicy: strict-origin-when-cross-origin
 
         # HSTS.
-        stsSeconds: 31536000 # Strict-Transport-Security: max-age
+        stsSeconds: {{ '365d' | community.general.to_seconds | int }} # Strict-Transport-Security: max-age
         stsIncludeSubdomains: false
         stsPreload: false
