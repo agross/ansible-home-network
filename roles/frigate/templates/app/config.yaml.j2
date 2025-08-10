@@ -22,6 +22,7 @@ auth:
     - {{ network.ip4 }}
   # Does not work with IPv6, at least not until 0.16.
   # failed_login_rate_limit: 1/second;5/minute;20/hour
+  session_length: {{ '7d' | community.general.to_seconds | int }}
 
 ui:
   time_format: 24hour
