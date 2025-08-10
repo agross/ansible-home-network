@@ -29,9 +29,7 @@ services:
       TZ: Europe/Berlin
     networks:
       default:
-    command: /usr/local/etc/redis/redis.conf
     volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       - ./redis/data:/data
     healthcheck:
       test: redis-cli ping | grep -xq PONG
