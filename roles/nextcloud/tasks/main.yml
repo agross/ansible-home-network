@@ -95,7 +95,8 @@
     path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
 
 - name: Install systemd units
-  ansible.builtin.import_tasks: systemd-install-units.yml
+  ansible.builtin.import_tasks:
+    file: systemd-install-units.yml
   vars:
     directory: "{{ nextcloud_root }}/systemd"
     local_units: templates/systemd

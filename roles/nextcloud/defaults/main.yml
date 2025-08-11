@@ -1,4 +1,4 @@
-nextcloud_root: /data/nextcloud
+nextcloud_root: "/data/{{ ansible_role_name }}"
 nextcloud_domain: "cloud.{{ network.domain | ansible.builtin.mandatory }}"
 
 nextcloud_upgrade_timeout: 3m

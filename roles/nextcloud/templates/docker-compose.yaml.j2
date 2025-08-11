@@ -155,7 +155,7 @@ services:
       - ./app/config:/var/www/html/config
       - ./app/data:/var/www/html/data
       - ./app/themes:/var/www/html/themes
-      - ./cron/www-data:/var/spool/cron/crontabs/www-data:ro,z
+      - ./cron/www-data:/var/spool/cron/crontabs/www-data:ro
     depends_on:
       db:
         condition: service_healthy
@@ -187,7 +187,7 @@ services:
       - ./app/config:/var/www/html/config
       - ./app/data:/var/www/html/data
       - ./app/themes:/var/www/html/themes
-      - ./app/hooks/post-upgrade:/docker-entrypoint-hooks.d/post-upgrade:ro,z
+      - ./app/hooks/post-upgrade:/docker-entrypoint-hooks.d/post-upgrade:ro
     labels:
       traefik.enable: true
       traefik.http.routers.nextcloud.entrypoints: https
