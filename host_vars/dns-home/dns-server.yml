@@ -5,6 +5,10 @@ dns_server_firewalld_services:
   - dhcpv6
   - dns
   - http
+  # AdGuard UI.
+  - http
+  # dnscrypt-proxy UI.
+  - jenkins
 
 dns_server_remote_servers:
   - server: "{{ hostvars['gateway-ogd'].dns.servers | first }}"

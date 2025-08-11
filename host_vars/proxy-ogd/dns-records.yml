@@ -1,5 +1,6 @@
 dns_cname_records:
   - "adguard.{{ network.domain }}"
+  - "dnscrypt.{{ network.domain }}"
   - "cockpit.{{ network.domain }}"
 
   # - "{{ logger_grafana_domain | ansible.builtin.mandatory }}"

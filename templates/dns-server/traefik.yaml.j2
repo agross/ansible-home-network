@@ -6,8 +6,32 @@ http:
       rule: Host(`adguard.{{ network.domain }}`)
       service: {{ ansible_role_name }}-adguard
 
+    {{ ansible_role_name }}-dnscrypt:
+      entrypoints: https
+      rule: Host(`dnscrypt.{{ network.domain }}`)
+      service: {{ ansible_role_name }}-dnscrypt
+      middlewares:
+        - {{ ansible_role_name }}-dnscrypt-ipallowlist
+
+  middlewares:
+    {{ ansible_role_name }}-dnscrypt-ipallowlist:
+      ipAllowList:
+        sourceRange:
+          - 127.0.0.1/32
+          - {{ hostvars['gateway-ogd'].network.ip4 }}
+          - {{ hostvars['gateway-ogd'].network.ip6 }}
+          - {{ hostvars['gateway-home'].network.ip4 }}
+          - {{ hostvars['gateway-home'].network.ip6 }}
+          - fe80::/10
+          - fc00::/7
+
   services:
     {{ ansible_role_name }}-adguard:
       loadBalancer:
         servers:
           - url: http://{{ interfaces.lan.ip4.address }}
+
+    {{ ansible_role_name }}-dnscrypt:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8080

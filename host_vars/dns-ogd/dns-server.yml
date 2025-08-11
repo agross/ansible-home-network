@@ -4,7 +4,10 @@ dns_server_firewalld_services:
   - dhcp
   - dhcpv6
   - dns
+  # AdGuard UI.
   - http
+  # dnscrypt-proxy UI.
+  - jenkins
 
 dns_server_remote_servers:
   - server: "{{ hostvars['gateway-home'].dns.servers | first }}"
