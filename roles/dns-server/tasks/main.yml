@@ -29,10 +29,13 @@
     target: "{{ dns_server_root }}"
     notify: Restart dns-server service # noqa: var-naming[no-reserved]
 
-- name: Attempt to quickly reload dnsmasq
+- name: Attempt to quickly reload services
   ansible.builtin.systemd_service:
-    name: dnsmasq.service
+    name: "{{ item }}"
     state: reloaded
+  loop:
+    - dnscrypt-proxy.service
+    - dnsmasq.service
   failed_when: false
 
 - name: Ensure packages are installed

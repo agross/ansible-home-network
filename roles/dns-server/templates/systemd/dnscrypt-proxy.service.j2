@@ -10,6 +10,9 @@ WorkingDirectory={{ dns_server_root }}/dnscrypt-proxy
 
 ExecStart={{ dns_server_download_assets.dnscrypt.dest }} -config ./dnscrypt-proxy.toml -loglevel 2
 
+# Since 2.1.13.
+ExecReload=/usr/bin/kill -HUP $MAINPID
+
 Restart=on-failure
 RestartSec=5s
 
