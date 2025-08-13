@@ -1,0 +1,12 @@
+github_runner_url: https://github.com/GROSSWEBER
+
+github_runner_instances:
+  alpha:
+    url: "{{ github_runner_url }}"
+    token: '{{ vault_github_runner_instance_token_alpha }}'
+  beta:
+    url: "{{ github_runner_url }}"
+    token: '{{ vault_github_runner_instance_token_beta }}'
+  gamma:
+    url: "{{ github_runner_url }}"
+    token: '{{ vault_github_runner_instance_token_gamma }}'

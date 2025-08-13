@@ -13,3 +13,21 @@
         - apt
         - dnf
         - updates
+
+- name: Install GitHub Runners
+  hosts: github-runners
+  become: true
+  roles:
+    - role: guest-agent
+      tags: guest-agent
+    - role: github-runner
+      tags: github-runner
+    - role: docker
+      tags: docker
+    - role: devsec.hardening.ssh_hardening
+      tags: ssh
+    - role: automatic-updates
+      tags:
+        - apt
+        - dnf
+        - updates

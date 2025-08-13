@@ -1,0 +1,20 @@
+- name: Permamently disable SELinux
+  ansible.posix.selinux:
+    state: permissive
+    policy: targeted
+    update_kernel_param: true
+
+- name: Install tools also installed on GitHub
+  ansible.builtin.package:
+    name:
+      - jq
+      - git
+      - yq
+    state: present
+
+- name: Create runner
+  ansible.builtin.include_tasks:
+    file: create-runner.yml
+  vars:
+    instance: "{{ item }}"
+  loop: "{{ github_runner_instances | ansible.builtin.dict2items }}"

@@ -1,0 +1,76 @@
+- name: Set target directory
+  ansible.builtin.set_fact:
+    github_runner_dir: "/github-runner/{{ instance.key }}"
+
+- name: Remove old runner
+  ansible.builtin.file:
+    state: absent
+    path: "{{ github_runner_dir }}"
+
+- name: Create target directory
+  ansible.builtin.file:
+    path: "{{ github_runner_dir }}"
+    state: directory
+    owner: 1001
+    group: 987
+    mode: "755"
+
+- name: Download GitHub Runner
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/actions/runner/releases/download/v{{ github_runner_version }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
+    dest: /tmp/github-runner.tar.gz
+    owner: 0
+    group: 0
+    mode: "644"
+
+- name: Extract archive
+  ansible.builtin.unarchive:
+    src: /tmp/github-runner.tar.gz
+    remote_src: true
+    dest: "{{ github_runner_dir }}"
+
+- name: Configure GitHub Runner
+  ansible.builtin.command:
+    argv:
+      - "{{ github_runner_dir }}/config.sh"
+      - --unattended
+      - --name
+      - "{{ instance.key }}"
+      - --url
+      - "{{ instance.value.url | ansible.builtin.mandatory }}"
+      - --replace
+      - --token
+      - "{{ instance.value.token | ansible.builtin.mandatory }}"
+  environment:
+    RUNNER_ALLOW_RUNASROOT: "true"
+  register: github_runner_config
+  changed_when: true
+  failed_when: >-
+    github_runner_config.rc != 0 and
+    'Cannot configure the runner because it is already configured' not in github_runner_config.stderr
+
+- name: Install GitHub Runner service
+  ansible.builtin.command:
+    argv:
+      - ./svc.sh
+      - uninstall
+    chdir: "{{ github_runner_dir }}"
+  changed_when: true
+
+- name: Install GitHub Runner service
+  ansible.builtin.command:
+    argv:
+      - ./svc.sh
+      - install
+      - root
+    chdir: "{{ github_runner_dir }}"
+  changed_when: true
+
+- name: Start GitHub Runner service
+  ansible.builtin.command:
+    argv:
+      - ./svc.sh
+      - start
+    chdir: "{{ github_runner_dir }}"
+  changed_when: true
