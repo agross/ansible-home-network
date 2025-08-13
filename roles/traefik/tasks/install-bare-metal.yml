@@ -5,7 +5,7 @@
     url: https://api.github.com/repos/traefik/traefik/releases
     release: "{{ traefik_github_release_version }}"
     asset_name_regex: >-
-      ^traefik_v3\..*_{{
+      ^traefik_v.*_{{
         ansible_system | lower | ansible.builtin.regex_escape
       }}_{{
         traefik_arch_to_package_suffix[ansible_architecture] |

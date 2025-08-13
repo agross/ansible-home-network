@@ -1,6 +1,6 @@
 - name: Get release information from GitHub
   ansible.builtin.uri:
-    url: "{{ url }}"
+    url: "{{ url }}/tags/{{ release | ansible.builtin.mandatory }}"
     headers: "{{ github_release_request_headers | default(omit) }}"
     return_content: true
   register: github_release_json
@@ -9,10 +9,7 @@
   ansible.builtin.set_fact:
     github_asset_url: >-
       {{
-        (
-          github_release_json.json |
-          selectattr('tag_name', 'equalto', release | ansible.builtin.mandatory)
-        )[0].assets |
+        github_release_json.json.assets |
         selectattr('name',
                    'ansible.builtin.search',
                    asset_name_regex | ansible.builtin.mandatory) |
