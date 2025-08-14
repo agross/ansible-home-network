@@ -59,6 +59,11 @@
       "description": "Group ELK stack updates",
       "matchPackageNames": ["/docker\\.elastic\\.co/"],
       "groupName": "ELK Stack"
+    },
+    {
+      "description": "Group Immich updates",
+      "matchPackageNames": ["/immich-app/"],
+      "groupName": "Immich"
     }
   ]
 }
