@@ -1,9 +1,5 @@
-- name: Ensure python3-libselinux is installed
-  ansible.builtin.package:
-    name: python3-libselinux
-    state: present
-
 - name: Permamently disable SELinux
+  when: ansible_virtualization_type != 'lxc'
   ansible.posix.selinux:
     state: permissive
     policy: targeted
