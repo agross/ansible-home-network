@@ -34,8 +34,9 @@ groups:
     ansible_distribution == 'OtherLinux' and
     ansible_devices.synoboot.vendor == 'Synology'
 
-  build_agents: >-
-    inventory_hostname is match("agent-*")
+  teamcity_build_agents: >-
+    inventory_hostname is match("agent-*") and
+    not inventory_hostname is search("docker")
 
   kubes: >-
     inventory_hostname is match("kube-*")

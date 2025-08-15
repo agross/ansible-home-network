@@ -1,39 +1,34 @@
-- name: Install TeamCity build agent
-  hosts: build_agents
+- name: Prepare build agent
+  hosts:
+    - teamcity_build_agents
+    - agent-docker
+    - github-runners
   become: true
   roles:
     - role: guest-agent
       tags: guest-agent
-    - role: node-exporter
-      tags: node-exporter
-    - role: build-agent
-      tags: build-agent
-    - role: docker
-      tags: docker
     - role: devsec.hardening.ssh_hardening
       tags: ssh
+    - role: node-exporter
+      tags: node-exporter
     - role: automatic-updates
       tags:
         - apt
         - dnf
         - updates
+    - role: docker
+      tags: docker
+
+- name: Install TeamCity build agent
+  hosts: teamcity_build_agents
+  become: true
+  roles:
+    - role: build-agent
+      tags: build-agent
 
 - name: Install GitHub Runners
   hosts: github-runners
   become: true
   roles:
-    - role: guest-agent
-      tags: guest-agent
-    - role: node-exporter
-      tags: node-exporter
     - role: github-runner
       tags: github-runner
-    - role: docker
-      tags: docker
-    - role: devsec.hardening.ssh_hardening
-      tags: ssh
-    - role: automatic-updates
-      tags:
-        - apt
-        - dnf
-        - updates
