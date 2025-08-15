@@ -2,6 +2,10 @@
   hosts: build_agents
   become: true
   roles:
+    - role: guest-agent
+      tags: guest-agent
+    - role: node-exporter
+      tags: node-exporter
     - role: build-agent
       tags: build-agent
     - role: docker
@@ -20,6 +24,8 @@
   roles:
     - role: guest-agent
       tags: guest-agent
+    - role: node-exporter
+      tags: node-exporter
     - role: github-runner
       tags: github-runner
     - role: docker
