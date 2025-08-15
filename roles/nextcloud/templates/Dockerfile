@@ -1,4 +1,4 @@
-FROM nextcloud:31.0.7-apache
+FROM nextcloud:31.0.8-apache
 
 RUN apt-get update \
     \
@@ -15,7 +15,8 @@ RUN apt-get update \
     && apt-get install --yes \
                        imagemagick \
     # Enable reading PDFs. https://www.kb.cert.org/vuls/id/332928/ \
-    && sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml \
+    # Not required for ImageMagick >= 7. \
+    && ( sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml || true ) \
     \
     \
     && printf '%bInstalling OCR support.%b\n' '\e[32;1m' '\e[0m' \
