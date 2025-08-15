@@ -2,11 +2,6 @@
   ansible.builtin.set_fact:
     github_runner_dir: "/github-runner/{{ instance.key }}"
 
-- name: Remove old runner
-  ansible.builtin.file:
-    state: absent
-    path: "{{ github_runner_dir }}"
-
 - name: Create target directory
   ansible.builtin.file:
     path: "{{ github_runner_dir }}"

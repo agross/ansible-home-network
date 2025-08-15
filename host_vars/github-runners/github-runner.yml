@@ -1,12 +1,14 @@
 github_runner_url: https://github.com/GROSSWEBER
+# The token is only valid for 1 hour and can be used to configure multiple runners.
+github_runner_token: "{{ vault_github_runner_token }}"
 
 github_runner_instances:
   alpha:
     url: "{{ github_runner_url }}"
-    token: '{{ vault_github_runner_instance_token_alpha }}'
+    token: '{{ github_runner_token }}'
   beta:
     url: "{{ github_runner_url }}"
-    token: '{{ vault_github_runner_instance_token_beta }}'
+    token: '{{ github_runner_token }}'
   gamma:
     url: "{{ github_runner_url }}"
-    token: '{{ vault_github_runner_instance_token_gamma }}'
+    token: '{{ github_runner_token }}'
