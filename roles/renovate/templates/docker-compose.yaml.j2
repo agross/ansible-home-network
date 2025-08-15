@@ -21,6 +21,7 @@ services:
 
   app:
     image: ghcr.io/mend/renovate-ce:11.1.0
+    restart: unless-stopped
     ports:
       - 8080:8080
     environment:
