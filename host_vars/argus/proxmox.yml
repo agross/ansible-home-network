@@ -11,7 +11,7 @@ proxmox:
     - fuse=1
   password: "{{ vault_proxmox_default_root_password }}"
   ssh_public_key_github_account: agross
-  memory: 4096
+  memory: 8192
   netif:
     net0: >-
       name={{ interfaces.lan.device }},ip={{
