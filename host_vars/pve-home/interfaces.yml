@@ -1,7 +1,7 @@
 interfaces:
   management:
-    device: enp36s0f0
-    mtu: 9000
+    device: enmanage0
+    mac: d0:50:99:f8:7b:ed
     ip4:
       address: "{{ network.ip4 | ansible.utils.nthhost(1) }}"
       prefix: "{{ network.ip4 | ansible.utils.ipaddr('prefix') }}"
@@ -9,7 +9,8 @@ interfaces:
       address: "{{ network.ip6 | ansible.utils.nthhost(0x1) }}"
       prefix: "{{ network.ip6 | ansible.utils.ipaddr('prefix') }}"
   lan:
-    device: enp36s0f1
-    mtu: 9000
+    device: enlan0
+    mac: d0:50:99:f8:7b:ee
   wan:
-    device: enp38s0
+    device: enwan0
+    mac: d0:50:99:f8:7b:ec

@@ -1,0 +1,21 @@
+systemd_networkd_link:
+  10-enmanage0:
+    - Match:
+        - MACAddress: "{{ interfaces.management.mac }}"
+        - Type: ether
+    - Link:
+        - Name: "{{ interfaces.management.device }}"
+
+  10-enlan0:
+    - Match:
+        - MACAddress: "{{ interfaces.lan.mac }}"
+        - Type: ether
+    - Link:
+        - Name: "{{ interfaces.lan.device }}"
+
+  10-enwan0:
+    - Match:
+        - MACAddress: "{{ interfaces.wan.mac }}"
+        - Type: ether
+    - Link:
+        - Name: "{{ interfaces.wan.device }}"
