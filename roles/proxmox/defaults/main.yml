@@ -1,5 +1,5 @@
 # renovate: custom.proxmox=virtual-environment depName=Proxmox VE
-proxmox_pve_version: 8.4
+proxmox_pve_version: 9.0
 
 # renovate: github-releases=Jamesits/pve-fake-subscription
 proxmox_pve_fake_subscription_release_version: v0.0.11
