@@ -144,7 +144,9 @@ cameras:
       mask: 0.42,0.074,0.42,0.014,0,0.014,0,0.074
 
     live:
-      stream_name: east-h264
+      streams:
+        h264: east-h264
+        h265: east
 
   south:
     enabled: true
@@ -169,7 +171,9 @@ cameras:
       mask: 0.30,0.07,0.30,0.02,0,0.02,0,0.07
 
     live:
-      stream_name: south-h264
+      streams:
+        h264: south-h264
+        h265: south
 
   west:
     enabled: true
@@ -188,7 +192,9 @@ cameras:
       mask: 0.42,0.074,0.42,0.014,0,0.014,0,0.074
 
     live:
-      stream_name: west-h264
+      streams:
+        h264: west-h264
+        h265: west
 
 # For Reolink cameras:
 # - Preview_01_main == h265
