@@ -27,7 +27,14 @@
       "defaultRegistryUrlTemplate": "https://fedoraproject.org/releases.json",
       "format": "json",
       "transformTemplates": [
-        "{ \"releases\": $[variant=\"{{ packageName }}\"][subvariant=\"{{ packageName }}\"][arch=\"x86_64\"].{ \"version\": version, \"isStable\": true, \"sourceUrl\": link, \"changelogUrl\": \"https://fedoraproject.org/wiki/Releases/\" & version & \"/ChangeSet\" }, \"sourceUrl\": \"https://fedoraproject.org/releases.json\", \"homepage\": \"https://fedoraproject.org\" }"
+        "{ \"releases\": $[variant=\"{{ packageName }}\"][subvariant=\"{{ packageName }}\"][arch=\"x86_64\"].{ \"version\": version, \"isStable\": true, \"changelogUrl\": \"https://fedoraproject.org/wiki/Releases/\" & version & \"/ChangeSet\" }, \"sourceUrl\": \"https://fedoraproject.org/releases.json\", \"homepage\": \"https://fedoraproject.org\" }"
+      ]
+    },
+    "proxmox": {
+      "defaultRegistryUrlTemplate": "https://www.proxmox.com/en/downloads/proxmox-{{ packageName }}/iso",
+      "format": "html",
+      "transformTemplates": [
+        "{ \"releases\": releases[version ~> /\\.iso$/].{ \"version\": $replace($.version, /.*proxmox-ve_(.*)-.*\\.iso$/, '$1') }.{ \"version\": $.version, \"isStable\": true, \"sourceUrl\": \"https://www.proxmox.com/en/downloads/proxmox-virtual-environment/iso\", \"changelogUrl\": \"https://pve.proxmox.com/wiki/Roadmap#Proxmox_VE_\" & $.version } } "
       ]
     }
   },
