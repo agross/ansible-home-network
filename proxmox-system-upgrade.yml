@@ -1,0 +1,134 @@
+- name: Upgrade Proxmox Virtual Environment hosts
+  hosts: hypervisor:&debian
+  become: true
+  gather_facts: true
+  vars:
+    # Do not forget to update proxmox_pve_code_names below.
+    # renovate: custom.proxmox=virtual-environment depName=Proxmox VE
+    proxmox_pve_version: 9.0
+
+    proxmox_pve_code_names:
+      - bookworm
+      - trixie
+  tasks:
+    - name: Get PVE version string
+      ansible.builtin.command:
+        argv:
+          - pveversion
+      register: proxmox_pve_pveversion
+      changed_when: false
+
+    - name: Extract PVE version from string
+      ansible.builtin.set_fact:
+        proxmox_pve_current_version: >-
+          {{
+            proxmox_pve_pveversion.stdout |
+            ansible.builtin.regex_search('pve-manager/(.+)/', '\1') |
+            first
+          }}
+
+    - name: Skip host if it is already upgraded
+      when: >-
+        proxmox_pve_current_version is ansible.builtin.version(proxmox_pve_version, '>=')
+      ansible.builtin.meta: end_host
+
+    - name: Display version to upgrade to
+      ansible.builtin.debug:
+        msg: >-
+          Upgrading Proxmox Virtual Environment from
+          {{ proxmox_pve_current_version }}
+          to
+          {{ proxmox_pve_version }}
+
+    - name: Set upgrade check tool
+      ansible.builtin.set_fact:
+        proxmox_pve_upgrade_check_tool: >-
+          pve{{
+            proxmox_pve_current_version |
+            ansible.builtin.regex_search('^(\d+).', '\1') |
+            first
+          }}to{{
+            proxmox_pve_version |
+            ansible.builtin.regex_search('^(\d+).', '\1') |
+            first
+          }}
+
+    - name: Run upgrade check tool
+      ansible.builtin.command:
+        argv:
+          - "{{ proxmox_pve_upgrade_check_tool }}"
+          - --full
+      register: proxmox_pve_upgrade_check
+      changed_when: false
+
+    - name: Fail if the upgrade check tool reported warnings or errors
+      when: >-
+        not ignore_pve_warnings is defined and
+        warnings_and_failures | length > 0
+      ansible.builtin.fail:
+        msg: >-
+          There are warnings or errors. Run `{{ proxmox_pve_upgrade_check_tool }}`
+          manually. If you are OK with the remaining messages run the playbook
+          with
+          `--extra-args ignore_pve_warnings=` and potentially
+          `--limit {{ inventory_hostname }}`.
+
+          {{ warnings_and_failures | join('\n') }}
+      vars:
+        warnings_and_failures: >-
+          {{
+            proxmox_pve_upgrade_check.stdout_lines |
+            select('ansible.builtin.search', '(WARN|FAIL):')
+          }}
+
+    - name: Iterate apt source files
+      ansible.builtin.find:
+        paths:
+          - /etc/apt
+          - /etc/apt/sources.list.d
+        patterns:
+          - '*.list'
+          - '*.sources'
+        file_type: file
+      register: proxmox_pve_apt_source_files
+
+    - name: Replace suite name in apt source files
+      ansible.builtin.replace:
+        path: "{{ item }}"
+        regexp: >-
+          \b{{
+            proxmox_pve_code_names | first | ansible.builtin.regex_escape
+          }}\b
+        replace: "{{ proxmox_pve_code_names | last }}"
+      loop: >-
+        {{
+          proxmox_pve_apt_source_files.files |
+          map(attribute = 'path')
+        }}
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Show information
+      ansible.builtin.debug:
+        msg: |
+          The update is ready to be carried out manually. Run the following
+          commands using SSH:
+
+          1. Perform upgrade, answer questions, check results.
+
+          sudo apt dist-upgrade
+
+          2. Check for any issues.
+
+          sudo {{ proxmox_pve_upgrade_check_tool }} --full
+
+          3. Reboot the system.
+
+          sudo systemctl reboot
+
+          On systems with DKMS modules installed you may need remove those for
+          the update to succeed, e.g.:
+
+          sudo dpkg --purge gasket-dkms
