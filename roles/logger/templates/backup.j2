@@ -27,13 +27,15 @@ influxdb() {
 
 grafana() {
   local target={{ logger_root | ansible.builtin.quote }}/backups/grafana
+  # renovate: docker=alpine/sqlite
+  local sqlite_version=3.49.2
 
   mkdir --parents -- "$target"
 
   docker run \
          --rm \
          --volumes-from {{ ansible_role_name | ansible.builtin.quote }}-grafana-1 \
-         alpine/sqlite:latest \
+         "alpine/sqlite:$sqlite_version" \
          /var/lib/grafana/grafana.db \
          .dump \
     > "$target/db.sql"

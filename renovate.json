@@ -16,9 +16,9 @@
     {
       "description": "Magic comments",
       "customType": "regex",
-      "managerFilePatterns": ["/(^|/).+\\.ya?ml$/"],
+      "managerFilePatterns": ["/(^|/).+\\.(ya?ml|j2)$/"],
       "matchStrings": [
-        "# renovate: (?<datasource>[a-z-.]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?\\w+?:\\s*(?<currentValue>.+?)\\s"
+        "# renovate: (?<datasource>[a-z-.]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?\\w+?[:=]\\s*(?<currentValue>.+?)\\s"
       ]
     }
   ],
