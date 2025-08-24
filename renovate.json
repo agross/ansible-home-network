@@ -18,7 +18,8 @@
       "customType": "regex",
       "managerFilePatterns": ["/(^|/).+\\.(ya?ml|j2)$/"],
       "matchStrings": [
-        "# renovate: (?<datasource>[a-z-.]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?\\w+?[:=]\\s*(?<currentValue>.+?)\\s"
+        "# renovate: (?<datasource>[a-z-.]+?)=(?<packageName>.+?)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?\\w+?[:=]\\s*(?<currentValue>.+?)\\s",
+        "# renovate: (?<datasource>pypi)(?: depName=(?<depName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?(?<packageName>\\w+?)==\\s*(?<currentValue>.+?)\\s"
       ]
     }
   ],

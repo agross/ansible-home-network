@@ -32,8 +32,10 @@
 - name: Ensure proxmoxer and requests are installed
   ansible.builtin.pip:
     name:
-      - proxmoxer>=2.0
-      - requests
+      # renovate: pypi
+      - proxmoxer==2.2.0
+      # renovate: pypi
+      - requests==2.32.5
     break_system_packages: true
   tags:
     - lxc
