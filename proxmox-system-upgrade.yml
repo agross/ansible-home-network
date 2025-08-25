@@ -73,12 +73,19 @@
           `--extra-args ignore_pve_warnings=` and potentially
           `--limit {{ inventory_hostname }}`.
 
-          {{ warnings_and_failures | join('\n') }}
+
+          {{ warnings_and_failures_message }}
       vars:
         warnings_and_failures: >-
           {{
             proxmox_pve_upgrade_check.stdout_lines |
             select('ansible.builtin.search', '(WARN|FAIL):')
+          }}
+        warnings_and_failures_message: >-
+          {{
+            warnings_and_failures |
+            map('ansible.builtin.regex_replace', '\x1B\[\d+m', '') |
+            ansible.builtin.to_nice_yaml
           }}
 
     - name: Iterate apt source files
