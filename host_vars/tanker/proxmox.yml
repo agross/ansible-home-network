@@ -252,8 +252,8 @@ zfs_datasets:
       group: 112021
   tank/renovate/postgres:
     chown:
-      owner: 100999
-      group: 100999
+      owner: 100070
+      group: 100070
     options:
       prefetch: none
       recordsize: 8K
