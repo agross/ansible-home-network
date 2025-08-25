@@ -70,7 +70,7 @@
           There are warnings or errors. Run `{{ proxmox_pve_upgrade_check_tool }}`
           manually. If you are OK with the remaining messages run the playbook
           with
-          `--extra-args ignore_pve_warnings=` and potentially
+          `--extra-vars ignore_pve_warnings=` and potentially
           `--limit {{ inventory_hostname }}`.
 
 
