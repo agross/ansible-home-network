@@ -85,8 +85,8 @@ ffmpeg:
   output_args:
     # I have 2 RLC-1240A cameras with a main stream resolution of 4512x2512,
     # which is more than the <=4096px the Intel GPU supports. Downscale the
-    # recorded stream to 1080p (1940x1080). -noautoscale also needs to be applied:
-
+    # recorded stream to 1080p (1940x1080).
+    # -noautoscale also needs to be applied:
     record:
       # Frigate's default segment options.
       # https://github.com/blakeblackshear/frigate/blob/c3410cd13eef70b5dbbaaa3f6e86e5ff3bb82740/frigate/ffmpeg_presets.py#L446-L458
@@ -104,9 +104,9 @@ ffmpeg:
       # Video encoding.
       - -c:v
       - h264_vaapi
-      # Scale to 4k.
+      # Scale to 1080p.
       - -vf
-      - scale_vaapi=-2:2160
+      - scale_vaapi=-2:1080
       # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
       - -noautoscale
       # Frigate's default encoding options.
