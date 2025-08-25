@@ -16,6 +16,12 @@
   vars:
     playbook_hosts: ogd:&linux
 
+- name: Import Linux configuration playbook
+  tags: linux
+  ansible.builtin.import_playbook: _linux-like.yml
+  vars:
+    playbook_hosts: ogd:&linux
+
 - name: Import Fedora configuration playbook
   tags: fedora
   ansible.builtin.import_playbook: _fedora.yml
