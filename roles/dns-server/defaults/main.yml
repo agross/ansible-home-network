@@ -12,7 +12,7 @@ dns_server_adguard_arch_to_package_suffix:
 dns_server_adguard_release_version: v0.107.65
 
 # renovate: github-releases=DNSCrypt/dnscrypt-proxy depName=DNSCrypt-Proxy
-dns_server_dnscrypt_release_version: 2.1.13
+dns_server_dnscrypt_release_version: 2.1.14
 
 dns_server_download_assets:
   adguard:
