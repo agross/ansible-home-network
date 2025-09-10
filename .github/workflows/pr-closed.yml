@@ -29,3 +29,35 @@ jobs:
     steps:
       - run: |
           echo The PR was merged
+
+  affected-files-and-roles:
+    name: Show affected files and roles
+    runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Show affected files
+        run: |
+          git diff --name-status {{ github.event.pull_request.base.sha }}..{{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Determine roles from affected files
+        id: affected-roles
+        run: |
+          {
+            echo 'roles<<EOR'
+
+            git diff --name-only {{ github.event.pull_request.base.sha }}..{{ github.event.pull_request.merge_commit_sha }} |
+            grep '^roles' |
+            sed -e 's|roles/\([^/]*\)/.*|\1|' |
+            sort |
+            uniq
+
+            echo EOR
+          } >> "$GITHUB_ENV"
+
+      - name: Show roles
+        env:
+          ROLES: ${{ steps.affected-roles.outputs.roles }}
+        run: >-
+          printf 'Roles affected by the merge: %s\n' "$ROLES"
