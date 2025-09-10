@@ -1,0 +1,31 @@
+name: PR Closed
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  testing:
+    name: Test what happens when closing a PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show env vars
+        run: env
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+
+  if_merged:
+    name: Test what happens when closing a PR by accepting it
+    runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - run: |
+          echo The PR was merged
