@@ -18,7 +18,7 @@ services:
 
   hub:
     image: jetbrains/hub:2025.1.67057
-    mem_limit: 800m
+    mem_limit: 1500m
     ports:
       - 8110:8080
     labels:
@@ -37,7 +37,7 @@ services:
 
   app:
     image: jetbrains/teamcity-server:2023.05.6
-    mem_limit: 3072m
+    mem_limit: 4096m
     ports:
       - 8111:8111
     environment:
