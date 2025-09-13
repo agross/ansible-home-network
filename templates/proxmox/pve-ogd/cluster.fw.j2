@@ -1,18 +1,20 @@
 # {{ ansible_managed }}
 # vim: set ft=jinja-properties ts=2 sw=2 et:
-# Port 22/tcp and 8006/tcp are still allowed. ICMP ping is disabled by default.
+# Port 22/tcp and 8006/tcp from the local IPv4 network are allowed by default.
 
 [OPTIONS]
 
 enable: 1
 
-[IPSET management] # Allow management from hosts behind the WireGuard tunnel.
+[IPSET management] # Allow PVE management (22/tcp, 8006/tcp).
 
-{{ network.wireguard.ip4 | ansible.utils.nthhost(1) | mandatory }} # Remote tunnel endpoint IP.
-{{ hostvars['gateway-home'].network.ip6 | mandatory }} # Remote IPv6 subnet.
+{{ network.ip6 | ansible.builtin.mandatory }} # Local IPv6 subnet.
 
-{{ network.ip6 | mandatory }} # Local IPv6 subnet.
+{{ network.wireguard.ip4 | ansible.builtin.mandatory }} # WireGuard IPv4 subnet.
+{{ network.wireguard.ip6 | ansible.builtin.mandatory }} # WireGuard IPv6 subnet.
+
+{{ hostvars['gateway-home'].network.ip6 | ansible.builtin.mandatory }} # {{ hostvars['gateway-home'].site }} IPv6 subnet.
 
 [RULES]
 
-IN Ping(ACCEPT) -log nolog
+IN Ping(ACCEPT) -log nolog # ICMP ping is disabled by default.
