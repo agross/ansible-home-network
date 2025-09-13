@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Show affected files
         run: |
-          git diff --name-status {{ github.event.pull_request.base.sha }}..{{ github.event.pull_request.merge_commit_sha }}
+          git diff --name-status ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Determine roles from affected files
         id: affected-roles
@@ -47,7 +47,7 @@ jobs:
           {
             echo 'roles<<EOR'
 
-            git diff --name-only {{ github.event.pull_request.base.sha }}..{{ github.event.pull_request.merge_commit_sha }} |
+            git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} |
             grep '^roles' |
             sed -e 's|roles/\([^/]*\)/.*|\1|' |
             sort |
