@@ -37,14 +37,21 @@ jobs:
     if: github.event.pull_request.merged == true
 
     steps:
-      - name: Get git history
+      - name: Get latest code
         uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+
+      - name: Download base commit and merge commit
+        run: |
+          git fetch
+              origin
+              ${{ github.event.pull_request.base.sha }}
+              ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Show affected files
         run: |
-          git diff --name-status ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}
+          git diff
+              --name-status
+              ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Determine roles from affected files
         id: affected-roles
