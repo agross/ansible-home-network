@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Run ansible
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: Tags to apply (comma-separated)
+        required: true
+        type: string
+
+jobs:
+  ansible:
+    strategy:
+      matrix:
+        site:
+          - home
+          - ogd
+
+    runs-on:
+      - self-hosted
+      - ${{ matrix.site }}
+
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v5
+
+      - name: Install ansible
+        run: |
+          sudo dnf install --assumeyes ansible python3-netaddr &&
+          ansible --version
+
+      - name: Save SSH keyfile
+        run: |
+          printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" > .ansible-ssh-private-key &&
+          chmod 600 .ansible-ssh-private-key
+
+      - name: Save ansible vault password for for vault ID "agross2"
+        run: |
+          printf '%s' "${{ secrets.ANSIBLE_VAULT_AGROSS2 }}" > .ansible-vault-agross2 &&
+          chmod 600 .ansible-vault-agross2
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.ansible
+          # Look to see if there is a cache hit for the corresponding
+          # requirements file.
+          key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('**/requirements*.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-ansible-galaxy
+
+      - name: Gather facts
+        run: |
+          ./gather-facts ${{ matrix.site }} \
+                         --vault-id agross2@.ansible-vault-agross2 \
+                         --user agross \
+                         --key-file .ansible-ssh-private-key
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+        # Because some hosts might not be reachable.
+        continue-on-error: true
+
+      - name: Run ansible
+        uses: dawidd6/action-ansible-playbook@v4
+        with:
+          requirements: requirements.yml
+          playbook: ${{ matrix.site }}.yml
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          options: |
+            --tags ${{ github.event.inputs.tags }}
+            --vault-id agross2@.ansible-vault-agross2
+            --user agross
+
+      - name: Clean up secrets
+        if: always()
+        run: |
+          rm .ansible-ssh-private-key \
+             .ansible-vault-agross2
+        # Because files might not exist.
+        continue-on-error: true

@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e
+
 playbook="$(mktemp)"
 
 cat > "$playbook" <<PLAYBOOK
@@ -16,4 +18,6 @@ cat > "$playbook" <<PLAYBOOK
       ansible.builtin.setup:
 PLAYBOOK
 
-ansible-playbook "$playbook"
+shift
+
+ansible-playbook "$playbook" "$@"

@@ -5,10 +5,14 @@ github_runner_token: "{{ vault_github_runner_token }}"
 github_runner_instances:
   alpha:
     url: "{{ github_runner_url }}"
-    token: '{{ github_runner_token }}'
+    token: "{{ github_runner_token }}"
   beta:
     url: "{{ github_runner_url }}"
-    token: '{{ github_runner_token }}'
+    token: "{{ github_runner_token }}"
   gamma:
     url: "{{ github_runner_url }}"
-    token: '{{ github_runner_token }}'
+    token: "{{ github_runner_token }}"
+
+  self-home:
+    url: https://github.com/agross/ansible-home-network
+    token: "{{ vault_github_runner_token_self_home }}"
