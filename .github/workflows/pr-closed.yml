@@ -37,6 +37,11 @@ jobs:
     if: github.event.pull_request.merged == true
 
     steps:
+      - name: Get git history
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
       - name: Show affected files
         run: |
           git diff --name-status ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}
@@ -45,7 +50,7 @@ jobs:
         id: affected-roles
         run: |
           {
-            echo 'roles<<EOR'
+            echo 'roles=<<EOR'
 
             git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} |
             grep '^roles' |
