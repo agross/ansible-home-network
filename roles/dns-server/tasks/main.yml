@@ -4,7 +4,7 @@
   vars:
     directory: ../templates
     target: "{{ dns_server_root }}"
-    notify: Restart dns-server service # noqa: var-naming[no-reserved]
+    notify_: Restart dns-server service
     files:
       adguard:
         owner: 0
@@ -27,7 +27,7 @@
   vars:
     directory: "templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
     target: "{{ dns_server_root }}"
-    notify: Restart dns-server service # noqa: var-naming[no-reserved]
+    notify_: Restart dns-server service
 
 - name: Attempt to quickly reload services
   ansible.builtin.systemd_service:
@@ -63,7 +63,7 @@
   vars:
     directory: "{{ dns_server_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart dns-server service # noqa: var-naming[no-reserved]
+    notify_: Restart dns-server service
 
 - name: Ensure dnsmasq systemd override directory exists
   ansible.builtin.file:
@@ -88,7 +88,7 @@
   vars:
     directory: templates/systemd-resolved/resolved.conf.d
     target: /etc/systemd/resolved.conf.d
-    notify: Restart systemd-resolved service # noqa: var-naming[no-reserved]
+    notify_: Restart systemd-resolved service
 
 - name: Start systemd-resolved
   ansible.builtin.systemd:

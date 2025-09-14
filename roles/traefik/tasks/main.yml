@@ -11,7 +11,7 @@
   vars:
     directory: ../templates
     target: "{{ traefik_root }}"
-    notify: Restart traefik service  # noqa: var-naming[no-reserved]
+    notify_: Restart traefik service
     files:
       systemd/traefik.service.j2:
         mode: "600"
@@ -41,7 +41,7 @@
   vars:
     directory: "{{ traefik_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart traefik service  # noqa: var-naming[no-reserved]
+    notify_: Restart traefik service
 
 - name: Start systemd units
   ansible.builtin.systemd:

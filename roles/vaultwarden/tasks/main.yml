@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ vaultwarden_root }}"
-    notify: Restart vaultwarden service # noqa: var-naming[no-reserved]
+    notify_: Restart vaultwarden service
     files:
       .env.vaultwarden.j2:
         owner: 0
@@ -16,7 +16,7 @@
     directory: "{{ vaultwarden_root }}"
     pull: true
     build: true
-    notify: Restart vaultwarden service # noqa: var-naming[no-reserved]
+    notify_: Restart vaultwarden service
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -38,7 +38,7 @@
   vars:
     directory: "{{ vaultwarden_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart vaultwarden service # noqa: var-naming[no-reserved]
+    notify_: Restart vaultwarden service
 
 - name: Start service
   ansible.builtin.systemd:

@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ harbor_root }}"
-    notify: Restart harbor service # noqa: var-naming[no-reserved]
+    notify_: Restart harbor service
 
 - name: Download Harbor online installer {{ harbor_installer_version }}
   ansible.builtin.get_url:
@@ -165,7 +165,7 @@
   vars:
     directory: "{{ harbor_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart harbor service # noqa: var-naming[no-reserved]
+    notify_: Restart harbor service
 
 - name: Start service
   ansible.builtin.systemd:

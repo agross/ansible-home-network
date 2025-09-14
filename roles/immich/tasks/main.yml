@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ immich_root }}"
-    notify: Restart immich service # noqa: var-naming[no-reserved]
+    notify_: Restart immich service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -11,7 +11,7 @@
     directory: "{{ immich_root }}"
     pull: true
     build: true
-    notify: Restart immich service # noqa: var-naming[no-reserved]
+    notify_: Restart immich service
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -35,7 +35,7 @@
   vars:
     directory: "{{ immich_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart immich service # noqa: var-naming[no-reserved]
+    notify_: Restart immich service
 
 - name: Start service
   ansible.builtin.systemd:

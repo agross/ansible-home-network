@@ -4,7 +4,7 @@
   vars:
     directory: ../templates
     target: "{{ teamcity_root }}"
-    notify: Restart teamcity service # noqa: var-naming[no-reserved]
+    notify_: Restart teamcity service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
@@ -13,7 +13,7 @@
     directory: "{{ teamcity_root }}"
     pull: true
     build: true
-    notify: Restart teamcity service # noqa: var-naming[no-reserved]
+    notify_: Restart teamcity service
 
 - name: Ensure unzip is installed (used for backup script)
   ansible.builtin.package:
@@ -31,7 +31,7 @@
   vars:
     directory: "{{ teamcity_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart teamcity service # noqa: var-naming[no-reserved]
+    notify_: Restart teamcity service
 
 - name: Start service
   ansible.builtin.systemd:

@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ prometheus_root }}"
-    notify: Restart prometheus service # noqa: var-naming[no-reserved]
+    notify_: Restart prometheus service
     files:
       docker-compose.yaml.j2:
         owner: 0
@@ -30,7 +30,7 @@
     directory: "{{ prometheus_root }}"
     pull: true
     build: true
-    notify: Restart prometheus service # noqa: var-naming[no-reserved]
+    notify_: Restart prometheus service
 
 - name: Symlink systemd unit
   ansible.builtin.file:

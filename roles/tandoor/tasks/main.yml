@@ -4,7 +4,7 @@
   vars:
     directory: ../templates
     target: "{{ tandoor_root }}"
-    notify: Restart tandoor service # noqa: var-naming[no-reserved]
+    notify_: Restart tandoor service
     files:
       .env.j2:
         mode: "640"
@@ -16,7 +16,7 @@
     directory: "{{ tandoor_root }}"
     pull: true
     build: true
-    notify: Restart tandoor service # noqa: var-naming[no-reserved]
+    notify_: Restart tandoor service
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -29,7 +29,7 @@
   vars:
     directory: "{{ tandoor_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart tandoor service # noqa: var-naming[no-reserved]
+    notify_: Restart tandoor service
 
 - name: Start service
   ansible.builtin.systemd:

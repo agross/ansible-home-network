@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ banking_root }}"
-    notify: Restart banking service # noqa: var-naming[no-reserved]
+    notify_: Restart banking service
     files:
       app/.hbci-pinfile:
         owner: 1000
@@ -17,7 +17,7 @@
     directory: "{{ banking_root }}"
     pull: true
     build: true
-    notify: Restart banking service # noqa: var-naming[no-reserved]
+    notify_: Restart banking service
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -30,7 +30,7 @@
   vars:
     directory: "{{ banking_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart banking service # noqa: var-naming[no-reserved]
+    notify_: Restart banking service
 
 - name: Start systemd units
   ansible.builtin.systemd:

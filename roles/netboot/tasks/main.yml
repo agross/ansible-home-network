@@ -4,7 +4,7 @@
   vars:
     directory: ../templates
     target: "{{ netboot_root }}"
-    notify: Restart netboot service # noqa: var-naming[no-reserved]
+    notify_: Restart netboot service
     files:
       .env.j2:
         mode: "640"
@@ -16,7 +16,7 @@
     directory: "{{ netboot_root }}"
     pull: true
     build: true
-    notify: Restart netboot service # noqa: var-naming[no-reserved]
+    notify_: Restart netboot service
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -29,7 +29,7 @@
   vars:
     directory: "{{ netboot_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart netboot service # noqa: var-naming[no-reserved]
+    notify_: Restart netboot service
 
 - name: Start service
   ansible.builtin.systemd:

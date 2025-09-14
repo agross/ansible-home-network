@@ -4,7 +4,7 @@
   vars:
     directory: ../templates
     target: "{{ logger_root }}"
-    notify: Restart logger service # noqa: var-naming[no-reserved]
+    notify_: Restart logger service
     files:
       backup.j2:
         mode: "700"
@@ -19,7 +19,7 @@
     directory: "{{ logger_root }}"
     pull: true
     build: true
-    notify: Restart logger service # noqa: var-naming[no-reserved]
+    notify_: Restart logger service
 
 - name: Symlink InfluxDB rename script
   ansible.builtin.file:
@@ -42,7 +42,7 @@
   vars:
     directory: "{{ logger_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart logger service # noqa: var-naming[no-reserved]
+    notify_: Restart logger service
 
 - name: Start systemd units
   ansible.builtin.systemd:

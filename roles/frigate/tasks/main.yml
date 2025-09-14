@@ -23,7 +23,7 @@
   vars:
     directory: ../templates
     target: "{{ frigate_root }}"
-    notify: Restart frigate service # noqa: var-naming[no-reserved]
+    notify_: Restart frigate service
 
 # Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
@@ -33,14 +33,14 @@
     directory: "{{ frigate_root }}"
     pull: true
     build: true
-    notify: Restart frigate service # noqa: var-naming[no-reserved]
+    notify_: Restart frigate service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ frigate_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart frigate service # noqa: var-naming[no-reserved]
+    notify_: Restart frigate service
 
 - name: Start service
   ansible.builtin.systemd:

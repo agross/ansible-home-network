@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ freshrss_root }}"
-    notify: Restart freshrss service # noqa: var-naming[no-reserved]
+    notify_: Restart freshrss service
     files:
       .env.j2:
         mode: "640"
@@ -14,7 +14,7 @@
     directory: "{{ freshrss_root }}"
     pull: true
     build: true
-    notify: Restart freshrss service # noqa: var-naming[no-reserved]
+    notify_: Restart freshrss service
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -27,7 +27,7 @@
   vars:
     directory: "{{ freshrss_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart freshrss service # noqa: var-naming[no-reserved]
+    notify_: Restart freshrss service
 
 - name: Start service
   ansible.builtin.systemd:

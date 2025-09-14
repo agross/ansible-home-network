@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ gitlab_root }}"
-    notify: Restart gitlab service # noqa: var-naming[no-reserved]
+    notify_: Restart gitlab service
     files:
       docker-compose.yaml:
         owner: 0
@@ -16,7 +16,7 @@
     directory: "{{ gitlab_root }}"
     pull: true
     build: true
-    notify: Restart gitlab service # noqa: var-naming[no-reserved]
+    notify_: Restart gitlab service
 
 - name: Symlink backup configuration
   ansible.builtin.file:
@@ -40,7 +40,7 @@
   vars:
     directory: "{{ gitlab_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart gitlab service # noqa: var-naming[no-reserved]
+    notify_: Restart gitlab service
 
 - name: Start service
   ansible.builtin.systemd:

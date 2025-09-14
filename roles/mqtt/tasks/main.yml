@@ -14,7 +14,7 @@
   vars:
     directory: ../templates
     target: "{{ mqtt_root }}"
-    notify: Restart mqtt service # noqa: var-naming[no-reserved]
+    notify_: Restart mqtt service
     files:
       mosquitto/mosquitto.conf.j2:
         owner: 1883
@@ -33,7 +33,7 @@
   vars:
     directory: "{{ mqtt_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart mqtt service # noqa: var-naming[no-reserved]
+    notify_: Restart mqtt service
 
 - name: Build custom image
   community.docker.docker_image:
@@ -43,7 +43,7 @@
     build:
       path: "{{ mqtt_root }}/mosquitto"
       pull: true
-  notify: Restart mqtt service # noqa: var-naming[no-reserved]
+  notify: Restart mqtt service
 
 - name: Start systemd units
   ansible.builtin.systemd:

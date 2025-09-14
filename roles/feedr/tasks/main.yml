@@ -10,7 +10,7 @@
   vars:
     directory: ../templates
     target: "{{ feedr_root }}"
-    notify: Restart feedr service # noqa: var-naming[no-reserved]
+    notify_: Restart feedr service
     files:
       .env.j2:
         mode: "640"
@@ -30,14 +30,14 @@
     directory: "{{ feedr_root }}"
     pull: "{{ docker_update is defined }}"
     build: "{{ docker_update is defined }}"
-    notify: Restart feedr service # noqa: var-naming[no-reserved]
+    notify_: Restart feedr service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ feedr_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart feedr service # noqa: var-naming[no-reserved]
+    notify_: Restart feedr service
 
 - name: Start service
   ansible.builtin.systemd:

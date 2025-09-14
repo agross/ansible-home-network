@@ -3,7 +3,7 @@
   vars:
     directory: ../templates
     target: "{{ renovate_root }}"
-    notify: Restart renovate service # noqa: var-naming[no-reserved]
+    notify_: Restart renovate service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -11,14 +11,14 @@
     directory: "{{ renovate_root }}"
     pull: true
     build: true
-    notify: Restart renovate service # noqa: var-naming[no-reserved]
+    notify_: Restart renovate service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ renovate_root }}/systemd"
     local_units: templates/systemd
-    notify: Restart renovate service # noqa: var-naming[no-reserved]
+    notify_: Restart renovate service
 
 - name: Start service
   ansible.builtin.systemd:
