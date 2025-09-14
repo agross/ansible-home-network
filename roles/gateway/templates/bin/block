@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ipset=blocked-ips
+netset=blocked-nets
+
+fwcmd=(firewall-cmd --permanent)
+
+usage() {
+  printf '%s usage:\n\n' "$0"
+  printf '%s [-l] [-d <entry>] [entry]\n\n' "$0"
+  printf '  -l          list entries\n'
+  printf '  -d <entry>  delete entries\n'
+  printf '  <entry>     add entry, where entry is an IP address (1.2.3.4) or network (1.2.3.0/24)\n'
+  exit
+}
+
+require_root() {
+  if (( EUID == 0 )); then
+    return
+  fi
+
+  >&2 printf 'This script must be run as root\n'
+  exit 1
+}
+
+setup() {
+  if ! "${fwcmd[@]}" --info-ipset="$ipset" >/dev/null 2>&1; then
+    "${fwcmd[@]}" --new-ipset="$ipset" --type hash:ip
+    firewall-cmd --reload
+  fi
+
+  if ! "${fwcmd[@]}" --info-ipset="$netset" >/dev/null 2>&1; then
+    "${fwcmd[@]}" --new-ipset="$netset" --type hash:net
+    firewall-cmd --reload
+  fi
+
+  local set
+  for set in "$ipset" "$netset"; do
+    # Used to drop regular traffic targeting the machine.
+    firewall-cmd --zone=drop --add-source="ipset:$set" >/dev/null 2>&1
+
+    if hash docker 2>/dev/null; then
+      # Used to drop traffic targeting docker networks.
+      local table=filter
+      local chain=DOCKER-USER
+      local priority=0
+      local args=(--match set --match-set "$set" src --jump DROP)
+
+      {
+        firewall-cmd --direct --add-chain ipv4 "$table" "$chain"
+        firewall-cmd --direct --add-rule ipv4 "$table" "$chain" "$priority" "${args[@]}"
+      } >/dev/null 2>&1
+    fi
+  done
+}
+
+list() {
+  local set
+  for set in "$ipset" "$netset"; do
+    "${fwcmd[@]}" --info-ipset="$set"
+  done
+
+  exit
+}
+
+target-set() {
+  if [[ "$1" == */* ]]; then
+    printf '%s' "$netset"
+    return
+  fi
+
+  printf '%s' "$ipset"
+}
+
+action=
+while getopts "hld:" opt; do
+  case "$opt" in
+    l)
+      action=list
+      ;;
+
+    d)
+      action=delete
+      entry="$OPTARG"
+      break
+      ;;
+
+    *)
+      usage
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+require_root
+setup
+
+if [[ "$action" == list ]]; then
+  list
+fi
+
+if [[ ! -v entry ]]; then
+  entry="${1?Need entry}"
+fi
+
+target_set="$(target-set "$entry")"
+
+if [[ "$action" == delete ]]; then
+  firewall-cmd --ipset="$target_set" --remove-entry="$entry"
+else
+  firewall-cmd --ipset="$target_set" --add-entry="$entry"
+fi
+
+firewall-cmd --runtime-to-permanent

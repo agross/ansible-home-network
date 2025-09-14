@@ -10,10 +10,13 @@
 - name: Configure WireGuard
   ansible.builtin.import_tasks: wireguard.yml
 
-- name: Install speed monitoring script
+- name: Install scripts
   ansible.builtin.template:
-    src: templates/speed
-    dest: /usr/local/bin/speed
+    src: "templates/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
     owner: 0
     group: 0
     mode: "755"
+  loop:
+    - block
+    - speed
