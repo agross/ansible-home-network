@@ -31,4 +31,4 @@ collections:
   - name: prometheus.prometheus
     version: 0.27.3
   - name: vladgh.samba
-    version: 3.5.3
+    version: 3.5.4
