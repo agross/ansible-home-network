@@ -27,17 +27,17 @@ jobs:
 
       - name: Install ansible
         run: |
-          sudo dnf install --assumeyes ansible python3-netaddr &&
+          sudo dnf install --assumeyes ansible python3-netaddr
           ansible --version
 
       - name: Save SSH keyfile
         run: |
-          printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" > .ansible-ssh-private-key &&
+          printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" > .ansible-ssh-private-key
           chmod 600 .ansible-ssh-private-key
 
       - name: Save ansible vault password for for vault ID "agross2"
         run: |
-          printf '%s' "${{ secrets.ANSIBLE_VAULT_AGROSS2 }}" > .ansible-vault-agross2 &&
+          printf '%s' "${{ secrets.ANSIBLE_VAULT_AGROSS2 }}" > .ansible-vault-agross2
           chmod 600 .ansible-vault-agross2
 
       - uses: actions/cache@v4
