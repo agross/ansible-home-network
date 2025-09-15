@@ -57,15 +57,16 @@ jobs:
         id: affected-roles
         run: |
           {
-            echo 'roles=<<EOR'
+            echo 'roles<<ROLES'
 
             git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} |
             grep '^roles' |
             sed -e 's|roles/\([^/]*\)/.*|\1|' |
             sort |
-            uniq
+            uniq |
+            paste --serial --delimiter=,
 
-            echo EOR
+            echo ROLES
           } >> "$GITHUB_ENV"
 
       - name: Show roles
