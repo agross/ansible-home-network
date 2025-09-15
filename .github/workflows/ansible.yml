@@ -27,7 +27,10 @@ jobs:
 
       - name: Install ansible
         run: |
-          sudo dnf install --assumeyes ansible python3-netaddr
+          dnf install --assumeyes ansible \
+                                  python3-netaddr \
+                                  python3-passlib \
+                                  python3-bcrypt
           ansible --version
 
       - name: Save SSH keyfile
