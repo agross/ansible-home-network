@@ -7,7 +7,7 @@ on:
 
 jobs:
   run-ansible:
-    name: Run ansible for roles affected by the PR
+    name: Run Ansible for roles affected by the PR
     runs-on: ubuntu-latest
 
     if: |

@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: Run ansible
+name: Run Ansible
 
 on:
   workflow_call:
@@ -22,6 +22,8 @@ jobs:
         site:
           - home
           - ogd
+
+    name: ${{ matrix.site }}
 
     runs-on:
       - self-hosted
@@ -69,7 +71,7 @@ jobs:
         # Because some hosts might not be reachable.
         continue-on-error: true
 
-      - name: Run ansible
+      - name: Run Ansible
         uses: dawidd6/action-ansible-playbook@v4
         with:
           requirements: requirements.yml
