@@ -57,7 +57,7 @@ jobs:
           printf 'Roles affected by the merge: %s\n' "$ROLES"
 
   run-ansible:
-    name: Run Ansible for roles affected by the PR
+    name: Run Ansible with tags ${{ needs.affected-roles.outputs.roles }}
 
     needs: affected-roles
 
