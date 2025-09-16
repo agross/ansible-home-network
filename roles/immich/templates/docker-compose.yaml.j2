@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/immich-app/immich-server:v1.142.0
+    image: ghcr.io/immich-app/immich-server:v1.142.1
     hostname: {{ immich_domain | ansible.builtin.mandatory }}
     volumes:
       - /etc/localtime:/etc/localtime:ro
