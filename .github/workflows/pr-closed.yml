@@ -66,3 +66,4 @@ jobs:
     uses: ./.github/workflows/ansible.yml
     with:
       tags: ${{ needs.affected-roles.outputs.roles }}
+    secrets: inherit
