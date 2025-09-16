@@ -2,6 +2,12 @@
 name: Run ansible
 
 on:
+  workflow_call:
+    inputs:
+      tags:
+        description: Tags to apply (comma-separated)
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       tags:

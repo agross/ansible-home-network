@@ -67,10 +67,18 @@ jobs:
             paste --serial --delimiter=,
 
             echo ROLES
-          } >> "$GITHUB_ENV"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Show roles
         env:
           ROLES: ${{ steps.affected-roles.outputs.roles }}
-        run: >-
-          printf 'Roles affected by the merge: %s\n' "$ROLES"
+          ROLES2: ${{ steps['affected-roles'].outputs.roles }}
+        run: |
+          printenv
+          printf 'Roles affected by the merge: %s %s\n' "$ROLES" "$ROLES2"
+
+      - name: Apply roles
+        if: steps.affected-roles.outputs.roles != ''
+        uses: ./.github/workflows/ansible.yml
+        with:
+          tags: ${{ steps.affected-roles.outputs.roles }}
