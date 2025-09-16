@@ -6,13 +6,16 @@ on:
       - closed
 
 jobs:
-  run-ansible:
-    name: Run Ansible for roles affected by the PR
+  affected-roles:
+    name: Determine roles affected by the PR
     runs-on: ubuntu-latest
 
     if: |
       github.event.pull_request.merged == true &&
       !contains(github.event.pull_request.labels.*.name, 'skip-ansible')
+
+    outputs:
+      roles: ${{ steps.affected-roles.outputs.roles }}
 
     steps:
       - name: Get latest code
@@ -53,8 +56,13 @@ jobs:
         run: |
           printf 'Roles affected by the merge: %s\n' "$ROLES"
 
-      - name: Apply roles
-        if: steps.affected-roles.outputs.roles != ''
-        uses: ./.github/workflows/ansible.yml
-        with:
-          tags: ${{ steps.affected-roles.outputs.roles }}
+  run-ansible:
+    name: Run Ansible for roles affected by the PR
+
+    needs: affected-roles
+
+    if: needs.affected-roles.outputs.roles != ''
+
+    uses: ./.github/workflows/ansible.yml
+    with:
+      tags: ${{ needs.affected-roles.outputs.roles }}
