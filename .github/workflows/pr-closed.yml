@@ -1,4 +1,4 @@
-name: PR Closed
+name: PR closed
 
 on:
   pull_request:
@@ -6,35 +6,13 @@ on:
       - closed
 
 jobs:
-  testing:
-    name: Test what happens when closing a PR
+  run-ansible:
+    name: Run ansible for roles affected by the PR
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Show env vars
-        run: env
-
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "$GITHUB_CONTEXT"
-
-  if_merged:
-    name: Test what happens when closing a PR by accepting it
-    runs-on: ubuntu-latest
-
-    if: github.event.pull_request.merged == true
-
-    steps:
-      - run: |
-          echo The PR was merged
-
-  affected-files-and-roles:
-    name: Show affected files and roles
-    runs-on: ubuntu-latest
-
-    if: github.event.pull_request.merged == true
+    if: |
+      github.event.pull_request.merged == true &&
+      !contains(github.event.pull_request.labels.*.name, 'skip-ansible')
 
     steps:
       - name: Get latest code
@@ -72,10 +50,8 @@ jobs:
       - name: Show roles
         env:
           ROLES: ${{ steps.affected-roles.outputs.roles }}
-          ROLES2: ${{ steps['affected-roles'].outputs.roles }}
         run: |
-          printenv
-          printf 'Roles affected by the merge: %s %s\n' "$ROLES" "$ROLES2"
+          printf 'Roles affected by the merge: %s\n' "$ROLES"
 
       - name: Apply roles
         if: steps.affected-roles.outputs.roles != ''
