@@ -78,7 +78,7 @@ jobs:
           playbook: ${{ matrix.site }}.yml
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           options: |
-            --tags ${{ github.event.inputs.tags }}
+            --tags ${{ inputs.tags }}
             --vault-id agross2@.ansible-vault-agross2
             --user agross
 
