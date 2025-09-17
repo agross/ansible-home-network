@@ -36,6 +36,12 @@ detect:
   # My cameras support 4 or 7 fps on the sub stream, the default would be 5.
   fps: 7
 
+objects:
+  filters:
+    person:
+      # Minimum "Snapshot Score"
+      min_score: 0.77
+
 record:
   enabled: true
   alerts:
