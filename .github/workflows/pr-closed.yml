@@ -40,8 +40,7 @@ jobs:
           {
             echo 'roles<<ROLES'
 
-            git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} |
-            grep '^roles' |
+            git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} -- roles |
             sed -e 's|roles/\([^/]*\)/.*|\1|' |
             sort |
             uniq |
