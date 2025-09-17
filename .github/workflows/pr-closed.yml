@@ -18,6 +18,12 @@ jobs:
       roles: ${{ steps.affected-roles.outputs.roles }}
 
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+
       - name: Get latest code
         uses: actions/checkout@v5
 
