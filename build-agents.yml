@@ -13,6 +13,7 @@
       tags: node-exporter
     - role: automatic-updates
       tags:
+        - automatic-updatess
         - apt
         - dnf
         - updates

@@ -49,6 +49,7 @@
       tags: dotfiles
     - role: automatic-updates
       tags:
+        - automatic-updates
         - apt
         - dnf
         - updates
