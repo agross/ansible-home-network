@@ -4,4 +4,7 @@
   gather_facts: false
   roles:
     - role: node-exporter
-      tags: node-exporter
+      tags:
+        - node-exporter
+        - pve_exporter
+        - zfs_exporter
