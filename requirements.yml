@@ -15,7 +15,7 @@ roles:
   - name: lae.proxmox
     version: v1.9.4
   - name: xanmanning.k3s
-    version: v3.5.0
+    version: v3.6.0
 
 collections:
   - name: ansible.posix
