@@ -13,6 +13,6 @@ github_runner_instances:
     url: "{{ github_runner_url }}"
     token: "{{ github_runner_token }}"
 
-  self-home:
+  home:
     url: https://github.com/agross/ansible-home-network
-    token: "{{ vault_github_runner_token_self_home }}"
+    token: "{{ vault_github_runner_token_home }}"
