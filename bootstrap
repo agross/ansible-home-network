@@ -2,4 +2,6 @@
 
 set -e
 
-ansible-galaxy install --role-file requirements.yml "$@"
+# ansible-galaxy role install does not install updates unless `--force`d.
+ansible-galaxy role install --role-file requirements.yml --force "$@"
+ansible-galaxy collection install --requirements-file requirements.yml "$@"
