@@ -25,7 +25,6 @@
     target: "{{ frigate_root }}"
     notify_: Restart frigate service
 
-# Enable update with: ansible-playbook --extra-vars docker_update=42
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
     file: docker-compose-update.yml
