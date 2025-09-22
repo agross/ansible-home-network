@@ -68,6 +68,7 @@ jobs:
                          --key-file .ansible-ssh-private-key
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
+          ANSIBLE_FORCE_COLOR: True
         # Because some hosts might not be reachable.
         continue-on-error: true
 
@@ -92,6 +93,7 @@ jobs:
                            --key-file .ansible-ssh-private-key
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
+          ANSIBLE_FORCE_COLOR: True
 
       - name: Clean up secrets
         if: always()
