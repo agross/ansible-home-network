@@ -39,4 +39,4 @@
   vars:
     app: "{{ ansible_role_name }}"
     scrapes:
-      - "https://{{ renovate_domain }}"
+      - "{{ renovate_domain }}"
