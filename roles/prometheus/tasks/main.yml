@@ -9,6 +9,9 @@
         owner: 0
         group: 0
         mode: '640'
+      app/data:
+        owner: 65534
+        group: 65534
       backup.j2:
         mode: '750'
         owner: 0
