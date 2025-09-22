@@ -97,3 +97,5 @@
       tags:
         - logger
         - container
+    - role: github-runner
+      tags: github-runner
