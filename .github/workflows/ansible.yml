@@ -62,7 +62,7 @@ jobs:
 
       - name: Gather facts
         run: |
-          ./gather-facts ${{ matrix.site }} \
+          ./gather-facts "${{ matrix.site }}" \
                          --vault-id agross2@.ansible-vault-agross2 \
                          --user agross \
                          --key-file .ansible-ssh-private-key
@@ -71,16 +71,27 @@ jobs:
         # Because some hosts might not be reachable.
         continue-on-error: true
 
+      - name: Install Ansible dependencies
+        # ansible-galaxy role install does not install updates unless `--force`d.
+        run: |
+          ansible-galaxy role \
+                         install \
+                         --role-file requirements.yml \
+                         --force
+
+          ansible-galaxy collection \
+                         install \
+                         --requirements-file requirements.yml
+
       - name: Run Ansible
-        uses: dawidd6/action-ansible-playbook@v4
-        with:
-          requirements: requirements.yml
-          playbook: ${{ matrix.site }}.yml
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          options: |
-            --tags ${{ inputs.tags }}
-            --vault-id agross2@.ansible-vault-agross2
-            --user agross
+        run: |
+          ansible-playbook "${{ matrix.site }}.yml" \
+                           --tags "${{ inputs.tags }}" \
+                           --vault-id agross2@.ansible-vault-agross2 \
+                           --user agross \
+                           --key-file .ansible-ssh-private-key
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
 
       - name: Clean up secrets
         if: always()
