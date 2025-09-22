@@ -97,5 +97,3 @@
       tags:
         - logger
         - container
-    - role: samba
-      tags: samba
