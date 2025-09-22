@@ -1,0 +1,5 @@
+[RULES]
+
+{% for exp in node_exporter_roles | selectattr('port', 'defined') %}
+IN ACCEPT -p tcp -dport {{ exp.port }} -log nolog # {{ exp.role }}
+{% endfor %}

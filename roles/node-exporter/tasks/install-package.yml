@@ -5,23 +5,32 @@
   loop_control:
     label: "{{ item.role }}"
 
-- name: Get Proxmox firewall info
+- name: Get Proxmox node info
   ansible.builtin.stat:
-    path: "/etc/pve/nodes/{{ ansible_hostname }}/host.fw"
-  register: proxmox_firewall
+    path: "/etc/pve/nodes/{{ ansible_hostname }}"
+  register: proxmox_node_info
 
-- name: Allow exporter port through Proxmox firewall
-  when: proxmox_firewall.stat.exists
-  ansible.builtin.lineinfile:
-    path: "{{ proxmox_firewall.stat.path }}"
-    search_string: "# {{ item.role }}"
-    line: "IN ACCEPT -p tcp -dport {{ item.port }} -log nolog # {{ item.role }}"
-  loop: >-
-    {{
-      node_exporter_roles | selectattr('port', 'defined')
-    }}
-  loop_control:
-    label: "port={{ item.port }}"
+# Templating need to be separate because the PVE file system does not handle
+# atomic moves.
+- name: Ensure Proxmox host firewall config file exists
+  when: proxmox_node_info.stat.exists
+  ansible.builtin.file:
+    path: "{{ proxmox_node_info.stat.path }}/host.fw"
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    owner: 0
+    group: 33
+    mode: "640"
+
+- name: Allow exporter ports through Proxmox firewall
+  when: proxmox_node_info.stat.exists
+  ansible.builtin.template:
+    src: proxmox/host.fw.j2
+    dest: "{{ proxmox_node_info.stat.path }}/host.fw"
+    owner: 0
+    group: 33
+    mode: "640"
 
 - name: Get firewalld info
   ansible.posix.firewalld_info:
