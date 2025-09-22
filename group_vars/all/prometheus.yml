@@ -1,0 +1,3 @@
+prometheus_domain: "prometheus.{{ network.domain }}"
+
+prometheus_dynamic_file_configuration: /data/prometheus/app/conf.d/scrapes

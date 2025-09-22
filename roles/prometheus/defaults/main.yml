@@ -1,3 +1,4 @@
 prometheus_root: "/data/{{ ansible_role_name }}"
 
+prometheus_port: 9090
 prometheus_scrape_interval: 30s

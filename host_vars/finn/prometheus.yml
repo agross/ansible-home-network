@@ -1,1 +1,3 @@
 prometheus_backup_healthcheck: "{{ vault_prometheus_backup_healthcheck }}"
+
+prometheus_port: 9091

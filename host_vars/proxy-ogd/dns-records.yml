@@ -11,4 +11,5 @@ dns_cname_records:
 
   - "{{ frigate_domain | ansible.builtin.mandatory }}"
   - "{{ frigate_go2rtc_domain | ansible.builtin.mandatory }}"
-  # - "{{ prometheus_domain | ansible.builtin.mandatory }}"
+
+  - "{{ prometheus_domain | ansible.builtin.mandatory }}"
