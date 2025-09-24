@@ -1,7 +1,7 @@
 frigate_root: "/data/{{ ansible_role_name }}"
 
 # renovate: github-releases=AlexxIT/go2rtc
-frigate_go2rtc_release_version: v1.9.9
+frigate_go2rtc_release_version: v1.9.10
 frigate_go2rtc_release_file: go2rtc_linux_amd64
 
 frigate_camera_user: frigate
