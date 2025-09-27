@@ -5,6 +5,10 @@ services:
       POSTGRES_USER: renovate
       POSTGRES_PASSWORD: renovate
       POSTGRES_DB: renovate
+
+      # For psql invocations.
+      PGUSER: renovate
+      PGPASSWORD: renovate
     volumes:
       - ./db:/var/lib/postgresql/data
     healthcheck:

@@ -16,6 +16,10 @@ services:
       POSTGRES_DB: feedr
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
       TZ: Europe/Berlin
+
+      # For psql invocations.
+      PGUSER: feedr
+      PGPASSWORD: feedr
     volumes:
       - ./db:/var/lib/postgresql/data
     healthcheck:
