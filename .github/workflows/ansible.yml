@@ -57,8 +57,6 @@ jobs:
           # Look to see if there is a cache hit for the corresponding
           # requirements file.
           key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('**/requirements*.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-ansible-galaxy
 
       - name: Gather facts
         run: |
