@@ -4,7 +4,7 @@ volumes:
 
 services:
   app:
-    image: freshrss/freshrss:1.27.0-alpine
+    image: freshrss/freshrss:1.27.1-alpine
     volumes:
       - data:/var/www/FreshRSS/data
       - extensions:/var/www/FreshRSS/extensions
@@ -23,7 +23,7 @@ services:
         condition: service_healthy
 
   cron:
-    image: freshrss/freshrss:1.27.0-alpine
+    image: freshrss/freshrss:1.27.1-alpine
     volumes:
       - data:/var/www/FreshRSS/data
       - extensions:/var/www/FreshRSS/extensions
