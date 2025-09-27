@@ -44,6 +44,10 @@ services:
       POSTGRES_DB: freshrss
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
       TZ: Europe/Berlin
+
+      # For psql invocations.
+      PGUSER: freshrss
+      PGPASSWORD: freshrss
     volumes:
       - ./db:/var/lib/postgresql/data
     healthcheck:
