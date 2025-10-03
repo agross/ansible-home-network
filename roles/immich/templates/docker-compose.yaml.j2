@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/immich-app/immich-server:v2.0.0
+    image: ghcr.io/immich-app/immich-server:v2.0.1
     hostname: {{ immich_domain | ansible.builtin.mandatory }}
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -16,7 +16,7 @@ services:
       - db
 
   machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v2.0.0
+    image: ghcr.io/immich-app/immich-machine-learning:v2.0.1
     volumes:
       - ml-model-cache:/cache
     env_file:
