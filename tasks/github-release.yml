@@ -26,4 +26,5 @@
     dest: "{{ dest }}"
     owner: 0
     group: 0
-    mode: '755'
+    mode: "755"
+  notify: "{{ notify_ | default(omit) }}"
