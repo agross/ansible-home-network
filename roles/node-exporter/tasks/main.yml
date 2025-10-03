@@ -6,7 +6,7 @@
 - name: Install using docker
   when: node_exporter_install_method | default('package') == 'docker'
   ansible.builtin.import_tasks:
-    file: "install-docker.yml"
+    file: install-docker.yml
 
 - name: Register exporters with Prometheus
   ansible.builtin.template:

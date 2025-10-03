@@ -41,6 +41,38 @@
   when: >-
     'firewalld_info' in firewalld_info
   block:
+    - name: Template firewalld service
+      when: template | length > 0
+      ansible.builtin.template:
+        src: "{{ template }}"
+        dest: "/etc/firewalld/services/{{ item }}.xml"
+        lstrip_blocks: true
+        owner: 0
+        group: 0
+        mode: "644"
+      loop: >-
+        {{
+          node_exporter_roles |
+          selectattr('firewalld_service', 'defined') |
+          map(attribute = 'firewalld_service')
+        }}
+      loop_control:
+        label: "firewalld_service={{ item }}"
+      vars:
+        files:
+          - "{{ item }}.xml.j2"
+          - "{{ item }}.xml"
+        paths:
+          - ../templates/firewalld
+        template: >-
+          {{
+            lookup('ansible.builtin.first_found', paths=paths, files=files, skip=true)
+          }}
+      notify: Reload firewalld
+
+    - name: Reload firewalld if required
+      ansible.builtin.meta: flush_handlers
+
     - name: Allow exporter service through firewalld
       ansible.posix.firewalld:
         service: "{{ item.firewalld_service }}"

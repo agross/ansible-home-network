@@ -4,6 +4,11 @@ scrape_configs:
       - files:
         - app/*.yml
 
+  - job_name: cadvisor
+    file_sd_configs:
+      - files:
+        - cadvisor/*.yml
+
   - job_name: node
     file_sd_configs:
       - files:

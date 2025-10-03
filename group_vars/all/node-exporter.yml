@@ -1,6 +1,13 @@
 # renovate: github-releases=prometheus/node_exporter
 node_exporter_version: 1.9.1
 
+# renovate: github-releases=google/cadvisor
+cadvisor_release_version: v0.53.0
+
+# The version expected here is without the "v".
+cadvisor_version: "{{ cadvisor_release_version[1:] }}"
+cadvisor_port: 9280
+
 # renovate: github-releases=prometheus-community/ipmi_exporter
 ipmi_exporter_version: 1.10.1
 ipmi_exporter_system_user: root
