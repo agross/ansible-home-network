@@ -18,6 +18,8 @@ cat > "$playbook" <<PLAYBOOK
       ansible.builtin.setup:
 PLAYBOOK
 
-shift
+if [ $# -gt 0 ]; then
+  shift
+fi
 
 ansible-playbook "$playbook" "$@"
