@@ -6,7 +6,7 @@ networks:
 services:
   app:
     image: gitlab/gitlab-ce:18.4.1-ce.0
-    mem_limit: 3072m
+    mem_limit: 3584m
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         gitlab_rails['initial_root_password'] = '{{ gitlab_initial_root_password }}'
