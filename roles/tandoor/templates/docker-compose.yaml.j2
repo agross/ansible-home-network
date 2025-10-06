@@ -24,12 +24,11 @@ services:
     image: ghcr.io/tandoorrecipes/recipes:2.2.7
     env_file:
       - .env
+    ports:
+      - "4003:80"
     volumes:
       - ./app/media:/opt/recipes/mediafiles
       - nginx-static:/opt/recipes/staticfiles
-      # Do not make this a bind mount, see
-      # https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
-      - nginx-conf:/opt/recipes/nginx/conf.d
     healthcheck:
       test:
         - CMD
@@ -37,7 +36,7 @@ services:
         - -S
         - -O
         - /dev/null
-        - http://127.0.0.1:8080/
+        - http://127.0.0.1:80/
       interval: 5s
       timeout: 5s
       retries: 3
@@ -45,32 +44,4 @@ services:
       start_period: 60s
     depends_on:
       db:
-        condition: service_healthy
-
-  nginx:
-    image: nginx:mainline-alpine
-    ports:
-      - 4003:80
-    volumes:
-      - ./app/media:/media:ro
-      - nginx-static:/static:ro
-      # Do not make this a bind mount, see
-      # https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
-      - nginx-conf:/etc/nginx/conf.d:ro
-    links:
-      - app:web_recipes
-    healthcheck:
-      test:
-        - CMD
-        - wget
-        - -S
-        - -O
-        - /dev/null
-        - http://127.0.0.1/
-      interval: 5s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    depends_on:
-      app:
         condition: service_healthy
