@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Run Ansible
 
 on:
@@ -46,7 +45,7 @@ jobs:
           printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" > .ansible-ssh-private-key
           chmod 600 .ansible-ssh-private-key
 
-      - name: Save ansible vault password for for vault ID "agross2"
+      - name: Save ansible vault password for vault ID "agross2"
         run: |
           printf '%s' "${{ secrets.ANSIBLE_VAULT_AGROSS2 }}" > .ansible-vault-agross2
           chmod 600 .ansible-vault-agross2
