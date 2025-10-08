@@ -17,7 +17,7 @@ harbor_installer_arguments: >-
     harbor_installer_args +
     (
       harbor_installer_with |
-      map('regex_replace','^(.+)$', '--with-\1')
+      map('ansible.builtin.regex_replace','^(.+)$', '--with-\1')
     )
   }}
 

@@ -139,7 +139,7 @@
     dest: "{{ harbor_installer_directory }}/harbor/docker-compose.override.yml"
     owner: 0
     group: 0
-    mode: '644'
+    mode: "644"
     lstrip_blocks: true
   notify: Restart harbor service
 
