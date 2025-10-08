@@ -1,3 +1,26 @@
+- name: Ensure Prometheus configuration directory exists
+  ansible.builtin.file:
+    path: >-
+      {{
+        hostvars[item].prometheus_dynamic_file_configuration
+      }}/{{
+        job
+      }}
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+  vars:
+    job: app
+  delegate_to: "{{ item }}"
+  loop: >-
+    {{
+      groups[site] |
+      ansible.builtin.intersect(groups['prometheus'])
+    }}
+  loop_control:
+    label: "job={{ job }}"
+
 - name: Register Prometheus scrape
   ansible.builtin.copy:
     content: |
