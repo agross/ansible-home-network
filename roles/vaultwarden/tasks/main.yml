@@ -11,7 +11,8 @@
         mode: "600"
 
 - name: Update docker-compose images
-  ansible.builtin.import_tasks: docker-compose-update.yml
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
   vars:
     directory: "{{ vaultwarden_root }}"
     pull: true
