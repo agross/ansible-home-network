@@ -68,7 +68,7 @@ jobs:
 
     if: needs.affected-roles.outputs.roles != ''
 
-    uses: ./.github/workflows/ansible.yml
+    uses: ./.github/workflows/ansible.yaml
     with:
       tags: ${{ needs.affected-roles.outputs.roles }}
     secrets: inherit
