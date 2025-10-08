@@ -5,8 +5,6 @@ After=docker.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]
-Environment=COMPOSE_PROJECT_NAME=%p
-
 WorkingDirectory={{ prometheus_root }}
 
 ExecStartPre=/usr/bin/docker compose config
