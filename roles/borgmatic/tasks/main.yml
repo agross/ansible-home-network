@@ -44,7 +44,7 @@
 
     borgmatic_hooks:
       healthchecks:
-        ping_url: "{{ borgmatic_healthchecks_system }}"
+        ping_url: "{{ borgmatic_system_backup_healthcheck }}"
 
     borgmatic_store_atime: false
 
