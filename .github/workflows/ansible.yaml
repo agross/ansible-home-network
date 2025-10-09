@@ -37,7 +37,7 @@ jobs:
           dnf install --assumeyes ansible \
                                   python3-netaddr \
                                   python3-passlib \
-                                  python3-bcrypt
+                                  python3-bcrypt-4.3.0
           ansible --version
 
       - name: Save SSH keyfile
