@@ -32,7 +32,8 @@
       - "../roles/{{ ansible_role_name }}/templates/traefik.yaml.j2"
       - "../templates/{{ ansible_role_name }}/{{ inventory_hostname }}/traefik.yaml.j2"
       - "../templates/{{ ansible_role_name }}/traefik.yaml.j2"
-    candidates: "{{ templates | select('string') }}"
+    # https://stackoverflow.com/a/60526774/149264
+    candidates: "{{ templates | select('string') | select }}"
     src: "{{ lookup('ansible.builtin.first_found', candidates, skip=true) }}"
   delegate_to: "{{ item }}"
   loop: >-
