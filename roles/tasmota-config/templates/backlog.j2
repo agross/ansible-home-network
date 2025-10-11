@@ -6,35 +6,33 @@ https://tasmota.github.io/docs/Commands/#backlog
 #}
 
 {# Set friendly device name (32 char limit). #}
-FriendlyName {{ friendly_name }}
-{# This one is displayed in the webUI and used for HA autodiscovery. #}
-DeviceName {{ friendly_name }}
+FriendlyName {{ tasmota_config_friendly_name[0:32] }}
+{# This one is displayed in the web UI and used for HA autodiscovery. #}
+DeviceName {{ tasmota_config_friendly_name }}
 
 {# MQTT config. #}
-{% if mqtt_host %}
-  MqttHost {{ mqtt_host }}
+{% if tasmota_config_mqtt_host %}
+  MqttHost {{ tasmota_config_mqtt_host }}
+  MqttPort {{ tasmota_config_mqtt_port | default(1883) }}
+  MqttClient {{ tasmota_config_mqtt_client }}
 {% endif %}
 {% if mqtt_accounts is defined %}
   MqttUser {{ (mqtt_accounts | ansible.builtin.dict2items | first).key }}
-{% endif %}
-{% if mqtt_accounts is defined %}
   MqttPassword {{ (mqtt_accounts | ansible.builtin.dict2items | first).value }}
 {% endif %}
-MqttPort {{ mqtt_port | default(1883) }}
-MqttClient {{ mqtt_client }}
 
-Topic {{ mqtt_topic }}
-FullTopic {{ mqtt_full_topic }}
+Topic {{ tasmota_config_mqtt_topic }}
+FullTopic {{ tasmota_config_mqtt_full_topic }}
 
 {# Update telemetry every n seconds (e.g. state and power consumption). #}
 TelePeriod 10
 
-{% if module is defined %}
+{% if tasmota_config_module is defined %}
   {# Set predefined device template and activate. #}
-  Module {{ module }}
-{% elif template is defined %}
+  Module {{ tasmota_config_module }}
+{% elif tasmota_config_template is defined %}
   {# Set custom device template and activate. #}
-  Template {{ template }}
+  Template {{ tasmota_config_template }}
   Module 0
 {% endif %}
 
@@ -49,6 +47,6 @@ TimeDST 0,0,3,1,1,120
 TimeSTD 0,0,10,1,1,60
 TimeZone 99
 
-{% if custom_backlog is defined %}
-  {{ custom_backlog }}
+{% if tasmota_config_custom_backlog is defined %}
+  {{ tasmota_config_custom_backlog }}
 {% endif %}

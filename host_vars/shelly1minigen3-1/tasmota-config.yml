@@ -1,5 +1,5 @@
-device_model: Shelly 1 Mini Gen3
-room: Shed
+tasmota_config_device_model: Shelly 1 Mini Gen3
+tasmota_config_room: Shed
 
 # With relay:
 # {"NAME":"Shelly 1 Mini Gen3","GPIO":[320,32,0,4736,0,0,0,224,0,0,192,0,0,0,0,0,0,0,0,0,0,0],"FLAG":0,"BASE":1}

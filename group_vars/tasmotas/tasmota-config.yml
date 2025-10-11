@@ -1,0 +1,25 @@
+tasmota_config_mqtt_host: mqtt
+tasmota_config_mqtt_port: 1883
+
+tasmota_config_mqtt_topic: "{{ network_name }}"
+
+tasmota_config_mqtt_full_topic: >-
+  {{
+    site
+  }}/{{
+    tasmota_config_room | lower | replace(' ', '-')
+  }}/{{
+    tasmota_config_function
+  }}/%prefix%/%topic%/
+
+# Suffix because of https://github.com/arendst/Tasmota/issues/9282
+tasmota_config_mqtt_client: "{{ tasmota_config_mqtt_topic }}-client"
+
+# Device function, e.g. power, lights, climate.
+tasmota_config_function: power
+
+tasmota_config_friendly_name: >-
+  #{{ network_name | ansible.builtin.regex_search('(?<=-)\d+$') }}
+  {{ tasmota_config_room }}
+  {{ tasmota_config_installation_location | default('') }}
+  {{ tasmota_config_purpose }}

@@ -4,7 +4,7 @@
     url: >-
       http://{{
         hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
-      }}/cm?cmnd=OtaUrl{{ tasmota_credentials | default('') }}
+      }}/cm?cmnd=OtaUrl{{ tasmota_update_credentials | default('') }}
     return_content: true
   register: tasmota_update_original_ota_url
   changed_when: false
@@ -27,7 +27,7 @@
       }}/cm?cmnd=OtaUrl%20{{
         tasmota_update_ota_url
       }}{{
-        tasmota_credentials | default('')
+        tasmota_update_credentials | default('')
       }}
 
 - name: Show upgrade URL
