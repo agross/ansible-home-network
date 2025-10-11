@@ -5,24 +5,6 @@
     - role: validate
       tags: validate
 
-- name: Raspberry Pi configuration
-  hosts: home:&raspi
-  become: true
-  gather_facts: false
-  roles:
-    - role: raspi-config
-      tags: raspi-config
-    - role: smartmontools
-      tags: smartmontools
-    - role: persistent-journal
-      tags: persistent-journal
-    - role: swapfile
-      tags: swapfile
-    - role: led-heartbeat
-      tags: led-heartbeat
-    - role: argon-one
-      tags: argon-one
-
 - name: Import Proxmox configuration playbook
   ansible.builtin.import_playbook: _proxmox.yml
   vars:
