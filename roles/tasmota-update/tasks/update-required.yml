@@ -4,7 +4,7 @@
     url: >-
       http://{{
         hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
-      }}/cm?cmnd=Status%202{{ tasmota_credentials | default('') }}
+      }}/cm?cmnd=Status%202{{ tasmota_update_credentials | default('') }}
     return_content: true
   changed_when: false
   register: tasmota_update_current_firmware

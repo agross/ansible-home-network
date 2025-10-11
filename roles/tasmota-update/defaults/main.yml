@@ -15,15 +15,16 @@ tasmota_update_ota_release:
       tasmota_update_ota_file | default('tasmota32.bin')
     }}
 
-tasmota_user: admin
+tasmota_update_user: admin
+tasmota_update_password:
 
-tasmota_credentials: >-
+tasmota_update_credentials: >-
   {{
     '&user=' ~
-    tasmota_user | urlencode | replace('/', '%2F') ~
+    tasmota_update_user | urlencode | replace('/', '%2F') ~
     '&password=' ~
-    tasmota_password | urlencode | replace('/', '%2F') if
-      (tasmota_password | default('', true) | string | length) > 0
+    tasmota_update_password | urlencode | replace('/', '%2F') if
+      (tasmota_update_password | default('', true) | string | length) > 0
     else
       ''
   }}

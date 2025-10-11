@@ -1,14 +1,14 @@
-device_model: Shelly 2.5 PM
-room: Living Room
-purpose: Shutter
+tasmota_config_device_model: Shelly 2.5 PM
+tasmota_config_room: Living Room
+tasmota_config_purpose: Shutter
 function: shutter
 
 # https://templates.blakadder.com/shelly_25.html
-template: >-
+tasmota_config_template: >-
   {"NAME":"Shelly 2.5 PM","GPIO":[320,0,0,0,224,193,0,0,640,192,608,225,3456,4736],"FLAG":0,"BASE":18}
 
 # Enable shutter support
-custom_backlog: |
+tasmota_config_custom_backlog: |
   # Shutter support.
   SetOption80 1
 
