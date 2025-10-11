@@ -30,13 +30,3 @@
   vars:
     pip_install_packages:
       - name: docker
-
-- name: Upgrade libseccomp2 on Raspberry Pi
-  when: "'raspi' in group_names"
-  ansible.builtin.import_tasks:
-    file: raspi-libseccomp2.yml
-
-- name: Enable memory cgroups on Raspberry Pi
-  when: "'raspi' in group_names"
-  ansible.builtin.import_tasks:
-    file: raspi-memory-cgroups.yml
