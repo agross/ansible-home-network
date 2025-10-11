@@ -13,7 +13,6 @@
     }}
 
 - name: Template Traefik configuration
-  when: src | length > 0
   ansible.builtin.template:
     src: "{{ src }}"
     dest: >-
@@ -34,7 +33,7 @@
       - "../templates/{{ ansible_role_name }}/traefik.yaml.j2"
     # https://stackoverflow.com/a/60526774/149264
     candidates: "{{ templates | select('string') | select }}"
-    src: "{{ lookup('ansible.builtin.first_found', candidates, skip=true) }}"
+    src: "{{ lookup('ansible.builtin.first_found', candidates) }}"
   delegate_to: "{{ item }}"
   loop: >-
     {{
