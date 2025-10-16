@@ -14,13 +14,10 @@ cleanup() {
 }
 
 db() {
-  printf 'Dumping database.\n'
+  local -a cmd=(docker compose exec postgresql)
 
-  docker compose \
-         exec \
-         postgresql \
-         pg_dumpall \
-    > "$target/db.sql"
+  printf 'Dumping database.\n'
+  "${cmd[@]}" pg_dumpall > "$target/db.sql"
 }
 
 trap cleanup ERR SIGINT SIGTERM
