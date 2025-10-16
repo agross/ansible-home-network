@@ -13,12 +13,9 @@ cleanup() {
 }
 
 db() {
-  docker compose \
-         exec \
-         db \
-         pg_dumpall \
-         --username=tandoor \
-    > "$target/db.sql"
+  local -a cmd=(docker compose exec db)
+
+  "${cmd[@]}" pg_dumpall > "$target/db.sql"
 }
 
 trap cleanup ERR SIGINT SIGTERM
