@@ -8,6 +8,7 @@
     ":rebaseStalePrs",
     ":semanticCommitsDisabled"
   ],
+  "labels": ["dependencies"],
   "docker-compose": {
     "managerFilePatterns": ["/(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$/"]
   },
