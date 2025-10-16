@@ -72,6 +72,17 @@
       "description": "Group Immich updates",
       "matchPackageNames": ["/immich-app/"],
       "groupName": "Immich"
+    },
+    {
+      "description": "From MariaDB 12.3 every .3 release will be a LTS release, https://endoflife.date/mariadb#release-cadence",
+      "matchPackageNames": ["mariadb"],
+      "allowedVersions": "/^[0-9]+\\.3(\\.[0-9]+)?$/",
+      "changelogUrl": "https://github.com/MariaDB/server"
+    },
+    {
+      "description": "Allow known MySQL stable releases, https://endoflife.date/mysql",
+      "matchPackageNames": ["mysql"],
+      "allowedVersions": "/^(8\\.4|9\\.7)(\\.[0-9]+)?$/"
     }
   ]
 }
