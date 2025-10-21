@@ -13,7 +13,7 @@
       }}
 
 - name: Get InfluxDB version number from version entry
-  when: logger_version_env_entry | default([], true) | length
+  when: logger_version_env_entry | default([], true) | length > 0
   ansible.builtin.set_fact:
     logger_version_number: "{{ logger_version_env_entry | first | split('=') | last }}"
 
