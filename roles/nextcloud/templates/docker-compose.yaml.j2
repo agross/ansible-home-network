@@ -141,13 +141,13 @@ services:
         condition: service_healthy
 
   imaginary:
-    image: nextcloud/aio-imaginary
+    image: nextcloud/aio-imaginary:20251015_082711
     cap_add:
       # Required for HEIC previews.
       - SYS_NICE
 
   cron:
-    image: nextcloud:apache
+    image: nextcloud:32.0.0-apache
     entrypoint: /cron.sh
     volumes:
       - app:/var/www/html
