@@ -16,13 +16,13 @@ use=if, if={{ interfaces.telekom.device }}
 # Tunnelbroker he-ipv6.
 protocol=dyndns2, \
 server=ipv4.tunnelbroker.net, \
-login={{ he_ipv6.username | mandatory }}, \
-password={{ he_ipv6.update_key | mandatory }} \
-{{ he_ipv6.tunnel_id | mandatory }}
+login={{ he_ipv6.username | ansible.builtin.mandatory }}, \
+password={{ he_ipv6.update_key | ansible.builtin.mandatory }} \
+{{ he_ipv6.tunnel_id | ansible.builtin.mandatory }}
 
-# INWX.
+# deSEC.
 protocol=dyndns2, \
-server=dyndns.inwx.com, \
-login={{ inwx_dyndns_username | mandatory }}, \
-password={{ inwx_dyndns_password | mandatory }} \
-{{ network.domain | mandatory }}
+server=update.dedyn.io, \
+login={{ network.domain | ansible.builtin.mandatory }}, \
+password={{ gateway_dyndns_password | ansible.builtin.mandatory }} \
+{{ network.domain | ansible.builtin.mandatory }}&myipv6=preserve

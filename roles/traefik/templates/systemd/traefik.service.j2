@@ -9,9 +9,11 @@ OnFailure=unit-status-mail@%n.service
 [Service]
 {% if traefik_install_method == 'bare-metal' %}
 Environment=LEGO_DISABLE_CNAME_SUPPORT=true
-{% if traefik_acme_inwx %}
+{% if traefik_acme_type == 'inwx' %}
 Environment=INWX_USERNAME={{ inwx_acme_username | ansible.builtin.mandatory }}
 Environment=INWX_PASSWORD={{ inwx_acme_password | ansible.builtin.mandatory }}
+{% elif traefik_acme_type == 'desec' %}
+Environment=DESEC_TOKEN={{ desec_acme_token | ansible.builtin.mandatory }}
 {% endif %}
 
 ExecStart={{ traefik_root | ansible.builtin.quote }}/bin/traefik \
@@ -51,9 +53,11 @@ ExecStart=/usr/bin/docker container \
                           --volume '{{ traefik_root }}/conf/traefik.yaml:{{ traefik_config_root_dir }}/traefik.yaml:ro' \
                           --volume '{{ traefik_dynamic_file_configuration }}:{{ traefik_config_root_dir }}/conf.d:ro' \
                           --env 'LEGO_DISABLE_CNAME_SUPPORT=true' \
-                          {% if traefik_acme_inwx %}
-                          --env 'INWX_USERNAME={{ inwx_acme_username }}' \
-                          --env 'INWX_PASSWORD={{ inwx_acme_password }}' \
+                          {% if traefik_acme_type == 'inwx' %}
+                          --env 'INWX_USERNAME={{ inwx_acme_username | ansible.builtin.mandatory }}' \
+                          --env 'INWX_PASSWORD={{ inwx_acme_password | ansible.builtin.mandatory }}' \
+                          {% elif traefik_acme_type == 'desec' %}
+                          --env 'DESEC_TOKEN={{ desec_acme_token | ansible.builtin.mandatory }}' \
                           {% endif %}
                           --add-host=host.docker.internal:host-gateway \
                           --health-cmd 'traefik healthcheck' \

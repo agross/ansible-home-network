@@ -38,43 +38,51 @@ resolve() {
   printf '%s' "$ip"
 }
 
-inwx() {
-  local host ip
+desec() {
+  local host ip user url
 
-  printf 'Updating INWX...\n'
+  printf 'Updating deSEC...\n'
 
-  host=dyndns.inwx.com
+  host=update.dedyn.io
   ip="$(resolve "$host")"
 
+  user={{ network.domain | ansible.builtin.mandatory | ansible.builtin.quote }}:{{ gateway_dyndns_password | ansible.builtin.mandatory | ansible.builtin.quote }}
+
+  url="https://$host/nic/update?hostname={{ network.domain | ansible.builtin.mandatory }}&myipv6=preserve"
+
   output="$(curl --resolve "$host:443:$ip" \
-                 --fail \
+                 --fail-with-body \
                  --connect-timeout 15 \
-                 --user {{ inwx_dyndns_username | mandatory | quote }}:{{ inwx_dyndns_password | mandatory | quote }} \
-                 "https://$host/nic/update?hostname={{ network.domain | mandatory }}")"
+                 --user "$user" \
+                 "$url")"
 
   printf '%s\n' "$output"
 
   if [[ "$output" == good || "$output" == nochg ]]; then
-    printf 'Successfully updated INWX IP\n'
+    printf 'Successfully updated deSEC IP\n'
   else
-    printf 'Failed to update INWX IP\n'
+    printf 'Failed to update deSEC IP\n'
     return 1
   fi
 }
 
 tunnelbroker() {
-  local host ip
+  local host ip user url
 
   printf 'Updating Tunnelbroker...\n'
 
   host=ipv4.tunnelbroker.net
   ip="$(resolve "$host")"
 
+  user={{ he_ipv6.username | ansible.builtin.mandatory | ansible.builtin.quote }}:{{ he_ipv6.update_key | ansible.builtin.mandatory | ansible.builtin.quote }}
+
+  url="https://$host/nic/update?hostname={{ he_ipv6.tunnel_id | ansible.builtin.mandatory }}"
+
   output="$(curl --resolve "$host:443:$ip" \
                  --fail \
                  --connect-timeout 15 \
-                 --user {{ he_ipv6.username | mandatory | quote }}:{{ he_ipv6.update_key | mandatory | quote }} \
-                 "https://$host/nic/update?hostname={{ he_ipv6.tunnel_id | mandatory }}")"
+                 --user "$user" \
+                 "$url")"
 
   printf '%s\n' "$output"
 
@@ -87,7 +95,7 @@ tunnelbroker() {
   fi
 }
 
-for provider in inwx tunnelbroker; do
+for provider in desec tunnelbroker; do
   while ((1)); do
     if $provider; then
       break

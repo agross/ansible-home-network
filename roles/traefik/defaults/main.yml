@@ -17,17 +17,17 @@ traefik_config_root_dir: >-
 
 traefik_cert_sans: []
 
-traefik_acme_inwx: >-
+traefik_acme_type: >-
   {{
-    inwx_acme_username is defined and
-    inwx_acme_username | length > 0 and
-    inwx_acme_password is defined and
-    inwx_acme_password | length > 0
+    'inwx' if inwx_acme_username | default('') | length > 0 and
+              inwx_acme_password | default('') | length > 0
+    else 'desec' if desec_acme_token | default('') | length > 0
+    else ''
   }}
 
 traefik_cert_resolver: >-
   {{
-    'letsencrypt-dns' if traefik_acme_inwx
+    'letsencrypt-dns' if traefik_acme_type | length > 0
     else 'letsencrypt'
   }}
 
