@@ -74,6 +74,7 @@
     name:
       - curl
       - bind-utils
+      - iproute-tc
     state: present
 
 - name: Copy dispatcher scripts
