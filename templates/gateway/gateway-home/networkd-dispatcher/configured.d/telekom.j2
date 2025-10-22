@@ -20,12 +20,15 @@ if [[ -z "$(tc filter show dev "$IFACE" ingress)" ]]; then
             dev "$IFACE-ingress"
 fi
 
-if sudo --user=ddclient -- ddclient -daemon=0 -debug -use=if -if="$IFACE"; then
+{#
+Broken in 4.x https://github.com/ddclient/ddclient/issues/856
+
+if sudo --user=ddclient -- ddclient --daemon=0 --debug --use=if --if="$IFACE"; then
   printf 'ddclient succeeded\n'
   exit
 fi
 
-printf 'ddclient failed, attempting manual DynDNS update\n'
+printf 'ddclient failed, attempting manual DynDNS update\n' #}
 
 resolve() {
   local host="${1?Need host to resolve}"
