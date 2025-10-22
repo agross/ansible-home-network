@@ -2,6 +2,12 @@
   hosts: "{{ playbook_hosts | default([]) }}"
   become: true
   gather_facts: false
+  module_defaults:
+    group/community.proxmox.proxmox:
+      api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
+      api_token_id: ansible
+      api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
+      api_host: localhost
   pre_tasks:
     - name: End play for hypervisors that are detected falsely
       ansible.builtin.meta: end_host
