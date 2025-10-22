@@ -1,9 +1,5 @@
 - name: Retrieve LXC guests
   community.proxmox.proxmox_vm_info:
-    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
-    api_token_id: ansible
-    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
-    api_host: localhost
     node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
     type: lxc
     config: pending
@@ -47,13 +43,9 @@
 
 - name: Configure LXC guest
   community.proxmox.proxmox:
-    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
     # Token-based auth cannot set features, mount_volumes and hookscript,
     # even if the token is for the root user.
     # https://forum.proxmox.com/threads/is-it-possible-to-deploy-lxc-container-through-the-api-with-bind-mounts.124543/post-542617
-    api_token_id: ansible
-    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
-    api_host: localhost
     node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
     vmid: "{{ guest.lxc.id | ansible.builtin.mandatory }}"
     hostname: "{{ guest.inventory_hostname | ansible.builtin.mandatory }}"

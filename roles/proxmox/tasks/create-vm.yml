@@ -1,9 +1,5 @@
 - name: Configure guest VM
   community.proxmox.proxmox_kvm:
-    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
-    api_token_id: ansible
-    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
-    api_host: localhost
     node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
     vmid: "{{ guest.kvm.id | ansible.builtin.mandatory }}"
     name: "{{ guest.inventory_hostname | ansible.builtin.mandatory }}"

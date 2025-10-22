@@ -1,9 +1,5 @@
-- name: Retrieve pending guest VM config
+- name: Retrieve pending guest VM config # noqa args[module]
   community.proxmox.proxmox_vm_info:
-    api_user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
-    api_token_id: ansible
-    api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
-    api_host: localhost
     node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
     type: qemu
     config: pending
