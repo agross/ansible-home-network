@@ -17,40 +17,38 @@
             acme
             account
             register
-            {{ pve_acme_account_id | quote }}
-            {{ pve_acme_account_email | ansible.builtin.mandatory | quote }}
+            {{ pve_acme_account_id | ansible.builtin.quote }}
+            {{ pve_acme_account_email | ansible.builtin.mandatory | ansible.builtin.quote }}
             --directory https://acme-v02.api.letsencrypt.org/directory
         responses:
           "Do you agree to the above terms?": "y"
         echo: true
 
-- name: Check if the INWX DNS plugin is configured
+- name: Check if the ACME plugin is configured
   ansible.builtin.command:
     argv:
       - pvenode
       - acme
       - plugin
       - config
-      - inwx-dns
-  register: proxmox_inwx_dns_plugin
+      - desec
+  register: proxmox_acme_plugin
   changed_when: false
   failed_when: false
 
-- name: Configure INWX DNS plugin
-  when: proxmox_inwx_dns_plugin.rc != 0
+- name: Configure ACME plugin
+  when: proxmox_acme_plugin.rc != 0
   block:
-    - name: Create file with INWX authentication data
+    - name: Create file with ACME authentication data
       ansible.builtin.copy:
-        dest: /tmp/inwx-auth
+        dest: /tmp/acme-auth
         content: |
-          INWX_User={{ inwx_acme_username | ansible.builtin.mandatory }}
-          INWX_Password={{ inwx_acme_password | ansible.builtin.mandatory }}
-          INWX_Shared_Secret=
+          DEDYN_TOKEN={{ desec_acme_token | ansible.builtin.mandatory }}
         owner: 0
         group: 0
         mode: "400"
 
-    - name: Register INWX DNS plugin
+    - name: Register ACME plugin
       ansible.builtin.command:
         argv:
           - pvenode
@@ -58,17 +56,17 @@
           - plugin
           - add
           - dns
-          - inwx-dns
+          - desec
           - --api
-          - inwx
+          - desec
           - --data
-          - /tmp/inwx-auth
+          - /tmp/acme-auth
       changed_when: true
 
   always:
-    - name: Remove INWX authentication data file
+    - name: Remove ACME authentication data file
       ansible.builtin.file:
-        dest: /tmp/inwx-auth
+        dest: /tmp/acme-auth
         state: absent
 
 - name: Get default ACME account
@@ -105,14 +103,14 @@
   changed_when: false
 
 - name: Configure ACME domain
-  when: not pve_fqdn ~ ',plugin=inwx-dns' in proxmox_acme_domain.stdout
+  when: not pve_fqdn ~ ',plugin=desec' in proxmox_acme_domain.stdout
   ansible.builtin.command:
     argv:
       - pvenode
       - config
       - set
       - -acmedomain0
-      - "{{ pve_fqdn }},plugin=inwx-dns"
+      - "{{ pve_fqdn }},plugin=desec"
   changed_when: true
 
 # Not sure if this works. Ordering seems impossible when a certificate is still

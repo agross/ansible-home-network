@@ -1,2 +1,0 @@
-inwx_acme_username: "{{ vault_inwx_acme_username }}"
-inwx_acme_password: "{{ vault_inwx_acme_password }}"

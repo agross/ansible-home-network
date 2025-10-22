@@ -1,0 +1,1 @@
+gateway_dyndns_password: "{{ vault_gateway_dyndns_password }}"

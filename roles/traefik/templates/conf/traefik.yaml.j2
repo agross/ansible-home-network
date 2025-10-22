@@ -61,27 +61,26 @@ certificatesResolvers:
       storage: {{ traefik_config_root_dir }}/acme/letsencrypt.json
       tlsChallenge: {}
 
-  {% if traefik_acme_inwx %}
+  {% if traefik_cert_resolver == 'letsencrypt-dns' %}
   letsencrypt-dns:
     acme:
       email: agross@therightstuff.de
       storage: {{ traefik_config_root_dir }}/acme/letsencrypt-dns.json
       dnsChallenge:
-        provider: inwx
+        provider: {{ traefik_acme_type }}
         propagation:
           # By default, the Traefik/lego provider above verifies the TXT record
           # before letting ACME/Let's Encrypt verify.
-          # The default timeout for the TXT records to be publicly visible on the
-          # authorative INWX DNS servers is 6 minutes. During that time lego
-          # repeatedly checks if they are visible. If not, the check is retried
-          # until the timeout is reached. Otherwise, the certificate order is
-          # passed on to ACME.
+          # The default wait timeout for new TXT records to be publicly visible
+          # on the authorative DNS servers is 2 minutes. During that time lego
+          # repeatedly checks if the new ones are visible. If not, the check is
+          # retried until the timeout is reached. Otherwise, the certificate
+          # order is passed on to ACME.
           #
-          # https://go-acme.github.io/lego/dns/inwx/
+          # https://go-acme.github.io/lego/dns/desec/
           #
           # LEGO_DISABLE_CNAME_SUPPORT needs to be set to true because
-          # {{ network.domain }} has a wildcard CNAME record registered in INWX
-          # DNS.
+          # {{ network.domain }} has a wildcard CNAME record registered in DNS.
           # _acme-challenge.{{ network.domain }} would be resolved to find the
           # delegated domain used for certificate validations.
           # https://letsencrypt.org/2019/10/09/onboarding-your-customers-with-lets-encrypt-and-acme.html#the-advantages-of-a-cname
@@ -89,7 +88,12 @@ certificatesResolvers:
         # Use these DNS servers to find the SOA of the requesting domain.
         # The internal DNS might paint a different picture that is not usable.
         resolvers:
+          {% if traefik_acme_type == 'inwx' %}
           - ns.inwx.de
           - ns2.inwx.de
           - ns3.inwx.eu
+          {% elif traefik_acme_type == 'desec' %}
+          - ns1.desec.io
+          - ns2.desec.org
+          {% endif %}
   {% endif %}
