@@ -2,10 +2,30 @@
   ansible.builtin.file:
     path: "{{ target }}/{{ item.path }}"
     state: directory
-    owner: "{{ files[item.path].owner | default(omit) }}"
-    group: "{{ files[item.path].group | default(omit) }}"
-    mode: "{{ files[item.path].mode | default('755', true) }}"
+    owner: "{{ settings.owner | default(omit) }}"
+    group: "{{ settings.group | default(omit) }}"
+    mode: "{{ settings.mode | default('755', true) }}"
   vars:
+    settings: >-
+      {{
+        files[item.path] |
+        default(fnmatch_candidates | first) |
+        default(None)
+      }}
+    fnmatch_candidates_yaml: |
+      {% for entry in files | ansible.builtin.dict2items %}
+      {% if item.path is fnmatch(entry.key) %}
+      - # for debugging, the key of the follow object is: {{ entry.key }}
+        {{ entry.value }}
+      {% endif %}
+      {% endfor %}
+    fnmatch_candidates: >-
+      {{
+        fnmatch_candidates_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
     root_directory: >-
       {{
         {
@@ -21,16 +41,37 @@
       selectattr('state', 'eq', 'directory')
     }}
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }}{{ ' settings=' ~ settings if settings }}"
   notify: "{{ notify_ | default(omit) }}"
 
 - name: Copy non-template files
   ansible.builtin.copy:
     src: "{{ item.src }}"
-    dest: "{{ target }}/{{ files[item.path].rename | default(item.path) }}"
-    owner: "{{ files[item.path].owner | default(omit) }}"
-    group: "{{ files[item.path].group | default(omit) }}"
-    mode: "{{ files[item.path].mode | default('preserve', true) }}"
+    dest: "{{ target }}/{{ settings.rename | default(item.path) }}"
+    owner: "{{ settings.owner | default(omit) }}"
+    group: "{{ settings.group | default(omit) }}"
+    mode: "{{ settings.mode | default('preserve', true) }}"
+  vars:
+    settings: >-
+      {{
+        files[item.path] |
+        default(fnmatch_candidates | first) |
+        default(None)
+      }}
+    fnmatch_candidates_yaml: |
+      {% for entry in files | ansible.builtin.dict2items %}
+      {% if item.path is fnmatch(entry.key) %}
+      - # for debugging, the key of the follow object is: {{ entry.key }}
+        {{ entry.value }}
+      {% endif %}
+      {% endfor %}
+    fnmatch_candidates: >-
+      {{
+        fnmatch_candidates_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
   loop: >-
     {{
       lookup('community.general.filetree',
@@ -41,7 +82,7 @@
       rejectattr('path', 'ansible.builtin.search', '/\.gitignore$')
     }}
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }}{{ ' settings=' ~ settings if settings }}"
   notify: "{{ notify_ | default(omit) }}"
 
 - name: Copy template files
@@ -51,15 +92,36 @@
       {{
         target
       }}/{{
-        files[item.path].rename |
+        settings.rename |
         default(
           item.path | ansible.builtin.regex_replace('\.j2$', '')
         )
       }}
-    owner: "{{ files[item.path].owner | default(omit) }}"
-    group: "{{ files[item.path].group | default(omit) }}"
-    mode: "{{ files[item.path].mode | default('preserve', true) }}"
+    owner: "{{ settings.owner | default(omit) }}"
+    group: "{{ settings.group | default(omit) }}"
+    mode: "{{ settings.mode | default('preserve', true) }}"
     lstrip_blocks: true
+  vars:
+    settings: >-
+      {{
+        files[item.path] |
+        default(fnmatch_candidates | first) |
+        default(None)
+      }}
+    fnmatch_candidates_yaml: |
+      {% for entry in files | ansible.builtin.dict2items %}
+      {% if item.path is fnmatch(entry.key) %}
+      - # for debugging, the key of the follow object is: {{ entry.key }}
+        {{ entry.value }}
+      {% endif %}
+      {% endfor %}
+    fnmatch_candidates: >-
+      {{
+        fnmatch_candidates_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        list
+      }}
   loop: >-
     {{
       lookup('community.general.filetree',
@@ -70,5 +132,5 @@
       rejectattr('path', 'ansible.builtin.search', '/\.gitignore$')
     }}
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }}{{ ' settings=' ~ settings if settings }}"
   notify: "{{ notify_ | default(omit) }}"
