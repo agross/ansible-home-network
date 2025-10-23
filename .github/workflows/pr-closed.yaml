@@ -51,6 +51,14 @@ jobs:
               --name-status \
               ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}
 
+      - name: Show affected files (alternative)
+        run: |
+          real_base_commit=$(git merge-base ${{ github.event.pull_request.merge_commit_sha}} ${{ github.event.pull_request.head.sha }})
+
+          git diff \
+              --name-status \
+              $real_base_commit..${{ github.event.pull_request.head.sha }}
+
       - name: Determine roles from affected files
         id: affected-roles
         run: |
