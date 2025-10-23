@@ -18,46 +18,44 @@ jobs:
       roles: ${{ steps.affected-roles.outputs.roles }}
 
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "$GITHUB_CONTEXT"
-
-     # The base.sha is incorrect if merging the PR causes a rebase. The head.sha
-     # is the commit the PR was created from in this case. Check if base.sha
-     # and head.sha match for already-rebased PRs. If they to, replace base.sha
-     # with head.sha below.
-      - name: Dump GitHub context
-        run: |
-          echo "pull_request.base.sha=${{ github.event.pull_request.base.sha }}"
-          echo "github.event.pull_request.merge_commit_sha=${{ github.event.pull_request.base.sha }}"
-          echo "github.event.pull_request.head.sha=${{ github.event.pull_request.head.sha }}"
-
-
-      - name: Get latest code
+      - name: Get full commit history
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
-      - name: Download base commit and merge commit
+      - name: Download original PR branch
         run: |
           git fetch \
               origin \
-              ${{ github.event.pull_request.base.sha }} \
-              ${{ github.event.pull_request.merge_commit_sha }}
+              ${{ github.event.pull_request.head.sha }}
+
+      # If merging the PR caused a rebase (because new commits have been added
+      # to the PR target branch before the PR was merged):
+      # The pull_request.base.sha points to PR target branch commit before the
+      # rebase. The pull_request.head.sha denotes the last commit on the
+      # PR branch before the PR was rebased.
+      - name: Compute base commit
+        id: base-commit
+        run: |
+          echo "pull_request.base.sha=${{ github.event.pull_request.base.sha }}"
+          echo "pull_request.merge_commit_sha=${{ github.event.pull_request.merge_commit_sha }}"
+          echo "pull_request.head.sha=${{ github.event.pull_request.head.sha }}"
+
+          {
+            echo 'sha<<SHA'
+
+            git merge-base \
+                ${{ github.event.pull_request.merge_commit_sha }} \
+                ${{ github.event.pull_request.head.sha }}
+
+            echo SHA
+          } >> "$GITHUB_OUTPUT"
 
       - name: Show affected files
         run: |
           git diff \
               --name-status \
-              ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}
-
-      - name: Show affected files (alternative)
-        run: |
-          real_base_commit=$(git merge-base ${{ github.event.pull_request.merge_commit_sha}} ${{ github.event.pull_request.head.sha }})
-
-          git diff \
-              --name-status \
-              $real_base_commit..${{ github.event.pull_request.head.sha }}
+              ${{ steps.base-commit.outputs.sha }}..${{ github.event.pull_request.head.sha }}
 
       - name: Determine roles from affected files
         id: affected-roles
@@ -65,7 +63,7 @@ jobs:
           {
             echo 'roles<<ROLES'
 
-            git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} -- host_vars group_vars roles |
+            git diff --name-only ${{ steps.base-commit.outputs.sha }}..${{ github.event.pull_request.head.sha }} -- host_vars group_vars roles |
             sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' -e 's|roles/\([^/]*\)/.*|\1|' |
             sort |
             uniq |
