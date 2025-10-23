@@ -24,6 +24,17 @@ jobs:
         run: |
           echo "$GITHUB_CONTEXT"
 
+     # The base.sha is incorrect if merging the PR causes a rebase. The head.sha
+     # is the commit the PR was created from in this case. Check if base.sha
+     # and head.sha match for already-rebased PRs. If they to, replace base.sha
+     # with head.sha below.
+      - name: Dump GitHub context
+        run: |
+          echo "pull_request.base.sha=${{ github.event.pull_request.base.sha }}"
+          echo "github.event.pull_request.merge_commit_sha=${{ github.event.pull_request.base.sha }}"
+          echo "github.event.pull_request.head.sha=${{ github.event.pull_request.head.sha }}"
+
+
       - name: Get latest code
         uses: actions/checkout@v5
 
