@@ -1,12 +1,3 @@
-- name: Create root directory
-  ansible.builtin.file:
-    path: "{{ target }}"
-    state: directory
-    owner: "{{ files[target].owner | default(omit) }}"
-    group: "{{ files[target].group | default(omit) }}"
-    mode: "{{ files[target].mode | default('755', true) }}"
-  notify: "{{ notify_ | default(omit) }}"
-
 - name: Create directories
   ansible.builtin.file:
     path: "{{ target }}/{{ item.path }}"
@@ -14,8 +5,16 @@
     owner: "{{ files[item.path].owner | default(omit) }}"
     group: "{{ files[item.path].group | default(omit) }}"
     mode: "{{ files[item.path].mode | default('755', true) }}"
+  vars:
+    root_directory: >-
+      {{
+        {
+          'path': ''
+        }
+      }}
   loop: >-
     {{
+      [root_directory] +
       lookup('community.general.filetree',
              directory,
              wantlist = true) |
