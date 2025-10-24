@@ -83,6 +83,12 @@
       "description": "Allow known MySQL stable releases, https://endoflife.date/mysql",
       "matchPackageNames": ["mysql"],
       "allowedVersions": "/^(8\\.4|9\\.7)(\\.[0-9]+)?$/"
+    },
+    {
+      "description": "Nextcloud images are often broken if pulled immediately after release, delay PR creation",
+      "matchPackageNames": ["nextcloud"],
+      "minimumReleaseAge": "2 days",
+      "internalChecksFilter": "strict"
     }
   ]
 }
