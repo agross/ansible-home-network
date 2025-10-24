@@ -51,4 +51,4 @@
     path: "/etc/systemd/system/{{ item }}"
     force: true
   loop: "{{ systemd_units }}"
-  notify: "{{ notify | default(omit) }}"
+  notify: "{{ notify_ | default(omit) }}"
