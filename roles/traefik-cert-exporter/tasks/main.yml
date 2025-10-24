@@ -1,0 +1,38 @@
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ traefik_cert_exporter_root }}"
+    notify_: Restart traefik-cert-exporter timer
+    files:
+      export:
+        mode: "700"
+
+- name: Copy templates for {{ inventory_hostname }}
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: "templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
+    target: "{{ traefik_cert_exporter_root }}/hooks"
+    files:
+      "*":
+        mode: "750"
+      "**/*":
+        mode: "750"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ traefik_cert_exporter_root }}/systemd"
+    local_units: templates/systemd
+    notify_: Restart traefik-cert-exporter timer
+
+- name: Start systemd units
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: traefik_cert_exporter_started

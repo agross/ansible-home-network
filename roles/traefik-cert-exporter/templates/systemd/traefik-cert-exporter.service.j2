@@ -1,0 +1,9 @@
+[Unit]
+Description=Traefik certificate exporter
+Wants=network-online.target
+After=network-online.target
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+Type=oneshot
+ExecStart={{ traefik_cert_exporter_root }}/bin/run

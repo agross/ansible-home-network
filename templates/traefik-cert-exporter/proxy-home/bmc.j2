@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+if [[ "${DOMAIN-}" != therightstuff.de ]]; then
+  exit
+fi
+
+bmc=https://172.16.0.253
+bmc_user={{ bmc_user | ansible.builtin.quote }}
+bmc_password={{ bmc_password | ansible.builtin.quote }}
+
+curl_cookie_jar="$(mktemp)"
+trap '{ rm -f -- "$curl_cookie_jar"; }' EXIT
+
+curl=(curl --insecure
+           --silent
+           --show-error
+           --fail
+           --cookie-jar "$curl_cookie_jar"
+           --cookie "$curl_cookie_jar")
+
+>&2 printf "Updating cert on BMC %s for domain %s\n" "$bmc" "$DOMAIN"
+
+if ! token="$("${curl[@]}" \
+                --data-raw "username=$bmc_user&password=$bmc_password" \
+                "$bmc/api/session" |
+              jq --raw-output .CSRFToken)"; then
+  >&2 printf 'Login failed\n'
+  exit 1
+fi
+
+>&2 printf 'Logged in with CSRF token %s\n' "$token"
+
+"${curl[@]}" \
+  --header "X-CSRFTOKEN: $token" \
+  --header "Content-Type: application/json" \
+  --data-raw '{"uid_command":1}' \
+  "$bmc/api/actions/chassis-led"
+
+>&2 printf '\nUID LED blinks temporarily\n'
+
+"${curl[@]}" \
+  --header "X-CSRFTOKEN: $token" \
+  --form "new_certificate=@$CERT" \
+  --form "new_private_key=@$CERT_KEY" \
+  "$bmc/api/settings/ssl/certificate"
+
+>&2 printf '\nDone\n'

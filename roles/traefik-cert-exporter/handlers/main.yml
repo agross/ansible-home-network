@@ -1,0 +1,5 @@
+- name: Restart traefik-cert-exporter timer
+  when: traefik_cert_exporter_started is not changed
+  ansible.builtin.systemd:
+    name: traefik-cert-exporter.timer
+    state: restarted
