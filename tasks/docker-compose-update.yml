@@ -8,7 +8,7 @@
       - pull
   register: docker_compose_pull
   changed_when: "'Pull complete' in docker_compose_pull.stderr"
-  notify: "{{ notify | default(omit) }}"
+  notify: "{{ notify_ | default(omit) }}"
 
 - name: Build docker images
   when: build is defined and build | bool
@@ -25,4 +25,4 @@
   changed_when: >-
     docker_compose_build.stdout_lines | length > 0 and
     not 'exporting layers done' in docker_compose_build.stdout
-  notify: "{{ notify | default(omit) }}"
+  notify: "{{ notify_ | default(omit) }}"
