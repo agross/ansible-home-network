@@ -1,5 +1,3 @@
-passwordless_sudo_group: ansible
-
 system_users_combined: >-
   {{
     system_users |
