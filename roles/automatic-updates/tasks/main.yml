@@ -25,4 +25,4 @@
     ansible_os_family == 'Debian'
     and not ansible_virtualization_role == 'host'
   ansible.builtin.include_role:
-    name: hifis.unattended_upgrades
+    name: hifis.toolkit.unattended_upgrades
