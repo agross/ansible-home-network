@@ -1,5 +1,5 @@
 # renovate: github-releases=prometheus/node_exporter
-node_exporter_version: 1.9.1
+node_exporter_version: 1.10.0
 
 # renovate: github-releases=google/cadvisor
 cadvisor_release_version: v0.53.0
