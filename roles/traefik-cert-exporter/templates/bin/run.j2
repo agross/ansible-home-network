@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+export_dir={{ traefik_cert_exporter_root | ansible.builtin.quote }}/export
+hooks_dir={{ traefik_cert_exporter_root | ansible.builtin.quote }}/hooks
+acme={{ traefik_config_root_dir | ansible.builtin.quote }}/acme
+
+mkdir --parents -- "$export_dir" "$hooks_dir"
+
+printf -v now "@%(%s)T"
+
+find "$acme" -type f -name '*.json' -exec \
+  {{ traefik_cert_exporter_root | ansible.builtin.quote }}/bin/export-certs \
+  {} \
+  "$export_dir" \
+  \;
+
+mapfile -t certs < <(find "$export_dir/certs" -type f -name '*.crt' -newermt "$now")
+mapfile -t hooks < <(find "$hooks_dir" -type f -executable)
+
+failed_hooks=0
+
+for cert in "${certs[@]}"; do
+  domain="${cert%.crt}"
+  domain="${domain##*/}"
+
+  key="$export_dir/private/$domain.key"
+
+  printf 'DOMAIN=%s\nCERT=%s\nCERT_KEY=%s\n' "$domain" "$cert" "$key"
+
+  for hook in "${hooks[@]}"; do
+    printf 'Executing hook: %s\n' "$hook"
+
+    if ! DOMAIN=$domain CERT=$cert CERT_KEY=$key "$hook"; then
+      printf 'Hook failed\n'
+      (( ++failed_hooks ))
+    fi
+  done
+done
+
+if (( failed_hooks > 0 )); then
+  printf '%s hooks failed' "$failed_hooks"
+  exit 1
+fi

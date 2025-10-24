@@ -1,0 +1,2 @@
+bmc_user: "{{ vault_bmc_user }}"
+bmc_password: "{{ vault_bmc_password }}"

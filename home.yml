@@ -58,6 +58,8 @@
   roles:
     - role: traefik
       tags: traefik
+    - role: traefik-cert-exporter
+      tags: traefik-cert-exporter
 
 - name: Home automation
   hosts: nest

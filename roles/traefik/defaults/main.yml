@@ -1,4 +1,4 @@
-traefik_root: "/data/{{ ansible_role_name }}"
+traefik_root: /data/traefik
 
 traefik_install_method: docker
 

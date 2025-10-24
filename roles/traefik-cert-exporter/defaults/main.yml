@@ -1,0 +1,1 @@
+traefik_cert_exporter_root: "/data/{{ ansible_role_name }}"
