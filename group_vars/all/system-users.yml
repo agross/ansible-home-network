@@ -1,3 +1,5 @@
+passwordless_sudo_group: ansible
+
 system_users:
   agross:
     name: Alexander Groß
