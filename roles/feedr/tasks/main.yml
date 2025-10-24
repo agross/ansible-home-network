@@ -28,8 +28,8 @@
     file: docker-compose-update.yml
   vars:
     directory: "{{ feedr_root }}"
-    pull: "{{ docker_update is defined }}"
-    build: "{{ docker_update is defined }}"
+    pull: --policy=always
+    build: true
     notify_: Restart feedr service
 
 - name: Install systemd units

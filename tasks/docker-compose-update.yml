@@ -1,11 +1,25 @@
+# pull undefined -> skip task
+# pull == false -> skip task
+# pull == true -> argv_default
+# pull is string -> argv_default + [string]
+# pull is list -> argv_default + list
 - name: Pull docker images
-  when: pull is defined and pull | bool
+  when: pull is defined and (pull is string or pull is sequence or pull | bool)
   ansible.builtin.command:
     chdir: "{{ directory }}"
-    argv:
+    argv: "{{ argv_combined }}"
+  vars:
+    argv_default:
       - docker
       - compose
       - pull
+    argv_optional: >-
+      {{
+        [pull] if pull is string
+        else pull if pull is sequence
+        else []
+      }}
+    argv_combined: "{{ argv_default + argv_optional }}"
   register: docker_compose_pull
   changed_when: "'Pull complete' in docker_compose_pull.stderr"
   notify: "{{ notify_ | default(omit) }}"
