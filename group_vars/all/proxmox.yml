@@ -1,0 +1,1 @@
+proxmox_default_root_password: "{{ vault_proxmox_default_root_password }}"
