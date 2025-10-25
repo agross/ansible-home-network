@@ -1,3 +1,5 @@
+cockpit_port: 9090
+
 cockpit_proxied_hosts: >-
   {{
     groups[site] |
