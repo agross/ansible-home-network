@@ -6,9 +6,9 @@
     release: "{{ traefik_github_release_version }}"
     asset_name_regex: >-
       ^traefik_v.*_{{
-        ansible_system | lower | ansible.builtin.regex_escape
+        ansible_facts.system | lower | ansible.builtin.regex_escape
       }}_{{
-        traefik_arch_to_package_suffix[ansible_architecture] |
+        traefik_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
     dest: "/tmp/traefik-{{ traefik_github_release_version }}.tar.gz"

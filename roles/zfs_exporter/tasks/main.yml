@@ -6,9 +6,9 @@
     release: "{{ zfs_exporter_release_version }}"
     asset_name_regex: >-
       ^zfs_exporter-.*\.{{
-        ansible_system | lower | ansible.builtin.regex_escape
+        ansible_facts.system | lower | ansible.builtin.regex_escape
       }}-{{
-        zfs_exporter_arch_to_package_suffix[ansible_architecture] |
+        zfs_exporter_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
     dest: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz"

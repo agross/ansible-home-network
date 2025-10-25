@@ -4,4 +4,4 @@ scrape_configs:
       - targets:
           - localhost:9090
         labels:
-          instance: {{ ansible_hostname }}
+          instance: {{ ansible_facts.hostname }}

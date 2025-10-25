@@ -2,9 +2,9 @@ cockpit_proxied_hosts: >-
   {{
     groups[site] |
     map('ansible.builtin.extract', hostvars) |
-    selectattr('ansible_system', 'defined') |
-    selectattr('ansible_system', 'equalto', 'Linux') |
-    rejectattr('ansible_distribution', 'equalto', 'OtherLinux') |
+    selectattr('ansible_facts.system', 'defined') |
+    selectattr('ansible_facts.system', 'equalto', 'Linux') |
+    rejectattr('ansible_facts.distribution', 'equalto', 'OtherLinux') |
     rejectattr('cockpit', 'defined') |
     map(attribute = 'inventory_hostname') |
     list

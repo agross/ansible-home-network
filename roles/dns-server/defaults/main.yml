@@ -20,9 +20,9 @@ dns_server_download_assets:
     release: "{{ dns_server_adguard_release_version }}"
     asset_name_regex: >-
       ^AdGuardHome_{{
-        ansible_system | lower | ansible.builtin.regex_escape
+        ansible_facts.system | lower | ansible.builtin.regex_escape
       }}_{{
-        dns_server_adguard_arch_to_package_suffix[ansible_architecture] |
+        dns_server_adguard_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
     tmp: "/tmp/adguard-{{ dns_server_adguard_release_version }}.tar.gz"
@@ -33,13 +33,13 @@ dns_server_download_assets:
     release: "{{ dns_server_dnscrypt_release_version }}"
     asset_name_regex: >-
       ^dnscrypt-proxy-{{
-        ansible_system | lower | ansible.builtin.regex_escape
+        ansible_facts.system | lower | ansible.builtin.regex_escape
       }}_{{
-        ansible_architecture | ansible.builtin.regex_escape
+        ansible_facts.architecture | ansible.builtin.regex_escape
       }}-.*\.tar\.gz$
     tmp: "/tmp/dnscrypt-proxy-{{ dns_server_dnscrypt_release_version }}.tar.gz"
     binary: >-
-      {{ ansible_system | lower }}-{{ ansible_architecture }}/dnscrypt-proxy
+      {{ ansible_facts.system | lower }}-{{ ansible_facts.architecture }}/dnscrypt-proxy
     dest: "{{ dns_server_root }}/bin/dnscrypt-proxy"
 
 dns_server_firewalld_services: []

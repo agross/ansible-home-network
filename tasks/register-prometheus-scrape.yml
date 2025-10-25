@@ -27,7 +27,7 @@
       - targets:
           - {{ item.1 }}
         labels:
-          instance: {{ ansible_hostname | lower }}
+          instance: {{ ansible_facts.hostname | lower }}
           app: {{ app }}
     dest: >-
       {{

@@ -87,7 +87,7 @@ services:
       - path.repo=/backups
       # No security.
       - xpack.security.enabled=false
-    {% if 'container' not in ansible_virtualization_tech_guest %}
+    {% if 'container' not in ansible_facts.virtualization_tech_guest %}
     # Containers need this as lxc.prlimit.memlock=-1.
     ulimits:
       memlock:

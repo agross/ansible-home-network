@@ -1,5 +1,5 @@
 - name: Install cockpit (dnf)
-  when: ansible_pkg_mgr is ansible.builtin.match('dnf')
+  when: ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
   ansible.builtin.dnf:
     name:
       - cockpit
@@ -9,7 +9,7 @@
     state: present
 
 - name: Install cockpit (apt)
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_facts.pkg_mgr == 'apt'
   ansible.builtin.apt:
     name:
       - cockpit
@@ -55,11 +55,11 @@
     - name: Set SSH key to connect to proxied hosts
       ansible.builtin.copy:
         dest: >-
-          /home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/.ssh/id_{{ cockpit_ssh_key_type }}
+          /home/{{ ansible_facts.env.SUDO_USER | default(ansible_facts.user_id) }}/.ssh/id_{{ cockpit_ssh_key_type }}
         content: "{{ cockpit_ssh_private_key }}"
         mode: "600"
-        owner: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
-        group: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+        owner: "{{ ansible_facts.env.SUDO_USER | default(ansible_facts.user_id) }}"
+        group: "{{ ansible_facts.env.SUDO_USER | default(ansible_facts.user_id) }}"
 
     - name: Configure proxied hosts
       ansible.builtin.template:
@@ -74,7 +74,7 @@
     cockpit | default('') != 'bastion' and
     cockpit_ssh_public_key is defined
   ansible.posix.authorized_key:
-    user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+    user: "{{ ansible_facts.env.SUDO_USER | default(ansible_facts.user_id) }}"
     key: "{{ cockpit_ssh_public_key }}"
 
 - name: Register with loadbalancer

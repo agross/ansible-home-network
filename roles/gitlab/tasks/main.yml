@@ -26,7 +26,7 @@
 
 - name: Add vm.overcommit_memory sysctl for Redis
   when: >-
-    'container' not in ansible_virtualization_tech_guest
+    'container' not in ansible_facts.virtualization_tech_guest
   ansible.posix.sysctl:
     name: vm.overcommit_memory
     value: "1"

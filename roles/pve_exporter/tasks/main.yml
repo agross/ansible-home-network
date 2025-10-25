@@ -8,7 +8,7 @@
   ansible.builtin.pip:
     name: prometheus-pve-exporter=={{ pve_exporter_version }}
     virtualenv: "{{ pve_exporter_root }}"
-    virtualenv_command: "{{ ansible_python.executable }} -m venv"
+    virtualenv_command: "{{ ansible_facts.python.executable }} -m venv"
   notify: Restart pve_exporter service
 
 - name: Template config file

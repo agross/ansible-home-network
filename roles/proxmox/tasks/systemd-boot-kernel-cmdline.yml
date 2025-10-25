@@ -21,7 +21,7 @@
           {% for k in proxmox_kernel_cmdline | default([]) %}
           - {{ k }}
           {% endfor %}
-          {% if 'GenuineIntel' in ansible_processor %}
+          {% if 'GenuineIntel' in ansible_facts.processor %}
           - intel_iommu=on
           {% endif %}
           {% if pve_iommu_passthrough_mode | ansible.builtin.bool %}

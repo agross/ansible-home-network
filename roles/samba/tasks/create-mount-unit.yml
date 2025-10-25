@@ -34,14 +34,14 @@
   notify: Restart SMB services
 
 - name: Install SELinux packages
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   ansible.builtin.package:
     name:
       - python3-policycoreutils
     state: present
 
 - name: Set SELinux file context
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   block:
     - name: Set SELinux file contexts below {{ samba_share_path }}
       community.general.sefcontext:

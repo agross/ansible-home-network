@@ -19,7 +19,7 @@ password {{ google_smtp_password | mandatory }}
 # Must not be localhost as per Google Workspace.
 # https://marlam.de/msmtp/msmtp.html#domain states we can use %H, but we cannot,
 # at least on Raspbian.
-domain {{ ansible_hostname | mandatory }}.{{ network.domain | mandatory }}
+domain {{ ansible_facts.hostname | mandatory }}.{{ network.domain | mandatory }}
 
 # Set envelope from address. Must match the {{ google_smtp_user }} domain as per
 # the Google Workspace settings.

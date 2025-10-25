@@ -3,8 +3,8 @@ docker_install_compose: false
 docker_users: >-
   {{
     [
-      ansible_env.SUDO_USER |
-      default(ansible_user_id) |
+      ansible_facts.env.SUDO_USER |
+      default(ansible_facts.user_id) |
       default(None)
     ] |
     select

@@ -7,7 +7,7 @@ mqtt:
   enabled: true
   host: mqtt
   topic_prefix: {{ frigate_mqtt_topic_prefix }}
-  client_id: frigate-{{ ansible_hostname }}
+  client_id: frigate-{{ ansible_facts.hostname }}
   user: "{FRIGATE_MQTT_USER}"
   password: "{FRIGATE_MQTT_PASSWORD}"
 

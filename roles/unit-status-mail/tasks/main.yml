@@ -13,13 +13,13 @@
     )
   block:
     - name: Install msmtp-mta (apt)
-      when: ansible_pkg_mgr == 'apt'
+      when: ansible_facts.pkg_mgr == 'apt'
       ansible.builtin.package:
         name: msmtp-mta
         state: present
 
     - name: Install msmtp (dnf)
-      when: ansible_pkg_mgr is ansible.builtin.match('dnf')
+      when: ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
       ansible.builtin.package:
         name: msmtp
         state: present
@@ -59,21 +59,21 @@
     force: true
 
 - name: Install SELinux packages
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   ansible.builtin.package:
     name:
       - python3-policycoreutils
     state: present
 
 - name: Allow execution of the unit-status-mail script
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   community.general.sefcontext:
     target: "{{ unit_status_mail_root }}/unit-status-mail"
     setype: bin_t
     state: present
 
 - name: Apply SELinux file context for binaries
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   ansible.builtin.command:
     argv:
       - restorecon

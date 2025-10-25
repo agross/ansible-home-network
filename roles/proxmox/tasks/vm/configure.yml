@@ -1,6 +1,6 @@
 - name: Retrieve pending guest VM config # noqa args[module]
   community.proxmox.proxmox_vm_info:
-    node: "{{ ansible_hostname | ansible.builtin.mandatory }}"
+    node: "{{ ansible_facts.hostname | ansible.builtin.mandatory }}"
     type: qemu
     config: pending
   register: proxmox_kvm_config
