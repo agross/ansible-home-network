@@ -20,15 +20,15 @@ http:
     {{ ansible_role_name }}:
       loadBalancer:
         servers:
-          - url: http://{{ iobroker_ip4 }}:8081
+          - url: http://{{ iobroker_ip4 }}:{{ iobroker_ports.iobroker }}
 
     {{ ansible_role_name }}-lovelace:
       loadBalancer:
         servers:
-          - url: http://{{ iobroker_ip4 }}:8091
+          - url: http://{{ iobroker_ip4 }}:{{ iobroker_ports.lovelace }}
 
     {{ ansible_role_name }}-telegram:
       loadBalancer:
         serversTransport: no-verify
         servers:
-          - url: https://{{ iobroker_ip4 }}:8443
+          - url: https://{{ iobroker_ip4 }}:{{ iobroker_ports.telegram }}

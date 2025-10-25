@@ -9,6 +9,8 @@ dns_cname_records:
   - "{{ immich_domain | mandatory }}"
 
   - "{{ logger_grafana_domain | ansible.builtin.mandatory }}"
+  - "influxdb.{{ network.domain }}"
+
   - "iobroker.{{ network.domain }}"
   - "lovelace.{{ network.domain }}"
   - "telegram.{{ network.domain }}"
