@@ -9,6 +9,5 @@ http:
   services:
     {{ ansible_role_name }}:
       loadBalancer:
-        serversTransport: no-verify
         servers:
-          - url: https://{{ interfaces.lan.ip4.address }}:9090
+          - url: http://localhost:{{ cockpit_port }}

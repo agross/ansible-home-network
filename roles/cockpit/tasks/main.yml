@@ -25,6 +25,22 @@
     state: started
     enabled: true
 
+- name: Ensure cockpit socket systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/cockpit.socket.d
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Configure listen port
+  ansible.builtin.template:
+    src: listen.conf.j2
+    dest: /etc/systemd/system/cockpit.socket.d/listen.conf
+    owner: 0
+    group: 0
+    mode: "644"
+
 - name: Configure bastion host
   when: cockpit | default('') == 'bastion'
   block:
@@ -33,6 +49,7 @@
         unit: cockpit.socket
         state: started
         enabled: true
+        daemon_reload: true
 
     # https://github.com/cockpit-project/cockpit/wiki/Proxying-Cockpit-over-nginx
     - name: Make cockpit proxy-aware
