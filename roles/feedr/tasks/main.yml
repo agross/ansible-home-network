@@ -28,7 +28,7 @@
     file: docker-compose-update.yml
   vars:
     directory: "{{ feedr_root }}"
-    pull: --policy=always
+    pull: always
     build: true
     notify_: Restart feedr service
 
