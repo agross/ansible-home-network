@@ -43,6 +43,7 @@ services:
     restart: unless-stopped
     env_file: ./iobroker/.env
     hostname: iobroker
+    {% if traefik_host | default(false) | bool %}
     labels:
       traefik.enable: 'true'
       traefik.http.routers.iobroker.entrypoints: https
@@ -74,6 +75,12 @@ services:
       traefik.http.routers.iobroker-lovelace-guests.middlewares:
         iobroker-lovelace-guests-ipallowlist
       {% endif %}
+    {% else %}
+    ports:
+      {% for kvp in iobroker_ports | ansible.builtin.dict2items %}
+      - "{{ kvp.value }}:{{ kvp.value }}" # {{ kvp.key }}
+      {% endfor %}
+    {% endif %}
     networks:
       default:
       {% if traefik_host | default(false) | bool %}

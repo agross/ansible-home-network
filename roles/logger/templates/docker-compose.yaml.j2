@@ -94,12 +94,12 @@ services:
       GF_SMTP_EHLO_IDENTITY: {{ logger_grafana_domain }}
       GF_SMTP_FROM_ADDRESS: grafana@{{ ansible_facts.hostname }}.{{ network.domain }}
       {% endif %}
+    {% if traefik_host %}
     labels:
       traefik.enable: 'true'
       traefik.http.routers.grafana.entrypoints: https
       traefik.http.routers.grafana.rule: Host(`grafana.{{ network.domain }}`)
       traefik.http.services.grafana.loadbalancer.server.port: 3000
-    {% if traefik_host %}
     networks:
       - default
       - web

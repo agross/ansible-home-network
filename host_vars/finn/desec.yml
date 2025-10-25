@@ -1,1 +1,0 @@
-desec_acme_token: "{{ vault_desec_acme_token }}"
