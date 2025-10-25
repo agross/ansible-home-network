@@ -52,7 +52,7 @@ services:
       FN_FRIGATE__MQTT__SERVER: mqtt
       FN_FRIGATE__MQTT__USERNAME: {{ frigate_notify_mqtt_user }}
       FN_FRIGATE__MQTT__PASSWORD: {{ frigate_notify_mqtt_password }}
-      FN_FRIGATE__MQTT__CLIENTID: frigate-notify-{{ ansible_hostname }}
+      FN_FRIGATE__MQTT__CLIENTID: frigate-notify-{{ ansible_facts.hostname }}
       FN_FRIGATE__MQTT__TOPIC_PREFIX: {{ frigate_mqtt_topic_prefix }}
 
       FN_MONITOR__ENABLED: true

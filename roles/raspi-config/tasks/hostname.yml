@@ -1,5 +1,5 @@
 - name: Set hostname to match inventory_hostname
-  when: ansible_hostname != inventory_hostname
+  when: ansible_facts.hostname != inventory_hostname
   block:
     - name: Set hostname to match inventory_hostname
       ansible.builtin.command:

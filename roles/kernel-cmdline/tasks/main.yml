@@ -1,8 +1,8 @@
 - name: Remove "rhgb" kernel command line argument
   when:
-    - ansible_os_family == 'RedHat'
+    - ansible_facts.os_family == 'RedHat'
     - >-
-      'container' not in ansible_virtualization_tech_guest
+      'container' not in ansible_facts.virtualization_tech_guest
   block:
     - name: Check if "rhgb" is currently used
       ansible.builtin.lineinfile:

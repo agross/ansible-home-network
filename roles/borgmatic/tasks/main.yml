@@ -2,8 +2,8 @@
   ansible.builtin.include_tasks:
     file: "{{ file }}"
   with_first_found:
-    - "install-{{ ansible_distribution }}.yml"
-    - "install-{{ ansible_os_family }}.yml"
+    - "install-{{ ansible_facts.distribution }}.yml"
+    - "install-{{ ansible_facts.os_family }}.yml"
   loop_control:
     loop_var: file
 
@@ -22,7 +22,7 @@
           }}/volume2/NetBackup/borg/{{
             site | ansible.builtin.mandatory
           }}/{{
-            borgmatic_server_name | default(ansible_hostname)
+            borgmatic_server_name | default(ansible_facts.hostname)
           }}
 
     borgmatic_relocated_repo_access_is_ok: true
@@ -82,8 +82,8 @@
   ansible.builtin.include_tasks:
     file: "{{ file }}"
   with_first_found:
-    - "postinstall-{{ ansible_distribution }}.yml"
-    - "postinstall-{{ ansible_os_family }}.yml"
+    - "postinstall-{{ ansible_facts.distribution }}.yml"
+    - "postinstall-{{ ansible_facts.os_family }}.yml"
   loop_control:
     loop_var: file
 

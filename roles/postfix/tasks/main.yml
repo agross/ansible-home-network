@@ -28,13 +28,13 @@
   when: google_smtp_user is defined
   block:
     - name: Install SASL authentication package (apt)
-      when: ansible_pkg_mgr == 'apt'
+      when: ansible_facts.pkg_mgr == 'apt'
       ansible.builtin.package:
         name: libsasl2-modules
         state: present
 
     - name: Install SASL authentication package (dnf)
-      when: ansible_pkg_mgr is ansible.builtin.match('dnf')
+      when: ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
       ansible.builtin.package:
         name: cyrus-sasl-plain
         state: present

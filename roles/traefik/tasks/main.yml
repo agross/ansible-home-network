@@ -78,4 +78,4 @@
   vars:
     app: "{{ ansible_role_name }}"
     scrapes:
-      - "{{ ansible_hostname }}:8080"
+      - "{{ ansible_facts.hostname }}:8080"

@@ -1,11 +1,11 @@
 - name: Ensure growpart is available (apt)
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_facts.pkg_mgr == 'apt'
   ansible.builtin.package:
     name: cloud-guest-utils
     state: present
 
 - name: Ensure growpart is available (dnf)
-  when: ansible_pkg_mgr is ansible.builtin.match('dnf')
+  when: ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
   ansible.builtin.package:
     name: cloud-utils-growpart
     state: present
@@ -21,7 +21,7 @@
   failed_when: growpart_output.stdout is match('FAILED:')
   loop: >-
     {{
-      ansible_devices |
+      ansible_facts.devices |
       ansible.builtin.dict2items |
       selectattr('value.partitions')
     }}
@@ -36,7 +36,7 @@
     resizefs: true
   loop: >-
     {{
-      ansible_mounts |
+      ansible_facts.mounts |
       rejectattr('fstype', 'equalto', 'vfat') |
       ansible.builtin.unique(attribute = 'device')
     }}

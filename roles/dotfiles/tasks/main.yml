@@ -10,8 +10,8 @@
     version: master
     dest: >-
       {{
-        '/home/' ~ ansible_env.SUDO_USER if 'SUDO_USER' in ansible_env
-        else ansible_user_dir
+        '/home/' ~ ansible_facts.env.SUDO_USER if 'SUDO_USER' in ansible_facts.env
+        else ansible_facts.user_dir
       }}/.dotfiles
 
 - name: Bootstrap dotfiles
@@ -20,8 +20,8 @@
     argv:
       - >-
         {{
-          '/home/' ~ ansible_env.SUDO_USER if 'SUDO_USER' in ansible_env
-          else ansible_user_dir
+          '/home/' ~ ansible_facts.env.SUDO_USER if 'SUDO_USER' in ansible_facts.env
+          else ansible_facts.user_dir
         }}/.dotfiles/bootstrap
       - --force
   register: dotfiles_bootstrapper
@@ -29,7 +29,7 @@
 
 - name: Change shell to zsh
   ansible.builtin.user:
-    name: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+    name: "{{ ansible_facts.env.SUDO_USER | default(ansible_facts.user_id) }}"
     shell: /bin/zsh
 
 - name: Install useful tools
@@ -38,13 +38,13 @@
     state: present
 
 - name: Install useful tools (apt)
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_facts.pkg_mgr == 'apt'
   ansible.builtin.package:
     name: "{{ dotfiles_tools_apt }}"
     state: present
 
 - name: Install useful tools (dnf)
-  when: ansible_pkg_mgr is ansible.builtin.match('dnf')
+  when: ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
   ansible.builtin.package:
     name: "{{ dotfiles_tools_dnf }}"
     state: present

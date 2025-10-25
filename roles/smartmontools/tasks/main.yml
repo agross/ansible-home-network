@@ -8,8 +8,8 @@
     file: "{{ file }}"
   with_first_found:
     - files:
-        - "{{ ansible_distribution }}.yml"
-        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_facts.distribution }}.yml"
+        - "{{ ansible_facts.os_family }}.yml"
     - paths:
         - vars
   loop_control:
@@ -33,7 +33,7 @@
   notify: Restart smartmontools service
 
 - name: Ensure virtualized hosts can monitor passed-though devices
-  when: ansible_virtualization_role == 'guest'
+  when: ansible_facts.virtualization_role == 'guest'
   ansible.builtin.template:
     src: enabled-for-virtual-host.conf
     dest: /etc/systemd/system/{{ smartmontools_service_name }}.service.d/enabled-for-virtual-host.conf
@@ -59,7 +59,7 @@
     mode: "755"
 
 - name: Ensure Fedora runs the notifier script
-  when: ansible_distribution == 'Fedora'
+  when: ansible_facts.distribution == 'Fedora'
   ansible.builtin.lineinfile:
     path: /etc/smartmontools/smartd.conf
     regexp: '^(DEVICESCAN .* -M exec) [^\s]+ (.*)$'

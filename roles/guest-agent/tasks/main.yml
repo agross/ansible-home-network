@@ -1,7 +1,7 @@
 - name: Uninstall fwupd on virtual hosts (dnf)
   when: >-
-    ansible_virtualization_role == 'guest' and
-    ansible_pkg_mgr is ansible.builtin.match('dnf')
+    ansible_facts.virtualization_role == 'guest' and
+    ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
   ansible.builtin.dnf:
     name: fwupd
     state: absent
@@ -11,16 +11,16 @@
 
 - name: Uninstall fwupd on virtual hosts (apt)
   when: >-
-    ansible_virtualization_role == 'guest' and
-    ansible_pkg_mgr == 'apt'
+    ansible_facts.virtualization_role == 'guest' and
+    ansible_facts.pkg_mgr == 'apt'
   ansible.builtin.apt:
     name: fwupd
     state: absent
 
 - name: Install and enable QEMU guest agent
   when: >-
-    ansible_virtualization_role == 'guest' and
-    ansible_virtualization_type == 'kvm'
+    ansible_facts.virtualization_role == 'guest' and
+    ansible_facts.virtualization_type == 'kvm'
   block:
     - name: Ensure QEMU guest agent is installed
       ansible.builtin.package:

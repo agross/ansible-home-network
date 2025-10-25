@@ -3,7 +3,7 @@ http:
     dashboard:
       entrypoints: https
       rule: >-
-        Host(`{{ ansible_hostname }}.{{ network.domain | mandatory }}`) &&
+        Host(`{{ ansible_facts.hostname }}.{{ network.domain | mandatory }}`) &&
         (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       middlewares:

@@ -1,5 +1,5 @@
 - name: Automatic updates (dnf)
-  when: ansible_os_family == 'RedHat'
+  when: ansible_facts.os_family == 'RedHat'
   block:
     - name: Ensure dnf5-plugin-automatic is installed
       ansible.builtin.package:
@@ -22,7 +22,7 @@
 
 - name: Automatic updates (apt)
   when: >-
-    ansible_os_family == 'Debian'
-    and not ansible_virtualization_role == 'host'
+    ansible_facts.os_family == 'Debian'
+    and not ansible_facts.virtualization_role == 'host'
   ansible.builtin.include_role:
     name: hifis.toolkit.unattended_upgrades

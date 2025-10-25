@@ -26,21 +26,21 @@
         mode: "640"
 
 - name: Install SELinux packages
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   ansible.builtin.package:
     name:
       - python3-policycoreutils
     state: present
 
 - name: Allow execution of the healthcheck script
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   community.general.sefcontext:
     target: "{{ iobroker_root }}/healthcheck"
     setype: bin_t
     state: present
 
 - name: Apply SELinux file context for the healthcheck script
-  when: ansible_selinux.status != 'disabled'
+  when: ansible_facts.selinux.status != 'disabled'
   ansible.builtin.command:
     argv:
       - restorecon

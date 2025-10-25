@@ -7,7 +7,7 @@
 
 - name: Get Proxmox node info
   ansible.builtin.stat:
-    path: "/etc/pve/nodes/{{ ansible_hostname }}"
+    path: "/etc/pve/nodes/{{ ansible_facts.hostname }}"
   register: proxmox_node_info
 
 # Templating need to be separate because the PVE file system does not handle

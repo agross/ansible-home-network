@@ -1,7 +1,7 @@
 - name: Permanently disable SELinux
   when: >-
-    ansible_selinux.status != 'disabled' and
-    ansible_virtualization_type != 'lxc'
+    ansible_facts.selinux.status != 'disabled' and
+    ansible_facts.virtualization_type != 'lxc'
   ansible.posix.selinux:
     state: permissive
     policy: targeted

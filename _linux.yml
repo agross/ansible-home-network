@@ -8,11 +8,11 @@
     - role: guest-agent
       tags: guest-agent
     - role: uninstall-firmware
-      when: ansible_virtualization_role == 'guest'
+      when: ansible_facts.virtualization_role == 'guest'
       tags: uninstall-firmware
     - role: watchdog
       when: >-
-        ansible_virtualization_role == 'guest' or
+        ansible_facts.virtualization_role == 'guest' or
         'raspi' in group_names
       tags: watchdog
     - role: kernel-cmdline
@@ -23,7 +23,7 @@
       tags: swapfile
     - role: fstrim
       when: >-
-        'container' not in ansible_virtualization_tech_guest
+        'container' not in ansible_facts.virtualization_tech_guest
       tags: fstrim
     - role: filesystem
       tags: filesystem

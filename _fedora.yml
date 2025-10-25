@@ -4,7 +4,7 @@
   gather_facts: false
   tasks:
     - name: Disable units failing on LXC
-      when: ansible_virtualization_type == 'lxc'
+      when: ansible_facts.virtualization_type == 'lxc'
       vars:
         units:
           - audit-rules.service
@@ -42,7 +42,7 @@
   roles:
     - role: systemd-timesyncd
       when: >-
-        'container' not in ansible_virtualization_tech_guest
+        'container' not in ansible_facts.virtualization_tech_guest
       tags:
         - ntp
         - systemd-timesyncd

@@ -1,7 +1,7 @@
 - targets:
-    - {{ ansible_hostname | lower }}:{{ job_port }}
+    - {{ ansible_facts.hostname | lower }}:{{ job_port }}
   labels:
-    instance: {{ ansible_hostname | lower }}
-    {% if ansible_virtualization_role == 'guest' %}
-    virt: {{ ansible_virtualization_type }}
+    instance: {{ ansible_facts.hostname | lower }}
+    {% if ansible_facts.virtualization_role == 'guest' %}
+    virt: {{ ansible_facts.virtualization_type }}
     {% endif %}

@@ -1,6 +1,6 @@
 - name: Ensure systemd-networkd is installed
   # Debian has systemd-networkd included in the systemd package.
-  when: ansible_os_family == 'RedHat'
+  when: ansible_facts.os_family == 'RedHat'
   ansible.builtin.package:
     name: systemd-networkd
     state: present
@@ -9,8 +9,8 @@
   ansible.builtin.include_tasks:
     file: "{{ file }}"
   with_first_found:
-    - "uninstall-{{ ansible_distribution }}.yml"
-    - "uninstall-{{ ansible_os_family }}.yml"
+    - "uninstall-{{ ansible_facts.distribution }}.yml"
+    - "uninstall-{{ ansible_facts.os_family }}.yml"
   loop_control:
     loop_var: file
 
@@ -101,7 +101,7 @@
     name: aruhier.systemd_networkd
 
 - name: Prevent Proxmox PVE from overwriting network config files
-  when: ansible_virtualization_type == 'lxc'
+  when: ansible_facts.virtualization_type == 'lxc'
   ansible.builtin.file:
     path: "/etc/systemd/network/.pve-ignore.{{ item }}.network"
     state: touch
@@ -121,7 +121,7 @@
 
 - name: Prevent Proxmox PVE from overwriting /etc/resolv.conf
   when: >-
-    ansible_virtualization_type == 'lxc' and
+    ansible_facts.virtualization_type == 'lxc' and
     systemd_networkd_network |
     default({}) |
     ansible.builtin.dict2items |

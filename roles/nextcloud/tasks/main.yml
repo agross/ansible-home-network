@@ -62,7 +62,7 @@
 
 - name: Add vm.overcommit_memory sysctl for Redis
   when: >-
-    'container' not in ansible_virtualization_tech_guest
+    'container' not in ansible_facts.virtualization_tech_guest
   ansible.posix.sysctl:
     name: vm.overcommit_memory
     value: "1"
@@ -74,7 +74,7 @@
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
 - name: Add vm.max_map_count sysctl for Elasticsearch
   when: >-
-    'container' not in ansible_virtualization_tech_guest
+    'container' not in ansible_facts.virtualization_tech_guest
   ansible.posix.sysctl:
     name: vm.max_map_count
     value: "262144"

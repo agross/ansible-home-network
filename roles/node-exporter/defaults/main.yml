@@ -12,7 +12,7 @@ node_exporter_cadvisor:
 
 node_exporter_dynamic_roles: >-
   {{
-    [node_exporter_cadvisor] if 'docker0' in ansible_interfaces
+    [node_exporter_cadvisor] if 'docker0' in ansible_facts.interfaces
     else []
   }}
 
