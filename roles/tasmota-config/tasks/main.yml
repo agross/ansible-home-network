@@ -1,44 +1,30 @@
-- name: Create backlog file
-  delegate_to: localhost
-  ansible.builtin.tempfile:
-    state: file
-    suffix: backlog
-  changed_when: false
-  register: tasmota_config_backlog_file
-
 - name: Generate backlog
-  delegate_to: localhost
-  ansible.builtin.template:
-    src: templates/backlog.j2
-    dest: "{{ tasmota_config_backlog_file.path }}"
-    trim_blocks: true
-    lstrip_blocks: true
-    mode: preserve
-  changed_when: false
-
-- name: Read backlog
   ansible.builtin.set_fact:
     # The select filter removes empty strings.
     tasmota_config_backlog: >-
       {{
-        lookup('ansible.builtin.file', tasmota_config_backlog_file.path).splitlines() |
+        lookup('ansible.builtin.template', 'backlog.j2').splitlines() |
         map('trim') |
-        select |
+        select
+      }}
+
+- name: URL-encode backlog
+  ansible.builtin.set_fact:
+    tasmota_config_encoded_backlog: >-
+      {{
+        tasmota_config_backlog |
         join(';') |
         urlencode |
         replace('/', '%2F')
       }}
 
-- name: Remove backlog file
-  delegate_to: localhost
-  ansible.builtin.file:
-    path: "{{ tasmota_config_backlog_file.path }}"
-    state: absent
-  changed_when: false
-
 - name: Print backlog
   ansible.builtin.debug:
-    var: tasmota_config_backlog
+    msg: |
+      Lines:
+      {{ tasmota_config_backlog | ansible.builtin.to_nice_yaml }}
+      Encoded:
+      {{ tasmota_config_encoded_backlog }}
 
 - name: Execute backlog
   delegate_to: localhost
@@ -46,7 +32,9 @@
     url: >-
       http://{{
         hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
-      }}/cm?cmnd=Backlog%20{{ tasmota_config_backlog }}
+      }}/cm?cmnd=Backlog%20{{
+        tasmota_config_encoded_backlog
+      }}
     return_content: true
   register: tasmota_config_backlog_result
   changed_when: true
