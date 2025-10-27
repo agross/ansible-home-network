@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+mac=00:11:32:6a:cb:35
+ip=172.16.0.10
+interface=ens18
+
+yellow="\e[1;33m"
+green="\e[1;32m"
+reset="\e[0m"
+
+printf 'Waking %b%s%b...\n' "$yellow" "$mac" "$reset"
+ether-wake -i "$interface" "$mac"
+
+trap "printf '\n'; exit 1" INT TERM
+printf 'Pinging %b%s%b...' "$yellow" "$ip" "$reset"
+until ping -c 1 -w 1 "$ip" &> /dev/null; do
+  printf '.'
+done
+
+printf '\n%b%s is up!%b\n' "$green" "$ip" "$reset"

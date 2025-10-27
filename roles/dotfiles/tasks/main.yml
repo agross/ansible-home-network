@@ -2,3 +2,25 @@
   when: ansible_env.SUDO_USER == 'agross'
   ansible.builtin.import_tasks:
     file: install.yml
+
+- name: Install extra scripts
+  when: dotfiles_extra_scripts is defined
+  block:
+    - name: Copy templates
+      become: false
+      ansible.builtin.import_tasks:
+        file: copy-templates.yml
+      vars:
+        directory: ../templates
+        target: "{{ ansible_facts.env.SUDO_HOME }}/bin"
+
+    - name: Ensure ether-wake is installed
+      ansible.builtin.package:
+        name: net-tools
+        state: present
+
+    - name: Allow non-root users to run ether-wake
+      community.general.capabilities:
+        path: /usr/bin/ether-wake
+        capability: cap_net_raw+ep
+        state: present
