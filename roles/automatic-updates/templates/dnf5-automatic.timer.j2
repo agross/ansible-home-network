@@ -1,0 +1,9 @@
+[Timer]
+{% if automatic_updates_dnf_timer_calendar is defined %}
+# Reset the default calendar option set by the package.
+OnCalendar=
+OnCalendar={{ automatic_updates_dnf_timer_calendar }}
+{% endif %}
+{% if automatic_updates_dnf_random_delay is defined %}
+RandomizedDelaySec={{ automatic_updates_dnf_random_delay }}
+{% endif %}

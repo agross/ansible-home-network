@@ -1,0 +1,5 @@
+# https://dnf5.readthedocs.io/en/latest/dnf5_plugins/automatic.8.html#commands-section
+automatic_updates_dnf_upgrade_type: default
+automatic_updates_dnf_reboot: when-needed
+
+automatic_updates_dnf_random_delay: 10m

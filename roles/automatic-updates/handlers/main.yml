@@ -1,0 +1,6 @@
+- name: Restart dnf-automatic timer
+  when: automatic_updates_dnf_timer_started is not changed
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: dnf5-automatic.timer
+    state: restarted
