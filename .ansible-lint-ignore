@@ -1,7 +1,6 @@
 # This file contains ignores rule violations for ansible-lint
 copy-templates.yml load-failure[filenotfounderror]
 docker-compose-update.yml load-failure[filenotfounderror]
-file-permissions.yml load-failure[filenotfounderror]
 github-release.yml load-failure[filenotfounderror]
 htpasswd-users.yml load-failure[filenotfounderror]
 register-prometheus-scrape.yml load-failure[filenotfounderror]
