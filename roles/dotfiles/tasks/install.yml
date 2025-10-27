@@ -1,0 +1,50 @@
+- name: Install requirements
+  ansible.builtin.package:
+    name: "{{ dotfiles_requirements }}"
+    state: present
+
+- name: Clone dotfiles
+  become: false
+  ansible.builtin.git:
+    repo: https://github.com/agross/dotfiles.git
+    version: master
+    dest: >-
+      {{
+        '/home/' ~ ansible_facts.env.SUDO_USER if 'SUDO_USER' in ansible_facts.env
+        else ansible_facts.user_dir
+      }}/.dotfiles
+
+- name: Bootstrap dotfiles
+  become: false
+  ansible.builtin.command:
+    argv:
+      - >-
+        {{
+          '/home/' ~ ansible_facts.env.SUDO_USER if 'SUDO_USER' in ansible_facts.env
+          else ansible_facts.user_dir
+        }}/.dotfiles/bootstrap
+      - --force
+  register: dotfiles_bootstrapper
+  changed_when: "'] Linked' in dotfiles_bootstrapper.stdout"
+
+- name: Change shell to zsh
+  ansible.builtin.user:
+    name: "{{ ansible_facts.env.SUDO_USER | default(ansible_facts.user_id) }}"
+    shell: /bin/zsh
+
+- name: Install useful tools
+  ansible.builtin.package:
+    name: "{{ dotfiles_tools }}"
+    state: present
+
+- name: Install useful tools (apt)
+  when: ansible_facts.pkg_mgr == 'apt'
+  ansible.builtin.package:
+    name: "{{ dotfiles_tools_apt }}"
+    state: present
+
+- name: Install useful tools (dnf)
+  when: ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
+  ansible.builtin.package:
+    name: "{{ dotfiles_tools_dnf }}"
+    state: present
