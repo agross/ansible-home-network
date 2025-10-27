@@ -3,30 +3,30 @@
 - name: Read /boot/cmdline.txt
   ansible.builtin.slurp:
     src: /boot/cmdline.txt
-  register: cmdline_txt
+  register: k3s_cmdline_txt
 
 - name: Generate regular expression for existing arguments
   ansible.builtin.set_fact:
-    regex_existing: >-
+    k3s_regex_existing: >-
       {{
         "\b" + key | string +
-          "=" +
-          ("[\w]*" if update else value | string) +
-          "\b"
+        "=" +
+        ("[\w]*" if update else value | string) +
+        "\b"
       }}
-    key_value_pair: >-
+    k3s_key_value_pair: >-
       {{
         key | string +
-          "=" +
-          value | string
+        "=" +
+        value | string
       }}
 
 - name: Generate regular expression for new arguments
   ansible.builtin.set_fact:
-    regex_add_missing: >-
+    k3s_regex_add_missing: >-
       {{
         "^((?!(?:.|\n)*" +
-          regex_existing +
+          k3s_regex_existing +
           ")((?:.|\n)*))$"
       }}
 
@@ -35,9 +35,9 @@
     content: >-
       {{
         cmdline_txt.content |
-          b64decode |
-          regex_replace(regex_existing, key_value_pair) |
-          regex_replace(regex_add_missing, key_value_pair + " \1")
+        ansible.builtin.b64decode |
+        ansible.builtin.regex_replace(k3s_regex_existing, key_value_pair) |
+        ansible.builtin.regex_replace(k3s_regex_add_missing, key_value_pair + " \1")
       }}
     dest: /boot/cmdline.txt
     mode: preserve
