@@ -1,5 +1,7 @@
 roles:
   - name: aruhier.systemd_networkd
+    # renovate: git-refs=https://github.com/aruhier/ansible-role-systemd-networkd ref=master
+    version: a689f58d5678b8e25d48dfb60f2325ebd4c4c735
   - name: borgbase.ansible_role_borgbackup
     version: v1.1.3
   - name: geerlingguy.docker
