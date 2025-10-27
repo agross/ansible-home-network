@@ -4,7 +4,7 @@ Description=borgmatic Backup Timer
 [Timer]
 # Reset the default calendar option set by the package.
 OnCalendar=
-OnCalendar=01:15
+OnCalendar={{ borgmatic_backup_time }}
 RandomizedDelaySec=10m
 
 # Catch up when an invocation was missed.

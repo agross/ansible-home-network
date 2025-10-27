@@ -20,12 +20,17 @@
 - name: Install borgmatic service and timer overrides
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: "/etc/systemd/system/{{ item | ansible.builtin.basename }}.d/override.conf"
+    dest: >-
+      /etc/systemd/system/{{
+        item |
+        ansible.builtin.basename |
+        ansible.builtin.regex_replace('\.j2$', '')
+      }}.d/override.conf
     owner: 0
     group: 0
     mode: "644"
     lstrip_blocks: true
   loop:
     - Fedora/borgmatic.service
-    - borgmatic.timer
+    - borgmatic.timer.j2
   notify: Restart borgmatic timer
