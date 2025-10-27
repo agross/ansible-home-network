@@ -1,3 +1,0 @@
-docker_libseccomp2_package: libseccomp2
-docker_libseccomp2_repo: https://ftp.debian.org/debian/pool/main/libs/libseccomp/
-docker_libseccomp2_install_version: 2.5.1-1
