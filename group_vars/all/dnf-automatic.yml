@@ -1,3 +1,0 @@
-# https://dnf5.readthedocs.io/en/latest/dnf5_plugins/automatic.8.html#commands-section
-dnf_automatic_upgrade_type: default
-dnf_automatic_reboot: when-needed

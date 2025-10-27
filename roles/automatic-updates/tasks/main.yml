@@ -14,11 +14,30 @@
         group: 0
         mode: "644"
 
-    - name: Automatic updates (dnf)
+    - name: Ensure dnf5-automatic.timer override directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/system/dnf5-automatic.timer.d
+        state: directory
+        owner: 0
+        group: 0
+        mode: "755"
+
+    - name: Override dnf5-automatic.timer settings
+      ansible.builtin.template:
+        src: dnf5-automatic.timer.j2
+        dest: /etc/systemd/system/dnf5-automatic.timer.d/override.conf
+        owner: 0
+        group: 0
+        mode: "644"
+      notify: Restart dnf-automatic timer
+
+    - name: Start timer
       ansible.builtin.systemd:
+        daemon_reload: true
         state: started
         enabled: true
         name: dnf5-automatic.timer
+      register: automatic_updates_dnf_timer_started
 
 - name: Automatic updates (apt)
   when: >-
