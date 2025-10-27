@@ -5,22 +5,14 @@
   ansible.builtin.set_fact:
     systemd_units: >-
       {{
-        (
-          lookup('ansible.builtin.fileglob',
-                 local_units ~ '/*.service*',
-                 wantlist = true) +
-          lookup('ansible.builtin.fileglob',
-                 local_units ~ '/*.timer*',
-                 wantlist = true) +
-          lookup('ansible.builtin.fileglob',
-                 local_units ~ '/*.mount*',
-                 wantlist = true) +
-          lookup('ansible.builtin.fileglob',
-                 local_units ~ '/*.target*',
-                 wantlist = true)
-        ) |
-        map('basename') |
-        map('regex_replace', '\.j2$', '')
+        lookup('ansible.builtin.fileglob',
+                local_units ~ '/*.service*',
+                local_units ~ '/*.timer*',
+                local_units ~ '/*.mount*',
+                local_units ~ '/*.target*',
+                wantlist = true) |
+        map('ansible.builtin.basename') |
+        map('ansible.builtin.regex_replace', '\.j2$', '')
       }}
 
 - name: Get list of systemd units to autostart
@@ -30,7 +22,7 @@
         systemd_units_autostart_yaml |
         ansible.builtin.from_yaml |
         default ([], true) |
-        reject('regex', '\.mount$')
+        reject('ansible.builtin.regex', '\.mount$')
       }}
   vars:
     # Reject service units that have a timer unit with the same name.
