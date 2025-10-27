@@ -8,7 +8,10 @@ dotfiles_requirements:
 
 # Technically not required but useful.
 dotfiles_tools:
+  - curl
   - htop
+  - jid
+  - jq
   - mc
   - tcpdump
   - tree
