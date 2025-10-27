@@ -5,10 +5,10 @@
     state: absent
   changed_when: false
   check_mode: true
-  register: memory_cgroups_enabled
+  register: k3s_memory_cgroups_enabled
 
 - name: Enable memory cgroups
-  when: not memory_cgroups_enabled.found
+  when: not k3s_memory_cgroups_enabled.found
   block:
     - name: Create a backup of /boot/cmdline.txt
       ansible.builtin.copy:
