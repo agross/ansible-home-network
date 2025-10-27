@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+script="USE commafeed;
+        SELECT content
+        FROM FEEDENTRYCONTENTS
+        WHERE content LIKE '%${1:?Need search string}%';"
+
+docker compose \
+       --project-directory {{ commafeed_root | ansible.builtin.quote }} \
+       exec \
+       --user mysql \
+       db \
+       mariadb --skip-column-names --silent --execute "$script"

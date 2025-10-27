@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+script="USE commafeed;
+        SELECT link, message, disabledUntil
+        FROM FEEDS
+        WHERE disabledUntil IS NOT NULL;
+        UPDATE FEEDS SET disabledUntil = NULL;"
+
+docker compose \
+       --project-directory {{ commafeed_root | ansible.builtin.quote }} \
+       exec \
+       --user mysql \
+       db \
+       mariadb --execute "$script"
