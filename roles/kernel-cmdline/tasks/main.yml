@@ -14,7 +14,7 @@
       register: rhgb_enabled
 
     - name: Remove "rhgb" kernel command line argument
-      when: rhgb_enabled.found
+      when: rhgb_enabled.found | bool
       # Does not work with ansible.builtin.command.
       ansible.builtin.shell: # noqa: command-instead-of-shell
         cmd: >-
