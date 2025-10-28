@@ -38,10 +38,13 @@
 - name: Copy ddclient config file
   ansible.builtin.template:
     src: ddclient/ddclient.conf.j2
-    dest: /etc/ddclient/ddclient.conf
+    dest: "{{ item }}"
     owner: ddclient
     group: ddclient
     mode: "600"
+  loop:
+    - /etc/ddclient/ddclient.conf
+    - /etc/ddclient.conf
   notify: Restart ddclient service
 
 - name: Enable ddclient service
