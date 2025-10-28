@@ -12,6 +12,7 @@
     name:
       - jq
       - git
+      - python3-pip
       - yq
     state: present
 
