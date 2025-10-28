@@ -28,17 +28,29 @@ jobs:
       - self-hosted
       - ${{ matrix.site }}
 
-    steps:
-      - name: Get latest code
-        uses: actions/checkout@v5
+    container:
+      image: ghcr.io/ansible-community/community-ee-base:2.18.9-1
+      # Run as root to install packages, tty for unbuffered output.
+      options: --user root --tty
 
-      - name: Install ansible
+    defaults:
+      run:
+        # The container image provides bash.
+        shell: bash
+
+    steps:
+      - name: Install git and Python packages required for ansible modules
         run: |
-          dnf install --assumeyes ansible \
+          dnf install --assumeyes git \
                                   python3-netaddr \
                                   python3-passlib \
                                   python3-bcrypt-4.3.0
+
+          git --version
           ansible --version
+
+      - name: Get latest code
+        uses: actions/checkout@v5
 
       - name: Save SSH keyfile
         run: |
@@ -57,18 +69,6 @@ jobs:
           # requirements file.
           key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('**/requirements*.yml') }}
 
-      - name: Gather facts
-        run: |
-          ./gather-facts "${{ matrix.site }}" \
-                         --vault-id agross2@.ansible-vault-agross2 \
-                         --user agross \
-                         --key-file .ansible-ssh-private-key
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: False
-          ANSIBLE_FORCE_COLOR: True
-        # Because some hosts might not be reachable.
-        continue-on-error: true
-
       - name: Install Ansible dependencies
         # ansible-galaxy role install does not install updates unless `--force`d.
         run: |
@@ -80,6 +80,18 @@ jobs:
           ansible-galaxy collection \
                          install \
                          --requirements-file requirements.yml
+
+      - name: Gather facts
+        run: |
+          ./gather-facts "${{ matrix.site }}" \
+                         --vault-id agross2@.ansible-vault-agross2 \
+                         --user agross \
+                         --key-file .ansible-ssh-private-key
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+          ANSIBLE_FORCE_COLOR: True
+        # Because some hosts might not be reachable.
+        continue-on-error: true
 
       - name: Run Ansible
         run: |
