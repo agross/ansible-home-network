@@ -143,3 +143,27 @@
       tags:
         - teamcity
         - container
+
+- name: Prepare build agent
+  hosts:
+    - teamcity_build_agents
+    - agent-docker
+    - github-runners
+  become: true
+  roles:
+    - role: docker
+      tags: docker
+
+- name: Install TeamCity build agent
+  hosts: teamcity_build_agents
+  become: true
+  roles:
+    - role: build-agent
+      tags: build-agent
+
+- name: Install GitHub Runners
+  hosts: github-runners
+  become: true
+  roles:
+    - role: github-runner
+      tags: github-runner
