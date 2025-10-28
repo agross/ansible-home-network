@@ -83,7 +83,5 @@
       tags:
         - logger
         - container
-    - role: github-runner
-      tags: github-runner
     - role: prometheus
       tags: prometheus
