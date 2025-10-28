@@ -16,8 +16,7 @@
     state: present
 
 - name: Create runner
-  ansible.builtin.include_tasks:
+  ansible.builtin.import_tasks:
     file: create-runner.yml
   vars:
-    instance: "{{ item }}"
-  loop: "{{ github_runner_instances | ansible.builtin.dict2items }}"
+    instances: "{{ github_runner_instances | ansible.builtin.dict2items }}"

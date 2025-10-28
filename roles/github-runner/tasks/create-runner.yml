@@ -1,14 +1,13 @@
-- name: Set target directory
-  ansible.builtin.set_fact:
-    github_runner_dir: "/github-runner/{{ instance.key }}"
-
 - name: Create target directory
   ansible.builtin.file:
-    path: "{{ github_runner_dir }}"
+    path: "/github-runner/{{ item.key }}"
     state: directory
     owner: 1001
     group: 987
     mode: "755"
+  loop: "{{ instances }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 - name: Download GitHub Runner
   ansible.builtin.get_url:
@@ -23,22 +22,28 @@
   ansible.builtin.unarchive:
     src: /tmp/github-runner.tar.gz
     remote_src: true
-    dest: "{{ github_runner_dir }}"
+    dest: "/github-runner/{{ item.key }}"
+  loop: "{{ instances }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 - name: Configure GitHub Runner
   ansible.builtin.command:
     argv:
-      - "{{ github_runner_dir }}/config.sh"
+      - "/github-runner/{{ item.key }}/config.sh"
       - --unattended
       - --name
-      - "{{ instance.key }}"
+      - "{{ item.key }}"
       - --url
-      - "{{ instance.value.url | ansible.builtin.mandatory }}"
+      - "{{ item.value.url | ansible.builtin.mandatory }}"
       - --replace
       - --token
-      - "{{ instance.value.token | ansible.builtin.mandatory }}"
+      - "{{ item.value.token | ansible.builtin.mandatory }}"
   environment:
     RUNNER_ALLOW_RUNASROOT: "true"
+  loop: "{{ instances }}"
+  loop_control:
+    label: "{{ item.key }} url={{ item.value.url }}"
   register: github_runner_config
   changed_when: true
   failed_when: >-
@@ -50,7 +55,10 @@
     argv:
       - ./svc.sh
       - uninstall
-    chdir: "{{ github_runner_dir }}"
+    chdir: "/github-runner/{{ item.key }}"
+  loop: "{{ instances }}"
+  loop_control:
+    label: "{{ item.key }} uninstall"
   changed_when: true
 
 - name: Install GitHub Runner service
@@ -59,7 +67,10 @@
       - ./svc.sh
       - install
       - root
-    chdir: "{{ github_runner_dir }}"
+    chdir: "/github-runner/{{ item.key }}"
+  loop: "{{ instances }}"
+  loop_control:
+    label: "{{ item.key }} install"
   changed_when: true
 
 - name: Start GitHub Runner service
@@ -67,5 +78,8 @@
     argv:
       - ./svc.sh
       - start
-    chdir: "{{ github_runner_dir }}"
+    chdir: "/github-runner/{{ item.key }}"
+  loop: "{{ instances }}"
+  loop_control:
+    label: "{{ item.key }}"
   changed_when: true
