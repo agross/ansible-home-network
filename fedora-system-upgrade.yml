@@ -4,7 +4,7 @@
   gather_facts: true
   vars:
     # renovate: custom.fedora=Server depName=Fedora Server
-    fedora_release: 42
+    fedora_release: 43
   tasks:
     - name: Skip host unless it is Fedora
       when: ansible_facts.distribution != 'Fedora'
