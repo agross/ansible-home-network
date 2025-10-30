@@ -78,7 +78,7 @@ services:
 
       {% if logger_grafana_google_client_id is defined %}
       GF_AUTH_GOOGLE_ENABLED: true
-      GF_AUTH_GOOGLE_ALLOW_SIGN_UP: false
+      GF_AUTH_GOOGLE_ALLOW_SIGN_UP: true
       GF_AUTH_GOOGLE_CLIENT_ID: {{ logger_grafana_google_client_id }}
       GF_AUTH_GOOGLE_CLIENT_SECRET: {{ logger_grafana_google_client_secret | ansible.builtin.mandatory }}
       {% if logger_grafana_google_allowed_domains is defined %}
