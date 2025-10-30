@@ -6,9 +6,6 @@ logger_grafana_google_client_id: "{{ vault_logger_grafana_google_client_id }}"
 logger_grafana_google_client_secret: "{{ vault_logger_grafana_google_client_secret }}"
 logger_grafana_google_allowed_domains: "{{ vault_logger_grafana_google_allowed_domains }}"
 
-logger_grafana_github_client_id: "{{ vault_logger_grafana_github_client_id }}"
-logger_grafana_github_client_secret: "{{ vault_logger_grafana_github_client_secret }}"
-
 logger_grafana_smtp_user: "{{ google_smtp_user }}"
 logger_grafana_smtp_password: "{{ vault_logger_grafana_smtp_password }}"
 

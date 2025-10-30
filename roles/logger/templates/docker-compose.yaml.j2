@@ -69,13 +69,6 @@ services:
 
       GF_AUTH_LOGIN_MAXIMUM_INACTIVE_LIFETIME_DURATION: 30d
 
-      {% if logger_grafana_github_client_id is defined %}
-      GF_AUTH_GITHUB_ENABLED: true
-      GF_AUTH_GITHUB_ALLOW_SIGN_UP: false
-      GF_AUTH_GITHUB_CLIENT_ID: {{ logger_grafana_github_client_id }}
-      GF_AUTH_GITHUB_CLIENT_SECRET: {{ logger_grafana_github_client_secret | ansible.builtin.mandatory }}
-      {% endif %}
-
       {% if logger_grafana_google_client_id is defined %}
       GF_AUTH_GOOGLE_ENABLED: true
       GF_AUTH_GOOGLE_ALLOW_SIGN_UP: true
