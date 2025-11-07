@@ -1,0 +1,3 @@
+interfaces:
+  lan:
+    device: eth0

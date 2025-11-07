@@ -1,0 +1,15 @@
+systemd_networkd_network:
+  eth0:
+    - Match:
+        - "# PVE Ignore": true
+        - Name: "{{ interfaces.lan.device }}"
+    - Network:
+        - DHCP: true
+
+        # No IPv6.
+        - LinkLocalAddressing: false
+        - IPv6AcceptRA: false
+
+        - DNSDefaultRoute: true
+        - Domains: "{{ dns.search_domains | join(' ') }}"
+        - MulticastDNS: true
