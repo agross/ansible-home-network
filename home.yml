@@ -150,6 +150,7 @@
     - agent-docker
     - github-runners
   become: true
+  gather_facts: false
   roles:
     - role: docker
       tags: docker
@@ -157,6 +158,7 @@
 - name: Install TeamCity build agent
   hosts: teamcity_build_agents
   become: true
+  gather_facts: false
   roles:
     - role: build-agent
       tags: build-agent
@@ -164,6 +166,7 @@
 - name: Install GitHub Runners
   hosts: github-runners
   become: true
+  gather_facts: false
   roles:
     - role: github-runner
       tags: github-runner
