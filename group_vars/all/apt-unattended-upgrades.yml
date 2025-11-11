@@ -1,6 +1,17 @@
-# Install security updates at 3:00 + up to 30min, reboot immeditately if
+# Install security updates at 3:30 + up to 10min, reboot immediately if
 # required.
 unattended_systemd_timer_override: true
 unattended_apt_daily_upgrade_oncalendar: "*-*-* 3:30"
 unattended_apt_daily_upgrade_randomizeddelaysec: 10m
 unattended_automatic_reboot: true
+
+unattended_origins_patterns:
+  # Default.
+  # https://github.com/hifis-net/ansible-collection-toolkit/blob/main/roles/unattended_upgrades/vars/Debian.yml
+  - 'origin=Debian,codename=${distro_codename},label=Debian-Security'
+  - 'origin=Debian,codename=${distro_codename}-security,label=Debian-Security'
+  # Enable all Debian updates.
+  - 'origin=Debian,codename=${distro_codename},archive=stable'
+  - 'origin=Debian,codename=${distro_codename}-updates,archive=stable-updates'
+  # Enable Docker updates.
+  - 'origin=Docker,component=stable,archive=${distro_codename}'
