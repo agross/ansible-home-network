@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/ansible-community/community-ee-base:2.18.9-1
+      image: ghcr.io/ansible-community/community-ee-minimal:2.18.9-1
       # Run as root to install packages, tty for unbuffered output.
       options: --user root --tty
 
@@ -60,7 +60,7 @@ jobs:
       github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
 
     env:
-      # renovate: docker=ghcr.io/ansible-community/community-ee-base
+      # renovate: docker=ghcr.io/ansible-community/community-ee-minimal
       version: 2.18.9-1
 
     steps:
@@ -72,7 +72,7 @@ jobs:
           actual="$(docker container \
                            run \
                            --rm \
-                           "ghcr.io/ansible-community/community-ee-base:${{ env.version }}" \
+                           "ghcr.io/ansible-community/community-ee-minimal:${{ env.version }}" \
                            ansible --version |
                     grep --fixed-strings 'ansible [core ')"
           actual="${actual##*core }"
