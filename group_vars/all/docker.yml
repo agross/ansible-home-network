@@ -15,7 +15,6 @@ docker_users: >-
 docker_daemon_options_default:
   ipv6: true
   fixed-cidr-v6: fd00:c0ff:ee::/48
-  experimental: true
   ip6tables: true
 
   # https://docs.docker.com/engine/logging/drivers/json-file/
