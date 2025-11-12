@@ -8,6 +8,8 @@ plugin: ansible.builtin.constructed
 #
 # To see the list of hosts in a specific groups:
 #
+# ansible hypervisor --list-hosts
+# or
 # ansible-inventory --list | jq .hypervisor
 groups:
   hypervisor: >-
@@ -15,6 +17,14 @@ groups:
 
   guest: >-
     ansible_virtualization_role == "guest"
+
+  lxc: >-
+    ansible_virtualization_role == "guest" and
+    ansible_virtualization_type == "lxc"
+
+  vm: >-
+    ansible_virtualization_role == "guest" and
+    ansible_virtualization_type == "kvm"
 
   linux: >-
     ansible_system == "Linux"
