@@ -70,3 +70,6 @@ services:
       RENOVATE_REPOSITORY_CACHE: enabled
     # volumes:
     #   - ./app/logs:/logs
+    depends_on:
+      db:
+        condition: service_healthy
