@@ -4,6 +4,7 @@ proxmox:
   id: 106
   protection: true
   startup: order=100
+  cores: 5
   ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
   hookscript: lxc-fedora.sh
   features:
