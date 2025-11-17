@@ -38,9 +38,6 @@ proxmox:
       options:
         mountoptions: discard;noatime
   custom:
-    - reason: https://github.com/opencontainers/runc/issues/4968#issuecomment-3511829481
-      key: lxc.apparmor.profile
-      value: unconfined
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
       key: lxc.cap.drop
