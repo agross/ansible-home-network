@@ -9,7 +9,6 @@ proxmox:
   hookscript: lxc-fedora.sh
   features:
     - nesting=1
-    - fuse=1
   password: "{{ vault_proxmox_default_root_password }}"
   ssh_public_key_github_account: agross
   memory: 8192
