@@ -53,40 +53,50 @@
             first
           }}
 
-    - name: Run upgrade check tool
-      ansible.builtin.command:
-        argv:
-          - "{{ proxmox_pve_upgrade_check_tool }}"
-          - --full
-      register: proxmox_pve_upgrade_check
+    - name: Check if upgrade check tool exists
+      ansible.builtin.shell: # noqa: command-instead-of-shell
+        command -v "{{ proxmox_pve_upgrade_check_tool }}"
       changed_when: false
+      failed_when: false
+      register: proxmox_pve_upgrade_check_tool_exist
 
-    - name: Fail if the upgrade check tool reported warnings or errors
-      when: >-
-        not ignore_pve_warnings is defined and
-        warnings_and_failures | length > 0
-      ansible.builtin.fail:
-        msg: >-
-          There are warnings or errors. Run `{{ proxmox_pve_upgrade_check_tool }}`
-          manually. If you are OK with the remaining messages run the playbook
-          with
-          `--extra-vars ignore_pve_warnings=` and potentially
-          `--limit {{ inventory_hostname }}`.
+    - name: Run upgrade check tool
+      when: proxmox_pve_upgrade_check_tool_exist.rc == 0
+      block:
+        - name: Run upgrade check tool
+          ansible.builtin.command:
+            argv:
+              - "{{ proxmox_pve_upgrade_check_tool }}"
+              - --full
+          register: proxmox_pve_upgrade_check
+          changed_when: false
+
+        - name: Fail if the upgrade check tool reported warnings or errors
+          when: >-
+            not ignore_pve_warnings is defined and
+            warnings_and_failures | length > 0
+          ansible.builtin.fail:
+            msg: >-
+              There are warnings or errors. Run `{{ proxmox_pve_upgrade_check_tool }}`
+              manually. If you are OK with the remaining messages run the playbook
+              with
+              `--extra-vars ignore_pve_warnings=` and potentially
+              `--limit {{ inventory_hostname }}`.
 
 
-          {{ warnings_and_failures_message }}
-      vars:
-        warnings_and_failures: >-
-          {{
-            proxmox_pve_upgrade_check.stdout_lines |
-            select('ansible.builtin.search', '(WARN|FAIL):')
-          }}
-        warnings_and_failures_message: >-
-          {{
-            warnings_and_failures |
-            map('ansible.builtin.regex_replace', '\x1B\[\d+m', '') |
-            ansible.builtin.to_nice_yaml
-          }}
+              {{ warnings_and_failures_message }}
+          vars:
+            warnings_and_failures: >-
+              {{
+                proxmox_pve_upgrade_check.stdout_lines |
+                select('ansible.builtin.search', '(WARN|FAIL):')
+              }}
+            warnings_and_failures_message: >-
+              {{
+                warnings_and_failures |
+                map('ansible.builtin.regex_replace', '\x1B\[\d+m', '') |
+                ansible.builtin.to_nice_yaml
+              }}
 
     - name: Iterate apt source files
       ansible.builtin.find:
