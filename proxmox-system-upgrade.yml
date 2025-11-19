@@ -5,7 +5,7 @@
   vars:
     # Do not forget to update proxmox_pve_code_names below.
     # renovate: custom.proxmox=virtual-environment depName=Proxmox VE
-    proxmox_pve_version: 9.0
+    proxmox_pve_version: 9.1
 
     proxmox_pve_code_names:
       - bookworm
