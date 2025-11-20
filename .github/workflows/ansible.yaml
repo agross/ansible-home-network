@@ -50,7 +50,7 @@ jobs:
           ansible --version
 
       - name: Get latest code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Save SSH keyfile
         run: |
