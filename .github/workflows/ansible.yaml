@@ -29,7 +29,7 @@ jobs:
       - ${{ matrix.site }}
 
     container:
-      image: ghcr.io/ansible-community/community-ee-minimal:2.18.9-1
+      image: ghcr.io/ansible-community/community-ee-minimal:2.20.0-1
       # Run as root to install packages, tty for unbuffered output.
       options: --user root --tty
 
