@@ -209,13 +209,41 @@ cameras:
 # - Preview_01_main == h265
 # - Preview_01_sub == h264
 
-# ffmpeg:* is for transcoding to WebRTC-supported formats (h264) at a resolution
-# that the Intel hardware encoder supports (<=4096 pixels in any dimension).
 go2rtc:
   log:
     level: warn
     # Useful for ffmpeg debugging.
     # exec: debug
+
+  # Limit allowed modules.
+  # https://github.com/AlexxIT/go2rtc/blob/aa0ece2d1e396cd4b044f2e069d4ec394586ce77/main.go#L56
+  # Those without a name are always loaded.
+  app:
+    modules:
+      - api
+      # - debug
+
+      - exec
+      - ffmpeg
+      - mp4
+      - rtsp
+      - webrtc
+      - ws
+
+  exec:
+    allow_paths:
+      - /usr/lib/ffmpeg/5.0/bin/ffmpeg
+
+  api:
+    allow_paths:
+      - / # For UI and HTML pages like /webrtc.html.
+      - /api
+      - /api/log
+      - /api/schemes
+      - /api/streams
+      - /api/streams.dot
+      - /api/webrtc
+      - /api/ws
 
   # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
   ffmpeg:
@@ -242,6 +270,8 @@ go2rtc:
       -level:v 4.1
       -sei:v 0
 
+  # ffmpeg:* is for transcoding to WebRTC-supported formats (h264) at a resolution
+  # that the Intel hardware encoder supports (<=4096 pixels in any dimension).
   streams:
     east:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@east.cam.{{ network.domain }}:554/Preview_01_main
