@@ -142,6 +142,7 @@ zfs_datasets:
       owner: 100999
       group: 100999
     options:
+      prefetch: none
       # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
       recordsize: 16K
 
@@ -166,5 +167,6 @@ zfs_datasets:
       owner: 100999
       group: 100999
     options:
+      prefetch: none
       # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
       recordsize: 16K
