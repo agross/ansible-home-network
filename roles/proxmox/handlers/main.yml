@@ -22,7 +22,7 @@
     msg: Networking changed, rebooting
 
 - name: Configure guest OS manually
-  when: lxc_guests | length or vm_guests | length
+  when: lxc_guests | length > 0 or vm_guests | length > 0
   ansible.builtin.fail:
     msg: |
       One or more LXC or VM guests were created. Please install the guest OS
