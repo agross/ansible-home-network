@@ -57,3 +57,12 @@ proxmox_kernel_cmdline:
   - boot=zfs
   - video=800x600
   - panic=60
+
+zfs_datasets:
+  rpool/_reservation:
+    options:
+      reservation: 100G
+      canmount: false
+      user:comment: >-
+        Here to reserve some space if the pool becomes full.
+        https://youtu.be/RLtTcRVrnLE?si=OiDkIr5B7fLZvWLG&t=548
