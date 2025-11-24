@@ -29,3 +29,12 @@ proxmox:
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
       key: lxc.cap.drop
       value: sys_rawio
+
+zfs_datasets:
+  rpool/_reservation:
+    options:
+      reservation: 100G
+      canmount: false
+      user:comment: >-
+        Here to reserve some space if the pool becomes full.
+        https://youtu.be/RLtTcRVrnLE?si=OiDkIr5B7fLZvWLG&t=548

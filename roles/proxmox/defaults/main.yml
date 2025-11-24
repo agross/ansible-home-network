@@ -1,12 +1,33 @@
 # renovate: github-releases=Jamesits/pve-fake-subscription
 proxmox_pve_fake_subscription_release_version: v0.0.11
 
-proxmox_zfs_datasets: >-
+proxmox_zfs_datasets_for_site: >-
   {{
     groups[site] |
     map('ansible.builtin.extract', hostvars) |
-    selectattr('zfs_datasets', 'defined') |
-    selectattr('proxmox.host', 'equalto', inventory_hostname) |
+    selectattr('zfs_datasets', 'defined')
+  }}
+
+proxmox_zfs_datasets_for_site_on_host: >-
+  {{
+    proxmox_zfs_datasets_for_site |
+    selectattr('proxmox.host', 'defined') |
+    selectattr('proxmox.host', 'equalto', inventory_hostname)
+  }}
+
+proxmox_zfs_datasets_for_site_on_hypervisor: >-
+  {{
+    proxmox_zfs_datasets_for_site |
+    selectattr('hypervisor', 'defined') |
+    selectattr('hypervisor', 'equalto', true)
+  }}
+
+proxmox_zfs_datasets: >-
+  {{
+    (
+      proxmox_zfs_datasets_for_site_on_host +
+      proxmox_zfs_datasets_for_site_on_hypervisor
+    ) |
     map(attribute = 'zfs_datasets') |
     ansible.builtin.combine |
     ansible.builtin.dict2items
