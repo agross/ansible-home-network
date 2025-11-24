@@ -5,11 +5,11 @@
     state: absent
   changed_when: false
   check_mode: true
-  register: host_has_no_hwrng
+  register: proxmox_host_has_no_hwrng
 
 - name: Add hardware RNG device to guest VM
   when:
-    - not host_has_no_hwrng.found
+    - not proxmox_host_has_no_hwrng.found
     - (
         config.proxmox_vms |
         selectattr('id', 'equalto', 'qemu/' ~ guest.kvm.id)
