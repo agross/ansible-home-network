@@ -2,7 +2,7 @@
   ansible.builtin.package:
     name:
       - python3-dbus
-      - python3-gobject
+      - python3-gobject-base
 
 - name: Download networkd-dispatcher
   ansible.builtin.get_url:
