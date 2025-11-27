@@ -50,6 +50,8 @@ pve_zfs_zed_healthcheck: "{{ vault_pve_zfs_zed_healthcheck }}"
 proxmox_zfs_options: |
   # 30% of RAM.
   options zfs zfs_arc_max={{ (ansible_facts.memtotal_mb * 1024 * 1024 * 0.3) | int }}
+  # Limit time spending scrubbing between transaction groups to lower heat for NVMe.
+  options zfs zfs_scrub_min_time_ms=20
 
 # https://docs.kernel.org/admin-guide/kernel-parameters.html
 proxmox_kernel_cmdline:
