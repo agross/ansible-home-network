@@ -9,6 +9,16 @@
   # From lae.proxmox.
   notify: update-initramfs
 
+- name: Throttle zpool scrub operations
+  ansible.builtin.copy:
+    src: zed/all-scrub-throttle
+    dest: /etc/zfs/zed.d/all-scrub-throttle
+    mode: "755"
+    owner: 0
+    group: 0
+  # From lae.proxmox.
+  notify: restart zfs-zed
+
 - name: Enable ZFS event daemon trim finish notifications
   ansible.builtin.file:
     src: /usr/lib/zfs-linux/zed.d/trim_finish-notify.sh
