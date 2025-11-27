@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+
+set -e
+
+[ -f "${ZED_ZEDLET_DIR}/zed.rc" ] && . "${ZED_ZEDLET_DIR}/zed.rc"
+# shellcheck disable=SC1091
+. "${ZED_ZEDLET_DIR}/zed-functions.sh"
+
+[ -n "$ZEVENT_POOL" ] || exit 9
+[ -n "$ZEVENT_SUBCLASS" ] || exit 9
+zed_check_cmd "$ZPOOL" || exit 9
+
+active_time=100s
+cooldown_time=30s
+
+case "$ZEVENT_SUBCLASS" in
+
+  scrub_start|scrub_resume)
+    zed_log_msg "scrub rate-limiter: pool $ZEVENT_POOL event $ZEVENT_SUBCLASS: waiting $active_time to pause scrub"
+    sleep "$active_time"
+
+    "$ZPOOL" scrub -p "$ZEVENT_POOL"
+    ;;
+
+  scrub_paused)
+    zed_log_msg "scrub rate-limiter: pool $ZEVENT_POOL event $ZEVENT_SUBCLASS: waiting $cooldown_time to continue scrub"
+    sleep "$cooldown_time"
+
+    "$ZPOOL" scrub -C "$ZEVENT_POOL"
+    ;;
+esac
