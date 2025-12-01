@@ -1,0 +1,7 @@
+{{ postfix_config.relayhost }} {{
+  postfix_relay_user |
+  ansible.builtin.mandatory
+}}:{{
+  postfix_relay_password |
+  ansible.builtin.mandatory
+}}

@@ -1,0 +1,40 @@
+postfix_config:
+  relayhost: "[{{ postfix_relay_host }}]:{{ postfix_relay_port }}"
+
+  smtp_tls_security_level: encrypt
+  smtp_tls_CAfile: /etc/ssl/certs/ca-certificates.crt
+
+  # == therightstuff.de.
+  mydomain: "{{ (network.domain | ansible.builtin.split('.'))[-2:] | join('.') }}"
+
+  # SMTP FROM addresses get @$myhostname appended (append_at_myorigin=yes where
+  # myorigin == myhostname), e.g. sender@gw-cloud.grossweber.com.
+  #
+  # This would require all hosts to have a SPF record
+  # (e.g. gw-cloud.grossweber.com) as it is not inherited from the apex domain.
+  #
+  # SPF checks against the envelope sender which can be different, i.e. without
+  # the host part bus just the apex domain.
+  sender_canonical_maps: regexp:/etc/postfix/envelope_sender_map
+  sender_canonical_classes: envelope_sender
+
+postfix_relay_host: smtp-relay.gmail.com
+postfix_relay_port: 587
+postfix_relay_user: "{{ google_smtp_user }}"
+postfix_relay_password: "{{ google_smtp_password }}"
+
+postfix_relay_aliases:
+  - user: root
+    alias: "{{ postfix_relay_user | ansible.builtin.mandatory }}"
+
+postfix_sasl_config:
+  smtp_sasl_auth_enable: "yes"
+  smtp_sasl_password_maps: hash:/etc/postfix/sasl_passwd
+  smtp_sasl_security_options: noanonymous
+
+postfix_sasl_package: >-
+  {{
+    'libsasl2-modules' if ansible_facts.pkg_mgr == 'apt'
+    else 'cyrus-sasl-plain' if ansible_facts.pkg_mgr is ansible.builtin.match('dnf')
+    else omit
+  }}
