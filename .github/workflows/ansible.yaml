@@ -17,6 +17,8 @@ on:
 jobs:
   ansible:
     strategy:
+      # Continue the other site's job if this site fails.
+      fail-fast: false
       matrix:
         site:
           - home
