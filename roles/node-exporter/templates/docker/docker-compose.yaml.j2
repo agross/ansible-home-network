@@ -8,3 +8,18 @@ services:
     restart: unless-stopped
     volumes:
       - /:/host:ro,rslave
+
+  {% set cadvisor_jobs = node_exporter_roles | selectattr('job', 'equalto', 'cadvisor') %}
+  {% if cadvisor_jobs | length > 0 %}
+  {% set cadvisor = cadvisor_jobs | first %}
+  cadvisor:
+    image: ghcr.io/google/cadvisor:0.54.0
+    restart: unless-stopped
+    ports:
+      - {{ cadvisor.port }}:8080
+    volumes:
+      - /volume1/@docker:/var/lib/docker:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /:/rootfs:ro
+  {% endif %}
