@@ -2,7 +2,7 @@
 node_exporter_version: 1.10.2
 
 # renovate: github-releases=google/cadvisor
-cadvisor_release_version: v0.54.0
+cadvisor_release_version: v0.54.1
 
 # The version expected here is without the "v".
 cadvisor_version: "{{ cadvisor_release_version[1:] }}"
