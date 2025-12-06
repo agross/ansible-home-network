@@ -1,0 +1,36 @@
+services:
+  db:
+    ports:
+      - 5432:5432
+
+  mediakit:
+    image: razgrizhsu/immich-mediakit:0.1.11
+    ports:
+      - 8086:8086
+    volumes:
+      - ./mediakit/:/app/data
+      - ./mediakit/cache:/root/.cache/torch/
+      - ./app:/immich:ro
+    env_file:
+      - .env
+    environment:
+      DASH_DEBUG: false
+      IMMICH_PATH: /immich
+      PSQL_HOST: db
+      PSQL_PORT: 5432
+      PSQL_DB: ${DB_DATABASE_NAME}
+      PSQL_USER: ${DB_USERNAME}
+      PSQL_PASS: ${DB_PASSWORD}
+      QDRANT_URL: http://qdrant:6333
+    depends_on:
+      - qdrant
+
+  qdrant:
+    image: qdrant/qdrant:v1.16.2
+    volumes:
+      - ./mediakit/qdrant:/qdrant/storage
+    networks:
+      default:
+        aliases:
+          # https://github.com/RazgrizHsu/immich-mediakit/issues/39#issuecomment-3619771699
+          - immich-mediakit-qdrant

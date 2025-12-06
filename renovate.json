@@ -10,7 +10,10 @@
   ],
   "labels": ["dependencies"],
   "docker-compose": {
-    "managerFilePatterns": ["/(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$/"]
+    "managerFilePatterns": [
+      "/(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$/",
+      "/(^|/)docker-compose.override\\.yaml\\.disabled$/"
+    ]
   },
   "customManagers": [
     {

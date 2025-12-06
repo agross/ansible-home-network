@@ -6,8 +6,32 @@ http:
       rule: Host(`{{ immich_domain }}`)
       service: {{ ansible_role_name }}
 
+    {{ ansible_role_name }}-mediakit:
+      entrypoints: https
+      rule: Host(`{{ immich_mediakit_domain }}`)
+      service: {{ ansible_role_name }}-mediakit
+      middlewares:
+        - {{ ansible_role_name }}-mediakit-ipallowlist
+
+  middlewares:
+    {{ ansible_role_name }}-mediakit-ipallowlist:
+      ipAllowList:
+        sourceRange:
+          - 127.0.0.1/32
+          - {{ network.ip4 }}
+          - {{ network.ip6 }}
+          - {{ hostvars['gateway-ogd'].network.ip4 }}
+          - {{ hostvars['gateway-ogd'].network.ip6 }}
+          - fe80::/10
+          - fc00::/7
+
   services:
     {{ ansible_role_name }}:
       loadBalancer:
         servers:
           - url: http://{{ interfaces.lan.ip4.address }}:2283
+
+    {{ ansible_role_name }}-mediakit:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8086
