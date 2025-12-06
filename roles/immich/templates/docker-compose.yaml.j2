@@ -42,6 +42,10 @@ services:
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE --data-checksums
       # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
       # DB_STORAGE_TYPE: 'HDD'
+
+      # For psql invocations.
+      PGUSER: ${DB_USERNAME}
+      PGPASSWORD: ${DB_PASSWORD}
     volumes:
       - ./db:/var/lib/postgresql/data
 
