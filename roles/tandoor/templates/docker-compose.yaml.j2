@@ -9,6 +9,10 @@ services:
       - .env
     environment:
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
+
+      # For psql invocations.
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./db:/var/lib/postgresql/data
     healthcheck:
