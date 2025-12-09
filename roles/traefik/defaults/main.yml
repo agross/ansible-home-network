@@ -49,4 +49,14 @@ traefik_firewalld_services:
   - http3
 
 traefik_entrypoints: {}
+
+traefik_https_entrypoint_default_config:
+  address: ":443"
+  http:
+    tls:
+      certResolver: "{{ traefik_cert_resolver }}"
+  http2:
+    maxConcurrentStreams: 250
+  http3: {}
+
 traefik_https_entrypoint_config: {}

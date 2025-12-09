@@ -34,28 +34,11 @@ entryPoints:
           permanent: true
 
   https:
-    address: ":443"
-    http:
-      encodedCharacters:
-        # These are used when Nextcloud is syncing files or when using the web UI.
-        # https://www.reddit.com/r/selfhosted/comments/1ph9jio/traefik_v364_breaks_nextcloud_officecollabora/
-        allowEncodedQuestionMark: true
-        allowEncodedHash: true
-        allowEncodedPercent: true
-        allowEncodedSemicolon: true
-        # allowEncodedSlash: true
-        # allowEncodedBackSlash: true
-        # allowEncodedNullCharacter: true
-      tls:
-        certResolver: {{ traefik_cert_resolver }}
-    http2:
-      maxConcurrentStreams: 250
-    http3: {}
     {{
-      traefik_https_entrypoint_config |
+      traefik_https_entrypoint_default_config |
+      ansible.builtin.combine(traefik_https_entrypoint_config | default({}), recursive = true) |
       ansible.builtin.to_nice_yaml(indent = 2, sort_keys = false) |
       indent(4)
-      if traefik_https_entrypoint_config.keys() | length > 0
     }}
   {{
     traefik_entrypoints |
