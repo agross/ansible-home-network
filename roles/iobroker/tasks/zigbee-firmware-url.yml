@@ -12,7 +12,7 @@
       {{
         iobroker_device_firmware |
         default({}) |
-        combine(firmware | ansible.builtin.from_yaml, recursive = true)
+        ansible.builtin.combine(firmware | ansible.builtin.from_yaml, recursive = true)
       }}
   vars:
     firmware: >-
