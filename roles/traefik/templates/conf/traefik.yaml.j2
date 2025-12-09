@@ -36,6 +36,16 @@ entryPoints:
   https:
     address: ":443"
     http:
+      encodedCharacters:
+        # These are used when Nextcloud is syncing files or when using the web UI.
+        # https://www.reddit.com/r/selfhosted/comments/1ph9jio/traefik_v364_breaks_nextcloud_officecollabora/
+        allowEncodedQuestionMark: true
+        allowEncodedHash: true
+        allowEncodedPercent: true
+        allowEncodedSemicolon: true
+        # allowEncodedSlash: true
+        # allowEncodedBackSlash: true
+        # allowEncodedNullCharacter: true
       tls:
         certResolver: {{ traefik_cert_resolver }}
     http2:
