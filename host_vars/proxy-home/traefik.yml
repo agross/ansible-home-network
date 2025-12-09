@@ -34,9 +34,9 @@ traefik_https_entrypoint_config:
   # https://immich.app/docs/administration/reverse-proxy/#traefik-proxy-example-config
   transport:
     respondingTimeouts:
-      readTimeout: 600s
-      idleTimeout: 600s
-      writeTimeout: 600s
+      readTimeout: 20m # Uploads.
+      idleTimeout: 10m
+      writeTimeout: 20m # Downloads.
   # For compatibility with Nextcloud Push which acts as a reverse proxy,
   # issuing requests to the main Nextcloud server through the public URL.
   forwardedHeaders:
