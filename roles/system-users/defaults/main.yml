@@ -1,9 +1,9 @@
 system_users_combined: >-
   {{
     system_users |
-    combine(host_system_users | default({}),
-            recursive = true,
-            list_merge = 'append_rp')
+    ansible.builtin.combine(host_system_users | default({}),
+                            recursive = true,
+                            list_merge = 'append_rp')
   }}
 
 # https://www.0xf8.org/2021/03/filtering-with-ansibles-selectattr-rejectattr-when-the-tested-attribute-can-be-absent/
