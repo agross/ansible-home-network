@@ -22,6 +22,7 @@ http:
           - {{ network.ip6 }}
           - {{ hostvars['gateway-ogd'].network.ip4 }}
           - {{ hostvars['gateway-ogd'].network.ip6 }}
+          - {{ network.wireguard.ip4 }}
           - fe80::/10
           - fc00::/7
 
