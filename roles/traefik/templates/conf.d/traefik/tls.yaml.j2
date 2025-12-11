@@ -7,9 +7,11 @@ tls:
         domain:
           main: {{ traefik_cert_sans | first }}
           sans:
-            {% for san in traefik_cert_sans[1:] %}
-            - "{{ san }}"
-            {% endfor %}
+            {{
+              traefik_cert_sans[1:] |
+              ansible.builtin.to_nice_yaml |
+              indent(12)
+            }}
       {% else %}
       {}
       {% endif %}
