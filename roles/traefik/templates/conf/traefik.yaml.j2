@@ -62,10 +62,10 @@ certificatesResolvers:
       dnsChallenge:
         provider: {{ traefik_acme_type }}
         propagation:
-          # By default, the Traefik/lego provider above verifies the TXT record
+          # By default, the Traefik/lego provider above verifies the TXT records
           # before letting ACME/Let's Encrypt verify.
           # The default wait timeout for new TXT records to be publicly visible
-          # on the authorative DNS servers is 2 minutes. During that time lego
+          # on the authoritative DNS servers is 2 minutes. During that time lego
           # repeatedly checks if the new ones are visible. If not, the check is
           # retried until the timeout is reached. Otherwise, the certificate
           # order is passed on to ACME.
