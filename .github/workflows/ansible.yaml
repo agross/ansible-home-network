@@ -64,7 +64,7 @@ jobs:
           printf '%s' "${{ secrets.ANSIBLE_VAULT_AGROSS2 }}" > .ansible-vault-agross2
           chmod 600 .ansible-vault-agross2
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.ansible
           # Look to see if there is a cache hit for the corresponding
