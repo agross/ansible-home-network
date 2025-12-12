@@ -1,5 +1,5 @@
 # renovate: github-releases=arendst/Tasmota
-tasmota_update_version: 15.1.0
+tasmota_update_version: 15.2.0
 
 tasmota_update_ota_release:
   tasmota: >-
