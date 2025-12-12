@@ -7,3 +7,13 @@ global:
 
 scrape_config_files:
   - /etc/prometheus.d/scrapes/*.yml
+
+storage:
+  tsdb:
+    retention:
+      # How long to retain samples in storage. If neither this option nor the
+      # size option is set, the retention time defaults to 15d.
+      # Units Supported: y, w, d, h, m, s, ms.
+      # This option takes precedence over the deprecated command-line flag
+      # --storage.tsdb.retention.time.
+      time: 8w
