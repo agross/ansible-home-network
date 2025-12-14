@@ -1,4 +1,4 @@
-FROM nextcloud:32.0.2-apache
+FROM nextcloud:32.0.3-apache
 
 RUN apt-get update \
     \
