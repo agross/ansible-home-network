@@ -4,7 +4,7 @@ services:
       - 5432:5432
 
   mediakit:
-    image: razgrizhsu/immich-mediakit:0.1.11
+    image: razgrizhsu/immich-mediakit:0.1.12
     ports:
       - 8086:8086
     volumes:
