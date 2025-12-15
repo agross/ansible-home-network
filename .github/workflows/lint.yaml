@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/ansible-community/community-ee-minimal:2.20.0-1
+      image: ghcr.io/ansible-community/community-ee-minimal:2.20.1-1
       # Run as root to install packages, tty for unbuffered output.
       options: --user root --tty
 
@@ -61,7 +61,7 @@ jobs:
 
     env:
       # renovate: docker=ghcr.io/ansible-community/community-ee-minimal
-      version: 2.20.0-1
+      version: 2.20.1-1
 
     steps:
       - name: Verify Ansible version matches image version
