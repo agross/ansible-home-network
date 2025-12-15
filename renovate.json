@@ -78,6 +78,11 @@
       "groupName": "Immich"
     },
     {
+      "description": "Group go2rtc updates",
+      "matchPackageNames": ["/go2rtc$/"],
+      "groupName": "go2rtc"
+    },
+    {
       "description": "From MariaDB 12.3 every .3 release will be a LTS release, https://endoflife.date/mariadb#release-cadence",
       "matchPackageNames": ["mariadb"],
       "allowedVersions": "/^[0-9]+\\.3(\\.[0-9]+)?$/",
