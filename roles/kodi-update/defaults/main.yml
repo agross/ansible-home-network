@@ -9,6 +9,6 @@ kodi_update_version_nosuffix: >-
   }}
 
 kodi_update_release_url: >-
-  https://mirrors.kodi.tv/releases/android/arm64-v8a/kodi-{{
+  https://mirrors.kodi.tv/releases/android/arm/kodi-{{
     kodi_update_version
-  }}-arm64-v8a.apk?https=1
+  }}-armeabi-v7a.apk?https=1
