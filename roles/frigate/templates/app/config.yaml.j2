@@ -3,13 +3,17 @@
 # https://docs.frigate.video/configuration/reference
 # https://www.reddit.com/r/frigate_nvr/comments/1ak5j2q/
 
+# Frigate reformats this files to single-quoted strings during startup. Follow
+# this convention. A new key "version:" is also added.
+# This file will always be "changed" when deploying with Ansible.
+
 mqtt:
   enabled: true
   host: mqtt
   topic_prefix: {{ frigate_mqtt_topic_prefix }}
   client_id: frigate-{{ ansible_facts.hostname }}
-  user: "{FRIGATE_MQTT_USER}"
-  password: "{FRIGATE_MQTT_PASSWORD}"
+  user: '{FRIGATE_MQTT_USER}'
+  password: '{FRIGATE_MQTT_PASSWORD}'
 
 logger:
   default: info
@@ -65,7 +69,7 @@ snapshots:
 ffmpeg:
   # ffmpeg 6.1.2 in the go2rtc 1.9.9 image works, but the default ffmpeg 7.0 causes:
   # Error while filtering: Cannot allocate memory
-  path: "5.0"
+  path: '5.0'
   hwaccel_args: preset-vaapi
   input_args:
     # Intel GPU acceleration
@@ -82,13 +86,13 @@ ffmpeg:
     - -fflags
     - +genpts+discardcorrupt
     - -use_wallclock_as_timestamps
-    - "1"
+    - '1'
 
     - -flags
     - low_delay
 
     - -timeout
-    - "5000000"
+    - '5000000'
     - -rtsp_flags
     - prefer_tcp
   output_args:
@@ -102,13 +106,13 @@ ffmpeg:
       - -f
       - segment
       - -segment_time
-      - "10"
+      - '10'
       - -segment_format
       - mp4
       - -reset_timestamps
-      - "1"
+      - '1'
       - -strftime
-      - "1"
+      - '1'
 
       # Video encoding.
       - -c:v
@@ -120,15 +124,15 @@ ffmpeg:
       - -noautoscale
       # Frigate's default encoding options.
       - -g
-      - "50"
+      - '50'
       - -bf
-      - "0"
+      - '0'
       - -profile:v
       - high
       - -level:v
-      - "4.1"
+      - '4.1'
       - -sei:v
-      - "0"
+      - '0'
 
       # Copy audio stream
       - -c:a
@@ -173,8 +177,8 @@ cameras:
     onvif:
       host: south.cam.{{ network.domain }}
       port: 8000
-      user: "{FRIGATE_RTSP_USER}"
-      password: "{FRIGATE_RTSP_PASSWORD}"
+      user: '{FRIGATE_RTSP_USER}'
+      password: '{FRIGATE_RTSP_PASSWORD}'
 
     motion:
       mask: 0.30,0.07,0.30,0.02,0,0.02,0,0.07
