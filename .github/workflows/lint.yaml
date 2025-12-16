@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/ansible-community/community-ee-minimal:2.20.1-1
-      # Run as root to install packages, tty for unbuffered output.
-      options: --user root --tty
+      image: ghcr.io/agross/ansible-ee:2.20.0-1
+      # --tty for unbuffered output.
+      options: --tty
 
     defaults:
       run:
@@ -29,13 +29,6 @@ jobs:
       github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
 
     steps:
-      - name: Install git and ansible/ansible-lint dependencies
-        run: |
-          dnf install --assumeyes git wget
-
-          git --version
-          ansible --version
-
       - name: Mark workspace directory as safe
         # Cannot use github.workspace: https://github.com/actions/runner/issues/2058
         run: |
@@ -50,36 +43,6 @@ jobs:
           setup_python: false
           requirements_file: requirements.yml
           args: --exclude .ansible
-
-  ansible-ee-version:
-    name: Ansible EE Version
-    runs-on: ubuntu-latest
-
-    if: >-
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-
-    env:
-      # renovate: docker=ghcr.io/ansible-community/community-ee-minimal
-      version: 2.20.1-1
-
-    steps:
-      - name: Verify Ansible version matches image version
-        run: |
-          expect="${{ env.version }}"
-          expect="${expect%%-*}"
-
-          actual="$(docker container \
-                           run \
-                           --rm \
-                           "ghcr.io/ansible-community/community-ee-minimal:${{ env.version }}" \
-                           ansible --version |
-                    grep --fixed-strings 'ansible [core ')"
-          actual="${actual##*core }"
-          actual="${actual%%]*}"
-
-          echo "expect=$expect, actual=$actual"
-          [[ "$expect" == "$actual" ]]
 
   encrypted-vaults:
     name: Ensure vaults are encrypted

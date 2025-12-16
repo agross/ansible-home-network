@@ -31,9 +31,9 @@ jobs:
       - ${{ matrix.site }}
 
     container:
-      image: ghcr.io/ansible-community/community-ee-minimal:2.20.1-1
-      # Run as root to install packages, tty for unbuffered output.
-      options: --user root --tty
+      image: ghcr.io/agross/ansible-ee:2.20.0-1
+      # --tty for unbuffered output.
+      options: --tty
 
     defaults:
       run:
@@ -41,16 +41,6 @@ jobs:
         shell: bash
 
     steps:
-      - name: Install git and Python packages required for ansible modules
-        run: |
-          dnf install --assumeyes git \
-                                  python3-netaddr \
-                                  python3-passlib \
-                                  python3-bcrypt-4.3.0
-
-          git --version
-          ansible --version
-
       - name: Get latest code
         uses: actions/checkout@v6
 
