@@ -3,4 +3,4 @@ pve_exporter_service: "{{ ansible_role_name }}.service"
 pve_exporter_root: /opt/prometheus-pve-exporter
 
 # renovate: pypi=prometheus-pve-exporter
-pve_exporter_version: 3.6.0
+pve_exporter_version: 3.7.0
