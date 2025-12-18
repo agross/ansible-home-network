@@ -46,7 +46,7 @@ services:
       interval: 5s
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:9.2.2
+    image: docker.elastic.co/kibana/kibana:9.2.3
     ports:
       - 8002:5601
     environment:
@@ -68,7 +68,7 @@ services:
         condition: service_healthy
 
   search:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.3
     ports:
       - 127.0.0.1:9200:9200
     environment:
