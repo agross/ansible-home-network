@@ -85,7 +85,7 @@ services:
       GF_SMTP_USER: {{ logger_grafana_smtp_user | ansible.builtin.mandatory }}
       GF_SMTP_PASSWORD: {{ logger_grafana_smtp_password | ansible.builtin.mandatory }}
       GF_SMTP_EHLO_IDENTITY: {{ logger_grafana_domain }}
-      GF_SMTP_FROM_ADDRESS: grafana@{{ ansible_facts.hostname }}.{{ network.domain }}
+      GF_SMTP_FROM_ADDRESS: grafana@{{ logger_grafana_smtp_user | ansible.builtin.split('@', 1) | last }}
       {% endif %}
     {% if traefik_host %}
     labels:
