@@ -37,25 +37,23 @@ services:
         condition: service_healthy
 
   db:
-    image: postgres:16.11-alpine
+    image: postgres:18.1-alpine
     environment:
       POSTGRES_USER: freshrss
       POSTGRES_PASSWORD: freshrss
       POSTGRES_DB: freshrss
-      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
       TZ: Europe/Berlin
 
       # For psql invocations.
       PGUSER: freshrss
       PGPASSWORD: freshrss
+      PGDATABASE: freshrss
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql
     healthcheck:
       test:
         - CMD
         - psql
-        - --username=freshrss
-        - --dbname=freshrss
         - --command=select 1
       interval: 5s
       timeout: 5s
