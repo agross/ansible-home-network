@@ -1,24 +1,23 @@
 volumes:
-  nginx-conf:
   nginx-static:
 
 services:
   db:
-    image: postgres:17.7-alpine
+    image: postgres:18.1-alpine
     env_file:
       - .env
     environment:
-      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
-
       # For psql invocations.
-      PGUSER: ${POSTGRES_USER}
-      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGUSER: $POSTGRES_USER
+      PGPASSWORD: $POSTGRES_PASSWORD
+      PGDATABASE: $POSTGRES_DB
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql
     healthcheck:
       test:
-        - CMD-SHELL
-        - psql --username=$POSTGRES_USER --dbname=$POSTGRES_DB --command='select 1'
+        - CMD
+        - psql
+        - --command=select 1
       interval: 5s
       timeout: 5s
       retries: 3
