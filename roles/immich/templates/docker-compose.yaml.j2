@@ -1,3 +1,6 @@
+volumes:
+  ml-model-cache:
+
 services:
   server:
     image: ghcr.io/immich-app/immich-server:v2.4.1
@@ -12,8 +15,10 @@ services:
     ports:
       - 2283:2283
     depends_on:
-      - redis
-      - db
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:v2.4.1
@@ -32,22 +37,29 @@ services:
       interval: 5s
 
   db:
-    image: ghcr.io/immich-app/postgres:17-vectorchord0.4.2
+    image: ghcr.io/immich-app/postgres:18-vectorchord0.5.3
     env_file:
       - .env
     environment:
-      POSTGRES_DB: ${DB_DATABASE_NAME}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE --data-checksums
+      POSTGRES_DB: $DB_DATABASE_NAME
+      POSTGRES_USER: $DB_USERNAME
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_INITDB_ARGS: --data-checksums
       # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
       # DB_STORAGE_TYPE: 'HDD'
 
       # For psql invocations.
-      PGUSER: ${DB_USERNAME}
-      PGPASSWORD: ${DB_PASSWORD}
+      PGUSER: $DB_USERNAME
+      PGPASSWORD: $DB_PASSWORD
+      PGDATABASE: $DB_DATABASE_NAME
     volumes:
-      - ./db:/var/lib/postgresql/data
-
-volumes:
-  ml-model-cache:
+      - ./db:/var/lib/postgresql
+    healthcheck:
+      test:
+        - CMD
+        - psql
+        - --command=select 1
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
