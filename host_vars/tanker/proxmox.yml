@@ -27,7 +27,7 @@ proxmox:
       }},bridge=vmbr0
   disk_volume:
     storage: local-zfs
-    size: 60
+    size: 70
     options:
       mountoptions: discard;noatime
   mount_volumes:
