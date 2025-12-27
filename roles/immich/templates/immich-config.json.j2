@@ -77,6 +77,9 @@
     "notifications": {
       "concurrency": 5
     },
+    "ocr": {
+      "concurrency": 5
+    },
     "search": {
       "concurrency": 5
     },
@@ -91,6 +94,9 @@
     },
     "videoConversion": {
       "concurrency": 1
+    },
+    "workflow": {
+      "concurrency": 5
     }
   },
   "library": {
@@ -107,6 +113,11 @@
     "level": "log"
   },
   "machineLearning": {
+    "availabilityChecks": {
+      "enabled": true,
+      "interval": 30000,
+      "timeout": 2000
+    },
     "clip": {
       "enabled": true,
       "modelName": "ViT-SO400M-14-SigLIP2-378__webli"
@@ -122,6 +133,13 @@
       "minFaces": 1,
       "minScore": 0.7,
       "modelName": "buffalo_l"
+    },
+    "ocr": {
+      "enabled": true,
+      "maxResolution": 736,
+      "minDetectionScore": 0.5,
+      "minRecognitionScore": 0.8,
+      "modelName": "EN__PP-OCRv5_mobile"
     },
     "urls": [
       "http://machine-learning:3003"
@@ -140,6 +158,14 @@
   "newVersionCheck": {
     "enabled": true
   },
+  "nightlyTasks": {
+    "clusterNewFaces": true,
+    "databaseCleanup": true,
+    "generateMemories": true,
+    "missingThumbnails": true,
+    "startTime": "00:00",
+    "syncQuotaUsage": true
+  },
   "notifications": {
     "smtp": {
       "enabled": true,
@@ -150,6 +176,7 @@
         "ignoreCert": false,
         "password": "{{ immich_smtp_password | ansible.builtin.mandatory }}",
         "port": 587,
+	"secure": false,
         "username": "{{ immich_smtp_user | ansible.builtin.mandatory }}"
       }
     }
@@ -166,10 +193,13 @@
     "mobileOverrideEnabled": true,
     "mobileRedirectUri": "{{ immich_url | mandatory }}/api/oauth/mobile-redirect",
     "profileSigningAlgorithm": "none",
+    "roleClaim": "immich_role",
     "scope": "openid email profile",
     "signingAlgorithm": "RS256",
     "storageLabelClaim": "preferred_username",
-    "storageQuotaClaim": "immich_quota"
+    "storageQuotaClaim": "immich_quota",
+    "timeout": 30000,
+    "tokenEndpointAuthMethod": "client_secret_post"
   },
   "passwordLogin": {
     "enabled": true
