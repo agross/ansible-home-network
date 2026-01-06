@@ -1,64 +1,34 @@
 <<: !include /etc/borgmatic/config.yaml
 
-# Constants to use in the configuration file. All occurrences of the constant
-# name within culy braces will be replaced with the value. For example, if you
-# have a constant named "hostname" with the value "myhostname", then the string
-# "{hostname}" will be replaced with "myhostname" in the configuration file.
+# Constants to use in the configuration file. Within option values, all
+# occurrences of the constant name in curly braces will be replaced with the
+# constant value. For example, if you have a constant named "app_name" with the
+# value "myapp", then the string "{app_name}" will be replaced with "myapp" in
+# the configuration file.
 constants:
   name: {{ ansible_role_name }}
 
-# Where to look for files to backup, and where to store those backups.
-# See https://borgbackup.readthedocs.io/en/stable/quickstart.html and
-# https://borgbackup.readthedocs.io/en/stable/usage/create.html
-# for details.
-location:
-  # List of source directories to backup. Globs and tildes are expanded. Do not
-  # backslash spaces in path names.
-  source_directories: !retain
-    - {{ netboot_root }}/app/config
+# List of source directories and files to back up. Globs and tildes are
+# expanded. Do not backslash spaces in path names. Be aware that by default,
+# Borg treats missing source directories as warnings rather than errors. If
+# you'd like to change that behavior, see
+# https://torsion.org/borgmatic/how-to/customize-warnings-and-errors/
+# or the "source_directories_must_exist" option.
+source_directories: !retain
+  - {{ netboot_root }}/app/config
 
-  # Only store/extract numeric user and group identifiers. Defaults to false.
-  numeric_ids: true
+# Any paths matching these patterns are excluded from backups. Globs and tildes
+# are expanded. Note that a glob pattern must either start with a glob or be an
+# absolute path. Do not backslash spaces in path names. See the output of "borg
+# help patterns" for more details.
+exclude_patterns:
+  - {{ netboot_root }}/app/config/log/
+  - {{ netboot_root }}/app/config/tftpd.log
 
-  # Store birthtime (creation date) into archive. Defaults to true.
-  birthtime: true
-
-  # Any paths matching these patterns are included/excluded from backups. Globs
-  # are expanded. (Tildes are not.) See the output of "borg help patterns" for
-  # more details. Quote any value if it contains leading punctuation, so it
-  # parses correctly. Note that only one of "patterns" and "source_directories"
-  # may be used.
-  # patterns:
-
-  # Any paths matching these patterns are excluded from backups. Globs and
-  # tildes are expanded. Note that a glob pattern must either start with a glob
-  # or be an absolute path. Do not backslash spaces in path names. See the
-  # output of "borg help patterns" for more details.
-  exclude_patterns:
-    - {{ netboot_root }}/app/config/log/
-    - {{ netboot_root }}/app/config/tftpd.log
-
-  # If true, the exclude_if_present filename is included in backups. Defaults to
-  # false, meaning that the exclude_if_present filename is omitted from backups.
-  keep_exclude_tags: true
-
-  # Exclude files with the NODUMP flag. Defaults to false.
-  # exclude_nodump: true
-
-  # If true, then source directories must exist, otherwise an error is raised.
-  # Defaults to false.
-  source_directories_must_exist: true
-
-# Shell commands, scripts, or integrations to execute at various points during a
-# borgmatic run. IMPORTANT: All provided commands and scripts are executed with
-# user permissions of borgmatic. Do not forget to set secure permissions on this
-# configuration file (chmod 0600) as well as on any script called from a hook
-# (chmod 0700) to prevent potential shell injection or privilege escalation.
-hooks:
-  # Configuration for a monitoring integration with Healthchecks. Create an
-  # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
-  # to use this service. See borgmatic monitoring documentation for details.
-  healthchecks:
-    # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors
-    # or just to send logs.
-    ping_url: "{{ netboot_backup_healthcheck }}"
+# Configuration for a monitoring integration with Healthchecks. Create an
+# account at https://healthchecks.io (or self-host Healthchecks) if you'd like
+# to use this service. See borgmatic monitoring documentation for details.
+healthchecks:
+  # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors,
+  # or to send only logs.
+  ping_url: "{{ netboot_backup_healthcheck }}"

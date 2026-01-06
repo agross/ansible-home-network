@@ -92,7 +92,7 @@ case "${1-}" in
     elastic
     ;;
 
-  stop|error)
+  stop)
     "${occ[@]}" maintenance:mode --off
     ;;
 
