@@ -1,104 +1,73 @@
 <<: !include /etc/borgmatic/config.yaml
 
-# Constants to use in the configuration file. All occurrences of the constant
-# name within culy braces will be replaced with the value. For example, if you
-# have a constant named "hostname" with the value "myhostname", then the string
-# "{hostname}" will be replaced with "myhostname" in the configuration file.
+# Constants to use in the configuration file. Within option values, all
+# occurrences of the constant name in curly braces will be replaced with the
+# constant value. For example, if you have a constant named "app_name" with the
+# value "myapp", then the string "{app_name}" will be replaced with "myapp" in
+# the configuration file.
 constants:
   name: {{ ansible_role_name }}
 
-# Where to look for files to backup, and where to store those backups.
-# See https://borgbackup.readthedocs.io/en/stable/quickstart.html and
-# https://borgbackup.readthedocs.io/en/stable/usage/create.html
-# for details.
-location:
-  # List of source directories to backup. Globs and tildes are expanded. Do not
-  # backslash spaces in path names.
-  source_directories: !retain
-    - {{ nextcloud_root }}/app
-    - {{ nextcloud_root }}/backups
-    - {{ nextcloud_root }}/valkey
+# List of source directories and files to back up. Globs and tildes are
+# expanded. Do not backslash spaces in path names. Be aware that by default,
+# Borg treats missing source directories as warnings rather than errors. If
+# you'd like to change that behavior, see
+# https://torsion.org/borgmatic/how-to/customize-warnings-and-errors/
+# or the "source_directories_must_exist" option.
+source_directories: !retain
+  - {{ nextcloud_root }}/app
+  - {{ nextcloud_root }}/backups
+  - {{ nextcloud_root }}/valkey
 
-  # Stay in same file system: do not cross mount points beyond the given source
-  # directories. Defaults to false. But when a database hook is used, the
-  # setting here is ignored and one_file_system is considered true.
-  one_file_system: false
+# Any paths matching these patterns are excluded from backups. Globs and tildes
+# are expanded. Note that a glob pattern must either start with a glob or be an
+# absolute path. Do not backslash spaces in path names. See the output of "borg
+# help patterns" for more details.
+exclude_patterns:
+  # Exclude logs.
+  - {{ nextcloud_root }}/app/data/*.log
+  - {{ nextcloud_root }}/app/data/*.log.*
 
-  # Only store/extract numeric user and group identifiers. Defaults to false.
-  numeric_ids: true
+  # No trashbins and versions.
+  - {{ nextcloud_root }}/app/data/*/files_trashbin/
+  - {{ nextcloud_root }}/app/data/*/files_versions/
 
-  # Store birthtime (creation date) into archive. Defaults to true.
-  birthtime: true
+  # No previews.
+  - {{ nextcloud_root }}/app/data/appdata*/preview/
 
-  # Any paths matching these patterns are included/excluded from backups. Globs
-  # are expanded. (Tildes are not.) See the output of "borg help patterns" for
-  # more details. Quote any value if it contains leading punctuation, so it
-  # parses correctly. Note that only one of "patterns" and "source_directories"
-  # may be used.
-  # patterns:
+  # Big user data.
+  - {{ nextcloud_root }}/app/data/agross/files/_Shared/
+  - {{ nextcloud_root }}/app/data/agross/files/Music/_Queue/
+  - {{ nextcloud_root }}/app/data/agross/files/Music/_Queue-Techno/
+  - {{ nextcloud_root }}/app/data/agross/files/Funstuff/Marcis Fotos/
 
-  # Any paths matching these patterns are excluded from backups. Globs and
-  # tildes are expanded. Note that a glob pattern must either start with a glob
-  # or be an absolute path. Do not backslash spaces in path names. See the
-  # output of "borg help patterns" for more details.
-  exclude_patterns:
-    # Exclude logs.
-    - {{ nextcloud_root }}/app/data/*.log
-    - {{ nextcloud_root }}/app/data/*.log.*
+  - {{ nextcloud_root }}/app/data/amay/
+  - {{ nextcloud_root }}/app/data/kfochtmann/
 
-    # No trashbins and versions.
-    - {{ nextcloud_root }}/app/data/*/files_trashbin/
-    - {{ nextcloud_root }}/app/data/*/files_versions/
+# List of one or more command hooks to execute, triggered at particular points
+# during borgmatic's execution. For each command hook, specify one of "before"
+# or "after", not both.
+commands:
+  - before: configuration
+    # Only trigger the hook when borgmatic is run with particular actions listed
+    # here. Defaults to running for all actions.
+    when:
+      - create
+    run:
+      - {{ nextcloud_root }}/backup start
 
-    # No previews.
-    - {{ nextcloud_root }}/app/data/appdata*/preview/
+  - after: configuration
+    # Only trigger the hook when borgmatic is run with particular actions listed
+    # here. Defaults to running for all actions.
+    when:
+      - create
+    run:
+      - {{ nextcloud_root }}/backup stop
 
-    # Big user data.
-    - {{ nextcloud_root }}/app/data/agross/files/_Shared/
-    - {{ nextcloud_root }}/app/data/agross/files/Music/_Queue/
-    - {{ nextcloud_root }}/app/data/agross/files/Music/_Queue-Techno/
-    - {{ nextcloud_root }}/app/data/agross/files/Funstuff/Marcis Fotos/
-
-    - {{ nextcloud_root }}/app/data/amay/
-    - {{ nextcloud_root }}/app/data/kfochtmann/
-
-  # If true, the exclude_if_present filename is included in backups. Defaults to
-  # false, meaning that the exclude_if_present filename is omitted from backups.
-  keep_exclude_tags: true
-
-  # Exclude files with the NODUMP flag. Defaults to false.
-  # exclude_nodump: true
-
-  # If true, then source directories must exist, otherwise an error is raised.
-  # Defaults to false.
-  source_directories_must_exist: true
-
-# Shell commands, scripts, or integrations to execute at various points during a
-# borgmatic run. IMPORTANT: All provided commands and scripts are executed with
-# user permissions of borgmatic. Do not forget to set secure permissions on this
-# configuration file (chmod 0600) as well as on any script called from a hook
-# (chmod 0700) to prevent potential shell injection or privilege escalation.
-hooks:
-  # List of one or more shell commands or scripts to execute before creating a
-  # backup, run once per repository.
-  before_backup:
-    - {{ nextcloud_root }}/backup start
-
-  # List of one or more shell commands or scripts to execute after creating a
-  # backup, run once per repository.
-  after_backup:
-    - {{ nextcloud_root }}/backup stop
-
-  # List of one or more shell commands or scripts to execute when an exception
-  # occurs during a "create", "prune", "compact", or "check" action or an
-  # associated before/after hook.
-  on_error:
-    - {{ nextcloud_root }}/backup error
-
-  # Configuration for a monitoring integration with Healthchecks. Create an
-  # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
-  # to use this service. See borgmatic monitoring documentation for details.
-  healthchecks:
-    # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors
-    # or just to send logs.
-    ping_url: "{{ nextcloud_backup_healthcheck }}"
+# Configuration for a monitoring integration with Healthchecks. Create an
+# account at https://healthchecks.io (or self-host Healthchecks) if you'd like
+# to use this service. See borgmatic monitoring documentation for details.
+healthchecks:
+  # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors,
+  # or to send only logs.
+  ping_url: "{{ nextcloud_backup_healthcheck }}"

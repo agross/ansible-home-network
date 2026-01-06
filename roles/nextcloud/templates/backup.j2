@@ -92,12 +92,12 @@ case "${1-}" in
     elastic
     ;;
 
-  stop|error)
+  stop)
     "${occ[@]}" maintenance:mode --off
     ;;
 
   *)
-    printf 'Either the "start", "stop" or "error" action is supported.\n'
+    printf 'Either the "start" or "stop" action is supported.\n'
     exit 1
     ;;
 esac
