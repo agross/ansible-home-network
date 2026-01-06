@@ -1,11 +1,3 @@
-- name: Ensure /root/.borgmatic exists
-  ansible.builtin.file:
-    path: /root/.borgmatic
-    state: directory
-    owner: 0
-    group: 0
-    mode: "755"
-
 - name: Ensure borgmatic service and timer override directories exists
   ansible.builtin.file:
     path: "/etc/systemd/system/{{ item | ansible.builtin.basename }}.d/"
