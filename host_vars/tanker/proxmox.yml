@@ -51,80 +51,100 @@ proxmox:
       mountpoint: /data/immich/app/library
       options:
         mountoptions: discard;noatime
-
     mp4:
+      host_path: /tank/immich/backups
+      mountpoint: /data/immich/backups
+      options:
+        mountoptions: discard;noatime
+    mp5:
+      host_path: /tank/immich/cache
+      mountpoint: /data/immich/cache
+      options:
+        mountoptions: discard;noatime
+
+    mp6:
       host_path: /tank/nextcloud/app
       mountpoint: /data/nextcloud/app/data
       options:
         mountoptions: discard;noatime
-    mp5:
+    mp7:
+      host_path: /tank/nextcloud/backups
+      mountpoint: /data/nextcloud/backups
+      options:
+        mountoptions: discard;noatime
+    mp8:
       host_path: /tank/nextcloud/mariadb
       mountpoint: /data/nextcloud/mariadb/data
       options:
         mountoptions: discard;noatime
-    mp6:
+    mp9:
       host_path: /tank/nextcloud/elasticsearch
       mountpoint: /data/nextcloud/elasticsearch/data
       options:
         mountoptions: discard;noatime
 
-    mp7:
+    mp10:
       host_path: /tank/commafeed/mysql
       mountpoint: /data/commafeed/mysql/data
       options:
         mountoptions: discard;noatime
 
-    mp8:
+    mp11:
       host_path: /tank/feedr/postgres
       mountpoint: /data/feedr/db
       options:
         mountoptions: discard;noatime
 
-    mp9:
+    mp12:
       host_path: /tank/freshrss/postgres
       mountpoint: /data/freshrss/db
       options:
         mountoptions: discard;noatime
 
-    mp10:
+    mp13:
       host_path: /tank/tandoor/app
       mountpoint: /data/tandoor/app
       options:
         mountoptions: discard;noatime
-    mp11:
+    mp14:
       host_path: /tank/tandoor/postgres
       mountpoint: /data/tandoor/db
       options:
         mountoptions: discard;noatime
 
-    mp12:
+    mp15:
       host_path: /tank/vaultwarden/app
       mountpoint: /data/vaultwarden/app
       options:
         mountoptions: discard;noatime
-    mp13:
+    mp16:
       host_path: /tank/vaultwarden/mariadb
       mountpoint: /data/vaultwarden/mariadb/data
       options:
         mountoptions: discard;noatime
 
-    mp14:
+    mp17:
       host_path: /tank/prometheus/app
       mountpoint: /data/prometheus/app
       options:
         mountoptions: discard;noatime
-    mp15:
+    mp18:
       host_path: /tank/prometheus/app/data
       mountpoint: /data/prometheus/app/data
       options:
         mountoptions: discard;noatime
+    mp19:
+      host_path: /tank/prometheus/backups
+      mountpoint: /data/prometheus/backups
+      options:
+        mountoptions: discard;noatime
 
-    mp16:
+    mp20:
       host_path: /tank/renovate/app
       mountpoint: /data/renovate/app
       options:
         mountoptions: discard;noatime
-    mp17:
+    mp21:
       host_path: /tank/renovate/postgres
       mountpoint: /data/renovate/db
       options:
@@ -162,6 +182,18 @@ zfs_datasets:
       group: 100000
     options:
       recordsize: 512K
+  tank/immich/backups:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 1M
+  tank/immich/cache:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 1M
   tank/immich/postgres:
     chown:
       owner: 100999
@@ -176,6 +208,10 @@ zfs_datasets:
       group: 100033
     options:
       recordsize: 32K
+  tank/nextcloud/backups:
+    chown:
+      owner: 100000
+      group: 100000
   tank/nextcloud/mariadb:
     chown:
       owner: 100999
@@ -251,6 +287,12 @@ zfs_datasets:
     chown:
       owner: 165534
       group: 165534
+  tank/prometheus/backups:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 1M
 
   tank/renovate/app:
     chown:

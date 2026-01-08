@@ -1,6 +1,3 @@
-volumes:
-  ml-model-cache:
-
 services:
   server:
     image: ghcr.io/immich-app/immich-server:v2.4.1
@@ -23,7 +20,7 @@ services:
   machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:v2.4.1
     volumes:
-      - ml-model-cache:/cache
+      - ./cache/ml-model:/cache
     env_file:
       - .env
 
