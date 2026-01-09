@@ -1,2 +1,2 @@
 # renovate: docker=ghcr.io/actions/actions-runner
-github_runner_version: 2.330.0
+github_runner_version: 2.331.0
