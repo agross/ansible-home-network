@@ -3,38 +3,40 @@
 
 set -euo pipefail
 
-role={{ ansible_role_name | ansible.builtin.quote }}
-compose=(docker compose --project-name "$role")
+export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+target={{ prometheus_root | ansible.builtin.quote }}/backups
 
 cleanup() {
   printf 'Cleaning up backup directory.\n'
-  rm -rf -- {{ prometheus_root | ansible.builtin.quote }}/backups
-  mkdir --parents -- {{ prometheus_root | ansible.builtin.quote }}/backups
+
+  mkdir --parents -- "$target"
+  rm -rf -- "${target:?}"/{*,.*}
 }
 
 prometheus() {
   local target={{ prometheus_root | ansible.builtin.quote }}/backups
   local snapshot
 
-  mkdir --parents -- "$target"
-
   snapshot="$( \
-    "${compose[@]}" exec \
-                    app \
-                    wget \
-                    --post-data '' \
-                    -O - \
-                    http://localhost:9090/api/v1/admin/tsdb/snapshot \
+    docker compose \
+           exec \
+           app \
+           wget \
+           --post-data '' \
+           -O - \
+           http://localhost:9090/api/v1/admin/tsdb/snapshot \
       | jq --exit-status --raw-output .data.name \
   )"
 
-  "${compose[@]}" cp \
-                  "app:/prometheus/snapshots/$snapshot" \
-                  "$target"
+  docker compose \
+         cp \
+         "app:/prometheus/snapshots/$snapshot" \
+         "$target"
 
-  "${compose[@]}" exec \
-                  app \
-                  rm -r /prometheus/snapshots
+  docker compose \
+         exec \
+         app \
+         rm -r /prometheus/snapshots
 }
 
 trap cleanup ERR SIGINT SIGTERM

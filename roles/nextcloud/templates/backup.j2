@@ -12,7 +12,8 @@ cleanup() {
   printf 'Cleaning up backup directory.\n'
 
   # Directory needs to be kept because it is mounted on the Elasticsearch container.
-  rm -rf -- "$target"/*.sql
+  mkdir --parents -- "$target"
+  rm -rf -- "${target:?}"/*.sql
 }
 
 mariadb() {

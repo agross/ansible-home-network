@@ -9,8 +9,8 @@ target={{ harbor_root | ansible.builtin.quote }}/backups
 cleanup() {
   printf 'Cleaning up backup directory.\n'
 
-  rm -rf -- "$target"
   mkdir --parents -- "$target"
+  rm -rf -- "${target:?}"/{*,.*}
 }
 
 db() {

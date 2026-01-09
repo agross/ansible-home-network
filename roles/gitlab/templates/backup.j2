@@ -9,7 +9,8 @@ target={{ gitlab_root | ansible.builtin.quote }}/app/data/backups
 cleanup() {
   printf 'Cleaning up backup directory.\n'
 
-  rm -rf -- "$target"/*
+  mkdir --parents -- "$target"
+  rm -rf -- "${target:?}"/{*,.*}
 }
 
 app() {
