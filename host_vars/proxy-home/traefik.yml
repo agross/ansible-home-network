@@ -38,15 +38,16 @@ traefik_https_entrypoint_config:
       idleTimeout: 10m
       writeTimeout: 20m # Downloads.
 
-  # These are used when Nextcloud is syncing files or when using the web UI.
-  # https://www.reddit.com/r/selfhosted/comments/1ph9jio/traefik_v364_breaks_nextcloud_officecollabora/
   http:
     encodedCharacters:
+      # These are used when Nextcloud is syncing files or when using the web UI.
+      # https://www.reddit.com/r/selfhosted/comments/1ph9jio/traefik_v364_breaks_nextcloud_officecollabora/
       allowEncodedQuestionMark: true
       allowEncodedHash: true
       allowEncodedPercent: true
       allowEncodedSemicolon: true
-      # allowEncodedSlash: true
+      # In addition, this is required for Kodi's web UI.
+      allowEncodedSlash: true
       # allowEncodedBackSlash: true
       # allowEncodedNullCharacter: true
 
