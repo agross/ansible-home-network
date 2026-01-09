@@ -33,7 +33,7 @@ services:
       interval: 5s
 
   app:
-    image: vaultwarden/server:1.35.1-alpine
+    image: vaultwarden/server:1.35.2-alpine
     restart: unless-stopped
     user: "{{ vaultwarden_uid_gid | ansible.builtin.mandatory }}:{{ vaultwarden_uid_gid }}"
     ports:
