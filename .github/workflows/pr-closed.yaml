@@ -5,6 +5,10 @@ on:
     types:
       - closed
 
+env:
+  # grep extended regexp defining roles that will not trigger Ansible.
+  EXCLUDED_ROLES: github-runners
+
 jobs:
   affected-roles:
     name: Determine roles affected by the PR
@@ -73,6 +77,7 @@ jobs:
             sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' -e 's|roles/\([^/]*\)/.*|\1|' |
             sort |
             uniq |
+            grep -Ev "${{ env.EXCLUDED_ROLES }}" |
             paste --serial --delimiter=,
 
             echo ROLES
