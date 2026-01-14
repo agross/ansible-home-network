@@ -67,9 +67,6 @@ snapshots:
 # https://frigate.ogd.therightstuff.de/api/config
 # https://github.com/blakeblackshear/frigate/blob/dev/frigate/ffmpeg_presets.py
 ffmpeg:
-  # ffmpeg 6.1.2 in the go2rtc 1.9.9 image works, but the default ffmpeg 7.0 causes:
-  # Error while filtering: Cannot allocate memory
-  path: '5.0'
   hwaccel_args: preset-vaapi
   # preset-rtsp-restream* will not fix bogus streams.
   input_args: preset-rtsp-generic
