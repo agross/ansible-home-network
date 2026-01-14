@@ -20,7 +20,7 @@ borg_repository: >-
   }}/volume2/NetBackup/borg/{{
     site | ansible.builtin.mandatory
   }}/{{
-    borgmatic_server_name | default(ansible_hostname)
+    borgmatic_server_name | default(ansible_facts.hostname)
   }}
 
 borg_remote_path: /usr/local/bin/borg
