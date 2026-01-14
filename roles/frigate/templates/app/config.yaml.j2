@@ -71,72 +71,10 @@ ffmpeg:
   # Error while filtering: Cannot allocate memory
   path: '5.0'
   hwaccel_args: preset-vaapi
-  input_args:
-    # Intel GPU acceleration
-    - -hwaccel
-    - vaapi
-    - -hwaccel_output_format
-    - vaapi
-
-    # Frigate's default options.
-    # https://github.com/blakeblackshear/frigate/blob/c3410cd13eef70b5dbbaaa3f6e86e5ff3bb82740/frigate/ffmpeg_presets.py#L335-L346
-    # Fix bogus streams.
-    - -avoid_negative_ts
-    - make_zero
-    - -fflags
-    - +genpts+discardcorrupt
-    - -use_wallclock_as_timestamps
-    - '1'
-
-    - -flags
-    - low_delay
-
-    - -timeout
-    - '5000000'
-    - -rtsp_flags
-    - prefer_tcp
+  # preset-rtsp-restream* will not fix bogus streams.
+  input_args: preset-rtsp-generic
   output_args:
-    # I have 2 RLC-1240A cameras with a main stream resolution of 4512x2512,
-    # which is more than the <=4096px the Intel GPU supports. Downscale the
-    # recorded stream to 1080p (1940x1080).
-    # -noautoscale also needs to be applied:
-    record:
-      # Frigate's default segment options.
-      # https://github.com/blakeblackshear/frigate/blob/c3410cd13eef70b5dbbaaa3f6e86e5ff3bb82740/frigate/ffmpeg_presets.py#L446-L458
-      - -f
-      - segment
-      - -segment_time
-      - '10'
-      - -segment_format
-      - mp4
-      - -reset_timestamps
-      - '1'
-      - -strftime
-      - '1'
-
-      # Video encoding.
-      - -c:v
-      - h264_vaapi
-      # Scale to 1080p.
-      - -vf
-      - scale_vaapi=-2:1080
-      # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
-      - -noautoscale
-      # Frigate's default encoding options.
-      - -g
-      - '50'
-      - -bf
-      - '0'
-      - -profile:v
-      - high
-      - -level:v
-      - '4.1'
-      - -sei:v
-      - '0'
-
-      # Copy audio stream
-      - -c:a
-      - copy
+    record: preset-record-generic-audio-copy
 
 cameras:
   east:
