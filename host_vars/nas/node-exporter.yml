@@ -1,2 +1,5 @@
 node_exporter_root: /volume1/docker/node-exporter
 node_exporter_install_method: docker
+
+# Newer versions are not supported because DSM 7.1 only supports Docker 20.
+cadvisor_version: 0.55.1

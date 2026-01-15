@@ -13,7 +13,7 @@ services:
   {% if cadvisor_jobs | length > 0 %}
   {% set cadvisor = cadvisor_jobs | first %}
   cadvisor:
-    image: ghcr.io/google/cadvisor:0.56.0
+    image: ghcr.io/google/cadvisor:{{ cadvisor_version }}
     restart: unless-stopped
     ports:
       - {{ cadvisor.port }}:8080
