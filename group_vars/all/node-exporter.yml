@@ -2,10 +2,10 @@
 node_exporter_version: 1.10.2
 
 # renovate: github-releases=google/cadvisor
-cadvisor_release_version: v0.56.1
+cadvisor_release_version: v0.56.2
 
 # renovate: docker=ghcr.io/google/cadvisor
-cadvisor_version: 0.56.1
+cadvisor_version: 0.56.2
 cadvisor_port: 9280
 
 # renovate: github-releases=prometheus-community/ipmi_exporter
