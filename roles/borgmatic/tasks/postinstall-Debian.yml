@@ -12,6 +12,6 @@
     mode: "644"
     lstrip_blocks: true
   loop:
-    - Debian/borgmatic.service
+    - Debian/borgmatic.service.j2
     - borgmatic.timer.j2
   notify: Restart borgmatic timer

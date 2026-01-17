@@ -56,8 +56,12 @@ ProtectSystem=full
 # includes, for instance, programs to snapshot filesystems (e.g. ZFS, LVM, and
 # Btrfs). But rather than commenting this out entirely, one workaround may be to
 # add "CAP_SYS_ADMIN".
-# Indeed, it does interfere with hooks when CAP_SYS_ADMIN is not included.
-CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_NET_RAW CAP_SYS_ADMIN
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_NET_RAW
+{% if borgmatic_systemd_capabilities | default('', true) | length > 0 %}
+# Required to execute borgmatic hooks.
+CapabilityBoundingSet={{ borgmatic_systemd_capabilities }}
+{% endif %}
+
 
 # Lower CPU and I/O priority.
 Nice=19

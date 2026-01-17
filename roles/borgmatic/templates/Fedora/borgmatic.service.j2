@@ -1,0 +1,8 @@
+[Service]
+{% if borgmatic_systemd_capabilities | default('', true) | length > 0 %}
+# Required to execute borgmatic hooks.
+CapabilityBoundingSet={{ borgmatic_systemd_capabilities }}
+{% endif %}
+
+# No sleep before running the backup.
+ExecStartPre=

@@ -1,3 +1,7 @@
 borgmatic_encryption_passphrase: "{{ vault_borgmatic_encryption_passphrase }}"
 
 borgmatic_system_backup_healthcheck: "{{ vault_borgmatic_system_backup_healthcheck }}"
+
+# Hook scripts of banking, gitlab and teamcity need this to remove files owned
+# by other users.
+borgmatic_systemd_capabilities: cap_dac_override

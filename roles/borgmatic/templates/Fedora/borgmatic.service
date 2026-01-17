@@ -1,6 +1,0 @@
-[Service]
-# Required to execute borgmatic hooks.
-CapabilityBoundingSet=CAP_SYS_ADMIN
-
-# No sleep before running the backup.
-ExecStartPre=
