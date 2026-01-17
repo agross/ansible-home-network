@@ -1,8 +1,6 @@
 [Service]
-# May interfere with running external programs within borgmatic hooks.
-# Indeed, it does, reset.
-# CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_NET_RAW
-CapabilityBoundingSet=~
+# Required to execute borgmatic hooks.
+CapabilityBoundingSet=CAP_SYS_ADMIN
 
 # No sleep before running the backup.
 ExecStartPre=
