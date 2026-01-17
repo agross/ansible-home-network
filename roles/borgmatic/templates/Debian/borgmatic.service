@@ -65,9 +65,10 @@ Restart=no
 # remove this option.
 LogRateLimitIntervalSec=0
 
+# Disable stdout verbosity (-2) and log to syslog (1), otherwise all log lines
+# would be prefixed with systemd-inhibit as the process name.
 ExecStart=/usr/bin/systemd-inhibit --who=borgmatic \
                                    --what=sleep:shutdown \
                                    --why="Prevent interrupting scheduled backup" \
-                                   /usr/local/bin/borgmatic --verbosity -1 \
-                                                            --syslog-verbosity 1 \
-                                                            --stats
+                                   /usr/local/bin/borgmatic --verbosity -2 \
+                                                            --syslog-verbosity 1

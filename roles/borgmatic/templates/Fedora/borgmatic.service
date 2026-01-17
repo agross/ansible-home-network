@@ -6,12 +6,3 @@ CapabilityBoundingSet=~
 
 # No sleep before running the backup.
 ExecStartPre=
-
-# More verbose output.
-ExecStart=
-ExecStart=/usr/bin/systemd-inhibit --who=borgmatic \
-                                   --what=sleep:shutdown \
-                                   --why="Prevent interrupting scheduled backup" \
-                                   /usr/bin/borgmatic --verbosity -1 \
-                                                      --syslog-verbosity 1 \
-                                                      --stats
