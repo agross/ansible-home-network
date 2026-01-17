@@ -86,3 +86,7 @@ borgmatic_custom_config:
     # same as PING_BODY_LIMIT configured on the Healthchecks server. Set to 0 to
     # send all logs and disable this truncation. Defaults to 100000.
     ping_body_limit: 0
+
+    # Send borgmatic logs to Healthchecks as part of the "finish",
+    # "fail", and "log" states. Defaults to false.
+    send_logs: true
