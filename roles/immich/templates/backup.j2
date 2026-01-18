@@ -20,7 +20,18 @@ db() {
   "${cmd[@]}" pg_dumpall > "$target/db.sql"
 }
 
+clean-uploads() {
+  printf 'Removing empty upload directories.\n'
+
+  find {{ immich_root | ansible.builtin.quote }}/app/upload \
+       -type d \
+       -empty \
+       -delete
+}
+
+
 trap cleanup ERR SIGINT SIGTERM
 
 cleanup
 db
+clean-uploads
