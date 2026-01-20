@@ -61,6 +61,8 @@
           - desec
           - --data
           - /tmp/acme-auth
+          - --validation-delay
+          - 120
       changed_when: true
 
   always:
