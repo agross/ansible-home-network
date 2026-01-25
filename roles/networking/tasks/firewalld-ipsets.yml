@@ -1,0 +1,50 @@
+- name: Query IP set
+  ansible.builtin.command:
+    argv:
+      - firewall-cmd
+      - --permanent
+      - "--info-ipset={{ item.key }}"
+  failed_when: false
+  changed_when: false
+  register: networking_firewalld_public_ipset
+  loop: "{{ ipsets }}"
+  loop_control:
+    label: "{{ item.key }}: {{ item.value }}"
+
+- name: Ensure IP set exists
+  ansible.builtin.command:
+    argv:
+      - firewall-cmd
+      - --permanent
+      - "--new-ipset={{ item.key }}"
+      - "--type={{ item.value.type }}"
+      - "--family={{ item.value.family | ansible.builtin.default('inet') }}"
+  changed_when: true
+  notify: Reload firewalld
+  loop: >-
+    {{
+      networking_firewalld_public_ipset.results |
+      rejectattr('rc', 'equalto', 0) |
+      map(attribute = 'item')
+    }}
+  loop_control:
+    label: "{{ item.key }}: {{ item.value.type }}"
+
+- name: Add static entries to IP set
+  ansible.builtin.command:
+    argv:
+      - firewall-cmd
+      - --permanent
+      - "--ipset={{ item.0.key }}"
+      - "--add-entry={{ item.1 }}"
+  register: networking_firewalld_ipset_add
+  changed_when: "'ALREADY_ENABLED' not in networking_firewalld_ipset_add.stderr"
+  notify: Reload firewalld
+  loop: >-
+    {{
+      ipsets |
+      selectattr('value.entries', 'defined') |
+      ansible.builtin.subelements('value.entries')
+    }}
+  loop_control:
+    label: "{{ item.0.key }}: {{ item.1 }}"

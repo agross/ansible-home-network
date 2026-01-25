@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+# Log outputs with:
+#
+# journalctl --follow --unit networkd-dispatcher.service
+
+set -euo pipefail
+shopt -s inherit_errexit
+
+[[ "${IFACE:-}" == {{ interfaces.telekom.device | mandatory | quote }} ]] || exit  0
+
+if [[ -z "${ADDR:-}" ]]; then
+  >&2 printf 'IPv4 address is missing\n'
+  exit 1
+fi
+
+# Enforce that the IP set is defined in the host's firewalld config.
+ipset={{ firewalld.ipsets.keys() | select('equalto', 'public-ip4') | first | ansible.builtin.quote }}
+
+printf 'Removing up old public IPs...\n'
+firewall-cmd --ipset "$ipset" --get-entries |
+  xargs --replace={} \
+        --verbose \
+        firewall-cmd --ipset "$ipset" --remove-entry={}
+
+printf 'Adding current public IP %s\n' "$ADDR"
+firewall-cmd --ipset "$ipset" \
+             --add-entry "$ADDR"
+
+printf 'Persisting configuration to support firewall-cmd --reload\n'
+firewall-cmd --runtime-to-permanent

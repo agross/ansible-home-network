@@ -4,6 +4,10 @@ firewalld:
       - dhcpv6-client
       - wireguard
 
+  ipsets:
+    public-ip4:
+      type: hash:ip
+
   rich_rules:
     # IPv6 port forwarding requires the use of the rich language.
     external:
@@ -38,6 +42,49 @@ firewalld:
           protocol=tcp
           port={{ gitlab_ssh_port }}
           to-addr={{ hostvars.grossweber.interfaces.lan.ip6.address }}
+          to-port={{ gitlab_ssh_port }}
+
+    # Same ports as above, but for IPv4 and limited to our public IP.
+    # Without limiting to the public IP all port-related traffic would be
+    # port-forwarded, making it impossible to access these ports on the
+    # internet.
+    # https://github.com/firewalld/firewalld/issues/258#issuecomment-453733565
+    internal:
+      # HTTP.
+      - >-
+        rule family=ipv4
+        destination ipset=public-ip4
+        forward-port
+          protocol=tcp
+          port=80
+          to-addr={{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
+          to-port=80
+      # HTTPS.
+      - >-
+        rule family=ipv4
+        destination ipset=public-ip4
+        forward-port
+          protocol=tcp
+          port=443
+          to-addr={{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
+          to-port=443
+      # HTTP/3.
+      - >-
+        rule family=ipv4
+        destination ipset=public-ip4
+        forward-port
+          protocol=udp
+          port=443
+          to-addr={{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
+          to-port=443
+      # GitLab SSH.
+      - >-
+        rule family=ipv4
+        destination ipset=public-ip4
+        forward-port
+          protocol=tcp
+          port={{ gitlab_ssh_port }}
+          to-addr={{ hostvars.grossweber.interfaces.lan.ip4.address }}
           to-port={{ gitlab_ssh_port }}
 
   forward_ports:
