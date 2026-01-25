@@ -53,17 +53,17 @@ firewalld:
       # HTTP.
       - proto: tcp
         port: 80
-        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}"
+        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip4.address }}"
         toport: 80
       # HTTPS.
       - proto: tcp
         port: 443
-        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}"
+        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip4.address }}"
         toport: 443
       # HTTP/3.
       - proto: udp
         port: 443
-        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip6.address }}"
+        toaddr: "{{ hostvars['proxy-ogd'].interfaces.lan.ip4.address }}"
         toport: 443
       # WebRTC over TCP.
       - proto: tcp
