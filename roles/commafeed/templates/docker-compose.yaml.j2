@@ -29,7 +29,7 @@ services:
       interval: 5s
 
   app:
-    image: athou/commafeed:6.1.0-mariadb
+    image: athou/commafeed:6.1.1-mariadb
     environment:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:mariadb://db/commafeed?autoReconnect=true&failOverReadOnly=false&maxReconnects=20&rewriteBatchedStatements=true
       QUARKUS_DATASOURCE_USERNAME: commafeed
