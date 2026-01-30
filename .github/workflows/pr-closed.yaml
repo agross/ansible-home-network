@@ -26,6 +26,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          # We don't need the file contents (blobs), but we inspect commits and
+          # trees.
+          # This in combination with a bare repo would be even faster, but it's
+          # not supported.
+          # https://github.com/actions/checkout/issues/603
+          filter: blob:none
 
       - name: Download original PR branch
         run: |
