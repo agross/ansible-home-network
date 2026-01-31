@@ -1,7 +1,6 @@
 name: Lint
 
 on:
-  pull_request:
   push:
 
 # Cancel previous runs when a new commit is pushed.
@@ -24,10 +23,6 @@ jobs:
         # The container image provides bash.
         shell: bash
 
-    if: >-
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-
     steps:
       - name: Mark workspace directory as safe
         # Cannot use github.workspace: https://github.com/actions/runner/issues/2058
@@ -47,10 +42,6 @@ jobs:
   encrypted-vaults:
     name: Ensure vaults are encrypted
     runs-on: ubuntu-latest
-
-    if: >-
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
 
     steps:
       - name: Get latest code
