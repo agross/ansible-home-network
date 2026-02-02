@@ -1,0 +1,6 @@
+http:
+  middlewares:
+    no-robots:
+      plugin:
+        tinyrobotsblock:
+          enabled: true
