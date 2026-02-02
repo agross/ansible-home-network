@@ -82,6 +82,7 @@ services:
       traefik.enable: 'true'
       traefik.http.routers.gitlab.entrypoints: https
       traefik.http.routers.gitlab.rule: Host(`{{ gitlab_domain | ansible.builtin.mandatory }}`)
+      traefik.http.routers.gitlab.middlewares: no-robots@file
       traefik.http.services.gitlab.loadbalancer.server.port: 80
     networks:
       - web

@@ -5,6 +5,8 @@ http:
       entrypoints: https
       rule: Host(`{{ gitlab_domain }}`)
       service: {{ ansible_role_name }}
+      middlewares:
+        - no-robots@file
       tls:
         certResolver: letsencrypt
 
