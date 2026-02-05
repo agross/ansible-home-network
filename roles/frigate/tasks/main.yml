@@ -26,6 +26,7 @@
     asset_name_regex: "^{{ frigate_go2rtc_release_file | ansible.builtin.regex_escape }}$"
     # Placing a custom binary into the config directory makes Frigate use it.
     dest: "{{ frigate_root }}/app/go2rtc"
+    notify_: Restart frigate service
 
 - name: Copy templates
   ansible.builtin.import_tasks:
