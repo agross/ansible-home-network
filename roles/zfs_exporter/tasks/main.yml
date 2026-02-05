@@ -1,3 +1,10 @@
+- name: Create download directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: "zfs_exporter-{{ zfs_exporter_release_version }}-"
+  changed_when: false
+  register: zfs_exporter_download_temp
+
 - name: Download GitHub release
   ansible.builtin.include_tasks:
     file: github-release.yml
@@ -11,26 +18,19 @@
         zfs_exporter_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
-    dest: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz"
-
-- name: Create extraction directory
-  ansible.builtin.file:
-    path: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz-extracted"
-    state: directory
-    owner: 0
-    group: 0
-    mode: "755"
+    dest: "{{ zfs_exporter_download_temp.path }}/zfs_exporter.tar.gz"
 
 - name: Extract downloaded release
   ansible.builtin.unarchive:
-    src: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz"
+    src: "{{ zfs_exporter_download_temp.path }}/zfs_exporter.tar.gz"
     remote_src: true
     extra_opts:
       - --strip-components=1
       - --show-stored-names
-    dest: "/tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz-extracted"
+    dest: "{{ zfs_exporter_download_temp.path }}"
     owner: 0
     group: 0
+  changed_when: false
 
 - name: Ensure target directory exists
   ansible.builtin.file:
@@ -42,8 +42,7 @@
 
 - name: Copy release binary
   ansible.builtin.copy:
-    src: >-
-      /tmp/zfs_exporter-{{ zfs_exporter_release_version }}.tar.gz-extracted/zfs_exporter
+    src: "{{ zfs_exporter_download_temp.path }}/zfs_exporter"
     remote_src: true
     dest: /usr/local/bin/
     owner: 0
