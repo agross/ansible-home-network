@@ -5,6 +5,16 @@
   when: >-
     not 'pve-fake-subscription' in ansible_facts.packages
   block:
+    - name: Create download directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: >-
+          pve-fake-subscription-{{
+            proxmox_pve_fake_subscription_release_version
+          }}-
+      changed_when: false
+      register: proxmox_pve_fake_subscription_download_temp
+
     - name: Download pve-fake-subscription.deb
       ansible.builtin.import_tasks:
         file: github-release.yml
@@ -12,13 +22,11 @@
         url: https://api.github.com/repos/Jamesits/pve-fake-subscription/releases
         release: "{{ proxmox_pve_fake_subscription_release_version }}"
         asset_name_regex: ^pve-fake-subscription_.*\.deb$
-        dest: >-
-          /tmp/pve-fake-subscription-{{ proxmox_pve_fake_subscription_release_version }}.deb
+        dest: "{{ proxmox_pve_fake_subscription_download_temp.path }}/pve.deb"
 
     - name: Install pve-fake-subscription.deb
       ansible.builtin.apt:
-        deb: >-
-          /tmp/pve-fake-subscription-{{ proxmox_pve_fake_subscription_release_version }}.deb
+        deb: "{{ proxmox_pve_fake_subscription_download_temp.path }}/pve.deb"
 
 - name: Add DNS entries blocking license checks
   ansible.builtin.blockinfile:
