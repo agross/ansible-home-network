@@ -1,3 +1,10 @@
+- name: Create download directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: "traefik-{{ traefik_github_release_version }}-"
+  changed_when: false
+  register: traefik_download_temp
+
 - name: Download GitHub release
   ansible.builtin.include_tasks:
     file: github-release.yml
@@ -11,23 +18,14 @@
         traefik_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
-    dest: "/tmp/traefik-{{ traefik_github_release_version }}.tar.gz"
-
-- name: Create extraction directory
-  ansible.builtin.file:
-    path: "/tmp/traefik-{{ traefik_github_release_version }}.tar.gz-extracted"
-    state: directory
-    owner: 0
-    group: 0
-    mode: "755"
+    dest: "{{ traefik_download_temp.path }}/traefik.tar.gz"
 
 - name: Extract downloaded release
   ansible.builtin.unarchive:
-    src: "/tmp/traefik-{{ traefik_github_release_version }}.tar.gz"
+    src: "{{ traefik_download_temp.path }}/traefik.tar.gz"
     remote_src: true
-    dest: "/tmp/traefik-{{ traefik_github_release_version }}.tar.gz-extracted"
-    owner: 0
-    group: 0
+    dest: "{{ traefik_download_temp.path }}"
+  changed_when: false
 
 - name: Ensure target directory exists
   ansible.builtin.file:
@@ -39,7 +37,7 @@
 
 - name: Copy release binary
   ansible.builtin.copy:
-    src: "/tmp/traefik-{{ traefik_github_release_version }}.tar.gz-extracted/traefik"
+    src: "{{ traefik_download_temp.path }}/traefik"
     remote_src: true
     dest: "{{ traefik_root }}/bin/traefik"
     owner: 0
