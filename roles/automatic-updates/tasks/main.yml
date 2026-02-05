@@ -1,6 +1,11 @@
 - name: Automatic updates (dnf)
   when: ansible_facts.os_family == 'RedHat'
   block:
+    - name: Ensure fedora-repos-archive is installed to enable easy downgrades
+      ansible.builtin.package:
+        name: fedora-repos-archive
+        state: present
+
     - name: Ensure dnf5-plugin-automatic is installed
       ansible.builtin.package:
         name: dnf5-plugin-automatic
