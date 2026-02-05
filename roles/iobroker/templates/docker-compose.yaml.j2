@@ -39,7 +39,7 @@ services:
       net.core.somaxconn: 512
 
   app:
-    image: buanet/iobroker:v11.0.1
+    image: buanet/iobroker:v11.1.0
     restart: unless-stopped
     env_file: ./iobroker/.env
     hostname: iobroker
