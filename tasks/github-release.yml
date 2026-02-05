@@ -27,4 +27,5 @@
     owner: 0
     group: 0
     mode: "755"
+  changed_when: notify_ | default('') | length > 0
   notify: "{{ notify_ | default(omit) }}"
