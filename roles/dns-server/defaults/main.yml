@@ -25,7 +25,7 @@ dns_server_download_assets:
         dns_server_adguard_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
-    tmp: "/tmp/adguard-{{ dns_server_adguard_release_version }}.tar.gz"
+    tmp: adguard.tar.gz
     binary: AdGuardHome/AdGuardHome
     dest: "{{ dns_server_root }}/bin/AdGuardHome"
   dnscrypt:
@@ -37,7 +37,7 @@ dns_server_download_assets:
       }}_{{
         ansible_facts.architecture | ansible.builtin.regex_escape
       }}-.*\.tar\.gz$
-    tmp: "/tmp/dnscrypt-proxy-{{ dns_server_dnscrypt_release_version }}.tar.gz"
+    tmp: dnscrypt-proxy.tar.gz
     binary: >-
       {{ ansible_facts.system | lower }}-{{ ansible_facts.architecture }}/dnscrypt-proxy
     dest: "{{ dns_server_root }}/bin/dnscrypt-proxy"

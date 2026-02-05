@@ -1,3 +1,10 @@
+- name: Create download directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: dns-server-
+  changed_when: false
+  register: dns_server_download_temp
+
 - name: Download GitHub release
   ansible.builtin.include_tasks:
     file: github-release.yml
@@ -6,7 +13,7 @@
     url: "{{ item.value.url }}"
     release: "{{ item.value.release }}"
     asset_name_regex: "{{ item.value.asset_name_regex }}"
-    dest: "{{ item.value.tmp }}"
+    dest: "{{ dns_server_download_temp.path }}/{{ item.value.tmp }}"
 
 - name: Create extraction directory
   ansible.builtin.file:
@@ -15,24 +22,26 @@
     owner: 0
     group: 0
     mode: "755"
+  changed_when: false
   loop: "{{ assets }}"
   loop_control:
     label: "{{ item.key }}: {{ item.value.tmp }}"
 
 - name: Extract downloaded release
   ansible.builtin.unarchive:
-    src: "{{ item.value.tmp }}"
+    src: "{{ dns_server_download_temp.path }}/{{ item.value.tmp }}"
     remote_src: true
-    dest: "{{ item.value.tmp }}-extracted"
+    dest: "{{ dns_server_download_temp.path }}"
     owner: 0
     group: 0
+  changed_when: false
   loop: "{{ assets }}"
   loop_control:
     label: "{{ item.key }}: {{ item.value.tmp }}"
 
 - name: Copy release binary
   ansible.builtin.copy:
-    src: "{{ item.value.tmp }}-extracted/{{ item.value.binary }}"
+    src: "{{ dns_server_download_temp.path }}/{{ item.value.binary }}"
     remote_src: true
     dest: "{{ item.value.dest }}"
     owner: 0
