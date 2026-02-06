@@ -36,7 +36,6 @@ traefik_https_entrypoint_config:
     respondingTimeouts:
       readTimeout: 20m # Uploads.
       idleTimeout: 10m
-      writeTimeout: 20m # Downloads.
 
   http:
     encodedCharacters:
