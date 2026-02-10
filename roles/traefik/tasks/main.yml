@@ -25,6 +25,16 @@
     directory: "templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
     target: "{{ traefik_dynamic_file_configuration }}"
 
+- name: Download plugins for offline use
+  ansible.builtin.git:
+    repo: "https://{{ item.moduleName }}"
+    version: "{{ item.version | default('HEAD') }}"
+    force: true
+    depth: 1
+    dest: "{{ traefik_root }}/plugins-local/src/{{ item.moduleName }}"
+  loop: "{{ traefik_plugins.values() }}"
+  notify: Restart traefik service
+
 - name: Install Traefik using docker compose
   when: traefik_install_method == 'docker'
   ansible.builtin.include_tasks:

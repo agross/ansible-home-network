@@ -23,12 +23,14 @@ metrics:
 log:
   level: INFO
 
+{% if traefik_plugins.keys() | length > 0 %}
 experimental:
-  plugins:
-    tinyrobotsblock:
-      moduleName: github.com/steveiliop56/tinyrobotsblock
-      # renovate: github-releases=steveiliop56/tinyrobotsblock
-      version: v0.2.0
+  localPlugins:
+    {% for key, value in traefik_plugins.items() %}
+    {{ key }}:
+      moduleName: {{ value.moduleName }}
+    {% endfor %}
+{% endif %}
 
 entryPoints:
   http:

@@ -48,6 +48,8 @@ traefik_firewalld_services:
   - https
   - http3
 
+traefik_plugins: {}
+
 traefik_entrypoints: {}
 
 traefik_https_entrypoint_default_config:

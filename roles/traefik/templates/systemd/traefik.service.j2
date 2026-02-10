@@ -8,6 +8,7 @@ OnFailure=unit-status-mail@%n.service
 
 [Service]
 {% if traefik_install_method == 'bare-metal' %}
+WorkingDirectory={{ traefik_root | ansible.builtin.quote }}
 Environment=LEGO_DISABLE_CNAME_SUPPORT=true
 {% if traefik_acme_type == 'inwx' %}
 Environment=INWX_USERNAME={{ inwx_acme_username | ansible.builtin.mandatory }}

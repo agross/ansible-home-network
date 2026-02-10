@@ -6,9 +6,15 @@ http:
       rule: Host(`{{ gitlab_domain }}`)
       service: {{ ansible_role_name }}
       middlewares:
-        - no-robots@file
+        - {{ ansible_role_name }}-no-robots
       tls:
         certResolver: letsencrypt
+
+  middlewares:
+    {{ ansible_role_name }}-no-robots:
+      plugin:
+        tinyrobotsblock:
+          enabled: true
 
   services:
     {{ ansible_role_name }}:
