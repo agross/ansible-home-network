@@ -25,7 +25,7 @@ services:
       - .env
 
   redis:
-    image: redis:8.4-alpine
+    image: redis:8.6.0-alpine
     volumes:
       - ./redis:/data
     healthcheck:
