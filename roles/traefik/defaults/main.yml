@@ -7,7 +7,7 @@ traefik_image_version: v3.6.7
 traefik_image: "traefik:{{ traefik_image_version }}"
 
 # renovate: github-releases=traefik/traefik depName=Traefik
-traefik_github_release_version: v3.6.7
+traefik_github_release_version: v3.6.8
 
 traefik_config_root_dir: >-
   {{
