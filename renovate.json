@@ -99,8 +99,9 @@
       "allowedVersions": "/^(8\\.4|9\\.7)(\\.[0-9]+)?$/"
     },
     {
-      "description": "Nextcloud images are often broken if pulled immediately after release, delay PR creation",
-      "matchPackageNames": ["nextcloud"],
+      "description": "Docker Hub library images (without a slash) often miss layers if pulled immediately after release, delay PR creation",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["!*/*"],
       "minimumReleaseAge": "2 days",
       "internalChecksFilter": "strict"
     }
