@@ -99,6 +99,11 @@
       "allowedVersions": "/^(8\\.4|9\\.7)(\\.[0-9]+)?$/"
     },
     {
+      "description": "GitHub Runners update automatically and cannot be installed without manually getting a token, skip Ansible after PR is merged",
+      "matchPackageNames": ["ghcr.io/actions/actions-runner"],
+      "addLabels": ["skip-ansible"]
+    },
+    {
       "description": "Docker Hub library images (without a slash) often miss layers if pulled immediately after release, delay PR creation",
       "matchDatasources": ["docker"],
       "matchPackageNames": ["!*/*"],
