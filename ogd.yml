@@ -72,16 +72,10 @@
     - role: docker
       tags: docker
     - role: mqtt
-      tags:
-        - mqtt
-        - container
+      tags: mqtt
     - role: iobroker
-      tags:
-        - iobroker
-        - container
+      tags: iobroker
     - role: logger
-      tags:
-        - logger
-        - container
+      tags: logger
     - role: prometheus
       tags: prometheus

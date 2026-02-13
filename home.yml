@@ -64,21 +64,13 @@
     - role: docker
       tags: docker
     - role: mqtt
-      tags:
-        - mqtt
-        - container
+      tags: mqtt
     - role: ccu
-      tags:
-        - ccu
-        - container
+      tags: ccu
     - role: iobroker
-      tags:
-        - iobroker
-        - container
+      tags: iobroker
     - role: logger
-      tags:
-        - logger
-        - container
+      tags: logger
 
 - name: Hosted services on tanker
   hosts: tanker
@@ -124,25 +116,15 @@
     - role: docker
       tags: docker
     - role: traefik
-      tags:
-        - traefik
-        - container
+      tags: traefik
     - role: harbor
-      tags:
-        - harbor
-        - container
+      tags: harbor
     - role: gitlab
-      tags:
-        - gitlab
-        - container
+      tags: gitlab
     - role: banking
-      tags:
-        - banking
-        - container
+      tags: banking
     - role: teamcity
-      tags:
-        - teamcity
-        - container
+      tags: teamcity
 
 - name: Prepare build agent
   hosts:
