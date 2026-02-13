@@ -99,6 +99,8 @@
       tags: prometheus
     - role: renovate
       tags: renovate
+    - role: harbor
+      tags: harbor
 
 - name: Hosted services on smb
   hosts: smb
@@ -117,8 +119,6 @@
       tags: docker
     - role: traefik
       tags: traefik
-    - role: harbor
-      tags: harbor
     - role: gitlab
       tags: gitlab
     - role: banking

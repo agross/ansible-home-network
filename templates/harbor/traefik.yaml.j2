@@ -5,11 +5,9 @@ http:
       entrypoints: https
       rule: Host(`{{ harbor_domain }}`)
       service: {{ ansible_role_name }}
-      tls:
-        certResolver: letsencrypt
 
   services:
     {{ ansible_role_name }}:
       loadBalancer:
         servers:
-          - url: https://{{ harbor_domain }}
+          - url: http://{{ interfaces.lan.ip4.address }}:8888

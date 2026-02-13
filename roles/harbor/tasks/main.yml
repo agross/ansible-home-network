@@ -133,7 +133,7 @@
         path: "{{ harbor_docker_compose_yaml['backup_file'] }}"
         state: absent
 
-- name: Copy docker-compose.override.yml that includes Traefik labels
+- name: Copy docker-compose.override.yml
   ansible.builtin.template:
     src: templates/docker-compose.override.yml.j2
     dest: "{{ harbor_installer_directory }}/harbor/docker-compose.override.yml"

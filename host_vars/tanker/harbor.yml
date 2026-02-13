@@ -1,5 +1,3 @@
-harbor_domain: cr.grossweber.com
-
 harbor_backup_healthcheck: "{{ vault_harbor_backup_healthcheck }}"
 
 harbor_admin_password: "{{ vault_harbor_admin_password }}"

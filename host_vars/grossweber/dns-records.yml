@@ -1,3 +1,2 @@
 dns_cname_records:
-  - "{{ harbor_domain }}"
   - "{{ gitlab_domain }}"

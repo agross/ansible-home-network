@@ -1,12 +1,4 @@
-networks:
-  web:
-   external: true
-
 services:
   proxy:
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.harbor.entrypoints: https
-      traefik.http.routers.harbor.rule: Host(`{{ harbor_domain | ansible.builtin.mandatory }}`)
-    networks:
-      - web
+    ports: !override
+      - 8888:8080

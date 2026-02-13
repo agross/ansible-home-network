@@ -34,68 +34,53 @@ proxmox:
       mountoptions: discard;noatime
   mount_volumes:
     mp0:
-      host_path: /tank/grossweber/harbor/app
-      mountpoint: /data/harbor/app
-      options:
-        mountoptions: discard;noatime
-    mp1:
-      host_path: /tank/grossweber/harbor/postgres
-      mountpoint: /data/harbor/app/database
-      options:
-        mountoptions: discard;noatime
-    mp2:
-      host_path: /tank/grossweber/harbor/redis
-      mountpoint: /data/harbor/app/redis
-      options:
-        mountoptions: discard;noatime
-
-    mp3:
       host_path: /tank/grossweber/gitlab/app
       mountpoint: /data/gitlab/app
       options:
         mountoptions: discard;noatime
-    mp4:
+    mp1:
       host_path: /tank/grossweber/gitlab/postgres
       mountpoint: /data/gitlab/app/data/postgresql
       options:
         mountoptions: discard;noatime
-    mp5:
+    mp2:
       host_path: /tank/grossweber/gitlab/redis
       mountpoint: /data/gitlab/app/data/redis
       options:
         mountoptions: discard;noatime
 
-    mp6:
+    mp3:
       host_path: /tank/grossweber/banking/mariadb
       mountpoint: /data/banking/mariadb/data
       options:
         mountoptions: discard;noatime
 
-    mp7:
+    mp4:
       host_path: /tank/grossweber/teamcity/app
       mountpoint: /data/teamcity/app
       options:
         mountoptions: discard;noatime
-    mp8:
+    mp5:
       host_path: /tank/grossweber/teamcity/mysql
       mountpoint: /data/teamcity/mysql/data
       options:
         mountoptions: discard;noatime
-    mp9:
+    mp6:
       host_path: /tank/grossweber/teamcity/hub/backups
       mountpoint: /data/teamcity/hub/backups
       options:
         mountoptions: discard;noatime
-    mp10:
+    mp7:
       host_path: /tank/grossweber/teamcity/hub/conf
       mountpoint: /data/teamcity/hub/conf
       options:
         mountoptions: discard;noatime
-    mp11:
+    mp8:
       host_path: /tank/grossweber/teamcity/hub/data
       mountpoint: /data/teamcity/hub/data
       options:
         mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -103,24 +88,6 @@ proxmox:
       value: sys_rawio
 
 zfs_datasets:
-  tank/grossweber/harbor/app:
-    chown:
-      owner: 110000
-      group: 110000
-    options:
-      recordsize: 32K
-  tank/grossweber/harbor/postgres:
-    chown:
-      owner: 100999
-      group: 100999
-    options:
-      prefetch: none
-      recordsize: 8K
-  tank/grossweber/harbor/redis:
-    chown:
-      owner: 100999
-      group: 100999
-
   tank/grossweber/gitlab/app:
     chown:
       owner: 100999

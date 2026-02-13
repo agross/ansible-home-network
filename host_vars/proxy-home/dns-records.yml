@@ -28,4 +28,6 @@ dns_cname_records:
   - "{{ vaultwarden_domain | ansible.builtin.mandatory }}"
   - "{{ prometheus_domain | ansible.builtin.mandatory }}"
 
-  - "{{ renovate_domain | mandatory }}"
+  - "{{ renovate_domain | ansible.builtin.mandatory }}"
+
+  - "{{ harbor_domain | ansible.builtin.mandatory }}"

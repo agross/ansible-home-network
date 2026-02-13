@@ -150,6 +150,22 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp22:
+      host_path: /tank/harbor/app
+      mountpoint: /data/harbor/app
+      options:
+        mountoptions: discard;noatime
+    mp23:
+      host_path: /tank/harbor/postgres
+      mountpoint: /data/harbor/app/database
+      options:
+        mountoptions: discard;noatime
+    mp24:
+      host_path: /tank/harbor/redis
+      mountpoint: /data/harbor/app/redis
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -305,3 +321,21 @@ zfs_datasets:
     options:
       prefetch: none
       recordsize: 8K
+
+  tank/harbor/app:
+    chown:
+      owner: 110000
+      group: 110000
+    options:
+      recordsize: 32K
+  tank/harbor/postgres:
+    chown:
+      owner: 100999
+      group: 100999
+    options:
+      prefetch: none
+      recordsize: 8K
+  tank/harbor/redis:
+    chown:
+      owner: 100999
+      group: 100999
