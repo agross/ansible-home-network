@@ -72,12 +72,6 @@ borgmatic_custom_config:
   # false, meaning that the exclude_if_present filename is omitted from backups.
   keep_exclude_tags: true
 
-  # Deprecated. Replaced by borgmatic treating Borg's "backup file not found"
-  # warning as an error by default. But if "source_directories_must_exist" is
-  # true, then source directories (and root pattern paths) must exist before a
-  # backup begins. If they don't, borgmatic errors. Defaults to false.
-  source_directories_must_exist: true
-
   # Display verbose output to the console: -2 (disabled), -1 (errors only), 0
   # (warnings and responses to actions, the default), 1 (info about steps
   # borgmatic is taking), or 2 (debug).

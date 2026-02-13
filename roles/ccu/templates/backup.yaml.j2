@@ -8,12 +8,8 @@
 constants:
   name: {{ ansible_role_name }}
 
-# List of source directories and files to back up. Globs and tildes are
-# expanded. Do not backslash spaces in path names. Be aware that by default,
-# Borg treats missing source directories as warnings rather than errors. If
-# you'd like to change that behavior, see
-# https://torsion.org/borgmatic/how-to/customize-warnings-and-errors/
-# or the "source_directories_must_exist" option.
+# List of source directories and files to back up. Globs and tildes
+# are expanded. Do not backslash spaces in path names.
 source_directories: !retain
   - {{ ccu_root }}/backups
 
