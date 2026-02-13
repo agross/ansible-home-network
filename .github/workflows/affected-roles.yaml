@@ -1,0 +1,80 @@
+name: Affected roles
+
+on:
+  pull_request:
+
+jobs:
+  affected-roles:
+    name: Determine roles affected by the PR
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Get full commit history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          # We don't need the file contents (blobs), but we inspect commits and
+          # trees.
+          # This in combination with a bare repo would be even faster, but it's
+          # not supported.
+          # https://github.com/actions/checkout/issues/603
+          filter: blob:none
+
+      - name: Show PR commit information
+        run: |
+          echo "pull_request.base.sha=${{ github.event.pull_request.base.sha }}"
+          echo "pull_request.head.sha=${{ github.event.pull_request.head.sha }}"
+
+      - name: Show affected files
+        run: |
+          git diff \
+              --name-status \
+              ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+
+      - name: Determine roles from affected files
+        id: affected-roles
+        run: |
+          {
+            r="$(git diff \
+                     --name-only \
+                     ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} \
+                     -- \
+                     host_vars \
+                     group_vars \
+                     roles |
+                 sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' -e 's|roles/\([^/]*\)/.*|\1|' |
+                 sort |
+                 uniq)"
+
+            echo 'roles<<ROLES'
+
+            paste --serial --delimiter=, - <<< "$r"
+
+            echo ROLES
+
+            echo 'roles-markdown<<ROLES'
+
+            sed -e 's|.*|* [&](${{ github.server_url }}/${{ github.repository }}/tree/${{ github.event.pull_request.head.sha }}/roles/&)|' <<< "$r"
+
+            echo ROLES
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Show roles
+        env:
+          ROLES: ${{ steps.affected-roles.outputs.roles }}
+        run: |
+          printf 'Roles affected by the PR: %s\n' "$ROLES"
+
+      - name: Add PR comment
+        if: steps.affected-roles.outputs.roles != ''
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ## :scroll: Roles affected by this PR
+
+            ${{ steps.affected-roles.outputs.roles-markdown }}
+          message-id: ${{ github.event.action }}-affected-roles
