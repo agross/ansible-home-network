@@ -74,7 +74,7 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            ## :scroll: Roles affected by this PR
+            ### :scroll: Roles affected by this PR
 
             ${{ steps.affected-roles.outputs.roles-markdown }}
           message-id: ${{ github.event.action }}-affected-roles
