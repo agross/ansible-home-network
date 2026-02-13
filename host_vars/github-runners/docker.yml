@@ -1,0 +1,31 @@
+docker_daemon_options_custom:
+  # For custom docker networks, do not use systemd-resolved's stub resolver.
+  # Rather, first use docker's DNS (for intra-network resolution), then talk
+  # directly to these DNS servers.
+  #
+  # Without this, single-label resolutions for hosts that do not exist take long:
+  #
+  # $ time docker run --rm bash getent hosts doesntexist
+  # 0.01s user 0.01s system 6% cpu 0.295 total
+  #
+  # vs.
+  #
+  # $ time docker run --network some-net --rm bash getent hosts doesntexist
+  # 0.01s user 0.01s system 0% cpu 7.602 total
+  #
+  # With these settings in place:
+  #
+  # $ time docker run --network some-net --rm bash getent hosts doesntexist
+  # 0.01s user 0.01s system 8% cpu 0.255 total
+  do_not_use_resolved:
+    dns: "{{ dns.servers | mandatory }}"
+
+  disable_ipv6:
+    ipv6: false
+
+docker_daemon_options: >-
+  {{
+    docker_daemon_options_default |
+    ansible.builtin.combine(docker_daemon_options_custom.do_not_use_resolved) |
+    ansible.builtin.combine(docker_daemon_options_custom.disable_ipv6)
+  }}
