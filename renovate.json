@@ -106,7 +106,7 @@
     {
       "description": "Docker Hub library images (without a slash) often miss layers if pulled immediately after release, delay PR creation",
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["!*/*"],
+      "matchPackageNames": ["!/\\//"],
       "minimumReleaseAge": "2 days",
       "internalChecksFilter": "strict"
     }
