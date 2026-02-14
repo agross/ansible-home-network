@@ -10,21 +10,63 @@ docker_users: >-
     select
   }}
 
-# IPv6 support with NAT for containers, so they are not exposed to the
-# internet.
-docker_daemon_options_default:
-  ipv6: true
-  fixed-cidr-v6: fd00:c0ff:ee::/48
-  ip6tables: true
+docker_daemon_opts:
+  ipv6: &ipv6
+    # IPv6 support with NAT for containers, so they are not exposed to the
+    # internet.
+    ipv6: true
+    fixed-cidr-v6: fd00:c0ff:ee::/48
+    ip6tables: true
 
-  # https://docs.docker.com/engine/logging/drivers/json-file/
-  log-driver: json-file
-  log-opts:
-    max-size: "1m"
-    max-file: "3"
+  log-limits: &log-limits
+    # https://docs.docker.com/engine/logging/drivers/json-file/
+    log-driver: json-file
+    log-opts:
+      max-size: "1m"
+      max-file: "3"
 
-# https://www.reddit.com/r/Proxmox/comments/1ehurup/
-docker_daemon_options_for_lxc_on_zfs:
-  storage-driver: fuse-overlayfs
+  lxc_on_zfs:
+    # https://www.reddit.com/r/Proxmox/comments/1ehurup/
+    storage-driver: fuse-overlayfs
 
-docker_daemon_options: "{{ docker_daemon_options_default }}"
+  do_not_use_resolved: &do-not-use-resolved
+    # Useful when:
+    # - Running LXC, or
+    # - Not roles set up networking, i.e. use what Proxmox provides, or
+    # - You do not want systemd-resolved between docker containers on custom
+    #   networks and the DNS server
+    #
+    # Settings apply to custom docker networks:
+    # Do not use systemd-resolved's stub resolver as the upstream DNS server.
+    # Rather, first use docker's DNS (for intra-network resolution), then talk
+    # directly to the DNS servers.
+    #
+    # Without this, single-label resolutions for hosts that do not exist take
+    # long. Single-label queries might also not work (i.e. no answer) because
+    # systemd-resolved has no upstream servers for queries coming from the
+    # custom bridge networks (resolvectl monitor shows "no-servers").
+    #
+    # The default bridge network uses the DNS server directly:
+    #
+    # $ time docker run --rm bash getent hosts doesntexist
+    # 0.01s user 0.01s system 6% cpu 0.295 total
+    #
+    # vs. custom networks using systemd-resolved which might use LLMNR or mDNS:
+    #
+    # $ time docker run --network some-net --rm bash getent hosts doesntexist
+    # 0.01s user 0.01s system 0% cpu 7.602 total
+    #
+    # With these settings in place, the DNS server is used, no waiting for LLMNR
+    # timeouts or having "no-servers":
+    #
+    # $ time docker run --network some-net --rm bash getent hosts doesntexist
+    # 0.01s user 0.01s system 8% cpu 0.255 total
+    dns: "{{ dns.servers | ansible.builtin.mandatory }}"
+
+  disable_ipv6:
+    ipv6: false
+
+  default:
+    <<: [*ipv6, *log-limits, *do-not-use-resolved]
+
+docker_daemon_options: "{{ docker_daemon_opts.default }}"

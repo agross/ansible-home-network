@@ -1,5 +1,5 @@
 docker_daemon_options: >-
   {{
-    docker_daemon_options_default |
-    ansible.builtin.combine(docker_daemon_options_for_lxc_on_zfs)
+    docker_daemon_opts.default |
+    ansible.builtin.combine(docker_daemon_opts.lxc_on_zfs)
   }}
