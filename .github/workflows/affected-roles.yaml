@@ -77,4 +77,4 @@ jobs:
             ### :scroll: Roles affected by this PR
 
             ${{ steps.affected-roles.outputs.roles-markdown }}
-          message-id: ${{ github.event.action }}-affected-roles
+          message-id: affected-roles
