@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ nextcloud_root | ansible.builtin.quote }}
+
+db() {
+  docker compose up \
+                 --wait \
+                 db
+
+  docker compose exec \
+                 --user mysql \
+                 --no-TTY \
+                 db \
+                 mariadb \
+                 nextcloud \
+    < {{ nextcloud_root | ansible.builtin.quote }}/backups/nextcloud.sql
+}
+
+db

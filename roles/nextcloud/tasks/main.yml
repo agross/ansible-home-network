@@ -88,6 +88,14 @@
     name: jq
     state: present
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_stop_units: nextcloud.service
+    restore_target_dir: "{{ nextcloud_root }}"
+
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
