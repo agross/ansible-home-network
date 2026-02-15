@@ -3,8 +3,10 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+cd -- {{ banking_root | ansible.builtin.quote }}
+
 target={{ banking_root | ansible.builtin.quote }}/backups
+
 
 cleanup() {
   printf 'Cleaning up backup directory.\n'
