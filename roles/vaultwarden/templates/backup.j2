@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+cd -- {{ vaultwarden_root | ansible.builtin.quote }}
+
 target={{ vaultwarden_root | ansible.builtin.quote }}/backups
 
 cleanup() {

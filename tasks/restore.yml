@@ -1,0 +1,92 @@
+# borgmatic extract --archive=latest would pick the latest archive across all
+# archives in the repository and not just the ones satisfying match_archives.
+# borgmatic info considers match_archives correctly as per backup.yaml, but only
+# if --archive != latest.
+# By defining restore_archive the user can request a specific backup.
+- name: Query information about the backup archive to restore
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - --verbosity=-2
+      - --config
+      - "{{ restore_target_dir }}/backup.yaml"
+      - info
+      - "{{ '--archive=' ~ restore_archive if restore_archive is defined else omit }}"
+      - --last=1
+      - --json
+  register: borgmatic_archive_info_json
+  changed_when: false
+
+- name: Convert JSON output
+  ansible.builtin.set_fact:
+    borgmatic_archive_result: >-
+      {{
+        (
+          borgmatic_archive_info_json.stdout |
+          ansible.builtin.from_json
+        ) |
+        first
+      }}
+
+- name: Ensure an archive was returned
+  ansible.builtin.assert:
+    msg: >-
+      The borg repository at
+      {{ borgmatic_archive_result.repository.location }}
+      does not contain archives
+      {{
+        'named "' ~ restore_archive ~ '"' if restore_archive is defined
+        else 'satisfying the match_archives setting of ' ~ restore_target_dir ~ '/backup.yaml'
+      }}.
+
+
+      This is what borgmatic info returned:
+
+
+      {{
+        borgmatic_archive_result |
+        ansible.builtin.to_nice_yaml(indent = 2)
+      }}
+    that:
+      - borgmatic_archive_result.archives | length > 0
+
+- name: Show backup archive to restore
+  ansible.builtin.debug:
+    msg: >-
+      Restoring archive
+      {{ borgmatic_archive_result.archives[0].name }}
+      ({{
+        borgmatic_archive_result.archives[0].stats.original_size |
+        ansible.builtin.human_readable
+      }})
+
+- name: Stop units
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+  # Units might not exist yet on initial install with restore.
+  failed_when: false
+  loop: "{{ [restore_stop_units | default(None)] | ansible.builtin.flatten }}"
+
+- name: Restore data
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - --config
+      - "{{ restore_target_dir }}/backup.yaml"
+      - extract
+      - --archive
+      - "{{ borgmatic_archive_result.archives[0].name }}"
+      - --strip-components=all
+      - --path
+      - "{{ restore_target_dir }}"
+      # Trailing /.. is required, otherwise files would be placed in a directory
+      # below restore_target_dir.
+      - --destination
+      - "{{ restore_target_dir }}/.."
+  register: borgmatic_extract_output
+  changed_when: true
+
+- name: Show restore output
+  ansible.builtin.debug:
+    var: borgmatic_extract_output

@@ -19,6 +19,14 @@
     build: true
     notify_: Restart vaultwarden service
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_stop_units: vaultwarden.service
+    restore_target_dir: "{{ vaultwarden_root }}"
+
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
