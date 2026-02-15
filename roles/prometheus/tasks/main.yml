@@ -35,6 +35,14 @@
     build: true
     notify_: Restart prometheus service
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_stop_units: prometheus.service
+    restore_target_dir: "{{ prometheus_root }}"
+
 - name: Symlink systemd unit
   ansible.builtin.file:
     state: link

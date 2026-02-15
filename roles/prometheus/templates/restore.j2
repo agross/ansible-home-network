@@ -3,45 +3,31 @@
 
 set -euo pipefail
 
-# cd into script directory.
-cd -- "$(cd "$(dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
-
-role={{ ansible_role_name | ansible.builtin.quote }}
-compose=(docker compose --project-name "$role")
+cd -- {{ prometheus_root | ansible.builtin.quote }}
 
 prometheus() {
-  "${compose[@]}" down \
-                  --volumes \
-                  prometheus
+  rm -rf -- {{ prometheus_root | ansible.builtin.quote }}/app/data
 
-  "${compose[@]}" create \
-                  prometheus
+  docker compose down \
+                 --volumes \
+                 app
 
-  "${compose[@]}" cp \
-                  {{ prometheus_root | ansible.builtin.quote }}/backups/*/. \
-                  prometheus:/prometheus
+  docker compose create \
+                 app
+
+  docker compose cp \
+                 {{ prometheus_root | ansible.builtin.quote }}/backups/*/. \
+                 app:/prometheus
 
   # Files must have the right permissions, otherwise creating snapshots
   # (i.e. for the next backup) will fail. Docker copies files with root:root
   # ownership by default.
-  "${compose[@]}" exec \
-                  --user root \
-                  prometheus \
-                  chown \
-                  -R nobody:nobody \
-                  /prometheus
+  docker compose exec \
+                 --user root \
+                 --entrypoint chown \
+                 app \
+                 -R nobody:nobody \
+                 /prometheus
 }
 
-if systemctl is-active "$role" > /dev/null; then
-  start_stop=
-fi
-
-if [[ -v start_stop ]]; then
-  systemctl stop "$role"
-fi
-
 prometheus
-
-if [[ -v start_stop ]]; then
-  systemctl start "$role"
-fi

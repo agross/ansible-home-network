@@ -11,6 +11,7 @@ constants:
 # List of source directories and files to back up. Globs and tildes
 # are expanded. Do not backslash spaces in path names.
 source_directories: !retain
+  - {{ prometheus_root }}/app/conf.d
   - {{ prometheus_root }}/backups
 
 # List of one or more command hooks to execute, triggered at particular points
@@ -24,6 +25,14 @@ commands:
       - create
     run:
       - {{ prometheus_root }}/backup
+
+  - after: action
+    when:
+      - extract
+    states:
+      - finish
+    run:
+      - {{ prometheus_root }}/restore
 
 # Configuration for a monitoring integration with Healthchecks. Create an
 # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
