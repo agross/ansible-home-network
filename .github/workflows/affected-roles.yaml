@@ -11,6 +11,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
 
     steps:
       - name: Get full commit history
@@ -39,42 +40,35 @@ jobs:
         id: affected-roles
         run: |
           {
-            r="$(git diff \
-                     --name-only \
-                     ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} \
-                     -- \
-                     host_vars \
-                     group_vars \
-                     roles |
-                 sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' -e 's|roles/\([^/]*\)/.*|\1|' |
-                 sort |
-                 uniq)"
-
             echo 'roles<<ROLES'
 
-            paste --serial --delimiter=, - <<< "$r"
-
-            echo ROLES
-
-            echo 'roles-markdown<<ROLES'
-
-            sed -e 's|.*|* [&](${{ github.server_url }}/${{ github.repository }}/tree/${{ github.event.pull_request.head.sha }}/roles/&)|' <<< "$r"
+            git diff \
+                --name-only \
+                ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} \
+                -- \
+                host_vars \
+                group_vars \
+                roles |
+            sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' -e 's|roles/\([^/]*\)/.*|\1|' |
+            sort |
+            uniq |
+            paste --serial --delimiter=' '
 
             echo ROLES
           } >> "$GITHUB_OUTPUT"
 
       - name: Show roles
-        env:
-          ROLES: ${{ steps.affected-roles.outputs.roles }}
         run: |
-          printf 'Roles affected by the PR: %s\n' "$ROLES"
+          printf 'Roles affected by the PR: %s\n' "${{ steps.affected-roles.outputs.roles }}"
 
-      - name: Add PR comment
+      - name: Set role labels
         if: steps.affected-roles.outputs.roles != ''
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            ### :scroll: Roles affected by this PR
-
-            ${{ steps.affected-roles.outputs.roles-markdown }}
-          message-id: affected-roles
+        run: |
+          for role in ${{ steps.affected-roles.outputs.roles }}; do
+            label="role:$role"
+            gh label create "$label" --color fbca04 --force
+            gh issue edit "${{ github.event.number }}" --add-label "$label"
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
