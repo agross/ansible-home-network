@@ -28,7 +28,9 @@ interfaces:
   wireguard:
     device: wg0
     ip4:
-      address: "{{ network.wireguard.ip4 | ansible.utils.ipaddr(1) }}"
+      address: "{{ network.wireguard.ip4 | ansible.utils.nthhost(1) }}"
+      prefix: "{{ network.wireguard.ip4 | ansible.utils.ipaddr('prefix') }}"
     ip6:
-      address: "{{ network.wireguard.ip6 | ansible.utils.ipaddr(1) }}"
+      address: "{{ network.wireguard.ip6 | ansible.utils.nthhost(0x1) }}"
+      prefix: "{{ network.wireguard.ip6 | ansible.utils.ipaddr('prefix') }}"
     zone: trusted

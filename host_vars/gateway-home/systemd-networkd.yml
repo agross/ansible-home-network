@@ -124,8 +124,16 @@ systemd_networkd_network:
     - Link:
         - RequiredForOnline: false
     - Network:
-        - Address: "{{ interfaces.wireguard.ip4.address }}"
-        - Address: "{{ interfaces.wireguard.ip6.address }}"
+        - Address: >-
+            {{
+              (interfaces.wireguard.ip4.address ~ '/' ~ interfaces.wireguard.ip4.prefix) |
+              ansible.utils.ipaddr('host/prefix')
+            }}
+        - Address: >-
+            {{
+              (interfaces.wireguard.ip6.address ~ '/' ~ interfaces.wireguard.ip6.prefix) |
+              ansible.utils.ipaddr('host/prefix')
+            }}
 
   telekom:
     - Match:
