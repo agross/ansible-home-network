@@ -158,6 +158,9 @@ systemd_networkd_network:
     - Link:
         - RequiredForOnline: false
     - Network:
+        # Default IPv4 route.
+        - DefaultRouteOnDevice: true
+
         # Do not drop IP and routes on networkctl reload.
         - KeepConfiguration: true
 
