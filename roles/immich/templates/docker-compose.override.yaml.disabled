@@ -4,7 +4,7 @@ services:
       - 5432:5432
 
   mediakit:
-    image: razgrizhsu/immich-mediakit:0.1.13
+    image: razgrizhsu/immich-deduper:0.2.10
     ports:
       - 8086:8086
     volumes:
@@ -33,4 +33,4 @@ services:
       default:
         aliases:
           # https://github.com/RazgrizHsu/immich-mediakit/issues/39#issuecomment-3619771699
-          - immich-mediakit-qdrant
+          - immich-deduper-qdrant
