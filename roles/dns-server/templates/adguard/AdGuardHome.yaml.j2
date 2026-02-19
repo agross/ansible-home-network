@@ -155,6 +155,8 @@ user_rules:
   {% for domain in ipv6_blocked_domains | default([]) %}
   - '||{{ domain }}^$dnstype=AAAA,dnsrewrite=NOERROR;;'
   {% endfor %}
+  - '@@||sdk.split.io^$important'
+  - '@@||auth.split.io^$important'
 dhcp:
   enabled: false
   interface_name: ""
