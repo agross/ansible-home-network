@@ -13,3 +13,9 @@ traefik_users:
 
 traefik_firewalld_ports:
   - 8080/tcp
+
+traefik_plugins:
+  rewriteBody:
+    moduleName: github.com/traefik/plugin-rewritebody
+    # renovate: github-tags=traefik/plugin-rewritebody
+    version: v0.3.1

@@ -11,6 +11,13 @@ http:
       rule: Host(`lovelace.{{ network.domain }}`)
       service: {{ ansible_role_name }}-lovelace
 
+    {{ ansible_role_name }}-lovelace-components:
+      entrypoints: https
+      rule: Host(`lovelace.{{ network.domain }}`) && PathPrefix(`/lovelace`) && Method(`GET`)
+      middlewares:
+        - {{ ansible_role_name }}-lovelace-app-title
+      service: iobroker-lovelace
+
     {{ ansible_role_name }}-lovelace-gast:
       entrypoints: https
       rule: Host(`gast.{{ network.domain }}`)
@@ -24,6 +31,19 @@ http:
       service: {{ ansible_role_name }}-telegram
 
   middlewares:
+    {{ ansible_role_name }}-lovelace-app-title:
+      plugin:
+        rewriteBody:
+          lastModified: true
+          rewrites:
+            - regex: <meta name="application-name" content="ioBroker">
+              replacement: <meta name="application-name" content="ioBroker 🏡">
+            - regex: <meta name="apple-mobile-web-app-title" content="ioBroker">
+              replacement: <meta name="apple-mobile-web-app-title" content="ioBroker 🏡">
+            # lovelace/manifest.json
+            - regex: '"name":"ioBroker"'
+              replacement: '"name":"ioBroker 🏡"'
+
     {{ ansible_role_name }}-lovelace-gast-ipallowlist:
       ipAllowList:
         sourceRange:

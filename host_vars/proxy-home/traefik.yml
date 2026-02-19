@@ -22,6 +22,11 @@ traefik_plugins:
     # renovate: github-releases=steveiliop56/tinyrobotsblock
     version: v0.2.0
 
+  rewriteBody:
+    moduleName: github.com/traefik/plugin-rewritebody
+    # renovate: github-tags=traefik/plugin-rewritebody
+    version: v0.3.1
+
 traefik_entrypoints:
   kodi-wss:
     address: ":9090"

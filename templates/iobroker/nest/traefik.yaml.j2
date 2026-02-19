@@ -3,18 +3,39 @@ http:
   routers:
     {{ ansible_role_name }}:
       entrypoints: https
-      rule: Host(`iobroker.home.therightstuff.de`)
+      rule: Host(`iobroker.{{ network.domain }}`)
       service: {{ ansible_role_name }}
 
     {{ ansible_role_name }}-lovelace:
       entrypoints: https
-      rule: Host(`lovelace.home.therightstuff.de`)
+      rule: Host(`lovelace.{{ network.domain }}`)
       service: {{ ansible_role_name }}-lovelace
+
+    {{ ansible_role_name }}-lovelace-components:
+      entrypoints: https
+      rule: Host(`lovelace.{{ network.domain }}`) && PathPrefix(`/lovelace`) && Method(`GET`)
+      middlewares:
+        - {{ ansible_role_name }}-lovelace-app-title
+      service: iobroker-lovelace
 
     {{ ansible_role_name }}-telegram:
       entrypoints: https
-      rule: Host(`telegram.home.therightstuff.de`)
+      rule: Host(`telegram.{{ network.domain }}`)
       service: {{ ansible_role_name }}-telegram
+
+  middlewares:
+    {{ ansible_role_name }}-lovelace-app-title:
+      plugin:
+        rewriteBody:
+          lastModified: true
+          rewrites:
+            - regex: <meta name="application-name" content="ioBroker">
+              replacement: <meta name="application-name" content="ioBroker 🏠">
+            - regex: <meta name="apple-mobile-web-app-title" content="ioBroker">
+              replacement: <meta name="apple-mobile-web-app-title" content="ioBroker 🏠">
+            # lovelace/manifest.json
+            - regex: '"name":"ioBroker"'
+              replacement: '"name":"ioBroker 🏠"'
 
   services:
     {{ ansible_role_name }}:
