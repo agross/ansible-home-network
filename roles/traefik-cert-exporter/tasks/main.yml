@@ -21,6 +21,13 @@
       "**/*":
         mode: "750"
 
+- name: Ensure curl and jq are installed
+  ansible.builtin.package:
+    name:
+      - curl
+      - jq
+    state: present
+
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:

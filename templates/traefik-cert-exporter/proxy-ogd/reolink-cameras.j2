@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+if [[ "${DOMAIN-}" != '*.cam.ogd.therightstuff.de' ]]; then
+  exit
+fi
+
+cameras=(east south west)
+user={{ reolink_camera_user | ansible.builtin.quote }}
+password={{ reolink_camera_password | ansible.builtin.quote }}
+
+crt="$(base64 --wrap=0 "$CERT")"
+key="$(base64 --wrap=0 "$CERT_KEY")"
+
+{% raw %}
+# read -d '' will exit != 0 if it reaches EOF, disable using || true.
+read -r -d '' import <<DATA || true
+[{
+  "cmd": "ImportCertificate",
+  "action": 0,
+  "param": {
+    "importCertificate": {
+      "crt": {
+        "size": ${#crt},
+        "name": "fullchain.crt",
+        "content": "$crt"
+      },
+      "key": {
+        "size": ${#key},
+        "name": "server.key",
+        "content": "$key"
+      }
+    }
+  }
+}]
+DATA
+{% endraw %}
+
+for cam in "${cameras[@]}"; do
+  >&2 printf 'Pushing certificate to camera %s' "$cam"
+
+  curl --insecure \
+       --silent \
+       --show-error \
+       --fail \
+       --header 'Content-Type: application/json' \
+       --data-raw "$import" \
+       "https://$cam.cam.{{ network.domain }}/api.cgi?cmd=ImportCertificate&user=$user&password=$password"
+done

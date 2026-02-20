@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+http:
+  routers:
+    # Just here to request a wildcard certificate that can be exported to the
+    # cameras.
+    camera-wildcard-cert:
+      entrypoints: https
+      rule: Host(`cam.{{ network.domain }}`)
+      tls:
+        certResolver: letsencrypt-dns
+        domains:
+          - main: cam.{{ network.domain }}
+            sans:
+              - "*.cam.{{ network.domain }}"
+      service: noop@internal

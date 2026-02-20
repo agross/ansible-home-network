@@ -43,6 +43,8 @@
   roles:
     - role: traefik
       tags: traefik
+    - role: traefik-cert-exporter
+      tags: traefik-cert-exporter
 
 - name: Hosted services on yard
   hosts: yard

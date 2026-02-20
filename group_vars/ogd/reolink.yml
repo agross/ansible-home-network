@@ -1,0 +1,2 @@
+reolink_camera_user: admin
+reolink_camera_password: "{{ vault_reolink_camera_password }}"
