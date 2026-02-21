@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ harbor_installer_directory | ansible.builtin.quote }}/harbor
+
+db() {
+  docker compose up \
+                 --wait \
+                 postgresql
+
+  # Because we backed up with --clean we must connect to the postgres database.
+  # https://www.postgresql.org/docs/current/app-pg-dumpall.html#APP-PG-DUMPALL-EX
+  docker compose exec \
+                 --no-TTY \
+                 postgresql \
+                 psql \
+                 --no-psqlrc \
+                 --dbname=postgres \
+    < {{ harbor_root | ansible.builtin.quote }}/backups/db.sql
+}
+
+db

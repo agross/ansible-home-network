@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+cd -- {{ harbor_installer_directory | ansible.builtin.quote }}/harbor
+
 target={{ harbor_root | ansible.builtin.quote }}/backups
 
 cleanup() {
@@ -14,10 +15,14 @@ cleanup() {
 }
 
 db() {
-  local -a cmd=(docker compose exec postgresql)
-
-  printf 'Dumping database.\n'
-  "${cmd[@]}" pg_dumpall --clean --if-exists > "$target/db.sql"
+  docker compose \
+         exec \
+         postgresql \
+         pg_dumpall \
+         --clean \
+         --if-exists \
+         --quote-all-identifiers \
+    > "$target/db.sql"
 }
 
 trap cleanup ERR SIGINT SIGTERM
