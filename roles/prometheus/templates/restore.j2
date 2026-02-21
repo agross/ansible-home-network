@@ -22,7 +22,8 @@ prometheus() {
   # Files must have the right permissions, otherwise creating snapshots
   # (i.e. for the next backup) will fail. Docker copies files with root:root
   # ownership by default.
-  docker compose exec \
+  docker compose run \
+                 --rm \
                  --user root \
                  --entrypoint chown \
                  app \
