@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ immich_root | ansible.builtin.quote }}
+
+db() {
+  docker compose up \
+                 --wait \
+                 db
+
+  # Because we backed up with --clean we must connect to the postgres database.
+  # https://www.postgresql.org/docs/current/app-pg-dumpall.html#APP-PG-DUMPALL-EX
+  docker compose exec \
+                 --no-TTY \
+                 db \
+                 psql \
+                 --no-psqlrc \
+                 --dbname=postgres \
+    < {{ immich_root | ansible.builtin.quote }}/backups/db.sql
+}
+
+# https://docs.immich.app/administration/system-integrity/#common-issues
+ensure-immich-folder-check-files-exist() {
+  local dirs=(upload library thumbs encoded-video profile backups)
+
+  for dir in "${dirs[@]}"; do
+    mkdir --parents -- {{ immich_root | ansible.builtin.quote }}"/app/$dir"
+    touch -- {{ immich_root | ansible.builtin.quote }}"/app/$dir/.immich"
+  done
+}
+
+db
+ensure-immich-folder-check-files-exist

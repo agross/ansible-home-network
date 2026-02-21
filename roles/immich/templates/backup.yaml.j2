@@ -7,12 +7,14 @@
 # the configuration file.
 constants:
   name: {{ ansible_role_name }}
+  unit: immich.service
 
 # List of source directories and files to back up. Globs and tildes
 # are expanded. Do not backslash spaces in path names.
 source_directories: !retain
   - {{ immich_root }}/backups
   - {{ immich_root }}/app
+  - {{ immich_root }}/redis
 
 # Any paths matching these patterns are excluded from backups. Globs and tildes
 # are expanded. Note that a glob pattern must either start with a glob or be an
@@ -36,6 +38,23 @@ commands:
       - create
     run:
       - {{ immich_root }}/backup
+
+  - before: action
+    when:
+      - extract
+    run:
+      - |
+        if systemctl is-active --quiet {unit}; then
+          systemctl stop {unit}
+        fi
+
+  - after: action
+    when:
+      - extract
+    states:
+      - finish
+    run:
+      - {{ immich_root }}/restore
 
 # Configuration for a monitoring integration with Healthchecks. Create an
 # account at https://healthchecks.io (or self-host Healthchecks) if you'd like

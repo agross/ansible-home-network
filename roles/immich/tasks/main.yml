@@ -13,6 +13,13 @@
     build: true
     notify_: Restart immich service
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ immich_root }}"
+
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
