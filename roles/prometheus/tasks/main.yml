@@ -40,7 +40,6 @@
   ansible.builtin.import_tasks:
     file: restore.yml
   vars:
-    restore_stop_units: prometheus.service
     restore_target_dir: "{{ prometheus_root }}"
 
 - name: Symlink systemd unit

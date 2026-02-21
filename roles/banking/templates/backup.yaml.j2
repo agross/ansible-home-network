@@ -7,6 +7,7 @@
 # the configuration file.
 constants:
   name: {{ ansible_role_name }}
+  unit: banking.service
 
 # List of source directories and files to back up. Globs and tildes
 # are expanded. Do not backslash spaces in path names.
@@ -25,6 +26,15 @@ commands:
       - create
     run:
       - {{ banking_root }}/backup
+
+  - before: action
+    when:
+      - extract
+    run:
+      - |
+        if systemctl is-active --quiet {unit}; then
+          systemctl stop {unit}
+        fi
 
   - after: action
     when:
