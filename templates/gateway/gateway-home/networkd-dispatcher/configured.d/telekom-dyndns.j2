@@ -72,7 +72,7 @@ tunnelbroker() {
   url="https://$host/nic/update?hostname={{ he_ipv6.tunnel_id | ansible.builtin.mandatory }}"
 
   output="$(curl --resolve "$host:443:$ip" \
-                 --fail \
+                 --fail-with-body \
                  --connect-timeout 15 \
                  --user "$user" \
                  "$url")"

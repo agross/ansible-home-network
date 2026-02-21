@@ -44,7 +44,7 @@ for cam in "${cameras[@]}"; do
   curl --insecure \
        --silent \
        --show-error \
-       --fail \
+       --fail-with-body \
        --header 'Content-Type: application/json' \
        --data-raw "$import" \
        "https://$cam.cam.{{ network.domain }}/api.cgi?cmd=ImportCertificate&user=$user&password=$password"
