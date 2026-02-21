@@ -1,13 +1,9 @@
-volumes:
-  data:
-  extensions:
-
 services:
   app:
     image: freshrss/freshrss:1.28.1-alpine
     volumes:
-      - data:/var/www/FreshRSS/data
-      - extensions:/var/www/FreshRSS/extensions
+      - ./app/data:/var/www/FreshRSS/data
+      - ./app/extensions:/var/www/FreshRSS/extensions
     ports:
       - 4002:80
     environment:
@@ -25,8 +21,8 @@ services:
   cron:
     image: freshrss/freshrss:1.28.1-alpine
     volumes:
-      - data:/var/www/FreshRSS/data
-      - extensions:/var/www/FreshRSS/extensions
+      - ./app/data:/var/www/FreshRSS/data
+      - ./app/extensions:/var/www/FreshRSS/extensions
     environment:
       TZ: Europe/Berlin
       # Cron job to refresh feeds at specified minutes.

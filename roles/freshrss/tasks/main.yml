@@ -16,6 +16,13 @@
     build: true
     notify_: Restart freshrss service
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ freshrss_root }}"
+
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link

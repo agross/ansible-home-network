@@ -7,11 +7,22 @@
 # the configuration file.
 constants:
   name: {{ ansible_role_name }}
+  unit: freshrss.service
 
 # List of source directories and files to back up. Globs and tildes
 # are expanded. Do not backslash spaces in path names.
 source_directories: !retain
+  - {{ freshrss_root }}/app
   - {{ freshrss_root }}/backups
+
+# Any paths matching these patterns are excluded from backups. Globs and tildes
+# are expanded. Note that a glob pattern must either start with a glob or be an
+# absolute path. Do not backslash spaces in path names. See the output of "borg
+# help patterns" for more details.
+exclude_patterns:
+  - {{ freshrss_root }}/app/data/cache
+  - {{ freshrss_root }}/app/data/favicons
+  - {{ freshrss_root }}/app/data/users/*/log*.txt
 
 # List of one or more command hooks to execute, triggered at particular points
 # during borgmatic's execution. For each command hook, specify one of "before"
@@ -24,6 +35,23 @@ commands:
       - create
     run:
       - {{ freshrss_root }}/backup
+
+  - before: action
+    when:
+      - extract
+    run:
+      - |
+        if systemctl is-active --quiet {unit}; then
+          systemctl stop {unit}
+        fi
+
+  - after: action
+    when:
+      - extract
+    states:
+      - finish
+    run:
+      - {{ freshrss_root }}/restore
 
 # Configuration for a monitoring integration with Healthchecks. Create an
 # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
