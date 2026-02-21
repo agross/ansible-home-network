@@ -6,6 +6,8 @@ set -euo pipefail
 cd -- {{ nextcloud_root | ansible.builtin.quote }}
 
 db() {
+  printf 'Restoring database.\n'
+
   docker compose up \
                  --wait \
                  db
@@ -19,4 +21,50 @@ db() {
     < {{ nextcloud_root | ansible.builtin.quote }}/backups/nextcloud.sql
 }
 
+elastic() {
+  printf 'Restoring search database.\n'
+
+  local -a elastic=(docker compose exec search)
+  local -a curl=("${elastic[@]}" curl --silent --fail-with-body)
+
+  local elastic_uri=http://localhost:9200
+  local elastic_repo="$elastic_uri/_snapshot/nextcloud"
+  local index=nextcloud
+
+  # Ensure data directory has the correct permissions.
+  mkdir --parents -- {{ nextcloud_root | ansible.builtin.quote }}/elasticsearch/data
+  chown -R 1000 -- {{ nextcloud_root | ansible.builtin.quote }}/elasticsearch/data
+
+  docker compose up \
+                 --wait \
+                 search
+
+  if ! "${curl[@]}" "$elastic_repo" > /dev/null 2>&1; then
+    printf 'Registering snapshot repository\n'
+    "${curl[@]}" --request POST \
+                 --header 'Content-Type: application/json' \
+                 --data-raw '{ "type": "fs", "settings": { "location": "/backups" } }' \
+                 "$elastic_repo?pretty=true"
+  fi
+
+  printf 'Verifying snapshot repository\n'
+  "${curl[@]}" --request POST \
+               "$elastic_repo/_verify?pretty=true"
+
+  printf 'Getting snapshots\n'
+  mapfile -t snapshots < <("${curl[@]}" "$elastic_repo/_all?state=SUCCESS&order=desc" |
+                            jq --exit-status --raw-output ".snapshots[].snapshot")
+
+  printf 'Closing index %s such that its snapshot can be restored\n' "$index"
+  "${curl[@]}" --request POST \
+               "$elastic_uri/$index/_close?ignore_unavailable=true&pretty=true"
+
+  printf 'Restoring newest snapshot %s\n' "${snapshots[0]}"
+  "${curl[@]}" --request POST \
+               --header 'Content-Type: application/json' \
+               --data-raw "$(printf '{ "feature_states": ["kibana"], "indices": "%s" }' "$index")" \
+               "$elastic_repo/${snapshots[0]}/_restore?wait_for_completion=true&pretty=true"
+}
+
 db
+elastic

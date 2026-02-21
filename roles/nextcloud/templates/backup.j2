@@ -48,39 +48,28 @@ elastic() {
   printf 'Snapshotting search database.\n'
 
   local -a elastic=(docker compose exec search)
+  local -a curl=("${elastic[@]}" curl --silent --fail-with-body)
 
   local elastic_repo=http://localhost:9200/_snapshot/nextcloud
   local snapshot_date="$(date +%Y-%m-%d-%H:%M:%S)"
   local keep_snapshots=7
 
-  printf 'Creating Elastic Search snapshot %s\n' "$snapshot_date"
+  printf 'Creating snapshot %s\n' "$snapshot_date"
+  "${curl[@]}" --request PUT \
+               --header 'Content-Type: application/json' \
+               --data-raw '{ "metadata": { "taken_by": "borgmatic", "taken_because": "backup" } }' \
+               "$elastic_repo/snapshot-$snapshot_date?wait_for_completion=true&pretty=true"
 
-  "${elastic[@]}" curl \
-                  --silent \
-                  --fail \
-                  --request PUT \
-                  --header 'Content-Type: application/json' \
-                  --data '{ "metadata": { "taken_by": "borgmatic", "taken_because": "backup" } }' \
-                  "$elastic_repo/snapshot-$snapshot_date?wait_for_completion=true&pretty=true"
+  printf 'Retrieving snapshot %s\n' "$snapshot_date"
+  "${curl[@]}" "$elastic_repo/snapshot-$snapshot_date?pretty=true"
 
-  "${elastic[@]}" curl \
-                  --silent \
-                  --fail \
-                  --request GET \
-                  "$elastic_repo/snapshot-$snapshot_date?pretty=true"
-
-  mapfile -t snapshots < <("${elastic[@]}" curl \
-                                           --silent \
-                                           --request GET \
-                                           "$elastic_repo/_all" |
+  mapfile -t snapshots < <("${curl[@]}" "$elastic_repo/_all" |
                             jq --raw-output ".snapshots[:-${keep_snapshots}][].snapshot")
 
   for snapshot in "${snapshots[@]}"; do
     printf 'Deleting snapshot %s\n' "$snapshot"
-    "${elastic[@]}" curl \
-                    --silent \
-                    --request DELETE \
-                    "$elastic_repo/$snapshot?pretty=true"
+    "${curl[@]}" --request DELETE \
+                 "$elastic_repo/$snapshot?wait_for_completion=true&pretty=true"
   done
 }
 
