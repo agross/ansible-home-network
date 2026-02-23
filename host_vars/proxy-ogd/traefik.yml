@@ -1,3 +1,5 @@
+traefik_backup_healthcheck: "{{ vault_traefik_backup_healthcheck }}"
+
 traefik_install_method: bare-metal
 
 traefik_dynamic_file_configuration: /data/traefik/conf.d

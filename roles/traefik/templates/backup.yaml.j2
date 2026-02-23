@@ -1,0 +1,27 @@
+<<: !include /etc/borgmatic/config.yaml
+
+# Constants to use in the configuration file. Within option values, all
+# occurrences of the constant name in curly braces will be replaced with the
+# constant value. For example, if you have a constant named "app_name" with the
+# value "myapp", then the string "{app_name}" will be replaced with "myapp" in
+# the configuration file.
+constants:
+  name: {{ ansible_role_name }}
+
+# List of source directories and files to back up. Globs and tildes
+# are expanded. Do not backslash spaces in path names.
+source_directories: !retain
+  - {{ traefik_root }}/acme
+  - {{ traefik_root }}/conf
+  - {{ traefik_root }}/conf.d
+  {% if traefik_plugins | length > 0 %}
+  - {{ traefik_root }}/plugins-local
+  {% endif %}
+
+# Configuration for a monitoring integration with Healthchecks. Create an
+# account at https://healthchecks.io (or self-host Healthchecks) if you'd like
+# to use this service. See borgmatic monitoring documentation for details.
+healthchecks:
+  # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors,
+  # or to send only logs.
+  ping_url: "{{ traefik_backup_healthcheck }}"
