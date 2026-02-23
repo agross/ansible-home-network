@@ -1,0 +1,34 @@
+- name: End role if no datasets to snapshot are configured
+  ansible.builtin.meta: end_role
+  when: zfs_snapshot_datasets | length == 0
+
+- name: Gather package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: End role if ZFS is not available
+  ansible.builtin.meta: end_role
+  when: >-
+    'zfsutils-linux' not in ansible_facts.packages
+
+- name: Ensure sanoid is installed
+  ansible.builtin.package:
+    name: sanoid
+    state: present
+
+- name: Ensure sanoid config directory exists
+  ansible.builtin.file:
+    path: /etc/sanoid
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Template sanoid config
+  ansible.builtin.template:
+    src: sandoid.conf.j2
+    dest: /etc/sanoid/sanoid.conf
+    owner: 0
+    group: 0
+    mode: "644"
+    lstrip_blocks: true

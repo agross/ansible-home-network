@@ -1,0 +1,7 @@
+zfs_snapshot_datasets:
+  - dataset: "rpool/data/vm-{{ hostvars.finn.proxmox.id }}-disk-0"
+    settings: |
+      use_template = vm_volume
+  - dataset: "rpool/data/vm-{{ hostvars.finn.proxmox.id }}-disk-1"
+    settings: |
+      use_template = vm_volume

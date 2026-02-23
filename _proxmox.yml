@@ -27,6 +27,10 @@
         - pve
     - role: smartmontools
       tags: smartmontools
+    - role: zfs-snapshots
+      tags:
+        - proxmox
+        - zfs-snapshots
 
 - name: Resize filesystems of VMs with resized disks
   hosts: needs_fs_resize

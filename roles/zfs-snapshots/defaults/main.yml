@@ -1,0 +1,29 @@
+# List of ZFS datasets and their settings to snapshot.
+zfs_snapshot_datasets: []
+
+zfs_snapshot_default_dataset_settings: |
+  use_template = default
+  recursive = yes
+
+zfs_snapshot_sanoid_templates: |
+  [template_vm_volume]
+    frequently = 0
+    hourly = 24
+    daily = 14
+    weekly = 0
+    monthly = 0
+    yearly = 0
+
+    autosnap = yes
+    autoprune = yes
+
+  [template_default]
+    frequently = 0
+    hourly = 24
+    daily = 30
+    weekly = 4
+    monthly = 3
+    yearly = 0
+
+    autosnap = yes
+    autoprune = yes

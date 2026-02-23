@@ -1,0 +1,10 @@
+{% for config in zfs_snapshot_datasets %}
+[{{ config.dataset }}]
+  {{
+    config.settings |
+    default(zfs_snapshot_default_dataset_settings, true) |
+    indent(2)
+  }}
+{% endfor %}
+
+{{ zfs_snapshot_sanoid_templates }}
