@@ -45,6 +45,19 @@
   ansible.builtin.include_tasks:
     file: install-bare-metal.yml
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ traefik_root }}"
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ traefik_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
 - name: Install systemd units
   ansible.builtin.import_tasks:
     file: systemd-install-units.yml
