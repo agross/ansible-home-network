@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ mqtt_root | ansible.builtin.quote }}
+
+target={{ mqtt_root | ansible.builtin.quote }}/backups
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+
+  mkdir --parents -- "$target"
+  rm -rf -- "${target:?}"/{*,.*}
+}
+
+mosquitto() {
+  # Force flushing data to disk.
+  docker compose kill \
+                 --signal SIGUSR1 \
+                 app
+
+  docker compose cp \
+                 app:/mosquitto/data/mosquitto.db \
+                 "$target"
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+mosquitto

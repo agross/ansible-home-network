@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ mqtt_root | ansible.builtin.quote }}
+
+mosquitto() {
+  # Ensure the container exists.
+  docker compose create app
+
+  # Copy database into mosquitto container.
+  docker compose cp \
+                 {{ mqtt_root | ansible.builtin.quote }}/backups/mosquitto.db \
+                 app:/mosquitto/data/mosquitto.db
+
+  # Fix permissions.
+  docker compose run \
+                 --no-deps \
+                 --no-TTY \
+                 --rm \
+                 --user root \
+                 --entrypoint chown \
+                 app \
+                 1833:1833 /mosquitto/data/mosquitto.db
+
+  docker compose run \
+                 --no-deps \
+                 --no-TTY \
+                 --rm \
+                 --user root \
+                 --entrypoint chmod \
+                 app \
+                 600 /mosquitto/data/mosquitto.db
+}
+
+mosquitto

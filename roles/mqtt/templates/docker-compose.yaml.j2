@@ -1,0 +1,27 @@
+volumes:
+  data:
+  log:
+
+services:
+  app:
+    image: eclipse-mosquitto:with-clients
+    pull_policy: never
+    build:
+      context: ./mosquitto/docker
+    ports:
+      - 1883:1883
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/auth:/mosquitto/config/auth:ro
+      - data:/mosquitto/data
+      - log:/mosquitto/log
+    healthcheck:
+      {% set account = mqtt_accounts | default({}, true) | ansible.builtin.dict2items | first | default(None) %}
+      test: >-
+        mosquitto_pub {{
+          account | ansible.builtin.ternary('-u ' ~ account.key | default(''), '')
+        }} {{
+          account | ansible.builtin.ternary('-P ' ~ account.value | default(''), '')
+        }} --id docker-healthcheck --topic /docker-healthcheck --null-message
+      start_period: 5s
+      interval: 5s

@@ -1,0 +1,53 @@
+<<: !include /etc/borgmatic/config.yaml
+
+# Constants to use in the configuration file. Within option values, all
+# occurrences of the constant name in curly braces will be replaced with the
+# constant value. For example, if you have a constant named "app_name" with the
+# value "myapp", then the string "{app_name}" will be replaced with "myapp" in
+# the configuration file.
+constants:
+  name: {{ ansible_role_name }}
+  unit: mqtt.service
+
+# List of source directories and files to back up. Globs and tildes
+# are expanded. Do not backslash spaces in path names.
+source_directories: !retain
+  - {{ mqtt_root }}/backups
+  - {{ mqtt_root }}/mosquitto
+
+# List of one or more command hooks to execute, triggered at particular points
+# during borgmatic's execution. For each command hook, specify one of "before"
+# or "after", not both.
+commands:
+  - before: configuration
+    # Only trigger the hook when borgmatic is run with particular actions listed
+    # here. Defaults to running for all actions.
+    when:
+      - create
+    run:
+      - {{ mqtt_root }}/backup
+
+  - before: action
+    when:
+      - extract
+    run:
+      - |
+        if systemctl is-active --quiet {unit}; then
+          systemctl stop {unit}
+        fi
+
+  - after: action
+    when:
+      - extract
+    states:
+      - finish
+    run:
+      - {{ mqtt_root }}/restore
+
+# Configuration for a monitoring integration with Healthchecks. Create an
+# account at https://healthchecks.io (or self-host Healthchecks) if you'd like
+# to use this service. See borgmatic monitoring documentation for details.
+healthchecks:
+  # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors,
+  # or to send only logs.
+  ping_url: "{{ mqtt_backup_healthcheck }}"

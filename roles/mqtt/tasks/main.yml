@@ -3,8 +3,8 @@
     mqtt_accounts: >-
       {{
         mqtt_accounts |
-          default({}) |
-          ansible.builtin.combine(hostvars[item].mqtt_accounts | default({}))
+        default({}) |
+        ansible.builtin.combine(hostvars[item].mqtt_accounts | default({}))
       }}
   loop: "{{ groups[site] | default([]) }}"
 
@@ -28,22 +28,34 @@
         group: 0
         mode: "640"
 
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ mqtt_root }}"
+    pull: true
+    build: true
+    notify_: Restart mqtt service
+
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ mqtt_root }}"
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ mqtt_root }}/backup.yaml"
+    path: /etc/borgmatic.d/{{ ansible_role_name }}.yaml
+
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ mqtt_root }}/systemd"
     local_units: templates/systemd
     notify_: Restart mqtt service
-
-- name: Build custom image
-  community.docker.docker_image:
-    name: "{{ mqtt_image }}"
-    source: build
-    force_source: true
-    build:
-      path: "{{ mqtt_root }}/mosquitto"
-      pull: true
-  notify: Restart mqtt service
 
 - name: Start systemd units
   ansible.builtin.systemd:
