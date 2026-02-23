@@ -50,32 +50,37 @@ proxmox:
         mountoptions: discard;noatime
 
     mp3:
+      host_path: /tank/grossweber/banking/app
+      mountpoint: /data/banking/app
+      options:
+        mountoptions: discard;noatime
+    mp4:
       host_path: /tank/grossweber/banking/mariadb
       mountpoint: /data/banking/mariadb/data
       options:
         mountoptions: discard;noatime
 
-    mp4:
+    mp5:
       host_path: /tank/grossweber/teamcity/app
       mountpoint: /data/teamcity/app
       options:
         mountoptions: discard;noatime
-    mp5:
+    mp6:
       host_path: /tank/grossweber/teamcity/mysql
       mountpoint: /data/teamcity/mysql/data
       options:
         mountoptions: discard;noatime
-    mp6:
+    mp7:
       host_path: /tank/grossweber/teamcity/hub/backups
       mountpoint: /data/teamcity/hub/backups
       options:
         mountoptions: discard;noatime
-    mp7:
+    mp8:
       host_path: /tank/grossweber/teamcity/hub/conf
       mountpoint: /data/teamcity/hub/conf
       options:
         mountoptions: discard;noatime
-    mp8:
+    mp9:
       host_path: /tank/grossweber/teamcity/hub/data
       mountpoint: /data/teamcity/hub/data
       options:
@@ -104,6 +109,10 @@ zfs_datasets:
       owner: 100997
       group: 100998
 
+  tank/grossweber/banking/app:
+    chown:
+      owner: 101000
+      group: 101000
   tank/grossweber/banking/mariadb:
     chown:
       owner: 100999
