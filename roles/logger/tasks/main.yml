@@ -20,6 +20,13 @@
     build: true
     notify_: Restart logger service
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ logger_root }}"
+
 - name: Symlink InfluxDB rename script
   ansible.builtin.file:
     state: link

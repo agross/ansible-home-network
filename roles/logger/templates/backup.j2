@@ -3,26 +3,28 @@
 
 set -euo pipefail
 
+cd -- {{ logger_root | ansible.builtin.quote }}
+
+target={{ logger_root | ansible.builtin.quote }}/backups
+
 cleanup() {
+  mkdir --parents -- "$target"
+
   printf 'Cleaning up InfluxDB backup directory.\n'
   # Directory needs to be kept because it is mounted on the InfluxDB container.
-  rm -rf -- {{ logger_root | ansible.builtin.quote }}/backups/influxdb/*
+  rm -rf -- "${target:?}"/influxdb/{*,.*}
 
   printf 'Cleaning up Grafana backup directory.\n'
-  rm -rf -- {{ logger_root | ansible.builtin.quote }}/backups/grafana
+  rm -rf -- "${target:?}"/grafana
 }
 
 influxdb() {
-  for bucket in {{ logger_influxdb_backup_buckets | map('ansible.builtin.quote') | join(' ') }}; do
-    docker compose \
-           --project-name logger \
-           exec \
-           influxdb \
-           influx backup \
-                  --compression=none \
-                  "--bucket=$bucket" \
-                  "/backups/$bucket"
-  done
+  docker compose \
+         exec \
+         influxdb \
+         influx backup \
+                --compression=none \
+                /backups
 }
 
 grafana() {

@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ logger_root | ansible.builtin.quote }}
+
+influxdb() {
+  docker compose up \
+                 --wait \
+                 influxdb
+
+  # Initialization is required for a full restore to succeed.
+  docker compose exec \
+                 influxdb \
+                 influx \
+                 setup --username admin \
+                       --password 12345678 \
+                       --org overwritten-by-restore \
+                       --bucket overwritten-by-restore \
+                       --retention 0 \
+                       --force
+
+  docker compose exec \
+                 influxdb \
+                 influx \
+                 restore \
+                 --full \
+                 /backups
+}
+
+grafana() {
+  # renovate: docker=alpine/sqlite
+  local sqlite_version=3.51.2
+
+  # Delete existing container and create a new one.
+  docker compose down --volumes grafana
+  docker compose create grafana
+
+  local temp_db="$(mktemp -d)"
+
+  # Restore using sqlite container.
+  docker container \
+         run \
+         --interactive \
+         --rm \
+         --volume "$temp_db:/data" \
+         "alpine/sqlite:$sqlite_version" \
+         /data/grafana.db \
+    < {{ logger_root | ansible.builtin.quote }}/backups/grafana/db.sql
+
+  # Copy into grafana container.
+  docker compose cp \
+                 "$temp_db/grafana.db" \
+                 grafana:/var/lib/grafana/grafana.db
+
+  # Fix permissions.
+  docker compose run \
+                 --no-deps \
+                 --no-TTY \
+                 --rm \
+                 --user root \
+                 --entrypoint chown \
+                 grafana \
+                 grafana /var/lib/grafana/grafana.db
+
+  docker compose run \
+                 --no-deps \
+                 --no-TTY \
+                 --rm \
+                 --user root \
+                 --entrypoint chmod \
+                 grafana \
+                 600 /var/lib/grafana/grafana.db
+}
+
+influxdb
+grafana
