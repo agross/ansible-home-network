@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+cd -- {{ teamcity_root | ansible.builtin.quote }}
+
 target={{ teamcity_root | ansible.builtin.quote }}/app/backup
 
 cleanup() {
