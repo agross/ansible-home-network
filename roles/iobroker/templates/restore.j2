@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ iobroker_root | ansible.builtin.quote }}
+
+iobroker() {
+  # Fiddling with buanet/iobroker's maintenance mode is too unreliable.
+  # Especially if the container starts up, it might leave the impression that
+  # the container entered maintenance mode while it is actually still running
+  # locking the database files we want to restore.
+
+  local -a iob files_by_mtime
+  local newest_file
+
+  iob=(docker compose run --rm --user iobroker --entrypoint iobroker app)
+
+  printf 'Enabling beta repository as the only repo\n'
+  "${iob[@]}" repo set beta
+  "${iob[@]}" repo unset stable
+
+  printf 'Installing latest jscontroller\n'
+  "${iob[@]}" upgrade self
+  "${iob[@]}" version
+
+  printf 'Finding newest backup\n'
+  mapfile -t files_by_mtime < \
+    <(find {{ iobroker_root | ansible.builtin.quote }}/backups \
+                -maxdepth 1 \
+                -type f \
+                -name 'iobroker_*.tar.gz' \
+                -printf '%T@\t%p\n' |
+      sort --reverse |
+      cut --fields=2-)
+
+  newest_file="${files_by_mtime[0]}"
+  newest_file="${newest_file##*/}"
+
+  printf 'Restoring backup %s\n' "$newest_file"
+  "${iob[@]}" restore "$newest_file"
+}
+
+iobroker

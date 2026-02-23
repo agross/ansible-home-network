@@ -7,11 +7,33 @@
 # the configuration file.
 constants:
   name: {{ ansible_role_name }}
+  unit: iobroker.service
 
 # List of source directories and files to back up. Globs and tildes
 # are expanded. Do not backslash spaces in path names.
 source_directories: !retain
   - {{ iobroker_root }}/backups
+
+# List of one or more command hooks to execute, triggered at particular points
+# during borgmatic's execution. For each command hook, specify one of "before"
+# or "after", not both.
+commands:
+  - before: action
+    when:
+      - extract
+    run:
+      - |
+        if systemctl is-active --quiet {unit}; then
+          systemctl stop {unit}
+        fi
+
+  - after: action
+    when:
+      - extract
+    states:
+      - finish
+    run:
+      - {{ iobroker_root }}/restore
 
 # Configuration for a monitoring integration with Healthchecks. Create an
 # account at https://healthchecks.io (or self-host Healthchecks) if you'd like

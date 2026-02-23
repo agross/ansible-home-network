@@ -67,6 +67,13 @@
     state: present
     reload: true
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ iobroker_root }}"
+
 - name: Symlink backup configuration
   ansible.builtin.file:
     state: link
