@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
+cd -- {{ prometheus_root | ansible.builtin.quote }}
+
 target={{ prometheus_root | ansible.builtin.quote }}/backups
 
 cleanup() {
@@ -14,7 +15,6 @@ cleanup() {
 }
 
 prometheus() {
-  local target={{ prometheus_root | ansible.builtin.quote }}/backups
   local snapshot
 
   snapshot="$( \

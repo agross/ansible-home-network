@@ -9,8 +9,8 @@
     argv:
       - docker
       - compose
-      - --project-name
-      - prometheus
+      - --project-directory
+      - "{{ prometheus_root }}"
       - kill
       - --signal
       - SIGHUP
