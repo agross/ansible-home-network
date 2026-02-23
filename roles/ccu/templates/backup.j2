@@ -3,6 +3,8 @@
 
 set -euo pipefail
 
+cd -- {{ ccu_root | ansible.builtin.quote }}
+
 target={{ ccu_root | ansible.builtin.quote }}/backups
 
 cleanup() {
@@ -14,7 +16,6 @@ cleanup() {
 
 ccu() {
   docker compose \
-         --project-name {{ ansible_role_name | ansible.builtin.quote }} \
          exec \
          ccu \
          /bin/createBackup.sh \

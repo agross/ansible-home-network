@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ ccu_root | ansible.builtin.quote }}
+
+ccu() {
+  local -a files_by_mtime
+  local newest_file
+
+  docker compose up \
+                 --wait \
+                 ccu
+
+  mapfile -t files_by_mtime < \
+    <(find {{ ccu_root | ansible.builtin.quote }}/backups \
+                -maxdepth 1 \
+                -type f \
+                -name '*.sbk' \
+                -printf '%T@\t%p\n' |
+      sort --reverse |
+      cut --fields=2-)
+
+  newest_file="${files_by_mtime[0]}"
+  newest_file="${newest_file##*/}"
+
+  docker compose \
+         exec \
+         ccu \
+         /bin/restoreBackup.sh "/backups/$newest_file"
+
+  docker compose stop ccu
+}
+
+ccu
