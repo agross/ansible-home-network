@@ -2,9 +2,9 @@
 
 printf 'Info:\nhttps://www.aquamaniac.de/rdm/projects/aqbanking/wiki/SetupPinTan\n'
 
-export COMPOSE_PROJECT_NAME={{ ansible_role_name | ansible.builtin.quote }}
-
 docker compose \
+       --project-directory \
+       {{ banking_root | ansible.builtin.quote }} \
        run \
        --interactive \
        --entrypoint aqhbci-tool4 \
