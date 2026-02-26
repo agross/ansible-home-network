@@ -1,4 +1,4 @@
-{% for config in zfs_snapshot_datasets %}
+{% for config in zfs_snapshot_datasets_combined %}
 [{{ config.dataset }}]
   {{
     config.settings |

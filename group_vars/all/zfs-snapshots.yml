@@ -1,0 +1,3 @@
+zfs_snapshot_default_dataset_settings: |
+  use_template = default
+  recursive = yes

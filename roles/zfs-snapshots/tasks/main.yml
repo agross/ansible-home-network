@@ -1,6 +1,27 @@
 - name: End role if no datasets to snapshot are configured
   ansible.builtin.meta: end_role
-  when: zfs_snapshot_datasets | length == 0
+  when: zfs_snapshot_datasets_combined | length == 0
+
+- name: Fail if duplicate dataset settings exist
+  when: duplicate_datasets | length > 0
+  ansible.builtin.fail:
+    msg: >-
+      Duplicate dataset snapshot settings found:
+
+
+      {{ duplicate_dataset_names | ansible.builtin.to_nice_yaml }}
+  vars:
+    duplicate_datasets: >-
+      {{
+        zfs_snapshot_datasets_combined |
+        groupby('dataset', case_sensitive = true) |
+        selectattr('list.1', 'defined')
+      }}
+    duplicate_dataset_names: >-
+      {{
+        duplicate_datasets |
+        map(attribute = 'grouper')
+      }}
 
 - name: Gather package facts
   ansible.builtin.package_facts:

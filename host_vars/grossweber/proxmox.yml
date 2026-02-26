@@ -109,6 +109,10 @@ zfs_datasets:
       owner: 100997
       group: 100998
 
+  tank/grossweber/banking:
+    snapshot: |
+      {{ zfs_snapshot_default_dataset_settings }}
+      process_children_only = yes
   tank/grossweber/banking/app:
     chown:
       owner: 101000
