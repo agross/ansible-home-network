@@ -19,13 +19,24 @@
 
 - name: Download release asset
   when: dest is defined
-  become: true
-  ansible.builtin.get_url:
-    url: "{{ github_asset_url }}"
-    headers: "{{ github_release_request_headers | default(omit) }}"
-    dest: "{{ dest }}"
-    owner: 0
-    group: 0
-    mode: "755"
-  changed_when: notify_ | default('') | length > 0
-  notify: "{{ notify_ | default(omit) }}"
+  block:
+    - name: Ensure target directory exists
+      become: true
+      ansible.builtin.file:
+        state: directory
+        path: "{{ dest | ansible.builtin.dirname }}"
+        owner: 0
+        group: 0
+        mode: "755"
+
+    - name: Download release asset
+      become: true
+      ansible.builtin.get_url:
+        url: "{{ github_asset_url }}"
+        headers: "{{ github_release_request_headers | default(omit) }}"
+        dest: "{{ dest }}"
+        owner: 0
+        group: 0
+        mode: "{{ mode | default(755) }}"
+      changed_when: notify_ | default('') | length > 0
+      notify: "{{ notify_ | default(omit) }}"

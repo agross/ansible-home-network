@@ -17,6 +17,14 @@
     name: intel-gpu-tools
     state: present
 
+- name: Copy templates
+  ansible.builtin.import_tasks:
+    file: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ frigate_root }}"
+    notify_: Restart frigate service
+
 - name: Download custom go2rtc release
   ansible.builtin.include_tasks:
     file: github-release.yml
@@ -28,12 +36,15 @@
     dest: "{{ frigate_root }}/app/go2rtc"
     notify_: Restart frigate service
 
-- name: Copy templates
-  ansible.builtin.import_tasks:
-    file: copy-templates.yml
+- name: Download YOLOv9 model
+  ansible.builtin.include_tasks:
+    file: github-release.yml
   vars:
-    directory: ../templates
-    target: "{{ frigate_root }}"
+    url: https://api.github.com/repos/dbro/frigate-detector-edgetpu-yolo9/releases
+    release: "{{ frigate_yolov9_release_version }}"
+    asset_name_regex: "^{{ frigate_yolov9_release_file }}$"
+    dest: "{{ frigate_root }}/app/model_cache/{{ frigate_yolov9_release_file }}"
+    mode: "644"
     notify_: Restart frigate service
 
 - name: Update docker-compose images

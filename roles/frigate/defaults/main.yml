@@ -7,3 +7,7 @@ frigate_go2rtc_release_file: go2rtc_linux_amd64
 frigate_camera_user: frigate
 
 frigate_mqtt_topic_prefix: "{{ site }}/frigate"
+
+# renovate: github-releases=dbro/frigate-detector-edgetpu-yolo9
+frigate_yolov9_release_version: v1.0
+frigate_yolov9_release_file: yolov9-s-relu6-best_320_int8_edgetpu.tflite
