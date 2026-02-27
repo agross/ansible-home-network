@@ -35,6 +35,13 @@ detectors:
     type: edgetpu
     device: pci
 
+model:
+  model_type: yolo-generic
+  width: 320
+  height: 320
+  path: /config/model_cache/{{ frigate_yolov9_release_file }}
+  labelmap_path: /config/labels-coco17.txt
+
 detect:
   enabled: true
   # My cameras support 4 or 7 fps on the sub stream, the default would be 5.
