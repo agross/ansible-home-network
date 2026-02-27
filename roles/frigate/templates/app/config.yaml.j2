@@ -48,17 +48,18 @@ objects:
 
 record:
   enabled: true
-  retain:
+
+  continuous:
     days: 7
-    mode: motion
+  motion:
+    days: 14
+
   alerts:
     retain:
       days: 60
-      mode: motion
   detections:
     retain:
       days: 60
-      mode: motion
 
 snapshots:
   enabled: true
@@ -162,16 +163,11 @@ go2rtc:
       - api
       # - debug
 
-      - exec
       - ffmpeg
       - mp4
       - rtsp
       - webrtc
       - ws
-
-  exec:
-    allow_paths:
-      - /usr/lib/ffmpeg/5.0/bin/ffmpeg
 
   api:
     allow_paths:
