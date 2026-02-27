@@ -45,6 +45,19 @@
     build: true
     notify_: Restart frigate service
 
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ frigate_root }}"
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ frigate_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
