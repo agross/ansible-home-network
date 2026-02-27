@@ -13,7 +13,10 @@ http:
 
     {{ ansible_role_name }}-lovelace-components:
       entrypoints: https
-      rule: Host(`lovelace.{{ network.domain }}`) && PathPrefix(`/lovelace`) && Method(`GET`)
+      rule: >-
+        Host(`lovelace.{{ network.domain }}`) &&
+        (Path(`/manifest.json`) || PathPrefix(`/lovelace`)) &&
+        Method(`GET`)
       middlewares:
         - {{ ansible_role_name }}-lovelace-app-title
       service: iobroker-lovelace
