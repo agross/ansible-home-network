@@ -9,6 +9,13 @@ http:
         - {{ ansible_role_name }}-well-known-replace
         - security-headers@file
 
+    {{ ansible_role_name }}-metrics:
+      entrypoints: https
+      rule: Host(`{{ nextcloud_domain }}`) && Path(`/metrics`)
+      service: {{ ansible_role_name }}
+      middlewares:
+        - {{ ansible_role_name }}-ipallowlist
+
     {{ ansible_role_name }}-push:
       entrypoints: https
       rule: Host(`{{ nextcloud_domain }}`) && PathPrefix(`/push`)
@@ -29,6 +36,15 @@ http:
         regex: https://(.*)/.well-known/(?:card|cal)dav
         replacement: https://${1}/remote.php/dav/
         permanent: true
+
+    {{ ansible_role_name }}-ipallowlist:
+      ipAllowList:
+        sourceRange:
+          - 127.0.0.1/32
+          - {{ network.ip4 }}
+          - {{ network.ip6 }}
+          - fe80::/10
+          - fc00::/7
 
     {{ ansible_role_name }}-push-stripprefix:
       stripprefix:
