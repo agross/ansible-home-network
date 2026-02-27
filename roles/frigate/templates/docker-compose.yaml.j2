@@ -12,10 +12,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ./app:/config
       - ./media:/media/frigate
-      - type: tmpfs
-        target: /tmp/cache
-        tmpfs:
-          size: 1000000000
+    tmpfs:
+      - /tmp/cache:size=1G
     shm_size: 256m
     environment:
       FRIGATE_MQTT_USER: {{ frigate_mqtt_user }}

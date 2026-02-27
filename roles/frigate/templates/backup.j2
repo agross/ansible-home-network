@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+cd -- {{ frigate_root | ansible.builtin.quote }}
+
+target={{ frigate_root | ansible.builtin.quote }}/backups
+
+cleanup() {
+  printf 'Cleaning up backup directory.\n'
+
+  mkdir --parents -- "$target"
+  rm -rf -- "${target:?}"/{*,.*}
+}
+
+db() {
+  # renovate: docker=alpine/sqlite
+  local sqlite_version=3.51.2
+
+  mkdir --parents -- "$target"
+
+  docker run \
+         --rm \
+         --volumes-from {{ ansible_role_name | ansible.builtin.quote }}-app-1 \
+         "alpine/sqlite:$sqlite_version" \
+         /config/frigate.db \
+         .dump \
+    > "$target/db.sql"
+}
+
+trap cleanup ERR SIGINT SIGTERM
+
+cleanup
+db
