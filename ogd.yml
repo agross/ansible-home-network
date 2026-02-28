@@ -18,6 +18,11 @@
   vars:
     playbook_hosts: ogd:&fedora
 
+- name: Import Docker configuration playbook
+  ansible.builtin.import_playbook: _docker-hosts.yml
+  vars:
+    playbook_hosts: ogd:&docker
+
 - name: Gateway configuration
   hosts: gateway-ogd
   become: true
@@ -59,8 +64,6 @@
   become: true
   gather_facts: false
   roles:
-    - role: docker
-      tags: docker
     - role: frigate
       tags: frigate
 
@@ -71,8 +74,6 @@
   roles:
     - role: smartmontools
       tags: smartmontools
-    - role: docker
-      tags: docker
     - role: mqtt
       tags: mqtt
     - role: iobroker

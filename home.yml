@@ -18,6 +18,11 @@
   vars:
     playbook_hosts: home:&fedora
 
+- name: Import Docker configuration playbook
+  ansible.builtin.import_playbook: _docker-hosts.yml
+  vars:
+    playbook_hosts: home:&docker
+
 - name: Configure Kubernetes
   hosts: kubes
   become: true
@@ -61,8 +66,6 @@
   roles:
     - role: cockpit
       tags: cockpit
-    - role: docker
-      tags: docker
     - role: mqtt
       tags: mqtt
     - role: ccu
@@ -77,8 +80,6 @@
   become: true
   gather_facts: false
   roles:
-    - role: docker
-      tags: docker
     - role: immich
       tags: immich
     - role: nextcloud
@@ -115,8 +116,6 @@
   become: true
   gather_facts: false
   roles:
-    - role: docker
-      tags: docker
     - role: traefik
       tags: traefik
     - role: gitlab
@@ -125,17 +124,6 @@
       tags: banking
     - role: teamcity
       tags: teamcity
-
-- name: Prepare build agent
-  hosts:
-    - teamcity_build_agents
-    - agent-docker
-    - github-runners
-  become: true
-  gather_facts: false
-  roles:
-    - role: docker
-      tags: docker
 
 - name: Install TeamCity build agent
   hosts: teamcity_build_agents

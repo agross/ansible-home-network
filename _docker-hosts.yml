@@ -1,0 +1,7 @@
+- name: Configure Docker
+  hosts: "{{ playbook_hosts | default([]) }}"
+  become: true
+  gather_facts: false
+  roles:
+    - role: docker
+      tags: docker
