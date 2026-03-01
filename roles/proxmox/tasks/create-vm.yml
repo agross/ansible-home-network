@@ -85,6 +85,3 @@
 - name: Configure guest VM
   ansible.builtin.import_tasks:
     file: vm/configure.yml
-
-- name: Install guest OS manually, if a VM was created
-  ansible.builtin.meta: flush_handlers

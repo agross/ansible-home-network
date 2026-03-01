@@ -58,3 +58,6 @@
     file: create-vm.yml
   tags:
     - vm
+
+- name: Install guest OS manually if a LXC or VM was created
+  ansible.builtin.meta: flush_handlers
