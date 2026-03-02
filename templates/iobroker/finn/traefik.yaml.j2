@@ -6,6 +6,11 @@ http:
       rule: Host(`iobroker.{{ network.domain }}`)
       service: {{ ansible_role_name }}
 
+    {{ ansible_role_name }}-rest:
+      entrypoints: https
+      rule: Host(`iobroker.{{ network.domain }}`) && PathPrefix(`/v1/`)
+      service: {{ ansible_role_name }}-rest
+
     {{ ansible_role_name }}-lovelace:
       entrypoints: https
       rule: Host(`lovelace.{{ network.domain }}`)
@@ -64,6 +69,11 @@ http:
       loadBalancer:
         servers:
           - url: http://{{ interfaces.lan.ip4.address }}:{{ iobroker_ports.iobroker }}
+
+    {{ ansible_role_name }}-rest:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:{{ iobroker_ports.rest }}
 
     {{ ansible_role_name }}-lovelace:
       loadBalancer:

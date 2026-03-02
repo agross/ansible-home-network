@@ -23,5 +23,6 @@ iobroker_devices:
 
 iobroker_ports:
   iobroker: 8081
+  rest: 8093
   lovelace: 8091
   telegram: 8443
