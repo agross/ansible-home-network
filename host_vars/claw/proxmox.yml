@@ -1,0 +1,17 @@
+proxmox:
+  host: pve-home
+  type: kvm
+  id: 1002
+  cores: 4
+  memory: 8192
+  net:
+    net0: virtio,bridge=vmbr0,firewall=1
+  efi_disk:
+    storage: local-zfs
+  scsi:
+    scsi0:
+      storage: local-zfs
+      size: 40
+      discard: true
+      iothread: true
+      ssd: true
