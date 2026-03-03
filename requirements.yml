@@ -13,7 +13,7 @@ roles:
   - name: geerlingguy.swap
     version: 2.0.0
   - name: lae.proxmox
-    version: v1.10.0
+    version: v1.10.1
   - name: xanmanning.k3s
     version: v3.6.2
 
