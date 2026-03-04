@@ -104,6 +104,11 @@
       "addLabels": ["skip-ansible"]
     },
     {
+      "description": "Dependencies that would cause the proxmox role to be applied",
+      "matchPackageNames": ["proxmoxer", "requests"],
+      "addLabels": ["skip-ansible"]
+    },
+    {
       "description": "Docker Hub library images (without a slash) often miss layers if pulled immediately after release, delay PR creation",
       "matchDatasources": ["docker"],
       "matchPackageNames": ["!/\\//"],
