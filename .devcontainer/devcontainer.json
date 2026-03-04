@@ -5,8 +5,18 @@
       "extensions": ["redhat.ansible"]
     }
   },
-  "image": "ghcr.io/ansible/community-ansible-dev-tools:v26.1.0",
+  "image": "ghcr.io/ansible/community-ansible-dev-tools:v26.2.0",
   "name": "ansible-dev-container-docker",
+  "postCreateCommand": [
+    "dnf",
+    "install",
+    "--assumeyes",
+    "python3-netaddr",
+    "python3-passlib",
+    "python3-bcrypt-4.3.0",
+    "python3-jmespath"
+  ],
+  "updateContentCommand": "./bootstrap",
   "runArgs": [
     "--privileged",
     "--device",
