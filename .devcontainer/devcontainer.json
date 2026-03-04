@@ -5,7 +5,7 @@
       "extensions": ["redhat.ansible"]
     }
   },
-  "image": "ghcr.io/ansible/community-ansible-dev-tools:v26.1.0",
+  "image": "ghcr.io/ansible/community-ansible-dev-tools:v26.2.0",
   "name": "ansible-dev-container-docker",
   "runArgs": [
     "--privileged",
