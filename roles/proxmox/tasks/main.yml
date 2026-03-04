@@ -33,7 +33,7 @@
   ansible.builtin.pip:
     name:
       # renovate: pypi
-      - proxmoxer==2.2.0
+      - proxmoxer==2.3.0
       # renovate: pypi
       - requests==2.32.5
     break_system_packages: true
