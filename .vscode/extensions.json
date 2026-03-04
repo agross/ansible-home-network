@@ -1,3 +1,7 @@
 {
-  "recommendations": ["redhat.ansible", "esbenp.prettier-vscode"]
+  "recommendations": [
+    "redhat.ansible",
+    "esbenp.prettier-vscode",
+    "samuelcolvin.jinjahtml"
+  ]
 }
