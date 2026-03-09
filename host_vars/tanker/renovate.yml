@@ -1,3 +1,5 @@
+renovate_host_secrets: "{{ vault_renovate_host_secrets }}"
+
 renovate_license_key: "{{ vault_renovate_license_key }}"
 
 renovate_github_app_id: "{{ vault_renovate_github_app_id }}"

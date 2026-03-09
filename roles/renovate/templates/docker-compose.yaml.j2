@@ -69,8 +69,17 @@ services:
 
       # Enable repository cache to speed up subsequent jobs on a repo.
       RENOVATE_REPOSITORY_CACHE: enabled
-    # volumes:
-    #   - ./app/logs:/logs
+      RENOVATE_PERSIST_REPO_DATA: true
+
+      # Renovate tries to detect host rules from environment variables
+      RENOVATE_DETECT_HOST_RULES_FROM_ENV: true
+      {{
+        renovate_host_secrets |
+        default({}) |
+        ansible.builtin.to_nice_yaml(indent = 2, sort_keys = false) |
+        indent(6)
+      }}
+
     depends_on:
       db:
         condition: service_healthy

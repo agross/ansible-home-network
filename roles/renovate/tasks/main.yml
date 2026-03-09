@@ -4,6 +4,11 @@
     directory: ../templates
     target: "{{ renovate_root }}"
     notify_: Restart renovate service
+    files:
+      docker-compose.yaml.j2:
+        owner: 0
+        group: 0
+        mode: "600"
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
