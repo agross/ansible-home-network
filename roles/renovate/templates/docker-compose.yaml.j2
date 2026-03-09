@@ -9,6 +9,7 @@ services:
       # For psql invocations.
       PGUSER: renovate
       PGPASSWORD: renovate
+      PGDATABASE: renovate
     volumes:
       - ./db:/var/lib/postgresql/data
     healthcheck:
