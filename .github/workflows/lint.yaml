@@ -5,7 +5,7 @@ on:
 
 # Cancel previous runs when a new commit is pushed.
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow_ref }}
   cancel-in-progress: true
 
 jobs:
