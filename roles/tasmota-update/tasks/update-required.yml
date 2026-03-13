@@ -19,7 +19,7 @@
     tasmota_update_tasmota_variant: >-
       {{
         tasmota_update_current_firmware.json.StatusFWR.Version |
-        ansible.builtin.regex_replace('.*\(release-(.*)\)$', '\1')
+        ansible.builtin.regex_replace('.*\((?:release-)?(.*)\)$', '\1')
       }}
 
 - name: Remove host if no update is required
