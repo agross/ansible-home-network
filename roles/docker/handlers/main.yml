@@ -1,0 +1,5 @@
+- name: Restart docker-image-prune timer
+  when: docker_image_prune_timer_started is not changed
+  ansible.builtin.systemd:
+    name: docker-image-prune.timer
+    state: restarted

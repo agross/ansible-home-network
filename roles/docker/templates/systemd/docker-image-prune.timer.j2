@@ -1,0 +1,10 @@
+[Unit]
+Description=Docker Image Prune Timer
+BindsTo=docker.service
+
+[Timer]
+OnCalendar=4:00
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

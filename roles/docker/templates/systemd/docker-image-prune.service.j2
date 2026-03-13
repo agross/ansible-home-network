@@ -1,0 +1,17 @@
+[Unit]
+Description=Docker Image Prune
+BindsTo=docker.service
+After=docker.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+Type=oneshot
+
+ExecStart=/usr/bin/docker image \
+                          prune \
+                          --all \
+                          --force \
+                          --filter until={{ docker_image_prune_keep_days * 24 | int }}h
+
+[Install]
+WantedBy=multi-user.target
