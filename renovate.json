@@ -62,6 +62,12 @@
       "versioning": "regex:(?<compatibility>\\w+)_(?<major>\\d+)$"
     },
     {
+      "description": "The Nextcloud AIO image uses a timestamp as its version",
+      "matchPackageNames": ["nextcloud/aio-imaginary"],
+      "versioning": "loose",
+      "maxMajorIncrement": 0
+    },
+    {
       "description": "Major updates require manual backup and restore",
       "matchPackageNames": ["postgres"],
       "matchUpdateTypes": ["major"],
