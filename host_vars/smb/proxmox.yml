@@ -60,4 +60,4 @@ zfs_datasets:
       group: 101001
     options:
       recordsize: 2M
-      quota: 400G
+      quota: 500G
