@@ -42,10 +42,6 @@
         ansible.builtin.items2dict
       }}
 
-- name: Display config
-  ansible.builtin.debug:
-    var: harbor_yml_patched
-
 - name: Write combined config to harbor.yml
   ansible.builtin.copy:
     content: "{{ harbor_yml_patched | ansible.builtin.to_nice_yaml(indent=2) }}"
