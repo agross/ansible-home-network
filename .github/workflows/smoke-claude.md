@@ -36,6 +36,7 @@ network:
     - defaults
     - github
     - playwright
+    - api.minimax.io
 sandbox:
   mcp:
     container: "ghcr.io/github/gh-aw-mcpg"
