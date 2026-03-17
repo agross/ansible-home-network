@@ -37,7 +37,7 @@ jobs:
         with:
           setup_python: false
           requirements_file: requirements.yml
-          args: --exclude .ansible
+          args: --exclude .ansible .github
 
   encrypted-vaults:
     name: Ensure vaults are encrypted
