@@ -18,6 +18,7 @@ permissions:
 name: Smoke Claude
 engine:
   id: claude
+  model: MiniMax-M2.5
   env:
     ANTHROPIC_BASE_URL: "https://api.minimax.io/anthropic"
 strict: true
