@@ -14,9 +14,12 @@ permissions:
   pull-requests: read
   discussions: read
   actions: read
-  
+
 name: Smoke Claude
-engine: claude
+engine:
+  id: claude
+  env:
+    ANTHROPIC_BASE_URL: "https://api.minimax.io/anthropic"
 strict: true
 inlined-imports: true
 imports:
