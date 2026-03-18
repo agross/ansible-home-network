@@ -3,7 +3,6 @@ dns_cname_records:
   - "dnscrypt.{{ network.domain }}"
   - "cockpit.{{ network.domain }}"
 
-  - "{{ logger_grafana_domain | ansible.builtin.mandatory }}"
   - "influxdb.{{ network.domain }}"
 
   - "iobroker.{{ network.domain }}"

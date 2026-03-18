@@ -1,7 +1,9 @@
 volumes:
   influxdb2-config:
   influxdb2-data:
+  {% if logger_install_grafana | bool %}
   grafana-data:
+  {% endif %}
 
 networks:
   default:
@@ -47,6 +49,7 @@ services:
       start_period: 30s
       interval: 5s
 
+  {% if logger_install_grafana | bool %}
   grafana:
     image: grafana/grafana:12.4.1
 
@@ -116,3 +119,4 @@ services:
     depends_on:
       influxdb:
         condition: service_healthy
+  {% endif %}

@@ -1,5 +1,7 @@
 logger_root: "/data/{{ ansible_role_name }}"
 
+logger_install_grafana: true
+
 logger_influxdb_init_user: admin
 logger_influxdb_init_password:
 logger_influxdb_init_org:

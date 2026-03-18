@@ -27,6 +27,7 @@ influxdb() {
                 /backups
 }
 
+{% if logger_install_grafana | bool %}
 grafana() {
   local target={{ logger_root | ansible.builtin.quote }}/backups/grafana
   # renovate: docker=alpine/sqlite
@@ -42,9 +43,12 @@ grafana() {
          .dump \
     > "$target/db.sql"
 }
+{% endif %}
 
 trap cleanup ERR SIGINT SIGTERM
 
 cleanup
 influxdb
+{% if logger_install_grafana | bool %}
 grafana
+{% endif %}
