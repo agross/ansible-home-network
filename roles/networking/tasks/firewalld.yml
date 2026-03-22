@@ -57,8 +57,8 @@
     zone: "{{ item.0.key }}"
     port_forward:
       - "{{ item.1 }}"
-    immediate: true
-    permanent: false
+    immediate: false
+    permanent: true
     state: enabled
   loop: >-
     {{
