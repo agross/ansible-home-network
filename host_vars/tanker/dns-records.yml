@@ -1,0 +1,2 @@
+dns_cname_records:
+  - "{{ anytype_domain }}"

@@ -13,6 +13,7 @@ dns_server_remote_servers:
   - server: "{{ hostvars['gateway-home'].dns.servers | first }}"
     domains:
       - "{{ hostvars['gateway-home'].network.domain }}"
+      - anytype.therightstuff.de
       - cloud.therightstuff.de
       - kibana.cloud.therightstuff.de
       - bitwarden.therightstuff.de

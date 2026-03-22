@@ -102,6 +102,8 @@
       tags: renovate
     - role: harbor
       tags: harbor
+    - role: anytype
+      tags: anytype
 
 - name: Hosted services on smb
   hosts: smb

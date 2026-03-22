@@ -1,0 +1,4 @@
+anytype_domain: anytype.therightstuff.de
+
+anytype_drpc_port: 33010
+anytype_quic_port: 33020

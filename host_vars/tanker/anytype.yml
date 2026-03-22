@@ -1,0 +1,1 @@
+anytype_backup_healthcheck: "{{ vault_anytype_backup_healthcheck }}"

@@ -43,6 +43,21 @@ firewalld:
           port={{ gitlab_ssh_port }}
           to-addr={{ hostvars.grossweber.interfaces.lan.ip6.address }}
           to-port={{ gitlab_ssh_port }}
+      # Anytype.
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=tcp
+          port={{ anytype_drpc_port }}
+          to-addr={{ hostvars.tanker.interfaces.lan.ip6.address }}
+          to-port={{ anytype_drpc_port }}
+      - >-
+        rule family=ipv6
+        forward-port
+          protocol=udp
+          port={{ anytype_quic_port }}
+          to-addr={{ hostvars.tanker.interfaces.lan.ip6.address }}
+          to-port={{ anytype_quic_port }}
 
     # Same ports as above, but for IPv4 and limited to our public IP.
     # Without limiting to the public IP all port-related traffic would be
@@ -86,6 +101,23 @@ firewalld:
           port={{ gitlab_ssh_port }}
           to-addr={{ hostvars.grossweber.interfaces.lan.ip4.address }}
           to-port={{ gitlab_ssh_port }}
+      # Anytype.
+      - >-
+        rule family=ipv4
+        destination ipset=public-ip4
+        forward-port
+          protocol=tcp
+          port={{ anytype_drpc_port }}
+          to-addr={{ hostvars.tanker.interfaces.lan.ip4.address }}
+          to-port={{ anytype_drpc_port }}
+      - >-
+        rule family=ipv4
+        destination ipset=public-ip4
+        forward-port
+          protocol=udp
+          port={{ anytype_quic_port }}
+          to-addr={{ hostvars.tanker.interfaces.lan.ip4.address }}
+          to-port={{ anytype_quic_port }}
 
   forward_ports:
     external:
@@ -109,3 +141,12 @@ firewalld:
         port: "{{ gitlab_ssh_port }}"
         toaddr: "{{ hostvars.grossweber.interfaces.lan.ip4.address }}"
         toport: "{{ gitlab_ssh_port }}"
+      # Anytype.
+      - proto: tcp
+        port: "{{ anytype_drpc_port }}"
+        toaddr: "{{ hostvars.tanker.interfaces.lan.ip4.address }}"
+        toport: "{{ anytype_drpc_port }}"
+      - proto: udp
+        port: "{{ anytype_quic_port }}"
+        toaddr: "{{ hostvars.tanker.interfaces.lan.ip4.address }}"
+        toport: "{{ anytype_quic_port }}"

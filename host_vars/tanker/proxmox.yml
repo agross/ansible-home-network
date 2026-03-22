@@ -166,6 +166,12 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp25:
+      host_path: /tank/anytype
+      mountpoint: /data/anytype/data
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -362,3 +368,10 @@ zfs_datasets:
     chown:
       owner: 100999
       group: 100999
+
+  tank/anytype:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      recordsize: 16K
