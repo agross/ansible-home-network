@@ -65,6 +65,7 @@ docker_daemon_opts:
 
   disable_ipv6:
     ipv6: false
+    dns: "{{ dns.servers | select('ansible.utils.ipv4') }}"
 
   default:
     <<: [*ipv6, *log-limits, *do-not-use-resolved]
