@@ -512,7 +512,7 @@ reject_ttl = 10
 
 ## Enable a DNS cache to reduce latency and outgoing traffic
 
-cache = false
+cache = true
 
 
 ## Cache size
@@ -532,12 +532,12 @@ cache_max_ttl = 86400
 
 ## Minimum TTL for negatively cached entries
 
-cache_neg_min_ttl = 60
+cache_neg_min_ttl = 0
 
 
 ## Maximum TTL for negatively cached entries
 
-cache_neg_max_ttl = 600
+cache_neg_max_ttl = 10
 
 
 ###############################################################################
