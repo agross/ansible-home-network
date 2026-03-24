@@ -3,7 +3,7 @@ services:
     ports:
       - 5432:5432
 
-  mediakit:
+  deduper:
     image: razgrizhsu/immich-deduper:0.2.13
     ports:
       - 8086:8086
@@ -29,8 +29,3 @@ services:
     image: qdrant/qdrant:v1.17.0
     volumes:
       - ./mediakit/qdrant:/qdrant/storage
-    networks:
-      default:
-        aliases:
-          # https://github.com/RazgrizHsu/immich-mediakit/issues/39#issuecomment-3619771699
-          - immich-deduper-qdrant
