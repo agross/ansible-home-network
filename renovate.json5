@@ -161,7 +161,7 @@
         'docker',
       ],
       matchPackageNames: [
-        '!*/*',
+        '!*/**',
       ],
       minimumReleaseAge: '2 days',
       internalChecksFilter: 'strict',
