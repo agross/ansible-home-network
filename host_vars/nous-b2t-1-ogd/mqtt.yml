@@ -1,0 +1,2 @@
+mqtt_accounts:
+  nous-b2t-1-ogd: "{{ vault_mqtt_accounts_nous_b2t_1 }}"

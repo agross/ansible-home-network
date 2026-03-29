@@ -1,0 +1,4 @@
+tasmota_config_device_model: NOUS B2T
+
+tasmota_config_template: >-
+  {"NAME":"NOUS B2T","GPIO":[544,3200,1,8160,32,160,1,1,224,0,0,1,1,1,0,1,0,1,1,1,0,1,1,1,0,0,0,0,1,1,1,0,1,0,0,1],"FLAG":0,"BASE":1}

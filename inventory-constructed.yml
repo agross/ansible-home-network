@@ -58,13 +58,17 @@ groups:
   tasmotas: >-
     inventory_hostname is match("gosund-sp111-") or
     inventory_hostname is match("nous-a1t-") or
+    inventory_hostname is match("nous-b2t-") or
     inventory_hostname is match("shelly")
 
   gosunds: >-
     inventory_hostname is match("gosund-sp111-")
 
-  nouses: >-
+  nouse-a1ts: >-
     inventory_hostname is match("nous-a1t-")
+
+  nouse-b2ts: >-
+    inventory_hostname is match("nous-b2t-")
 
   shellies: >-
     inventory_hostname is match("shelly")
