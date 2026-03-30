@@ -1,0 +1,10 @@
+[Unit]
+Description=Docker Buildx Prune Timer
+BindsTo=docker.service
+
+[Timer]
+OnCalendar=4:30
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

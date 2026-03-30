@@ -3,3 +3,8 @@ docker_image_prune_enabled: true
 # Remove images created before x days ago.
 # https://docs.docker.com/reference/cli/docker/image/prune/#filter
 docker_image_prune_keep_days: 14
+
+docker_buildx_prune_enabled: true
+
+# https://docs.docker.com/reference/cli/docker/buildx/prune/#filter
+docker_buildx_prune_keep_days: 7

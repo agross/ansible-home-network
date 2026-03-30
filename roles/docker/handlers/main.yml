@@ -3,3 +3,9 @@
   ansible.builtin.systemd:
     name: docker-image-prune.timer
     state: restarted
+
+- name: Restart docker-buildx-prune timer
+  when: docker_buildx_prune_timer_started is not changed
+  ansible.builtin.systemd:
+    name: docker-buildx-prune.timer
+    state: restarted
