@@ -35,7 +35,7 @@
       # renovate: pypi
       - proxmoxer==2.3.0
       # renovate: pypi
-      - requests==2.33.0
+      - requests==2.33.1
     break_system_packages: true
   tags:
     - lxc
