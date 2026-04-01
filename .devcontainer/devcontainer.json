@@ -5,7 +5,7 @@
       "extensions": ["redhat.ansible"]
     }
   },
-  "image": "ghcr.io/ansible/community-ansible-dev-tools:v26.3.1",
+  "image": "ghcr.io/ansible/community-ansible-dev-tools:26.4.0",
   "name": "ansible-dev-container-docker",
   "postCreateCommand": [
     "dnf",
