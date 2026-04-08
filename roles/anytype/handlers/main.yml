@@ -2,4 +2,4 @@
   when: anytype_started is not changed
   ansible.builtin.systemd:
     name: anytype.service
-    state: restarted
+    state: reloaded
