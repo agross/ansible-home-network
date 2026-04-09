@@ -13,5 +13,8 @@ ExecStop=/usr/bin/docker compose stop
 
 ExecReload=/usr/bin/docker compose up --detach
 
+# docker compose up will sometimes exit with 128 + SIGINT = 130.
+SuccessExitStatus=130
+
 [Install]
 WantedBy=multi-user.target
