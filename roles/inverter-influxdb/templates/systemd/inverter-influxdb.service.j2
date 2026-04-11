@@ -1,0 +1,20 @@
+[Unit]
+Description=Write inverter data to InfluxDB
+BindsTo=docker.service
+After=docker.service adb-server.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+WorkingDirectory={{ inverter_influxdb_root }}
+
+ExecStartPre=/usr/bin/docker compose config
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose stop
+
+ExecReload=/usr/bin/docker compose up --detach
+
+# docker compose up will sometimes exit with 128 + SIGINT = 130.
+SuccessExitStatus=130
+
+[Install]
+WantedBy=multi-user.target

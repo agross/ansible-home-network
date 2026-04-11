@@ -1,1 +1,5 @@
 site: home
+
+site_latitude: "{{ vault_site_latitude }}"
+site_longitude: "{{ vault_site_longitude }}"
+site_altitude: 113

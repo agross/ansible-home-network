@@ -1,0 +1,21 @@
+services:
+  app:
+    image: ghcr.io/agross/hms-800w-2t-influxdb:12
+    restart: unless-stopped
+    environment:
+      HOST: 172.16.0.128
+      INTERVAL: 60
+
+      TZ: Europe/Berlin
+      LOGGING_LEVEL: INFO
+
+      SUNSET_DISABLED: false
+      SUNSET_LATITUDE: {{ site_latitude }}
+      SUNSET_LONGITUDE: {{ site_longitude }}
+      SUNSET_ALTITUDE: {{ site_altitude }}
+
+      INFLUX_URL: {{ inverter_influxdb_influxdb_address}}
+      INFLUX_TOKEN: {{ inverter_influxdb_influxdb_token }}
+      INFLUX_ORG: {{ inverter_influxdb_influxdb_org }}
+      INFLUX_BUCKET: {{ inverter_influxdb_influxdb_bucket }}
+      INFLUX_MEASUREMENT: {{ inverter_influxdb_influxdb_measurement }}

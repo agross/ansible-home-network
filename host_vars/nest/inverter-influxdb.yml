@@ -1,0 +1,6 @@
+inverter_influxdb_influxdb_address: https://influxdb.home.therightstuff.de
+inverter_influxdb_influxdb_token: "{{ vault_inverter_influxdb_influxdb_token }}"
+
+inverter_influxdb_influxdb_org: home
+inverter_influxdb_influxdb_bucket: productions
+inverter_influxdb_influxdb_measurement: inverter
