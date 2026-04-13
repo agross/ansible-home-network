@@ -93,7 +93,7 @@
 
     - name: Allow exporter port through firewalld
       ansible.posix.firewalld:
-        port: "{{ item.port }}"
+        port: "{{ item.port }}/{{ port_type }}"
         zone: >-
           {{
             interfaces.lan.zone |
@@ -102,9 +102,11 @@
         immediate: true
         permanent: true
         state: enabled
+      vars:
+        port_type: "{{ item.port_type | default('tcp') }}"
       loop: >-
         {{
           node_exporter_roles | rejectattr('firewalld_service', 'defined')
         }}
       loop_control:
-        label: "port={{ item.port }}"
+        label: "port={{ item.port }}/{{ port_type }}"
