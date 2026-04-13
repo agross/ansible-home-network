@@ -26,3 +26,5 @@ node_exporter_enabled_collectors:
           '^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+|zd\d.*$' |
           ansible.builtin.regex_replace('\\', '\\\\')
         }}
+
+systemd_exporter_enable_restart_count: true

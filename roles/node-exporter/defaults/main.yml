@@ -13,6 +13,17 @@ node_exporter_candidates:
       port: "{{ cadvisor_port }}"
       job: cadvisor
 
+  - enabled: >-
+      {{
+        ansible_facts.service_mgr == 'systemd' and
+        'synoboot' not in ansible_facts.devices
+      }}
+    value:
+      role: prometheus.prometheus.systemd_exporter
+      firewalld_service: systemd-exporter
+      port: 9558
+      job: systemd
+
 node_exporter_dynamic_roles: >-
   {{
     node_exporter_candidates |
