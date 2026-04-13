@@ -5,6 +5,8 @@ scrape_configs:
         - app/*.yml
 
   - job_name: cadvisor
+    # https://github.com/prometheus-community/ansible/tree/main/roles/cadvisor#prometheus-config
+    track_timestamps_staleness: true
     file_sd_configs:
       - files:
         - cadvisor/*.yml
