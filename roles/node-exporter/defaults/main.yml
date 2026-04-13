@@ -1,26 +1,30 @@
-node_exporter_default_roles:
-  - role: prometheus.prometheus.node_exporter
-    firewalld_service: prometheus-node-exporter
-    port: 9100
-    job: node
+node_exporter_candidates:
+  - enabled: true
+    value:
+      role: prometheus.prometheus.node_exporter
+      firewalld_service: prometheus-node-exporter
+      port: 9100
+      job: node
 
-node_exporter_cadvisor:
-  role: prometheus.prometheus.cadvisor
-  firewalld_service: cadvisor
-  port: "{{ cadvisor_port }}"
-  job: cadvisor
+  - enabled: "{{ 'docker0' in ansible_facts.interfaces }}"
+    value:
+      role: prometheus.prometheus.cadvisor
+      firewalld_service: cadvisor
+      port: "{{ cadvisor_port }}"
+      job: cadvisor
 
 node_exporter_dynamic_roles: >-
   {{
-    [node_exporter_cadvisor] if 'docker0' in ansible_facts.interfaces
-    else []
+    node_exporter_candidates |
+    selectattr('enabled') |
+    map(attribute = 'value') |
+    list
   }}
 
 node_exporter_extras: []
 
 node_exporter_roles: >-
   {{
-    node_exporter_default_roles +
     node_exporter_dynamic_roles +
     node_exporter_extras
   }}
