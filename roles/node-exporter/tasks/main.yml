@@ -13,9 +13,9 @@
     src: exporter.yaml.j2
     dest: >-
       {{
-        hostvars[item.0].prometheus_dynamic_file_configuration
+        hostvars[exporter.0].prometheus_dynamic_file_configuration
       }}/{{
-        item.1.job
+        exporter.1.job
       }}/{{
         inventory_hostname
       }}.yml
@@ -24,8 +24,8 @@
     group: 0
     mode: "644"
   vars:
-    job_port: "{{ item.1.port }}"
-  delegate_to: "{{ item.0 }}"
+    job_port: "{{ exporter.1.port }}"
+  delegate_to: "{{ exporter.0 }}"
   loop: >-
     {{
       groups[site] |
@@ -33,4 +33,5 @@
       ansible.builtin.product(node_exporter_roles)
     }}
   loop_control:
-    label: "job={{ item.1.job }} port={{ item.1.port }}"
+    loop_var: exporter
+    label: "job={{ exporter.1.job }} port={{ exporter.1.port }}"
