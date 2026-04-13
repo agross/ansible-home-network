@@ -39,6 +39,11 @@ scrape_configs:
       - files:
         - smartctl/*.yml
 
+  - job_name: systemd
+    file_sd_configs:
+      - files:
+        - systemd/*.yml
+
   - job_name: zfs
     file_sd_configs:
       - files:
