@@ -22,5 +22,5 @@
     - name: Allow non-root users to run ether-wake
       community.general.capabilities:
         path: /usr/bin/ether-wake
-        capability: cap_net_raw+ep
+        capability: cap_net_raw=ep
         state: present
