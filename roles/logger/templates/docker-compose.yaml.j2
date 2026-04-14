@@ -51,7 +51,7 @@ services:
 
   {% if logger_install_grafana | bool %}
   grafana:
-    image: grafana/grafana:12.4.2
+    image: grafana/grafana:13.0.0
 
     restart: unless-stopped
     environment:
