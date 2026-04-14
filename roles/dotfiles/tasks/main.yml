@@ -1,5 +1,5 @@
 - name: Install dotfiles for agross
-  when: ansible_env.SUDO_USER == 'agross'
+  when: ansible_facts.env.SUDO_USER == 'agross'
   ansible.builtin.import_tasks:
     file: install.yml
 
