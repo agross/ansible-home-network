@@ -1,0 +1,9 @@
+- name: Install locales
+  ansible.builtin.package:
+    name: locales
+    state: present
+
+- name: Generate locale
+  community.general.locale_gen:
+    name: en_US.UTF-8
+    state: present
