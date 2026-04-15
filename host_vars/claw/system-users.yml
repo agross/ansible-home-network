@@ -1,0 +1,5 @@
+host_system_users:
+  claw:
+    name: OpenClaw
+    shell: /bin/bash
+    github: agross
