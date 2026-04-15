@@ -115,6 +115,12 @@
     - role: samba
       tags: samba
 
+- name: OpenClaw
+  hosts: claw
+  become: true
+  gather_facts: false
+  roles: []
+
 - name: Hosted services on grossweber
   hosts: grossweber
   become: true
