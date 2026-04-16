@@ -1,0 +1,68 @@
+- name: Ensure dependencies are installed
+  become: true
+  become_user: "{{ openclaw_user }}"
+  ansible.builtin.command:
+    argv:
+      - "{{ openclaw_homebrew_dir }}/bin/brew"
+      - install
+      - nodejs
+      - uv
+      - gogcli
+      - gh
+    creates: "{{ openclaw_homebrew_dir }}/bin/npm"
+
+- name: Install OpenClaw via npm
+  become: true
+  become_user: "{{ openclaw_user }}"
+  ansible.builtin.command:
+    argv:
+      - "{{ openclaw_homebrew_dir }}/bin/npm"
+      - install
+      - --global
+      - openclaw
+    creates: "{{ openclaw_homebrew_dir }}/lib/node_modules/openclaw/package.json"
+
+- name: Create workspace
+  become: true
+  become_user: "{{ openclaw_user }}"
+  ansible.builtin.command:
+    argv:
+      - /home/linuxbrew/.linuxbrew/bin/openclaw
+      - setup
+    creates: "/home/{{ openclaw_user }}/.openclaw/workspace"
+
+- name: Tighten permissions on ~/.openclaw
+  ansible.builtin.file:
+    path: "/home/{{ openclaw_user }}/.openclaw"
+    state: directory
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_user }}"
+    mode: "700"
+
+- name: Ensure OpenClaw shell completion works
+  ansible.builtin.lineinfile:
+    path: "/home/{{ openclaw_user }}/.dotfiles/local/openclaw.zsh"
+    create: true
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_user }}"
+    mode: "644"
+    line: >-
+      source "/home/{{ openclaw_user }}/.openclaw/completions/openclaw.zsh"
+
+- name: Ensure systemd lingering is enabled for the OpenClaw user
+  ansible.builtin.command:
+    argv:
+      - loginctl
+      - enable-linger
+      - "{{ openclaw_user }}"
+    creates: "/var/lib/systemd/linger/{{ openclaw_user }}"
+
+- name: Install gateway service
+  remote_user: "{{ openclaw_user }}"
+  become: false
+  ansible.builtin.command:
+    argv:
+      - /home/linuxbrew/.linuxbrew/bin/openclaw
+      - gateway
+      - install
+    creates: "/home/{{ openclaw_user }}/.config/systemd/user/openclaw-gateway.service"

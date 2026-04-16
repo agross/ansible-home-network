@@ -1,0 +1,11 @@
+- name: Install dotfiles for the OpenClaw user
+  ansible.builtin.import_tasks:
+    file: dotfiles.yml
+
+- name: Install Linuxbrew
+  ansible.builtin.import_tasks:
+    file: linuxbrew.yml
+
+- name: Install OpenClaw
+  ansible.builtin.import_tasks:
+    file: openclaw.yml

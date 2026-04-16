@@ -1,0 +1,59 @@
+- name: Get Homebrew binary details
+  ansible.builtin.stat:
+    path: "{{ openclaw_homebrew_dir }}/bin/brew"
+  register: openclaw_linuxbrew_stat
+
+- name: Install Homebrew
+  when: not openclaw_linuxbrew_stat.stat.exists
+  environment:
+    PATH: "{{ openclaw_homebrew_dir }}/bin:{{ ansible_facts.env.PATH }}"
+  block:
+    - name: Ensure dependencies are installed
+      ansible.builtin.package:
+        name:
+          - build-essential
+          - procps
+          - curl
+          - file
+          - git
+
+    - name: Create Homebrew directory
+      ansible.builtin.file:
+        path: "{{ openclaw_homebrew_dir }}"
+        state: directory
+        owner: 0
+        group: 0
+        mode: "755"
+
+    - name: Download Homebrew installer
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+        dest: /tmp/linuxbrew-install.sh
+        owner: 0
+        group: 0
+        mode: "755"
+
+    - name: Install Homebrew # noqa: command-instead-of-shell
+      become: false
+      # ansible.builtin.command fails with:
+      # Task failed: Module failed: Error executing command: can't concat NoneType to bytes
+      ansible.builtin.shell:
+        cmd: /tmp/linuxbrew-install.sh
+        creates: "{{ openclaw_homebrew_dir }}/bin/brew"
+
+    - name: Set Homebrew installation root ownership so the OpenClaw user can use it
+      ansible.builtin.file:
+        path: "{{ openclaw_homebrew_dir }}"
+        state: directory
+        recurse: true
+        owner: "{{ openclaw_user }}"
+        group: "{{ openclaw_user }}"
+
+- name: Ensure Homebrew can be used from Bash
+  ansible.builtin.lineinfile:
+    path: "/home/{{ openclaw_user }}/.dotfiles/local/homebrew.zsh"
+    create: true
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_user }}"
+    mode: "644"
+    line: eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"

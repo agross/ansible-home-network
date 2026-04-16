@@ -1,0 +1,22 @@
+- name: Clone dotfiles # noqa latest[git]
+  remote_user: "{{ openclaw_user }}"
+  become: false
+  ansible.builtin.git:
+    repo: https://github.com/agross/dotfiles.git
+    version: HEAD
+    dest: "/home/{{ openclaw_user }}/.dotfiles"
+
+- name: Bootstrap dotfiles
+  remote_user: "{{ openclaw_user }}"
+  become: false
+  ansible.builtin.command:
+    argv:
+      - "/home/{{ openclaw_user }}/.dotfiles/bootstrap"
+      - --force
+  register: openclaw_dotfiles_bootstrapper
+  changed_when: "'] Linked' in openclaw_dotfiles_bootstrapper.stdout"
+
+- name: Change shell to zsh
+  ansible.builtin.user:
+    name: "{{ openclaw_user }}"
+    shell: /bin/zsh
