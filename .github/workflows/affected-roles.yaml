@@ -13,6 +13,10 @@ jobs:
       pull-requests: write
       issues: write
 
+    env:
+      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
     steps:
       - name: Get full commit history
         uses: actions/checkout@v6
@@ -27,14 +31,12 @@ jobs:
 
       - name: Show PR commit information
         run: |
-          echo "pull_request.base.sha=${{ github.event.pull_request.base.sha }}"
-          echo "pull_request.head.sha=${{ github.event.pull_request.head.sha }}"
+          echo "pull_request.base.sha=$PR_BASE_SHA"
+          echo "pull_request.head.sha=$PR_HEAD_SHA"
 
       - name: Show affected files
         run: |
-          git diff \
-              --name-status \
-              ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+          git diff --name-status "$PR_BASE_SHA..$PR_HEAD_SHA"
 
       - name: Determine roles from affected files
         id: affected-roles
@@ -44,7 +46,7 @@ jobs:
 
             git diff \
                 --name-only \
-                ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} \
+                "$PR_BASE_SHA..$PR_HEAD_SHA" \
                 -- \
                 host_vars \
                 group_vars \
@@ -59,15 +61,19 @@ jobs:
 
       - name: Show roles
         run: |
-          printf 'Roles affected by the PR: %s\n' "${{ steps.affected-roles.outputs.roles }}"
+          printf 'Roles affected by the PR: %s\n' "$ROLES"
+        env:
+          ROLES: ${{ steps.affected-roles.outputs.roles }}
 
       - name: Set role labels
         if: steps.affected-roles.outputs.roles != ''
         run: |
-          for role in ${{ steps.affected-roles.outputs.roles }}; do
+          for role in $ROLES; do
             label="role:$role"
             gh label create "$label" --color fbca04 --force
-            gh issue edit "${{ github.event.number }}" --add-label "$label"
+            gh issue edit "$PR_NUMBER" --add-label "$label"
           done
         env:
+          ROLES: ${{ steps.affected-roles.outputs.roles }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}

@@ -14,6 +14,11 @@ jobs:
       github.event.pull_request.merged == true &&
       !contains(github.event.pull_request.labels.*.name, 'skip-ansible')
 
+    env:
+      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+
     outputs:
       roles: ${{ steps.affected-roles.outputs.roles }}
 
@@ -31,9 +36,7 @@ jobs:
 
       - name: Download original PR branch
         run: |
-          git fetch \
-              origin \
-              ${{ github.event.pull_request.head.sha }}
+          git fetch origin "$PR_HEAD_SHA"
 
       # If merging the PR caused a rebase (because new commits have been added
       # to the PR target branch before the PR was merged):
@@ -43,25 +46,23 @@ jobs:
       - name: Compute base commit
         id: base-commit
         run: |
-          echo "pull_request.base.sha=${{ github.event.pull_request.base.sha }}"
-          echo "pull_request.merge_commit_sha=${{ github.event.pull_request.merge_commit_sha }}"
-          echo "pull_request.head.sha=${{ github.event.pull_request.head.sha }}"
+          echo "pull_request.base.sha=$PR_BASE_SHA"
+          echo "pull_request.merge_commit_sha=$PR_MERGE_SHA"
+          echo "pull_request.head.sha=$PR_HEAD_SHA"
 
           {
             echo 'sha<<SHA'
 
-            git merge-base \
-                ${{ github.event.pull_request.merge_commit_sha }} \
-                ${{ github.event.pull_request.head.sha }}
+            git merge-base "$PR_MERGE_SHA" "$PR_HEAD_SHA"
 
             echo SHA
           } >> "$GITHUB_OUTPUT"
 
       - name: Show affected files
         run: |
-          git diff \
-              --name-status \
-              ${{ steps.base-commit.outputs.sha }}..${{ github.event.pull_request.head.sha }}
+          git diff --name-status "$PR_REAL_BASE_SHA..$PR_HEAD_SHA"
+        env:
+          PR_REAL_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
 
       - name: Determine roles from affected files
         id: affected-roles
@@ -71,7 +72,7 @@ jobs:
 
             git diff \
                 --name-only \
-                ${{ steps.base-commit.outputs.sha }}..${{ github.event.pull_request.head.sha }} \
+                "$PR_REAL_BASE_SHA..$PR_HEAD_SHA" \
                 -- \
                 host_vars \
                 group_vars \
@@ -83,12 +84,14 @@ jobs:
 
             echo ROLES
           } >> "$GITHUB_OUTPUT"
+        env:
+          PR_REAL_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
 
       - name: Show roles
-        env:
-          ROLES: ${{ steps.affected-roles.outputs.roles }}
         run: |
           printf 'Roles affected by the merge: %s\n' "$ROLES"
+        env:
+          ROLES: ${{ steps.affected-roles.outputs.roles }}
 
   run-ansible:
     name: Run Ansible with tags ${{ needs.affected-roles.outputs.roles }}

@@ -46,13 +46,17 @@ jobs:
 
       - name: Save SSH keyfile
         run: |
-          printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" > .ansible-ssh-private-key
+          printf '%s' "$SSH_PRIVATE_KEY" > .ansible-ssh-private-key
           chmod 600 .ansible-ssh-private-key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Save ansible vault password for vault ID "agross2"
         run: |
-          printf '%s' "${{ secrets.ANSIBLE_VAULT_AGROSS2 }}" > .ansible-vault-agross2
+          printf '%s' "$ANSIBLE_VAULT_AGROSS2" > .ansible-vault-agross2
           chmod 600 .ansible-vault-agross2
+        env:
+          ANSIBLE_VAULT_AGROSS2: ${{ secrets.ANSIBLE_VAULT_AGROSS2 }}
 
       - uses: actions/cache@v5
         with:
@@ -75,26 +79,29 @@ jobs:
 
       - name: Gather facts
         run: |
-          ./gather-facts "${{ matrix.site }}" \
+          ./gather-facts "$SITE" \
                          --vault-id agross2@.ansible-vault-agross2 \
                          --user agross \
                          --key-file .ansible-ssh-private-key
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
           ANSIBLE_FORCE_COLOR: True
+          SITE: ${{ matrix.site }}
         # Because some hosts might not be reachable.
         continue-on-error: true
 
       - name: Run Ansible
         run: |
-          ansible-playbook "${{ matrix.site }}.yml" \
-                           --tags "${{ inputs.tags }}" \
+          ansible-playbook "$SITE.yml" \
+                           --tags "$TAGS" \
                            --vault-id agross2@.ansible-vault-agross2 \
                            --user agross \
                            --key-file .ansible-ssh-private-key
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
           ANSIBLE_FORCE_COLOR: True
+          SITE: ${{ matrix.site }}
+          TAGS: ${{ inputs.tags }}
 
       - name: Clean up secrets
         if: always()
