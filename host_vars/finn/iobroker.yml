@@ -1,5 +1,3 @@
-iobroker_backup_healthcheck: "{{ vault_iobroker_backup_healthcheck }}"
-
 iobroker_direct_network_access: false
 
 iobroker_devices:

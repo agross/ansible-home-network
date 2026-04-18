@@ -1,1 +1,0 @@
-teamcity_backup_healthcheck: "{{ vault_teamcity_backup_healthcheck }}"

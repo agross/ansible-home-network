@@ -1,1 +1,0 @@
-netboot_backup_healthcheck: "{{ vault_netboot_backup_healthcheck }}"

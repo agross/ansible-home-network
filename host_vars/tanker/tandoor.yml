@@ -1,5 +1,3 @@
-tandoor_backup_healthcheck: "{{ vault_tandoor_backup_healthcheck }}"
-
 tandoor_secret_key: "{{ vault_tandoor_secret_key }}"
 
 tandoor_smtp_user: "{{ google_smtp_user }}"

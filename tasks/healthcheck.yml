@@ -1,0 +1,21 @@
+- name: Ensure healthcheck exists
+  community.healthchecksio.checks:
+    management_api_base_url: "{{ healthchecks_base_url }}/api/v1"
+    ping_api_base_url: "{{ healthchecks_base_url }}"
+    api_key: "{{ healthchecks_api_key }}"
+    state: present
+    name: "{{ healthcheck_name | ansible.builtin.mandatory }}"
+    desc: "{{ healthcheck_description | default(omit) }}"
+    unique:
+      - name
+      - tags
+    tags: "{{ healthcheck_tags | default([]) }}"
+    grace: "{{ healthcheck_grace | default('24h' | community.general.to_seconds) }}"
+    timeout: "{{ healthcheck_timeout | default('2h' | community.general.to_seconds) }}"
+    channels: "{{ healthcheck_channels | default('*') }}"
+  register: healthcheck
+
+- name: Store result in a variable in addition to "healthcheck"
+  when: register_ | default('healthcheck', true) != 'healthcheck'
+  ansible.builtin.set_fact:
+    "{{ register_ }}": "{{ healthcheck }}"

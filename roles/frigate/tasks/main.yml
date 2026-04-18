@@ -17,6 +17,15 @@
     name: intel-gpu-tools
     state: present
 
+- name: Ensure backup healthcheck exists
+  ansible.builtin.import_tasks:
+    file: healthcheck.yml
+  vars:
+    healthcheck_name: "{{ ansible_role_name }}"
+    healthcheck_tags:
+      - "site:{{ site }}"
+      - "host:{{ inventory_hostname }}"
+
 - name: Copy templates
   ansible.builtin.import_tasks:
     file: copy-templates.yml

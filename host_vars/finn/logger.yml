@@ -1,5 +1,3 @@
-logger_backup_healthcheck: "{{ vault_logger_backup_healthcheck }}"
-
 logger_install_grafana: false
 
 logger_influxdb_init_password: "{{ vault_influxdb_init_password }}"

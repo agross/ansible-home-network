@@ -1,3 +1,12 @@
+- name: Ensure backup healthcheck exists
+  ansible.builtin.import_tasks:
+    file: healthcheck.yml
+  vars:
+    healthcheck_name: "{{ ansible_role_name }}"
+    healthcheck_tags:
+      - "site:{{ site }}"
+      - "host:{{ inventory_hostname }}"
+
 - name: Copy templates
   ansible.builtin.import_tasks:
     file: copy-templates.yml
@@ -24,12 +33,6 @@
     file: restore.yml
   vars:
     restore_target_dir: "{{ tandoor_root }}"
-
-- name: Symlink backup configuration
-  ansible.builtin.file:
-    state: link
-    src: "{{ tandoor_root }}/backup.yaml"
-    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml

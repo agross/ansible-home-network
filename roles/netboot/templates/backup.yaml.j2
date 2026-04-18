@@ -27,4 +27,4 @@ exclude_patterns:
 healthchecks:
   # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors,
   # or to send only logs.
-  ping_url: "{{ netboot_backup_healthcheck }}"
+  ping_url: {{ healthcheck.data.ping_url }}

@@ -32,4 +32,4 @@ commands:
 healthchecks:
   # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors,
   # or to send only logs.
-  ping_url: "{{ gitlab_backup_healthcheck }}"
+  ping_url: {{ healthcheck.data.ping_url }}

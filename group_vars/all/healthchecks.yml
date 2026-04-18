@@ -1,0 +1,2 @@
+healthchecks_base_url: https://healthchecks.grossweber.com
+healthchecks_api_key: "{{ vault_healthchecks_api_key }}"

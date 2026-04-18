@@ -22,12 +22,15 @@ collections:
     version: 2.1.0
   - name: ansible.utils
     version: 6.0.2
-  - name: community.general
-    version: 12.6.0
-  - name: community.proxmox
-    version: 1.6.0
   - name: community.docker
     version: 5.2.0
+  - name: community.general
+    version: 12.6.0
+  - name: https://github.com/ansible-collections/community.healthchecksio
+    type: git
+    version: 38c4e8085f572d5ac1ccef751b8401160a5509ff
+  - name: community.proxmox
+    version: 1.6.0
   - name: devsec.hardening
     version: 10.5.2
   - name: hifis.toolkit

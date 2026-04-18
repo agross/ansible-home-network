@@ -7,10 +7,20 @@
   loop_control:
     loop_var: file
 
+- name: Ensure backup healthcheck exists
+  ansible.builtin.import_tasks:
+    file: healthcheck.yml
+  vars:
+    healthcheck_name: system
+    healthcheck_tags:
+      - "site:{{ site }}"
+      - "host:{{ inventory_hostname }}"
+
 - name: Install borgmatic
-  # Import so vars are exposed, we need _borgbackup_config.name for validation.
-  ansible.builtin.import_role:
+  ansible.builtin.include_role:
     name: borgbase.ansible_role_borgbackup
+    # Expose vars, we need _borgbackup_config.name for validation.
+    public: true
   vars:
     borgbackup_install: >-
       {{

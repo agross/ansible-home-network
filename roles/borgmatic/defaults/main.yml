@@ -22,5 +22,5 @@ borgmatic_borgbackup_config:
   encryption_passphrase: "{{ borgmatic_encryption_passphrase }}"
   hooks:
     healthchecks:
-      ping_url: "{{ borgmatic_system_backup_healthcheck }}"
+      ping_url: "{{ healthcheck.data.ping_url }}"
   extra: "{{ borgmatic_extra_config | default({}) }}"
