@@ -1,5 +1,0 @@
-- name: Restart inverter-influxdb service
-  when: inverter_influxdb_started is not changed
-  ansible.builtin.systemd:
-    name: inverter-influxdb.service
-    state: reloaded

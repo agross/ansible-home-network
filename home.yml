@@ -74,8 +74,6 @@
       tags: iobroker
     - role: logger
       tags: logger
-    - role: inverter-influxdb
-      tags: inverter-influxdb
 
 - name: Hosted services on tanker
   hosts: tanker
