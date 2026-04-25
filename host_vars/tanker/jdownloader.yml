@@ -1,0 +1,3 @@
+jdownloader_backup_healthcheck: "{{ vault_jdownloader_backup_healthcheck }}"
+
+jdownloader_users: "{{ vault_jdownloader_users }}"

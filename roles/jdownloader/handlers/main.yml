@@ -1,0 +1,5 @@
+- name: Restart jdownloader service
+  when: jdownloader_started is not changed
+  ansible.builtin.systemd:
+    name: jdownloader.service
+    state: reloaded
