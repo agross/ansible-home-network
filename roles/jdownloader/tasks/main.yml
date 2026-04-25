@@ -1,0 +1,47 @@
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ jdownloader_root }}"
+    notify_: Restart jdownloader service
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ jdownloader_root }}"
+    pull: true
+    build: true
+    notify_: Restart jdownloader service
+
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ jdownloader_root }}"
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ jdownloader_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ jdownloader_root }}/systemd"
+    local_units: templates/systemd
+    notify_: Restart jdownloader service
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: jdownloader_started
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

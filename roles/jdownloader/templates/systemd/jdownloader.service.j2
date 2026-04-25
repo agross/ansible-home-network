@@ -1,0 +1,20 @@
+[Unit]
+Description=JDownloader
+BindsTo=docker.service
+After=docker.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+WorkingDirectory={{ jdownloader_root }}
+
+ExecStartPre=/usr/bin/docker compose config
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose stop
+
+ExecReload=/usr/bin/docker compose up --detach
+
+# docker compose up will sometimes exit with 128 + SIGINT = 130.
+SuccessExitStatus=130
+
+[Install]
+WantedBy=multi-user.target

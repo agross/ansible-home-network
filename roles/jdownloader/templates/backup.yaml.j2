@@ -1,0 +1,42 @@
+<<: !include /etc/borgmatic/config.yaml
+
+# Constants to use in the configuration file. Within option values, all
+# occurrences of the constant name in curly braces will be replaced with the
+# constant value. For example, if you have a constant named "app_name" with the
+# value "myapp", then the string "{app_name}" will be replaced with "myapp" in
+# the configuration file.
+constants:
+  name: {{ ansible_role_name }}
+  unit: jdownloader.service
+
+# List of source directories and files to back up. Globs and tildes
+# are expanded. Do not backslash spaces in path names.
+source_directories: !retain
+  - {{ jdownloader_root }}/app
+
+# Any paths matching these patterns are excluded from backups. Globs and tildes
+# are expanded. Note that a glob pattern must either start with a glob or be an
+# absolute path. Do not backslash spaces in path names. See the output of "borg
+# help patterns" for more details.
+exclude_patterns:
+  - {{ jdownloader_root }}/app/JD2.lock
+  - {{ jdownloader_root }}/app/JDownloader.pid
+
+  - {{ jdownloader_root }}/app/license.txt
+  - {{ jdownloader_root }}/app/license_german.txt
+
+  - {{ jdownloader_root }}/app/captchas
+  - {{ jdownloader_root }}/app/licenses
+  - {{ jdownloader_root }}/app/log
+  - {{ jdownloader_root }}/app/logs
+  - {{ jdownloader_root }}/app/tmp
+  - {{ jdownloader_root }}/app/update
+  - {{ jdownloader_root }}/app/xdg
+
+# Configuration for a monitoring integration with Healthchecks. Create an
+# account at https://healthchecks.io (or self-host Healthchecks) if you'd like
+# to use this service. See borgmatic monitoring documentation for details.
+healthchecks:
+  # Healthchecks ping URL or UUID to notify when a backup begins, ends, errors,
+  # or to send only logs.
+  ping_url: "{{ jdownloader_backup_healthcheck }}"

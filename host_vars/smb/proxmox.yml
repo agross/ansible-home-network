@@ -47,6 +47,11 @@ proxmox:
       mountpoint: /shares/time-machine
       options:
         mountoptions: discard;noatime
+    mp3:
+      host_path: /tank/downloads
+      mountpoint: /shares/downloads
+      options:
+        mountoptions: discard;noatime
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/

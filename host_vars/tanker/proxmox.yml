@@ -172,6 +172,12 @@ proxmox:
       options:
         mountoptions: discard;noatime
 
+    mp26:
+      host_path: /tank/downloads
+      mountpoint: /data/jdownloader/data
+      options:
+        mountoptions: discard;noatime
+
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
@@ -375,3 +381,10 @@ zfs_datasets:
       group: 100000
     options:
       recordsize: 16K
+
+  tank/downloads:
+    chown:
+      owner: 101000
+      group: 101001
+    options:
+      recordsize: 32K

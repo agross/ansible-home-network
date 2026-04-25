@@ -1,10 +1,16 @@
-samba_server_min_protocol: SMB3
+# Synology uses vers=3.02, but that is not allowed with SMB3.
+samba_server_min_protocol: SMB2
 
 samba_manage_directories: false
 
 # https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html
 # But only a subset is supported unless share.include_file is defined.
 samba_shares:
+  - name: Downloads
+    path: /shares/downloads
+    valid_users: agross
+    read_only: false
+
   - name: Music
     path: /shares/nextcloud/agross/files/Music
     guest_ok: true

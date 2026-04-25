@@ -104,6 +104,8 @@
       tags: harbor
     - role: anytype
       tags: anytype
+    - role: jdownloader
+      tags: jdownloader
 
 - name: Hosted services on smb
   hosts: smb

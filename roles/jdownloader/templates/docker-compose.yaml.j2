@@ -1,0 +1,22 @@
+services:
+  app:
+    image: jlesage/jdownloader-2:v26.03.1
+    environment:
+      TZ: Europe/Berlin
+      APP_NAME: JDownloader
+      USER_ID: 1000
+      GROUP_ID: 1001
+      KEEP_APP_RUNNING: 1
+      DISPLAY_WIDTH: 1280
+      DISPLAY_HEIGHT: 800
+      DARK_MODE: 0
+
+      VNC_LISTENING_PORT: -1
+      WEB_AUTHENTICATION: 1
+      SECURE_CONNECTION: 1
+    volumes:
+      - ./app:/config
+      - ./data:/output
+    ports:
+      - 3129:3129
+      - 5800:5800
