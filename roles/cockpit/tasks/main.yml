@@ -4,8 +4,6 @@
     name:
       - cockpit
       - cockpit-selinux
-      - pcp
-      - python3-pcp
     state: present
 
 - name: Install cockpit (apt)
@@ -14,16 +12,9 @@
     name:
       - cockpit
       - cockpit-packagekit
-      - cockpit-pcp # Deprecated for future versions.
       - cockpit-storaged
     state: present
     install_recommends: false
-
-- name: Start and enable pmlogger.service for pcp
-  ansible.builtin.systemd:
-    service: pmlogger.service
-    state: started
-    enabled: true
 
 - name: Ensure cockpit socket systemd override directory exists
   ansible.builtin.file:
