@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+# renovate: docker=jlesage/mediainfo
+mediainfo_version=v26.03.1
+
+# renovate: docker=ghcr.io/immich-app/immich-server
+immich_version=v2.7.5
+
+immich_encoded_videos={{ immich_root | ansible.builtin.quote }}/app/encoded-video
+
+page_number=1
+next_page=(curl --silent
+                --show-error
+                --fail
+                --header 'x-api-key: {{ immich_kodi_api_key }}'
+                --header 'content-type: application/json'
+                --request POST
+                --url https://{{ immich_domain | ansible.builtin.quote }}/api/search/metadata
+                --data-binary @-)
+query='{ page: $page_number, type: "VIDEO", isEncoded: true, withExif: true }'
+
+preview-for() {
+  asset_id="${1:?Need asset ID}"
+  owner_id="${2:?Need owner ID}"
+
+  printf -v preview '%s/%s/%s/%s/%s.mp4' \
+                    "$immich_encoded_videos" \
+                    "$owner_id" \
+                    "${asset_id:0:2}" \
+                    "${asset_id:2:2}" \
+                    "$asset_id"
+
+  if [[ ! -f "$preview" ]]; then
+    >&2 printf 'Could not find preview for %s: %s\n' "$asset_id" "$preview"
+  fi
+
+  printf '%s' "$preview"
+}
+
+needs-re-encoding() {
+  file="${1:?Need filename}"
+
+  rotation="$(docker container \
+                     run \
+                     --rm \
+                     --volume "$immich_encoded_videos:$immich_encoded_videos:ro" \
+                     "jlesage/mediainfo:$mediainfo_version" \
+                     mediainfo \
+                     '--Output=Video;%Rotation%' \
+                     "$file")"
+
+  if [[ -z "$rotation" ]]; then
+    >&2 printf 'Unexpected rotation value for %s: %s\n' "$file" "$rotation"
+  fi
+
+  [[ "$rotation" != 0.000 ]]
+}
+
+while [[ -n "$page_number" ]]; do
+  page="$(
+    jq --null-input --argjson page_number "$page_number" "$query" |
+    "${next_page[@]}"
+  )"
+
+  mapfile -t asset_ids < <(jq --exit-status \
+                              --raw-output \
+                              '.assets.items[] | select(.exifInfo.orientation != "1") | [.id, .ownerId] | @tsv' \
+                           <<< "$page")
+
+  for asset in "${asset_ids[@]}"; do
+    IFS=$'\t' read -r asset_id owner_id <<<"$asset"
+
+    printf '\r\e[KProcessing asset %s owned by %s' "$asset_id" "$owner_id"
+
+    preview=$(preview-for "$asset_id" "$owner_id")
+
+    if needs-re-encoding "$preview"; then
+      printf '\nPreview %s (asset %s) needs re-encoding with rotation removed\n' "$preview" "$asset_id"
+
+      # Not yet implemented. More information:
+      # https://github.com/vladd11/immich-kodi/issues/34
+      #
+      # Just a draft:
+      # docker container \
+      #        run \
+      #        --rm \
+      #        --volume "$immich_encoded_videos:$immich_encoded_videos:ro" \
+      #        --entrypoint ffmpeg \
+      #        "ghcr.io/immich-app/immich-server:$immich_version" \
+      #        -loglevel error \
+      #        ...
+    fi
+  done
+
+  page_number="$(jq --raw-output '.assets.nextPage // empty' <<< "$page")"
+done
+
+printf '\n'
