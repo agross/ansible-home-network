@@ -5,6 +5,18 @@
   loop_control:
     loop_var: share
 
+- name: Ensure share directories exist
+  ansible.builtin.file:
+    path: "{{ share.path }}"
+    state: directory
+    owner: "{{ share.permissions.owner | default(omit) }}"
+    group: "{{ share.permissions.group | default(omit) }}"
+    mode: "{{ share.permissions.mode | default(omit) }}"
+  loop: "{{ samba_shares | default([]) }}"
+  loop_control:
+    loop_var: share
+    label: "{{ share.path }}"
+
 - name: Install Samba server
   ansible.builtin.import_role:
     name: vladgh.samba.server

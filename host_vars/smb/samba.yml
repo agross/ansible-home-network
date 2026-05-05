@@ -1,5 +1,6 @@
-# Synology uses vers=3.02, but that is not allowed with SMB3.
-samba_server_min_protocol: SMB2
+# Synology uses vers=3.02, but that is not allowed with SMB3. So SMB2 works.
+# Thanks to HP8620, we need to downgrade even lower to NT1.
+samba_server_min_protocol: NT1
 
 samba_manage_directories: false
 
@@ -18,6 +19,15 @@ samba_shares:
   - name: Immich
     path: /shares/immich
     valid_users: agross
+
+  - name: Temp
+    path: /shares/tmp
+    guest_ok: true
+    read_only: false
+    permissions:
+      owner: 0
+      group: 0
+      mode: '777'
 
   - name: Time Machine
     path: /shares/time-machine
