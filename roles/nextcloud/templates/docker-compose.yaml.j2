@@ -76,7 +76,7 @@ services:
       - cluster.routing.allocation.disk.watermark.flood_stage=250mb
 
       - node.name=search01
-      - cluster.initial_master_nodes=search01
+      - discovery.type=single-node
       - cluster.name=nextcloud-cluster
       - bootstrap.memory_lock=true
       - ES_JAVA_OPTS=-Xms2g -Xmx2g -Des.enforce.bootstrap.checks=true
