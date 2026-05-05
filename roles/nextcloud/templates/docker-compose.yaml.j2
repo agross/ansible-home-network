@@ -75,11 +75,13 @@ services:
       - cluster.routing.allocation.disk.watermark.high=500mb
       - cluster.routing.allocation.disk.watermark.flood_stage=250mb
 
+      # Single-node setup with bootstrap checks that are disabled in single-node.
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g -Des.enforce.bootstrap.checks=true
+
       - node.name=search01
-      - cluster.initial_master_nodes=search01
       - cluster.name=nextcloud-cluster
       - bootstrap.memory_lock=true
-      - ES_JAVA_OPTS=-Xms2g -Xmx2g -Des.enforce.bootstrap.checks=true
       - http.max_content_length=500mb
       # For backups.
       - path.repo=/backups
