@@ -21,7 +21,7 @@ samba_shares:
     valid_users: agross
 
   - name: Temp
-    path: /shares/tmp
+    path: "{{ clear_temp_share_directory }}"
     guest_ok: true
     read_only: false
     permissions:

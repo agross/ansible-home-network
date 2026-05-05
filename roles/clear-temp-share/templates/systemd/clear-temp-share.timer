@@ -1,0 +1,12 @@
+[Unit]
+Description=Clear temp share timer
+
+[Timer]
+OnCalendar=3:00:00
+
+# Catch up when an invocation was missed.
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

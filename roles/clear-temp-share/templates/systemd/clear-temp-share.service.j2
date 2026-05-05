@@ -1,0 +1,10 @@
+[Unit]
+Description=Clear temp share
+
+[Service]
+Type=oneshot
+
+ExecStart={{ clear_temp_share_root | ansible.builtin.quote }}/clear-temp-share
+
+[Install]
+WantedBy=multi-user.target
