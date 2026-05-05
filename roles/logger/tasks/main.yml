@@ -27,11 +27,14 @@
   vars:
     restore_target_dir: "{{ logger_root }}"
 
-- name: Symlink InfluxDB rename script
+- name: Symlink InfluxDB scripts
   ansible.builtin.file:
     state: link
-    src: "{{ logger_root }}/bin/influx-rename"
-    path: /usr/local/bin/influx-rename
+    src: "{{ logger_root }}/bin/{{ item }}"
+    path: "/usr/local/bin/{{ item }}"
+  loop:
+    - influx-drop
+    - influx-rename
 
 - name: Symlink backup configuration
   ansible.builtin.file:
