@@ -114,6 +114,8 @@
   roles:
     - role: samba
       tags: samba
+    - role: clear-temp-share
+      tags: clear-temp-share
 
 - name: OpenClaw
   hosts: claw
