@@ -69,8 +69,6 @@ services:
 
   search:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.3.4
-    ports:
-      - 127.0.0.1:9200:9200
     environment:
       - cluster.routing.allocation.disk.threshold_enabled=true
       - cluster.routing.allocation.disk.watermark.low=1gb
