@@ -1,27 +1,32 @@
-- name: OS-dependent installation
-  ansible.builtin.include_tasks:
+- name: Include OS-specific variables
+  ansible.builtin.include_vars:
     file: "{{ file }}"
   with_first_found:
-    - "install-{{ ansible_facts.distribution }}.yml"
-    - "install-{{ ansible_facts.os_family }}.yml"
+    - "{{ ansible_facts.distribution }}.yml"
+    - "{{ ansible_facts.os_family }}.yml"
   loop_control:
     loop_var: file
 
 - name: Install borgmatic
-  # Import so vars are exposed, we need borgmatic_config_name for validation.
+  # Import so vars are exposed, we need _borgbackup_config.name for validation.
   ansible.builtin.import_role:
     name: borgbase.ansible_role_borgbackup
   vars:
-    # borgmatic_encryption_passphrase determines if this role is installed. We
-    # need to map it to borgbase.ansible_role_borgbackup's equivalent.
-    borg_encryption_passphrase: "{{ borgmatic_encryption_passphrase }}"
+    borgbackup_install: >-
+      {{
+        borgmatic_borgbackup_install |
+        combine(borgmatic_borgbackup_install_override | default({}), recursive=true)
+      }}
+    borgbackup_timer: "{{ borgmatic_borgbackup_timer }}"
+    borgbackup_ssh: "{{ borgmatic_borgbackup_ssh }}"
+    borgbackup_config: "{{ borgmatic_borgbackup_config }}"
 
 - name: Validate config file
   ansible.builtin.command:
     argv:
       - borgmatic
       - --config
-      - "/etc/borgmatic/{{ borgmatic_config_name }}"
+      - "/etc/borgmatic/{{ _borgbackup_config.name }}"
       - config
       - validate
   changed_when: false

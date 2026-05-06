@@ -1,0 +1,2 @@
+borgmatic_borgbackup_install_override:
+  method: package

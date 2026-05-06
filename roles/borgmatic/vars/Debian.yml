@@ -1,0 +1,4 @@
+borgmatic_borgbackup_install_override:
+  dep_packages:
+    # Ensure libfuse3-dev is installed to be able to mount backups.
+    - libfuse3-dev

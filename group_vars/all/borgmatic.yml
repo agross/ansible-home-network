@@ -1,20 +1,16 @@
-# These vars cannot be role defaults (roles/borgmatic/defaults/main.yml) as they
-# for some reason do not get picked up.
-
-borgmatic_version: ">=2.0.0"
-
-# Prevent borgbase.ansible_role_borgbackup from installing timers. We do this
-# ourselves in postinstall.
-borgmatic_timer: ""
 borgmatic_backup_time: 01:00
 
-borg_one_file_system: false
-borgmatic_store_atime: false
-borgmatic_relocated_repo_access_is_ok: true
+borgmatic_ssh_key_name: borg-backup
+borgmatic_ssh_key_path: "/root/.ssh/{{ borgmatic_ssh_key_name }}"
+borgmatic_ssh_command: >-
+  ssh
+  -o User=backup
+  -i "{{ borgmatic_ssh_key_path }}"
+  -o StrictHostKeyChecking=accept-new
 
 borgmatic_ssh_host: nas.home.therightstuff.de
-
-borg_repository: >-
+borgmatic_borg_remote_path: /usr/local/bin/borg
+borgmatic_repository: >-
   ssh://{{
     borgmatic_ssh_host | ansible.builtin.mandatory
   }}/volume2/NetBackup/borg/{{
@@ -23,23 +19,7 @@ borg_repository: >-
     borgmatic_server_name | default(ansible_facts.hostname)
   }}
 
-borg_remote_path: /usr/local/bin/borg
-
-borg_ssh_key_name: borg-backup
-borg_ssh_command: >-
-  ssh
-  -o User=backup
-  -i "{{ borg_ssh_key_file_path }}"
-  -o StrictHostKeyChecking=accept-new
-
-borg_source_directories:
-  - /etc
-
-borgmatic_hooks:
-  healthchecks:
-    ping_url: "{{ borgmatic_system_backup_healthcheck }}"
-
-borgmatic_custom_config:
+borgmatic_extra_config:
   # Constants to use in the configuration file. Within option values, all
   # occurrences of the constant name in curly braces will be replaced with the
   # constant value. For example, if you have a constant named "app_name" with

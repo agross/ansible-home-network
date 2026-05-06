@@ -1,0 +1,26 @@
+borgmatic_borgbackup_install:
+  borgmatic_version: ">=2.0.0"
+  method: pip
+
+borgmatic_borgbackup_timer:
+  type: ""
+
+borgmatic_borgbackup_ssh:
+  key_name: "{{ borgmatic_ssh_key_name }}"
+  key_path: "{{ borgmatic_ssh_key_path }}"
+  command: "{{ borgmatic_ssh_command }}"
+
+borgmatic_borgbackup_config:
+  repositories:
+    - "{{ borgmatic_repository }}"
+  source_directories:
+    - /etc
+  one_file_system: false
+  store_atime: false
+  relocated_repo_access_is_ok: true
+  remote_path: "{{ borgmatic_borg_remote_path }}"
+  encryption_passphrase: "{{ borgmatic_encryption_passphrase }}"
+  hooks:
+    healthchecks:
+      ping_url: "{{ borgmatic_system_backup_healthcheck }}"
+  extra: "{{ borgmatic_extra_config | default({}) }}"
