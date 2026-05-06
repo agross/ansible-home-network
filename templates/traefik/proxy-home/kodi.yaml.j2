@@ -6,6 +6,7 @@ http:
       rule: Host(`kodi.{{ network.domain }}`)
       service: kodi
       middlewares:
+        - kodi-encoded-characters
         - kodi-ipallowlist
 
     kodi-wss:
@@ -16,6 +17,11 @@ http:
         - kodi-ipallowlist
 
   middlewares:
+    kodi-encoded-characters:
+      # Encoded characters are used by Kodi's web UI.
+      encodedCharacters:
+        allowEncodedSlash: true
+
     kodi-ipallowlist:
       ipAllowList:
         sourceRange:

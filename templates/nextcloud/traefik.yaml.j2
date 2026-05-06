@@ -6,6 +6,7 @@ http:
       rule: Host(`{{ nextcloud_domain }}`)
       service: {{ ansible_role_name }}
       middlewares:
+        - {{ ansible_role_name }}-encoded-characters
         - {{ ansible_role_name }}-well-known-replace
         - security-headers@file
 
@@ -31,6 +32,17 @@ http:
         - {{ ansible_role_name }}-kibana-auth
 
   middlewares:
+    {{ ansible_role_name }}-encoded-characters:
+      # These are used when Nextcloud is syncing files or when using the web UI.
+      # https://www.reddit.com/r/selfhosted/comments/1ph9jio/traefik_v364_breaks_nextcloud_officecollabora/
+      # Since Traefik 3.6.7 they are no longer needed but it is recommended to
+      # make the requirement explicit.
+      encodedCharacters:
+        allowEncodedQuestionMark: true
+        allowEncodedHash: true
+        allowEncodedPercent: true
+        allowEncodedSemicolon: true
+
     {{ ansible_role_name }}-well-known-replace:
       redirectregex:
         regex: https://(.*)/.well-known/(?:card|cal)dav
