@@ -64,10 +64,10 @@ groups:
   gosunds: >-
     inventory_hostname is match("gosund-sp111-")
 
-  nouse-a1ts: >-
+  nous-a1ts: >-
     inventory_hostname is match("nous-a1t-")
 
-  nouse-b2ts: >-
+  nous-b2ts: >-
     inventory_hostname is match("nous-b2t-")
 
   shellies: >-
