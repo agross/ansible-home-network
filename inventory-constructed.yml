@@ -72,3 +72,6 @@ groups:
 
   shelly1s: >-
     inventory_hostname is match("shelly1-")
+
+  shelly1minigen3s: >-
+    inventory_hostname is match("shelly1minigen3-")
