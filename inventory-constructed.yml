@@ -70,5 +70,5 @@ groups:
   nous-b2ts: >-
     inventory_hostname is match("nous-b2t-")
 
-  shellies: >-
-    inventory_hostname is match("shelly")
+  shelly1s: >-
+    inventory_hostname is match("shelly1-")
