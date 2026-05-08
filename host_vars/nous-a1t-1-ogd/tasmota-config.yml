@@ -1,2 +1,4 @@
 tasmota_config_room: Bathroom
 tasmota_config_purpose: Water Heater
+
+tasmota_config_friendly_name: mdi:water-boiler

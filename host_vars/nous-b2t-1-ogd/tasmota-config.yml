@@ -1,2 +1,4 @@
 tasmota_config_room: Shed
 tasmota_config_purpose: South Camera
+
+tasmota_config_friendly_name: mdi:cctv

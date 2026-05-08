@@ -5,10 +5,15 @@ they are executed by Backlog.
 https://tasmota.github.io/docs/Commands/#backlog
 #}
 
-{# Set friendly device name (32 char limit). #}
-FriendlyName {{ tasmota_config_friendly_name[0:32] }}
 {# This one is displayed in the web UI and used for HA autodiscovery. #}
-DeviceName {{ tasmota_config_friendly_name }}
+DeviceName {{ tasmota_config_device_name }}
+
+{# Set friendly device name (32 char limit). Contains the icon used by ioBroker Lovelace. #}
+{% if tasmota_config_friendly_name | default('', true) | length > 0 %}
+FriendlyName {{ tasmota_config_friendly_name[0:32] }}
+{% else %}
+FriendlyName ""
+{% endif %}
 
 {# MQTT config. #}
 {% if tasmota_config_mqtt_host %}

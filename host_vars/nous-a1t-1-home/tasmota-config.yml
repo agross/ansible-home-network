@@ -1,2 +1,4 @@
 tasmota_config_room: Utility Room
 tasmota_config_purpose: NAS
+
+tasmota_config_friendly_name: mdi:nas

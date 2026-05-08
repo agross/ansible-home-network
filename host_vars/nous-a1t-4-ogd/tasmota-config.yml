@@ -1,2 +1,4 @@
 tasmota_config_room: Equipment Room
 tasmota_config_purpose: Freezer
+
+tasmota_config_friendly_name: mdi:ice-pop

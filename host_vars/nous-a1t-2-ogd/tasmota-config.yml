@@ -1,2 +1,4 @@
 tasmota_config_room: Living Room
 tasmota_config_purpose: Heater
+
+tasmota_config_friendly_name: mdi:radiator

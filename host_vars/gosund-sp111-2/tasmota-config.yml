@@ -1,2 +1,4 @@
 tasmota_config_room: Kitchen
 tasmota_config_purpose: Down Light
+
+tasmota_config_friendly_name: mdi:lightbulb|{{ tasmota_config_room }} {{ tasmota_config_purpose }}

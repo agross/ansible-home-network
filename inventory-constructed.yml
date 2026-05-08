@@ -55,23 +55,26 @@ groups:
   gateway: >-
     inventory_hostname is match("gateway-")
 
-  tasmotas: >-
+  tasmota: >-
     inventory_hostname is match("gosund-sp111-") or
     inventory_hostname is match("nous-a1t-") or
     inventory_hostname is match("nous-b2t-") or
-    inventory_hostname is match("shelly")
+    inventory_hostname is match("shelly1-") or
+    inventory_hostname is match("shelly1minigen3-")
 
-  gosunds: >-
+  gosund: >-
     inventory_hostname is match("gosund-sp111-")
 
-  nous-a1ts: >-
+  # No dashes allowed!
+  nous_a1t: >-
     inventory_hostname is match("nous-a1t-")
 
-  nous-b2ts: >-
+  # No dashes allowed!
+  nous_b2t: >-
     inventory_hostname is match("nous-b2t-")
 
-  shelly1s: >-
+  shelly1: >-
     inventory_hostname is match("shelly1-")
 
-  shelly1minigen3s: >-
+  shelly1minigen3: >-
     inventory_hostname is match("shelly1minigen3-")

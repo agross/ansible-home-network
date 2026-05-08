@@ -5,4 +5,8 @@ tasmota_config_purpose: Light Switch
 # possible to switch lights without also switching the relay which would produce
 # a clicking sound.
 tasmota_config_template: >-
-  {"NAME":"Shelly 1 w/o Relay","GPIO":[1,1,0,1,0,192,0,0,0,0,0,0,0,0],"FLAG":0,"BASE":46}
+  {"NAME":"{{
+    tasmota_config_device_model
+  }} w/o Relay {{
+    tasmota_config_device_index
+  }}","GPIO":[1,1,0,1,0,192,0,0,0,0,0,0,0,0],"FLAG":0,"BASE":46}

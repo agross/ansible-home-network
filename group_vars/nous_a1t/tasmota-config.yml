@@ -1,7 +1,11 @@
 tasmota_config_device_model: NOUS A1T
 
 tasmota_config_template: >-
-  {"NAME":"NOUS A1T","GPIO":[32,0,0,0,2720,2656,0,0,2624,320,224,0,0,0],"FLAG":0,"BASE":49}
+  {"NAME":"{{
+    tasmota_config_device_model
+  }} {{
+    tasmota_config_device_index
+  }}","GPIO":[32,0,0,0,2720,2656,0,0,2624,320,224,0,0,0],"FLAG":0,"BASE":49}
 
 # Disable LED, but enable when there are connection issues.
 tasmota_config_custom_backlog: |

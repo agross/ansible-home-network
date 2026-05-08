@@ -1,6 +1,6 @@
 # E.g. ansible-playbook tasmotas.yml --limit ogd -t tasmota-update
 - name: Update Tasmota-based devices to latest release
-  hosts: tasmotas
+  hosts: tasmota
   become: false
   gather_facts: false
   roles:

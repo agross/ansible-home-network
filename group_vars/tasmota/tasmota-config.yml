@@ -18,9 +18,17 @@ tasmota_config_mqtt_client: "{{ tasmota_config_mqtt_topic }}-client"
 # Device function, e.g. power, lights, climate.
 tasmota_config_function: power
 
-tasmota_config_friendly_name: >-
+tasmota_config_device_index: >-
   #{{ network_name | ansible.builtin.regex_search('(?<=-)\d+$') }}
+
+tasmota_config_device_name: >-
   {{ tasmota_config_room }}{{
-    tasmota_config_installation_location | default('')
+    '' if tasmota_config_installation_location | default('', true) | length == 0
+    else ' ' ~ tasmota_config_installation_location
   }}
   {{ tasmota_config_purpose }}
+
+# Used by the Transform Tasmota Data script in ioBroker.
+# https://github.com/agross/iobroker-scripts/blob/master/home/Automation/Oneshot/Transform_Tasmota_Data.ts
+# <optional Lovelace icon>|<optional Lovelace name>.
+tasmota_config_friendly_name:
