@@ -8,6 +8,8 @@
     files:
       backup.j2:
         mode: "700"
+      restore.j2:
+        mode: "700"
       docker-compose.yaml.j2:
         mode: "640"
 
