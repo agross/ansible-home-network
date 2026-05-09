@@ -1,4 +1,7 @@
 tasmota_config_room: Utility Room
 tasmota_config_purpose: Server
 
+# Prevent inclusion of room in device name.
+tasmota_config_device_name: "{{ tasmota_config_purpose }}"
+
 tasmota_config_friendly_name: mdi:server-network
