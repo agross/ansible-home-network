@@ -1,2 +1,5 @@
 tasmota_config_room: Porch
 tasmota_config_purpose: Power Socket
+
+tasmota_config_friendly_name: >-
+  mdi:power-socket-eu|{{ tasmota_config_room }} {{ tasmota_config_purpose }}
