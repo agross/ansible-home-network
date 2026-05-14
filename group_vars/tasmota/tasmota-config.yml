@@ -30,5 +30,6 @@ tasmota_config_device_name: >-
 
 # Used by the Transform Tasmota Data script in ioBroker.
 # https://github.com/agross/iobroker-scripts/blob/master/home/Automation/Oneshot/Transform_Tasmota_Data.ts
-# <optional Lovelace icon>|<optional Lovelace name>.
-tasmota_config_friendly_name:
+# 0: <optional Lovelace icon>
+# 1: <optional Lovelace name>.
+tasmota_config_friendly_name: []

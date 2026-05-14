@@ -8,12 +8,13 @@ https://tasmota.github.io/docs/Commands/#backlog
 {# This one is displayed in the web UI and used for HA autodiscovery. #}
 DeviceName {{ tasmota_config_device_name }}
 
-{# Set friendly device name (32 char limit). Contains the icon used by ioBroker Lovelace. #}
-{% if tasmota_config_friendly_name | default('', true) | length > 0 %}
-FriendlyName {{ tasmota_config_friendly_name[0:32] }}
-{% else %}
-FriendlyName ""
-{% endif %}
+{#
+Set friendly name (up to 8 entries, 32 char limit per entry). UI might only
+display the first entry. If <8 entries, reset to the default value by passing 1.
+#}
+{% for entry in (tasmota_config_friendly_name | default([], true) + ['1'] * 8)[:8] %}
+FriendlyName{{ loop.index }} {{ entry[0:32] }}
+{% endfor %}
 
 {# MQTT config. #}
 {% if tasmota_config_mqtt_host %}

@@ -1,4 +1,6 @@
 tasmota_config_room: Kitchen
 tasmota_config_purpose: Refrigerator
 
-tasmota_config_friendly_name: mdi:fridge
+tasmota_config_friendly_name:
+  - mdi:fridge
+  - "{{ tasmota_config_purpose }}"

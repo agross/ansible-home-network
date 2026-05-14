@@ -4,4 +4,5 @@ tasmota_config_purpose: NAS
 # Prevent inclusion of room in device name.
 tasmota_config_device_name: "{{ tasmota_config_purpose }}"
 
-tasmota_config_friendly_name: mdi:nas
+tasmota_config_friendly_name:
+  - mdi:nas

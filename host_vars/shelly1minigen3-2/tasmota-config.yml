@@ -1,4 +1,5 @@
 tasmota_config_room: Porch
 tasmota_config_purpose: Light Switch
 
-tasmota_config_friendly_name: mdi:light-switch
+tasmota_config_friendly_name:
+  - mdi:light-switch

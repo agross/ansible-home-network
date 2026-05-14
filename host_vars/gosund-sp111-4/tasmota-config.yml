@@ -1,4 +1,5 @@
 tasmota_config_room: Office
 tasmota_config_purpose: Desk
 
-tasmota_config_friendly_name: mdi:desktop-tower-monitor
+tasmota_config_friendly_name:
+  - mdi:desktop-tower-monitor

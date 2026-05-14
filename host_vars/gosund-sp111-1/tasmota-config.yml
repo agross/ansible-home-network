@@ -1,4 +1,6 @@
 tasmota_config_room: Living Room
 tasmota_config_purpose: Media
 
-tasmota_config_friendly_name: mdi:music-box-outline|NAD C350
+tasmota_config_friendly_name:
+ - mdi:music-box-outline
+ - NAD C350

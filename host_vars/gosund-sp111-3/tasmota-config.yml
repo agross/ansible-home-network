@@ -1,4 +1,6 @@
 tasmota_config_room: Bathroom
 tasmota_config_purpose: Washing Machine
 
-tasmota_config_friendly_name: mdi:washing-machine
+tasmota_config_friendly_name:
+  - mdi:washing-machine
+  - "{{ tasmota_config_purpose }}"
