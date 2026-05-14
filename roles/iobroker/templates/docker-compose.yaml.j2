@@ -3,10 +3,6 @@ volumes:
 
 networks:
   default:
-  {% if traefik_host | default(false) | bool %}
-  web:
-    external: true
-  {% endif %}
   {% if iobroker_direct_network_access | default(false) | bool %}
   iobroker:
     name: iobroker
@@ -43,49 +39,12 @@ services:
     restart: unless-stopped
     env_file: ./iobroker/.env
     hostname: iobroker
-    {% if traefik_host | default(false) | bool %}
-    labels:
-      traefik.enable: 'true'
-      traefik.http.routers.iobroker.entrypoints: https
-      traefik.http.routers.iobroker.rule: Host(`iobroker.{{ network.domain }}`)
-      traefik.http.routers.iobroker.service: iobroker
-      traefik.http.services.iobroker.loadbalancer.server.port: {{ iobroker_ports.iobroker }}
-      {% if iobroker_ports.telegram is defined %}
-      traefik.http.routers.iobroker-telegram.entrypoints: https
-      traefik.http.routers.iobroker-telegram.rule: Host(`telegram.{{ network.domain }}`)
-      traefik.http.routers.iobroker-telegram.service: iobroker-telegram
-      traefik.http.services.iobroker-telegram.loadbalancer.serverstransport: no-verify@file
-      traefik.http.services.iobroker-telegram.loadbalancer.server.port: {{ iobroker_ports.telegram }}
-      traefik.http.services.iobroker-telegram.loadbalancer.server.scheme: https
-      {% endif %}
-      {% if iobroker_ports.lovelace is defined %}
-      traefik.http.routers.iobroker-lovelace.entrypoints: https
-      traefik.http.routers.iobroker-lovelace.rule: Host(`lovelace.{{ network.domain }}`)
-      traefik.http.routers.iobroker-lovelace.service: iobroker-lovelace
-      traefik.http.services.iobroker-lovelace.loadbalancer.server.port: {{ iobroker_ports.lovelace }}
-      {% endif %}
-      {% if iobroker_ports.lovelace_guests is defined %}
-      traefik.http.routers.iobroker-lovelace-guests.entrypoints: https
-      traefik.http.routers.iobroker-lovelace-guests.rule: Host(`gast.{{ network.domain }}`)
-      traefik.http.routers.iobroker-lovelace-guests.service: iobroker-lovelace-guests
-      traefik.http.services.iobroker-lovelace-guests.loadbalancer.server.port: {{ iobroker_ports.lovelace_guests }}
-      # No access from outside this network or the home network.
-      traefik.http.middlewares.iobroker-lovelace-guests-ipallowlist.ipallowlist.sourcerange:
-        127.0.0.1/32, {{ network.ip4 }}, {{ network.ip6 }}, {{ hostvars['gateway-home'].network.ip4 }}, {{ hostvars['gateway-home'].network.ip6 }}, fe80::/10, fc00::/7
-      traefik.http.routers.iobroker-lovelace-guests.middlewares:
-        iobroker-lovelace-guests-ipallowlist
-      {% endif %}
-    {% else %}
     ports:
       {% for kvp in iobroker_ports | ansible.builtin.dict2items %}
       - "{{ kvp.value }}:{{ kvp.value }}" # {{ kvp.key }}
       {% endfor %}
-    {% endif %}
     networks:
       default:
-      {% if traefik_host | default(false) | bool %}
-      web:
-      {% endif %}
       {% if iobroker_direct_network_access | default(false) | bool %}
       iobroker:
         ipv4_address: {{ iobroker_ip4 | ansible.builtin.mandatory }}
