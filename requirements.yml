@@ -28,7 +28,7 @@ collections:
     version: 12.6.0
   - name: https://github.com/ansible-collections/community.healthchecksio
     type: git
-    version: 38c4e8085f572d5ac1ccef751b8401160a5509ff
+    version: v1.5.1
   - name: community.proxmox
     version: 1.6.0
   - name: devsec.hardening
