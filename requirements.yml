@@ -25,7 +25,7 @@ collections:
   - name: community.docker
     version: 5.2.0
   - name: community.general
-    version: 12.6.0
+    version: 12.6.1
   - name: https://github.com/ansible-collections/community.healthchecksio
     type: git
     version: v1.5.1
