@@ -30,7 +30,7 @@ collections:
     type: git
     version: v1.5.1
   - name: community.proxmox
-    version: 1.6.0
+    version: 2.0.0
   - name: devsec.hardening
     version: 10.5.2
   - name: hifis.toolkit
