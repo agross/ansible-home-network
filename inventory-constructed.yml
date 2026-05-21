@@ -60,6 +60,7 @@ groups:
     inventory_hostname is match("nous-a1t-") or
     inventory_hostname is match("nous-b2t-") or
     inventory_hostname is match("shelly1-") or
+    inventory_hostname is match("shelly25-") or
     inventory_hostname is match("shelly1minigen3-")
 
   gosund: >-
@@ -78,3 +79,6 @@ groups:
 
   shelly1minigen3: >-
     inventory_hostname is match("shelly1minigen3-")
+
+  shelly25: >-
+    inventory_hostname is match("shelly25-")
