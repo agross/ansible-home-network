@@ -49,6 +49,13 @@
   },
   packageRules: [
     {
+      description: 'Automerge Feedr',
+      matchPackageNames: [
+        'ghcr.io/agross/feedr',
+      ],
+      automerge: true
+    },
+    {
       description: 'No license purchased for newer versions',
       matchPackageNames: [
         'jetbrains/teamcity-server',
