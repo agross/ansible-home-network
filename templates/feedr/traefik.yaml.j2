@@ -11,6 +11,8 @@ http:
   middlewares:
     {{ ansible_role_name }}-auth:
       basicauth:
+        realm: Feedr
+        removeHeader: true
         users:
           {{
             feedr_auth |
