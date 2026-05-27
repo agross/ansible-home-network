@@ -64,12 +64,14 @@ http:
 
     {{ ansible_role_name }}-kibana-auth:
       basicauth:
+        realm: Kibana
         users:
           {{
             nextcloud_kibana_auth |
             ansible.builtin.to_nice_yaml(indent = 2) |
             indent(10)
           }}
+        removeHeader: true
 
   services:
     {{ ansible_role_name }}:
