@@ -53,7 +53,8 @@
       matchPackageNames: [
         'ghcr.io/agross/feedr',
       ],
-      automerge: true
+      automerge: true,
+      automergeType: 'branch',
     },
     {
       description: 'No license purchased for newer versions',
