@@ -10,8 +10,8 @@
       - name
       - tags
     tags: "{{ healthcheck_tags | default([]) }}"
-    grace: "{{ healthcheck_grace | default('24h' | community.general.to_seconds) }}"
-    timeout: "{{ healthcheck_timeout | default('2h' | community.general.to_seconds) }}"
+    grace: "{{ healthcheck_grace | default('2h' | community.general.to_seconds) }}"
+    timeout: "{{ healthcheck_timeout | default('24h' | community.general.to_seconds) }}"
     channels: "{{ healthcheck_channels | default('*') }}"
   register: healthcheck
 
