@@ -40,6 +40,10 @@
           loop: "{{ units }}"
 
   roles:
+    - role: dnf-extras
+      tags:
+        - dnf-extras
+        - dnf
     - role: systemd-timesyncd
       when: >-
         'container' not in ansible_facts.virtualization_tech_guest

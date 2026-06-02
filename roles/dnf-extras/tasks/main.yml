@@ -1,0 +1,9 @@
+- name: Enable dnf purge plugin repo
+  community.general.copr:
+    name: acidburnmonkey/invigilatus
+    state: enabled
+
+- name: Install dnf purge plugin
+  ansible.builtin.dnf5:
+    name: purge-command
+    state: present
