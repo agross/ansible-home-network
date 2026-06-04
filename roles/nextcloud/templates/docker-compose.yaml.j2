@@ -148,7 +148,7 @@ services:
       - SYS_NICE
 
   cron:
-    image: nextcloud:33.0.4-apache
+    image: nextcloud:33.0.5-apache
     entrypoint: /cron.sh
     volumes:
       - app:/var/www/html
