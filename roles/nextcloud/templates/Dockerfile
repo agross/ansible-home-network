@@ -1,4 +1,4 @@
-FROM nextcloud:33.0.4-apache
+FROM nextcloud:33.0.5-apache
 
 RUN apt-get update \
     \
