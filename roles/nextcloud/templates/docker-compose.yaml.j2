@@ -130,7 +130,7 @@ services:
       traefik.http.middlewares.nextcloud-push-stripprefix.stripprefix.prefixes: /push
       traefik.http.services.nextcloud-push.loadbalancer.server.port: 7867
     healthcheck:
-      test: cat /proc/1/net/tcp | grep -F '00000000:1EBB '
+      test: netstat -l | grep -F ':7867 '
       start_period: 5s
       interval: 5s
     depends_on:
