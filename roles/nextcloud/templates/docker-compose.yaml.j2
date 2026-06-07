@@ -6,7 +6,7 @@ networks:
 
 services:
   db:
-    image: mariadb:11.8.3
+    image: mariadb:12.3.2
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
 
     mem_limit: 8192m
