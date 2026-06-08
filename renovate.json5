@@ -92,6 +92,14 @@
       maxMajorIncrement: 0,
     },
     {
+      description: 'any-sync-bundle appends its release date to the version',
+      matchPackageNames: [
+        'ghcr.io/grishy/any-sync-bundle',
+      ],
+      versioning: 'loose',
+      allowedVersions: '/^\\d+\\.\\d+\\.\\d+-\\d{4}-\\d{2}-\\d{2}$/',
+    },
+    {
       description: 'Major updates require manual backup and restore',
       matchPackageNames: [
         'postgres',
