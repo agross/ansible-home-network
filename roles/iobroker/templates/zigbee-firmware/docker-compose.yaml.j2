@@ -15,7 +15,7 @@ services:
     {%
       set firmware_url = (iobroker_device_firmware | default([]))[key] | default(false)
     %}
-    image: ckware/ti-cc-tool:2024-03-19
+    image: ckware/ti-cc-tool:2025-01-23
     user: root
     devices:
       - {{ dev.host }}:{{ dev.container }}:rw
