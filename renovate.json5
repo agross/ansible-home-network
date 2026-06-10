@@ -100,6 +100,22 @@
       allowedVersions: '/^\\d+\\.\\d+\\.\\d+-\\d{4}-\\d{2}-\\d{2}$/',
     },
     {
+      description: 'ti-cc-tool uses release dates as versions',
+      matchPackageNames: [
+        'ckware/ti-cc-tool',
+      ],
+      versioning: 'loose',
+      allowedVersions: '/^\\d{4}-\\d{2}-\\d{2}$/',
+    },
+    {
+      description: 'netbootxyz appends its build number to the application version',
+      matchPackageNames: [
+        'ghcr.io/netbootxyz/netbootxyz',
+      ],
+      versioning: 'loose',
+      allowedVersions: '/^\\d+\\.\\d+\\.\\d+-nbxyz\\d+$/',
+    },
+    {
       description: 'Major updates require manual backup and restore',
       matchPackageNames: [
         'postgres',
