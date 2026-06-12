@@ -11,7 +11,7 @@ proxmox:
   scsi:
     scsi0:
       storage: local-zfs
-      size: 60
+      size: 100
       discard: true
       iothread: true
       ssd: true
