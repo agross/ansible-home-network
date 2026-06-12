@@ -8,6 +8,7 @@
       api_token_id: ansible
       api_token_secret: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
       api_host: localhost
+      validate_certs: false
   pre_tasks:
     - name: End play for hypervisors that are detected falsely
       ansible.builtin.meta: end_host
