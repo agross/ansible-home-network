@@ -7,7 +7,7 @@ cd -- {{ frigate_root | ansible.builtin.quote }}
 
 db() {
   # renovate: docker=alpine/sqlite
-  local sqlite_version=3.51.2
+  local sqlite_version=3.53.2
 
   local temp_db="$(mktemp --directory)"
 
