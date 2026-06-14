@@ -1,6 +1,3 @@
-volumes:
-  app:
-
 networks:
   search:
 
@@ -151,7 +148,7 @@ services:
     image: nextcloud:{{ nextcloud_version | ansible.builtin.mandatory }}
     entrypoint: /cron.sh
     volumes:
-      - app:/var/www/html
+      - ./app/html:/var/www/html
       - ./app/custom_apps:/var/www/html/custom_apps
       - ./app/config:/var/www/html/config
       - ./app/data:/var/www/html/data
@@ -183,7 +180,7 @@ services:
       - 8000:80
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - app:/var/www/html
+      - ./app/html:/var/www/html
       - ./app/custom_apps:/var/www/html/custom_apps
       - ./app/config:/var/www/html/config
       - ./app/data:/var/www/html/data
