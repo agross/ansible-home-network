@@ -148,7 +148,7 @@ services:
       - SYS_NICE
 
   cron:
-    image: nextcloud:33.0.5-apache
+    image: nextcloud:{{ nextcloud_version | ansible.builtin.mandatory }}
     entrypoint: /cron.sh
     volumes:
       - app:/var/www/html
@@ -164,7 +164,7 @@ services:
         condition: service_healthy
 
   app:
-    image: nextcloud:apache-svg
+    image: nextcloud:{{ nextcloud_version | ansible.builtin.mandatory }}-svg
     pull_policy: never
     build:
       context: .

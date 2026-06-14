@@ -2,3 +2,6 @@ nextcloud_root: "/data/{{ ansible_role_name }}"
 nextcloud_domain: "cloud.{{ network.domain | ansible.builtin.mandatory }}"
 
 nextcloud_upgrade_timeout: 3m
+
+# renovate: docker=nextcloud
+nextcloud_version: 33.0.5-apache
