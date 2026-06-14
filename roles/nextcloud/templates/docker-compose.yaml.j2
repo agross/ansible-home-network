@@ -178,7 +178,7 @@ services:
       # Since nginx does not chunk uploads all uploads will be PUT in one piece.
       POST_MAX_SIZE: 16G
       # Newer Apache versions set a 1G limit on request bodies.
-      APACHE_BODY_LIMIT: 17179869184 # 1073741824 (the 1G default) * 16 = 16G
+      APACHE_BODY_LIMIT: {{ '16 GB' | ansible.builtin.human_to_bytes }} # default: 1 GB
     ports:
       - 8000:80
     volumes:
