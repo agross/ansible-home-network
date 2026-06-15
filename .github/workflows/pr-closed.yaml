@@ -4,20 +4,36 @@ on:
   pull_request:
     types:
       - closed
+  push:
+    branches:
+      - master
 
 jobs:
   affected-roles:
-    name: Determine roles affected by the PR
+    name: Determine affected roles
     runs-on: ubuntu-latest
 
+    # Renovate triggers branch automerge pushes committed by GitHub. Rebased PR
+    # pushes are triggered and committed by the user who merged the PR.
     if: |
-      github.event.pull_request.merged == true &&
-      !contains(github.event.pull_request.labels.*.name, 'skip-ansible')
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.merged == true &&
+        !contains(github.event.pull_request.labels.*.name, 'skip-ansible')
+      ) || (
+        github.event_name == 'push' &&
+        github.actor == 'agross-renovate[bot]' &&
+        github.event.head_commit.committer.name == 'GitHub' &&
+        github.event.head_commit.committer.email == 'noreply@github.com'
+      )
 
     env:
+      EVENT_NAME: ${{ github.event_name }}
       PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
       PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       PR_MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+      PUSH_BASE_SHA: ${{ github.event.before }}
+      PUSH_HEAD_SHA: ${{ github.event.after }}
 
     outputs:
       roles: ${{ steps.affected-roles.outputs.roles }}
@@ -35,6 +51,7 @@ jobs:
           filter: blob:none
 
       - name: Download original PR branch
+        if: github.event_name == 'pull_request'
         run: |
           git fetch origin "$PR_HEAD_SHA"
 
@@ -46,23 +63,31 @@ jobs:
       - name: Compute base commit
         id: base-commit
         run: |
-          echo "pull_request.base.sha=$PR_BASE_SHA"
-          echo "pull_request.merge_commit_sha=$PR_MERGE_SHA"
-          echo "pull_request.head.sha=$PR_HEAD_SHA"
-
           {
             echo 'sha<<SHA'
 
-            git merge-base "$PR_MERGE_SHA" "$PR_HEAD_SHA"
+            if [[ "$EVENT_NAME" == pull_request ]]; then
+              echo "pull_request.base.sha=$PR_BASE_SHA" >&2
+              echo "pull_request.merge_commit_sha=$PR_MERGE_SHA" >&2
+              echo "pull_request.head.sha=$PR_HEAD_SHA" >&2
+
+              git merge-base "$PR_MERGE_SHA" "$PR_HEAD_SHA"
+            else
+              echo "push.before=$PUSH_BASE_SHA" >&2
+              echo "push.after=$PUSH_HEAD_SHA" >&2
+
+              echo "$PUSH_BASE_SHA"
+            fi
 
             echo SHA
           } >> "$GITHUB_OUTPUT"
 
       - name: Show affected files
         run: |
-          git diff --name-status "$PR_REAL_BASE_SHA..$PR_HEAD_SHA"
+          git diff --name-status "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA"
         env:
-          PR_REAL_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
+          CHANGE_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
+          CHANGE_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.after }}
 
       - name: Determine roles from affected files
         id: affected-roles
@@ -72,7 +97,7 @@ jobs:
 
             git diff \
                 --name-only \
-                "$PR_REAL_BASE_SHA..$PR_HEAD_SHA" \
+                "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA" \
                 -- \
                 host_vars \
                 group_vars \
@@ -85,11 +110,12 @@ jobs:
             echo ROLES
           } >> "$GITHUB_OUTPUT"
         env:
-          PR_REAL_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
+          CHANGE_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
+          CHANGE_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.after }}
 
       - name: Show roles
         run: |
-          printf 'Roles affected by the merge: %s\n' "$ROLES"
+          printf 'Roles affected by the change: %s\n' "$ROLES"
         env:
           ROLES: ${{ steps.affected-roles.outputs.roles }}
 
