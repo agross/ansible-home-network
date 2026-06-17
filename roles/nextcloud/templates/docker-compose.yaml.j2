@@ -113,7 +113,7 @@ services:
       DATABASE_URL: mysql://nextcloud:nextcloud@db/nextcloud
       DATABASE_PREFIX: oc_
       REDIS_URL: redis://valkey
-      NEXTCLOUD_URL: https://{{ nextcloud_domain | ansible.builtin.mandatory }}
+      NEXTCLOUD_URL: http://app
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./app/custom_apps:/var/www/html/custom_apps:ro,z
