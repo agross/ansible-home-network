@@ -161,7 +161,7 @@ services:
         condition: service_healthy
 
   app:
-    image: "nextcloud:{{ nextcloud_version | ansible.builtin.mandatory }}-svg"
+    image: "nextcloud:{{ nextcloud_version | ansible.builtin.mandatory }}-office-ocr"
     pull_policy: never
     build:
       context: .
