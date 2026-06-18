@@ -217,3 +217,73 @@ services:
         condition: service_healthy
       search:
         condition: service_healthy
+
+  mcp:
+    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.121
+    cpus: 5
+    environment:
+      # Cannot use http://app because MCP would use https://app/apps/oidc (TLS)
+      # to connect to Nextcloud.
+      NEXTCLOUD_HOST: https://{{ nextcloud_domain | ansible.builtin.mandatory }}
+      NEXTCLOUD_PUBLIC_ISSUER_URL: https://{{ nextcloud_domain | ansible.builtin.mandatory }}
+      NEXTCLOUD_RESOURCE_URI: https://{{ nextcloud_domain | ansible.builtin.mandatory }}
+
+      NEXTCLOUD_MCP_SERVER_URL: https://mcp.{{ nextcloud_domain | ansible.builtin.mandatory }}
+
+      NEXTCLOUD_OIDC_CLIENT_ID: {{ nextcloud_mcp_oidc_client_id | ansible.builtin.mandatory }}
+      NEXTCLOUD_OIDC_CLIENT_SECRET: {{ nextcloud_mcp_oidc_client_secret | ansible.builtin.mandatory }}
+
+      MCP_DEPLOYMENT_MODE: login_flow
+      ENABLE_BACKGROUND_OPERATIONS: true
+
+      ALLOWED_MCP_CLIENTS: {{ nextcloud_mcp_client_list | join(',') }}
+      ALLOWED_MGMT_CLIENT: {{ nextcloud_mcp_management_client_list | join(',') }}
+
+      TOKEN_STORAGE_DB: /app/data/tokens.db
+      TOKEN_ENCRYPTION_KEY: {{ nextcloud_mcp_token_encryption_key | ansible.builtin.mandatory }}
+
+      LOG_FORMAT: text
+      LOG_LEVEL: INFO
+
+      ENABLE_SEMANTIC_SEARCH: false
+      QDRANT_LOCATION: /app/data/qdrant
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+      # For immediate indexing.
+      WEBHOOK_SECRET: {{ nextcloud_mcp_webhook_secret | ansible.builtin.mandatory }}
+    # Used as the qdrant collection name prefix, needs to be stable.
+    hostname: mcp
+    volumes:
+      - ./mcp/data:/app/data
+      - ./mcp/oauth:/app/.oauth
+    ports:
+      - 8003:8000
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - http://localhost:8000/health/live
+      start_period: 20s
+      start_interval: 3s
+      interval: 90s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:0.30.10
+    cpus: 5
+    volumes:
+      - ./ollama:/root/.ollama
+    healthcheck:
+      test:
+        - CMD
+        - timeout
+        - 1s
+        - bash
+        - -c
+        - </dev/tcp/localhost/11434
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+      start_interval: 3s

@@ -1,0 +1,7 @@
+<?php
+$CONFIG = array (
+  'mcp_server_url' => 'http://mcp:8000',
+  'mcp_server_public_url' => 'https://mcp.{{ nextcloud_domain | ansible.builtin.mandatory }}/mcp',
+  'astrolabe_client_id' => '{{ vault_nextcloud_mcp_clients.astrolabe.id | ansible.builtin.mandatory }}',
+  'allow_local_remote_servers' => true,
+);

@@ -3,3 +3,23 @@ nextcloud_smtp_password: "{{ vault_nextcloud_smtp_password }}"
 
 nextcloud_kibana_users:
   agross: "{{ vault_nextcloud_kibana_users_agross }}"
+
+nextcloud_mcp_oidc_client_id: "{{ vault_nextcloud_mcp_oidc_client.id }}"
+nextcloud_mcp_oidc_client_secret: "{{ vault_nextcloud_mcp_oidc_client.secret }}"
+
+nextcloud_mcp_token_encryption_key: "{{ vault_nextcloud_mcp_token_encryption_key }}"
+nextcloud_mcp_webhook_secret: "{{ vault_nextcloud_mcp_webhook_secret }}"
+
+nextcloud_mcp_clients:
+  - name: localhost callbacks only
+    client_id: any-desktop-app
+  - name: claude.ai
+    client_id: "{{ vault_nextcloud_mcp_clients.claude.id }}"
+    callback_url: https://claude.ai/api/mcp/auth_callback
+  - name: ChatGPT Custom App by Alex
+    client_id: "{{ vault_nextcloud_mcp_clients.chatgpt_alex.id }}"
+    callback_url: "{{ vault_nextcloud_mcp_clients.chatgpt_alex.callback_url }}"
+
+nextcloud_mcp_management_clients:
+  - name: astrolabe
+    client_id: "{{ vault_nextcloud_mcp_clients.astrolabe.id }}"

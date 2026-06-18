@@ -31,6 +31,11 @@ http:
       middlewares:
         - {{ ansible_role_name }}-kibana-auth
 
+    {{ ansible_role_name }}-mcp:
+      entrypoints: https
+      rule: Host(`mcp.{{ nextcloud_domain }}`)
+      service: {{ ansible_role_name }}-mcp
+
   middlewares:
     {{ ansible_role_name }}-encoded-characters:
       # These are used when Nextcloud is syncing files or when using the web UI.
@@ -88,3 +93,8 @@ http:
       loadBalancer:
         servers:
           - url: http://{{ interfaces.lan.ip4.address }}:8002
+
+    {{ ansible_role_name }}-mcp:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8003

@@ -5,3 +5,22 @@ nextcloud_upgrade_timeout: 3m
 
 # renovate: docker=nextcloud
 nextcloud_version: 33.0.5-apache
+
+nextcloud_mcp_clients: []
+nextcloud_mcp_client_list: >-
+  {{
+    nextcloud_mcp_clients |
+    map(attribute = 'client_id') |
+    zip(nextcloud_mcp_clients |
+      map(attribute = 'callback_url') |
+      map('default', '')) |
+    map('select') |
+    map('join', '|')
+  }}
+
+nextcloud_mcp_management_clients: []
+nextcloud_mcp_management_client_list: >-
+  {{
+    nextcloud_mcp_management_clients |
+    map(attribute = 'client_id')
+  }}
