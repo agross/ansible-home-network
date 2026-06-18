@@ -219,7 +219,7 @@ services:
         condition: service_healthy
 
   mcp:
-    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.121
+    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.121.2
     cpus: 5
     environment:
       # Cannot use http://app because MCP would use https://app/apps/oidc (TLS)
@@ -245,10 +245,11 @@ services:
       LOG_FORMAT: text
       LOG_LEVEL: INFO
 
-      ENABLE_SEMANTIC_SEARCH: false
+      ENABLE_SEMANTIC_SEARCH: true
       QDRANT_LOCATION: /app/data/qdrant
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+      VECTOR_SYNC_PROCESSOR_WORKERS: 1
       # For immediate indexing.
       WEBHOOK_SECRET: {{ nextcloud_mcp_webhook_secret | ansible.builtin.mandatory }}
     # Used as the qdrant collection name prefix, needs to be stable.
