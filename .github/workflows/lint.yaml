@@ -30,7 +30,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Get latest code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7.0.0
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v26.4.0
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Get latest code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7.0.0
 
       - name: Ensure all *.vault.yml files are encrypted
         run: |
