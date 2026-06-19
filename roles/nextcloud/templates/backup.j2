@@ -13,7 +13,7 @@ cleanup() {
 
   # Directory needs to be kept because it is mounted on the Elasticsearch container.
   mkdir --parents -- "$target"
-  rm -rf -- "${target:?}"/*.sql
+  rm -rf -- "${target:?}"/*.sql "${target:?}"/*.tar
 }
 
 mariadb() {
@@ -64,12 +64,41 @@ elastic() {
   "${curl[@]}" "$elastic_repo/snapshot-$snapshot_date?pretty=true"
 
   mapfile -t snapshots < <("${curl[@]}" "$elastic_repo/_all" |
-                            jq --raw-output ".snapshots[:-${keep_snapshots}][].snapshot")
+                           jq --raw-output ".snapshots[:-${keep_snapshots}][].snapshot")
 
   for snapshot in "${snapshots[@]}"; do
     printf 'Deleting snapshot %s\n' "$snapshot"
     "${curl[@]}" --request DELETE \
                  "$elastic_repo/$snapshot?wait_for_completion=true&pretty=true"
+  done
+}
+
+qdrant() {
+  printf 'Snapshotting Qdrant database.\n'
+
+  local -a curl=(curl --silent --fail-with-body --header 'Api-Key: {{ nextcloud_mcp_qdrant_admin_api_key }}')
+
+  local collection=http://localhost:8004/collections/nextcloud
+  local json status
+
+  json="$("${curl[@]}" --request POST "$collection/snapshots")"
+
+  status=$(jq --raw-output .status <<< "$json")
+  if [[ "$status" != ok ]]; then
+    printf 'Creating snapshot failed: %s\n' "$json"
+    return 1
+  fi
+
+  name=$(jq --raw-output .result.name <<< "$json")
+  printf 'Saving snapshot %s to tarball\n' "$name"
+  "${curl[@]}" --output backups/qdrant-nextcloud.tar "$collection/snapshots/$name"
+
+  mapfile -t snapshots < <("${curl[@]}" "$collection/snapshots" |
+                           jq --raw-output '.result[].name')
+
+  for snapshot in "${snapshots[@]}"; do
+    printf 'Deleting snapshot %s\n' "$snapshot"
+    "${curl[@]}" --request DELETE "$collection/snapshots/$snapshot"
   done
 }
 
@@ -80,6 +109,7 @@ case "${1-}" in
     cleanup
     mariadb
     elastic
+    qdrant
     ;;
 
   stop)

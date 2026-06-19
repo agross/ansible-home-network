@@ -6,6 +6,7 @@ dns_cname_records:
   - "{{ nextcloud_domain | mandatory }}"
   - "kibana.{{ nextcloud_domain | mandatory }}"
   - "mcp.{{ nextcloud_domain | mandatory }}"
+  - "qdrant.{{ nextcloud_domain | mandatory }}"
 
   - "{{ immich_domain | mandatory }}"
   - "{{ immich_mediakit_domain | mandatory }}"

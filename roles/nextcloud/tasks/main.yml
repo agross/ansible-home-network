@@ -32,6 +32,14 @@
         owner: 1000
         group: 1000
         mode: "750"
+      backup.j2:
+        owner: 0
+        group: 0
+        mode: "750"
+      restore.j2:
+        owner: 0
+        group: 0
+        mode: "750"
 
 - name: Determine existence of app/config/config.php
   ansible.builtin.stat:

@@ -66,5 +66,29 @@ elastic() {
                "$elastic_repo/${snapshots[0]}/_restore?wait_for_completion=true&pretty=true"
 }
 
+qdrant() {
+  printf 'Restoring Qdrant database.\n'
+
+  docker compose up \
+                 --wait \
+                 qdrant
+
+  local -a curl=(curl --silent --fail-with-body --header 'Api-Key: {{ nextcloud_mcp_qdrant_admin_api_key }}')
+
+  local collection=http://localhost:8004/collections/nextcloud
+
+  json="$("${curl[@]}" --request POST \
+                       --header 'Content-Type: multipart/form-data' \
+                       --form snapshot=@backups/qdrant-nextcloud.tar \
+                       "$collection/snapshots/upload?priority=snapshot")"
+
+  status=$(jq --raw-output .status <<< "$json")
+  if [[ "$status" != ok ]]; then
+    printf 'Restoring snapshot failed: %s\n' "$json"
+    return 1
+  fi
+}
+
 db
 elastic
+qdrant

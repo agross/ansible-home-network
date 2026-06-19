@@ -246,7 +246,11 @@ services:
       LOG_LEVEL: INFO
 
       ENABLE_SEMANTIC_SEARCH: true
-      QDRANT_LOCATION: /app/data/qdrant
+
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: {{ nextcloud_mcp_qdrant_admin_api_key }}
+      QDRANT_COLLECTION: nextcloud
+
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_EMBEDDING_MODEL: nomic-embed-text
       VECTOR_SYNC_PROCESSOR_WORKERS: 1
@@ -283,6 +287,40 @@ services:
         - bash
         - -c
         - </dev/tcp/localhost/11434
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+      start_interval: 3s
+
+  qdrant:
+    image: qdrant/qdrant:v1.18.2
+    environment:
+      QDRANT__SERVICE__API_KEY: {{ nextcloud_mcp_qdrant_admin_api_key }}
+      QDRANT__SERVICE__READ_ONLY_API_KEY: {{ nextcloud_mcp_qdrant_readonly_api_key }}
+      QDRANT__SERVICE__JWT_RBAC: true
+
+      QDRANT__LOG_LEVEL: INFO
+      QDRANT__AUDIT_TRUST_FORWARDED_HEADERS: true
+      QDRANT__TELEMETRY_DISABLED: true
+      # Offers the lowest startup memory footprint, but first queries will be
+      # slower until the OS page cache warms up.
+      # QDRANT__STORAGE__LOW_MEMORY_MODE: no_populate
+      # The container will try to start normally first, and restarts in recovery
+      # mode if initialisation fails due to an out of memory error.
+      # QDRANT_ALLOW_RECOVERY_MODE: true
+    ports:
+      - 8004:6333
+    volumes:
+      - ./qdrant:/qdrant/storage
+    healthcheck:
+      test:
+        - CMD
+        - timeout
+        - 1s
+        - bash
+        - -c
+        - </dev/tcp/localhost/6333
       interval: 60s
       timeout: 5s
       retries: 3

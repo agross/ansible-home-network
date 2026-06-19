@@ -4,6 +4,12 @@ nextcloud_smtp_password: "{{ vault_nextcloud_smtp_password }}"
 nextcloud_kibana_users:
   agross: "{{ vault_nextcloud_kibana_users_agross }}"
 
+nextcloud_mcp_qdrant_admin_api_key: >-
+  {{ vault_nextcloud_mcp_qdrant_admin_api_key }}
+
+nextcloud_mcp_qdrant_readonly_api_key: >-
+  {{ vault_nextcloud_mcp_qdrant_readonly_api_key }}
+
 nextcloud_mcp_oidc_client_id: "{{ vault_nextcloud_mcp_oidc_client.id }}"
 nextcloud_mcp_oidc_client_secret: "{{ vault_nextcloud_mcp_oidc_client.secret }}"
 

@@ -36,6 +36,11 @@ http:
       rule: Host(`mcp.{{ nextcloud_domain }}`)
       service: {{ ansible_role_name }}-mcp
 
+    {{ ansible_role_name }}-qdrant:
+      entrypoints: https
+      rule: Host(`qdrant.{{ nextcloud_domain }}`)
+      service: {{ ansible_role_name }}-qdrant
+
   middlewares:
     {{ ansible_role_name }}-encoded-characters:
       # These are used when Nextcloud is syncing files or when using the web UI.
@@ -98,3 +103,8 @@ http:
       loadBalancer:
         servers:
           - url: http://{{ interfaces.lan.ip4.address }}:8003
+
+    {{ ansible_role_name }}-qdrant:
+      loadBalancer:
+        servers:
+          - url: http://{{ interfaces.lan.ip4.address }}:8004
