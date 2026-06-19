@@ -16,6 +16,8 @@ dns_server_remote_servers:
       - anytype.therightstuff.de
       - cloud.therightstuff.de
       - kibana.cloud.therightstuff.de
+      - mcp.cloud.therightstuff.de
+      - qdrant.cloud.therightstuff.de
       - bitwarden.therightstuff.de
       - feedr.therightstuff.de
       - feeds.therightstuff.de
