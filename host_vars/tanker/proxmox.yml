@@ -381,6 +381,7 @@ zfs_datasets:
       group: 100000
     options:
       recordsize: 16K
+    snapshot:
 
   tank/downloads:
     chown:
