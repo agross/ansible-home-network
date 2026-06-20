@@ -219,7 +219,7 @@ services:
         condition: service_healthy
 
   mcp:
-    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.121.3
+    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.122.0
     cpus: 10
     environment:
       # Cannot use http://app because MCP would use https://app/apps/oidc (TLS)
