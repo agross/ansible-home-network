@@ -275,6 +275,11 @@ services:
       start_interval: 3s
       interval: 90s
       retries: 5
+    depends_on:
+      ollama:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
 
   ollama:
     image: ollama/ollama:0.30.10
