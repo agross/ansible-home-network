@@ -21,7 +21,7 @@ source_directories: !retain
 # help patterns" for more details.
 exclude_patterns:
   - {{ vaultwarden_root }}/app/tmp
-  - {{ vaultwarden_root }}/app/icon_cache/*.miss
+  - sh:{{ vaultwarden_root }}/app/icon_cache/*.miss
 
 # List of one or more command hooks to execute, triggered at particular points
 # during borgmatic's execution. For each command hook, specify one of "before"
