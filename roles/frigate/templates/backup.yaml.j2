@@ -23,7 +23,7 @@ exclude_patterns:
   - {{ frigate_root }}/app/model_cache
   - {{ frigate_root }}/app/backup.db
   - {{ frigate_root }}/app/backup_config.yaml
-  - {{ frigate_root }}/app/frigate.db*
+  - sh:{{ frigate_root }}/app/frigate.db*
   - {{ frigate_root }}/app/go2rtc
 
 # List of one or more command hooks to execute, triggered at particular points
