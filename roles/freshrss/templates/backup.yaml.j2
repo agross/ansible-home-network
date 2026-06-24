@@ -22,7 +22,7 @@ source_directories: !retain
 exclude_patterns:
   - {{ freshrss_root }}/app/data/cache
   - {{ freshrss_root }}/app/data/favicons
-  - {{ freshrss_root }}/app/data/users/*/log*.txt
+  - sh:{{ freshrss_root }}/app/data/users/*/log*.txt
 
 # List of one or more command hooks to execute, triggered at particular points
 # during borgmatic's execution. For each command hook, specify one of "before"
