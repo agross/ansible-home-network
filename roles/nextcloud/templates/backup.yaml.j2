@@ -21,16 +21,16 @@ source_directories: !retain
 # absolute path. Do not backslash spaces in path names. See the output of "borg
 # help patterns" for more details.
 exclude_patterns:
-  # Exclude logs.
-  - {{ nextcloud_root }}/app/data/*.log
-  - {{ nextcloud_root }}/app/data/*.log.*
+  # Exclude logs, but only those in app/data.
+  - sh:{{ nextcloud_root }}/app/data/*.log
+  - sh:{{ nextcloud_root }}/app/data/*.log.*
 
   # No trashbins and versions.
-  - {{ nextcloud_root }}/app/data/*/files_trashbin/
-  - {{ nextcloud_root }}/app/data/*/files_versions/
+  - sh:{{ nextcloud_root }}/app/data/*/files_trashbin/**
+  - sh:{{ nextcloud_root }}/app/data/*/files_versions/**
 
   # No previews.
-  - {{ nextcloud_root }}/app/data/appdata*/preview/
+  - sh:{{ nextcloud_root }}/app/data/appdata*/preview/**
 
   # Big user data.
   - {{ nextcloud_root }}/app/data/agross/files/_Shared/
