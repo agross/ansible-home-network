@@ -80,7 +80,7 @@ jobs:
 
       - name: Trigger review of breaking changes
         if: steps.affected-roles.outputs.roles != ''
-        uses: mshick/add-pr-comment@v3.0.0
+        uses: mshick/add-pr-comment@v3.12.0
         with:
           repo-token: ${{ secrets.PR_COMMENT_TOKEN }}
           message: |
