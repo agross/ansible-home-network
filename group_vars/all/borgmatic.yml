@@ -8,7 +8,7 @@ borgmatic_ssh_command: >-
   -i "{{ borgmatic_ssh_key_path }}"
   -o StrictHostKeyChecking=accept-new
 
-borgmatic_ssh_host: nas.home.therightstuff.de
+borgmatic_ssh_host: 172.16.0.10
 borgmatic_borg_remote_path: /usr/local/bin/borg
 borgmatic_repository: >-
   ssh://{{
