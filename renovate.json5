@@ -188,6 +188,15 @@
       ],
     },
     {
+      description: 'Update only once a week on Friday morning',
+      matchPackageNames: [
+        'ghcr.io/cbcoutinho/nextcloud-mcp-server',
+      ],
+      schedule: [
+        'before 12pm on friday',
+      ],
+    },
+    {
       description: 'Docker Hub library images (without a slash) often miss layers if pulled immediately after release, delay PR creation',
       matchDatasources: [
         'docker',
