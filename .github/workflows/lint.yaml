@@ -55,7 +55,7 @@ jobs:
             local file="${1?Need file}"
 
             if [[ "$(head -n1 "$file")" != \$ANSIBLE_VAULT\;* ]]; then
-              >&2 printf 'Unencrypted vault file: %s' "$file"
+              >&2 printf 'Unencrypted vault file: %s\n' "$file"
               echo 1 > "$fail"
             fi
           }
