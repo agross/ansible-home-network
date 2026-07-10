@@ -49,9 +49,10 @@
   },
   packageRules: [
     {
-      description: 'Automerge Feedr',
+      description: 'Automerges',
       matchPackageNames: [
         'ghcr.io/agross/feedr',
+        'ghcr.io/cbcoutinho/nextcloud-mcp-server',
       ],
       automerge: true,
       automergeType: 'branch',
@@ -185,15 +186,6 @@
       ],
       addLabels: [
         'skip-ansible',
-      ],
-    },
-    {
-      description: 'Update only once a week on Friday morning',
-      matchPackageNames: [
-        'ghcr.io/cbcoutinho/nextcloud-mcp-server',
-      ],
-      schedule: [
-        'before 12pm on friday',
       ],
     },
     {
