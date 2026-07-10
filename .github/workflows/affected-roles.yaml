@@ -82,6 +82,5 @@ jobs:
         if: steps.affected-roles.outputs.roles != ''
         uses: mshick/add-pr-comment@v3.12.0
         with:
-          repo-token: ${{ secrets.PR_COMMENT_TOKEN }}
           message: |
             @codex review
