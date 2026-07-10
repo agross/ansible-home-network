@@ -148,7 +148,7 @@
       tags: build-agent
 
 - name: Install GitHub Runners
-  hosts: github-runners
+  hosts: github_runners
   become: true
   gather_facts: false
   roles:

@@ -1,0 +1,9 @@
+github_runner_url: https://github.com/agross/ansible-home-network
+
+github_runner_instances:
+  home:
+    url: "{{ github_runner_url }}"
+    token: "{{ github_runner_token }}"
+  ogd:
+    url: "{{ github_runner_url }}"
+    token: "{{ github_runner_token }}"
