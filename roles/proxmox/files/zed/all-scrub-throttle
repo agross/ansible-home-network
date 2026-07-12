@@ -2,29 +2,129 @@
 
 set -e
 
+# zed_log_msg outputs are logged to the systemd journal:
+# journalctl -fu zfs-zed
+
+# shellcheck source=/dev/null
 [ -f "${ZED_ZEDLET_DIR}/zed.rc" ] && . "${ZED_ZEDLET_DIR}/zed.rc"
-# shellcheck disable=SC1091
+# shellcheck source=/dev/null
 . "${ZED_ZEDLET_DIR}/zed-functions.sh"
 
 [ -n "$ZEVENT_POOL" ] || exit 9
 [ -n "$ZEVENT_SUBCLASS" ] || exit 9
 zed_check_cmd "$ZPOOL" || exit 9
 
-active_time=100s
-cooldown_time=30s
+temperature_limit=55000
+controller_temperature_limit=65000
+poll_interval=5
+
+maximum_nvme_temperature() {
+  maximum_temperature=-1
+  maximum_controller_temperature=-1
+  devices=0
+
+  for hwmon in /sys/class/hwmon/*; do
+    [ -r "$hwmon/name" ] || continue
+    IFS= read -r name < "$hwmon/name" || return 1
+    [ "$name" = nvme ] || continue
+
+    temperature=-1
+    controller_temperature=-1
+    if [ -r "$hwmon/temp2_input" ]; then
+      IFS= read -r temperature < "$hwmon/temp2_input" || temperature=-1
+    fi
+    if [ -r "$hwmon/temp3_input" ]; then
+      IFS= read -r controller_temperature < "$hwmon/temp3_input" || controller_temperature=-1
+    fi
+
+    case "$temperature" in
+      ''|*[!0-9]*) temperature=-1 ;;
+    esac
+    case "$controller_temperature" in
+      ''|*[!0-9]*) controller_temperature=-1 ;;
+    esac
+
+    if [ "$temperature" -gt "$maximum_temperature" ]; then
+      maximum_temperature=$temperature
+    fi
+    if [ "$controller_temperature" -gt "$maximum_controller_temperature" ]; then
+      maximum_controller_temperature=$controller_temperature
+    fi
+
+    devices=$((devices + 1))
+  done
+
+  [ "$devices" -gt 0 ] || return 1
+  printf '%s:%s\n' "$maximum_temperature" "$maximum_controller_temperature"
+}
+
+celsius() {
+  millidegrees=$1
+  sign=
+  if [ "$millidegrees" -lt 0 ]; then
+    sign=-
+    millidegrees=$((-millidegrees))
+  fi
+
+  degrees=$((millidegrees / 1000))
+  tenths=$(((millidegrees % 1000) / 100))
+  printf '%s%d.%d' "$sign" "$degrees" "$tenths"
+}
 
 case "$ZEVENT_SUBCLASS" in
-
   scrub_start|scrub_resume)
-    zed_log_msg "scrub rate-limiter: pool $ZEVENT_POOL event $ZEVENT_SUBCLASS: waiting $active_time to pause scrub"
-    sleep "$active_time"
+    while temperatures=$(maximum_nvme_temperature); do
+      temperature=${temperatures%%:*}
+      controller_temperature=${temperatures#*:}
+      if [ "$temperature" -ge "$temperature_limit" ] || \
+         [ "$controller_temperature" -ge "$controller_temperature_limit" ]; then
+        break
+      fi
+      sleep "$poll_interval"
+    done
+
+    if [ -z "${temperatures:-}" ]; then
+      zed_log_msg "scrub temperature throttle: pool $ZEVENT_POOL" \
+                  "event $ZEVENT_SUBCLASS:" \
+                  "unable to read all NVMe temperatures; pausing scrub"
+    else
+      temp2=$(celsius "$temperature")
+      temp3=$(celsius "$controller_temperature")
+      zed_log_msg "scrub temperature throttle: pool $ZEVENT_POOL" \
+                  "event $ZEVENT_SUBCLASS:" \
+                  "NVMe temperatures reached pause threshold:" \
+                  "temp2=${temp2}C, temp3=${temp3}C"
+    fi
 
     "$ZPOOL" scrub -p "$ZEVENT_POOL"
     ;;
 
   scrub_paused)
-    zed_log_msg "scrub rate-limiter: pool $ZEVENT_POOL event $ZEVENT_SUBCLASS: waiting $cooldown_time to continue scrub"
-    sleep "$cooldown_time"
+    while :; do
+      if temperatures=$(maximum_nvme_temperature); then
+        temperature=${temperatures%%:*}
+        controller_temperature=${temperatures#*:}
+        if [ "$temperature" -lt "$temperature_limit" ] && \
+           [ "$controller_temperature" -lt \
+            "$controller_temperature_limit" ]; then
+          break
+        fi
+      fi
+
+      if [ -z "${temperatures:-}" ]; then
+        zed_log_msg "scrub temperature throttle: pool $ZEVENT_POOL" \
+                    "event $ZEVENT_SUBCLASS:" \
+                    "unable to read all NVMe temperatures; keeping scrub paused"
+      fi
+      sleep "$poll_interval"
+    done
+
+    temp2=$(celsius "$temperature")
+    temp3=$(celsius "$controller_temperature")
+    zed_log_msg "scrub temperature throttle: pool $ZEVENT_POOL" \
+                "event $ZEVENT_SUBCLASS:" \
+                "all NVMe temperatures below thresholds:" \
+                "temp2=${temp2}C, temp3=${temp3}C"
 
     "$ZPOOL" scrub -C "$ZEVENT_POOL"
     ;;
