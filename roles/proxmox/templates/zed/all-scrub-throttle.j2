@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
+# vim: set ft=jinja-shell ts=2 sw=2 et:
 
 set -e
 
 # zed_log_msg outputs are logged to the systemd journal:
-# journalctl -fu zfs-zed
+# journalctl --follow --identifier=zed
 
 # shellcheck source=/dev/null
 [ -f "${ZED_ZEDLET_DIR}/zed.rc" ] && . "${ZED_ZEDLET_DIR}/zed.rc"
@@ -14,9 +15,10 @@ set -e
 [ -n "$ZEVENT_SUBCLASS" ] || exit 9
 zed_check_cmd "$ZPOOL" || exit 9
 
-temperature_limit=55000
-controller_temperature_limit=65000
+temperature_limit={{ proxmox_zfs_scrub_nvme_max_temp | int * 1000 }}
+controller_temperature_limit={{ proxmox_zfs_scrub_nvme_controller_max_temp | int * 1000 }}
 poll_interval=5
+cooldown_time={{ proxmox_zfs_scrub_nvme_cooldown_time | community.general.to_seconds | int }}
 
 maximum_nvme_temperature() {
   maximum_temperature=-1
@@ -76,7 +78,7 @@ case "$ZEVENT_SUBCLASS" in
     while temperatures=$(maximum_nvme_temperature); do
       temperature=${temperatures%%:*}
       controller_temperature=${temperatures#*:}
-      if [ "$temperature" -ge "$temperature_limit" ] || \
+      if [ "$temperature" -ge "$temperature_limit" ] ||
          [ "$controller_temperature" -ge "$controller_temperature_limit" ]; then
         break
       fi
@@ -100,15 +102,22 @@ case "$ZEVENT_SUBCLASS" in
     ;;
 
   scrub_paused)
+    cooled_time=0
     while :; do
       if temperatures=$(maximum_nvme_temperature); then
         temperature=${temperatures%%:*}
         controller_temperature=${temperatures#*:}
-        if [ "$temperature" -lt "$temperature_limit" ] && \
-           [ "$controller_temperature" -lt \
-            "$controller_temperature_limit" ]; then
-          break
+        if [ "$temperature" -lt "$temperature_limit" ] &&
+           [ "$controller_temperature" -lt "$controller_temperature_limit" ]; then
+          if [ "$cooled_time" -ge "$cooldown_time" ]; then
+            break
+          fi
+          cooled_time=$((cooled_time + poll_interval))
+        else
+          cooled_time=0
         fi
+      else
+        cooled_time=0
       fi
 
       if [ -z "${temperatures:-}" ]; then
@@ -123,7 +132,7 @@ case "$ZEVENT_SUBCLASS" in
     temp3=$(celsius "$controller_temperature")
     zed_log_msg "scrub temperature throttle: pool $ZEVENT_POOL" \
                 "event $ZEVENT_SUBCLASS:" \
-                "all NVMe temperatures below thresholds:" \
+                "NVMe temperatures below thresholds for ${cooldown_time}s:" \
                 "temp2=${temp2}C, temp3=${temp3}C"
 
     "$ZPOOL" scrub -C "$ZEVENT_POOL"

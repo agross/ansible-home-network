@@ -1,6 +1,10 @@
 # renovate: github-releases=Jamesits/pve-fake-subscription
 proxmox_pve_fake_subscription_release_version: v0.0.11
 
+proxmox_zfs_scrub_nvme_max_temp: 55
+proxmox_zfs_scrub_nvme_controller_max_temp: 60
+proxmox_zfs_scrub_nvme_cooldown_time: 30s
+
 proxmox_zfs_datasets_for_site: >-
   {{
     groups[site] |

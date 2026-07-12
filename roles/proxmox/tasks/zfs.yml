@@ -10,12 +10,13 @@
   notify: update-initramfs
 
 - name: Throttle zpool scrub operations
-  ansible.builtin.copy:
-    src: zed/all-scrub-throttle
+  ansible.builtin.template:
+    src: zed/all-scrub-throttle.j2
     dest: /etc/zfs/zed.d/all-scrub-throttle
     mode: "755"
     owner: 0
     group: 0
+    lstrip_blocks: true
   # From lae.proxmox.
   notify: restart zfs-zed
 
