@@ -5,6 +5,7 @@ set -euo pipefail
 
 cd -- {{ immich_root | ansible.builtin.quote }}
 
+immich_admin=(docker compose exec server immich-admin)
 target={{ immich_root | ansible.builtin.quote }}/backups
 
 cleanup() {
@@ -36,6 +37,21 @@ clean-uploads() {
 
 trap cleanup ERR SIGINT SIGTERM
 
-cleanup
-db
-clean-uploads
+case "${1-}" in
+  start)
+    "${immich_admin[@]}" enable-maintenance-mode
+
+    cleanup
+    db
+    clean-uploads
+    ;;
+
+  stop)
+    "${immich_admin[@]}" disable-maintenance-mode
+    ;;
+
+  *)
+    printf 'Either the "start" or "stop" action is supported.\n'
+    exit 1
+    ;;
+esac

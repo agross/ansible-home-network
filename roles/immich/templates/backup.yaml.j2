@@ -38,7 +38,15 @@ commands:
     when:
       - create
     run:
-      - {{ immich_root }}/backup
+      - {{ immich_root }}/backup start
+
+  - after: configuration
+    # Only trigger the hook when borgmatic is run with particular actions listed
+    # here. Defaults to running for all actions.
+    when:
+      - create
+    run:
+      - {{ immich_root }}/backup stop
 
   - before: action
     when:
