@@ -77,8 +77,8 @@
     "checksumFiles": {
       "cronExpression": "0 03 * * *",
       "enabled": true,
-      "percentageLimit": 1,
-      "timeLimit": 3600000
+      "percentageLimit": 0.01,
+      "timeLimit": {{ '30m' | community.general.to_milliseconds }}
     },
     "missingFiles": {
       "cronExpression": "0 03 * * *",
