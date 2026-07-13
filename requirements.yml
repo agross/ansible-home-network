@@ -25,7 +25,7 @@ collections:
   - name: community.docker
     version: 5.2.1
   - name: community.general
-    version: 13.1.0
+    version: 13.2.0
   - name: community.healthchecksio
     version: 1.5.1
   - name: community.proxmox
