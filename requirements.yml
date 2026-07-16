@@ -27,7 +27,7 @@ collections:
   - name: community.general
     version: 13.2.0
   - name: community.healthchecksio
-    version: 1.5.1
+    version: 1.5.2
   - name: community.proxmox
     version: 2.0.0
   - name: devsec.hardening
