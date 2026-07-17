@@ -45,7 +45,6 @@ systemd_networkd_network:
         - Address: "{{ iobroker_ip4_range | ansible.utils.next_nth_usable(2) }}"
         - LinkLocalAddressing: false
         - IPv6AcceptRA: false
-        # - IPForward: true
         - ConfigureWithoutCarrier: true
 
     - Route:

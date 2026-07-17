@@ -72,7 +72,8 @@ systemd_networkd_network:
         - Domains: "{{ dns.search_domains | join(' ') }}"
         - MulticastDNS: true
 
-        - IPForward: true
+        - IPv4Forwarding: true
+        - IPv6Forwarding: true
         - IPMasquerade: ipv4
 
         - LinkLocalAddressing: ipv6
