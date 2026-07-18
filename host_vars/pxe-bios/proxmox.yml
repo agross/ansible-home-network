@@ -2,6 +2,8 @@ proxmox:
   host: pve-home
   type: kvm
   id: 2000
+  tags:
+    - pxe
   onboot: false
   bios: seabios
   cores: 1

@@ -2,6 +2,8 @@ proxmox:
   host: pve-home
   type: kvm
   id: 3001
+  tags:
+    - gw
   cores: 4
   memory: 4096
   bios: seabios

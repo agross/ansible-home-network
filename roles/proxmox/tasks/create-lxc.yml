@@ -94,6 +94,7 @@
     swap: "{{ guest.lxc.swap | default(0) }}"
     timezone: "{{ guest.lxc.timezone | default('host') }}"
     netif: "{{ guest.lxc.netif | default(default_netif) }}"
+    tags: "{{ guest.lxc.tags | default(omit) }}"
   loop: "{{ proxmox_lxc_guest_configs }}"
   loop_control:
     loop_var: guest

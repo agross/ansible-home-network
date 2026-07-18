@@ -2,6 +2,8 @@ proxmox:
   host: pve-home
   type: kvm
   id: 105
+  tags:
+    - service
   startup: order=200
   cores: 8
   memory: 12288

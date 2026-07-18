@@ -2,6 +2,8 @@ proxmox:
   host: pve-ogd
   type: kvm
   id: 103
+  tags:
+    - service
   startup: order=200
   cores: 8
   memory: 8192

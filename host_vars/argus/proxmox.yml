@@ -2,6 +2,8 @@ proxmox:
   host: pve-ogd
   type: lxc
   id: 106
+  tags:
+    - service
   protection: true
   startup: order=300
   cores: 5

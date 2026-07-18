@@ -44,6 +44,7 @@
     # hostpci: "{{ guest.kvm.hostpci | default(omit) }}"
     ostype: l26
     watchdog: model=i6300esb,action=reset
+    tags: "{{ guest.kvm.tags | default(omit) }}"
     update: "{{ update }}"
   loop: "{{ proxmox_kvm_guest_configs }}"
   loop_control:

@@ -2,6 +2,8 @@ proxmox:
   host: pve-home
   type: kvm
   id: 1002
+  tags:
+    - service
   cores: 4
   memory: 4096
   net:

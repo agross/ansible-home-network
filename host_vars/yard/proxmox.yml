@@ -2,6 +2,8 @@ proxmox:
   host: pve-ogd
   type: lxc
   id: 108
+  tags:
+    - service
   protection: true
   ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
   hookscript: lxc-fedora.sh
