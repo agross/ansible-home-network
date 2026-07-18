@@ -4,6 +4,7 @@ proxmox:
   id: 3000
   cores: 4
   memory: 4096
+  bios: seabios
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   efi_disk:

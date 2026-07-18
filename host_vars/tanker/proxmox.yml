@@ -3,7 +3,7 @@ proxmox:
   type: lxc
   id: 1000
   protection: true
-  startup: order=200
+  startup: order=300
   ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
   hookscript: lxc-fedora.sh
   features:

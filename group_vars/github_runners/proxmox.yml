@@ -2,8 +2,8 @@ proxmox:
   host: pve-home
   type: kvm
   id: "{{ github_runner_proxmox_vm_id }}"
-  cores: 12
-  memory: 12288
+  cores: 8
+  memory: 10240
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   efi_disk:

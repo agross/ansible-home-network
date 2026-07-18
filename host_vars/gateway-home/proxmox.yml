@@ -3,7 +3,7 @@ proxmox:
   type: kvm
   id: 102
   startup: order=100
-  cores: 2
+  cores: 4
   memory: 2048
   net:
     net0: virtio,bridge=vmbr0,firewall=1

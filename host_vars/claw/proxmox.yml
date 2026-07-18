@@ -3,7 +3,7 @@ proxmox:
   type: kvm
   id: 1002
   cores: 4
-  memory: 8192
+  memory: 4096
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   efi_disk:

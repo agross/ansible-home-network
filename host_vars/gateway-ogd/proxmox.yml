@@ -3,11 +3,13 @@ proxmox:
   type: kvm
   id: 102
   startup: order=100
-  cores: 2
+  cores: 4
   memory: 2048
   net:
     net0: virtio,bridge=vmbr0,firewall=1
     net1: virtio,bridge=vmbr1,firewall=1
+  efi_disk:
+    storage: local-zfs
   scsi:
     scsi0:
       storage: local-lvm
