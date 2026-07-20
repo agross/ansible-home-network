@@ -39,6 +39,17 @@ jobs:
           requirements_file: requirements.yml
           args: --exclude .ansible .github
 
+  actionlint:
+    name: GitHub Actions Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v7.0.0
+
+      - name: Run actionlint
+        uses: raven-actions/actionlint@v2.2.0
+
   encrypted-vaults:
     name: Ensure vaults are encrypted
     runs-on: ubuntu-latest
@@ -49,7 +60,8 @@ jobs:
 
       - name: Ensure all *.vault.yml files are encrypted
         run: |
-          export fail="$(mktemp)"
+          fail="$(mktemp)"
+          export fail
 
           must-be-encrypted() {
             local file="${1?Need file}"
@@ -64,7 +76,7 @@ jobs:
 
           find . -type f \
                  -name '*.vault.yml' \
-                 -exec bash -c 'must-be-encrypted "{}"' \;
+                 -exec bash -c 'must-be-encrypted "$1"' shell {} \;
 
           failed="$(stat --printf=%s "$fail")"
           if (( failed > 0 )); then
