@@ -10,10 +10,13 @@
 - name: Install tools also installed on GitHub
   ansible.builtin.package:
     name:
-      - jq
-      - git
       - gh
+      - git
+      - jq
+      - nodejs # Equal to LTS version.
+      - pipx
       - python3-pip
+      - shellcheck
       - yq
     state: present
 
