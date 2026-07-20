@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Get full commit history
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           # We don't need the file contents (blobs), but we inspect commits and
