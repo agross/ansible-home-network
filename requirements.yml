@@ -35,6 +35,6 @@ collections:
   - name: hifis.toolkit
     version: 6.3.2
   - name: prometheus.prometheus
-    version: 0.30.0
+    version: 0.30.1
   - name: vladgh.samba
     version: 3.5.7
