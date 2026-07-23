@@ -30,6 +30,8 @@ services:
     ports:
       - 8080:8080
     environment:
+      LOG_LEVEL: info
+
       MEND_RNV_DATA_HANDLER_TYPE: postgresql
       PGHOST: db
       PGPORT: 5432
