@@ -79,6 +79,7 @@ services:
         renovate_host_secrets |
         default({}) |
         ansible.builtin.to_nice_yaml(indent = 2, sort_keys = false) |
+        replace('$', '$$') |
         indent(6)
       }}
     depends_on:
