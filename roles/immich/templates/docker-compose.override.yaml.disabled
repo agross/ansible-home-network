@@ -4,7 +4,7 @@ services:
       - 5432:5432
 
   deduper:
-    image: razgrizhsu/immich-deduper:0.3.0
+    image: razgrizhsu/immich-deduper:0.3.1
     ports:
       - 8086:8086
     volumes:
