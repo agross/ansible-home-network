@@ -10,13 +10,15 @@ db() {
                  --wait \
                  db
 
+  # Because we backed up with --clean we must connect to the postgres database.
+  # https://www.postgresql.org/docs/current/app-pg-dumpall.html#APP-PG-DUMPALL-EX
   docker compose exec \
-                 --user mysql \
                  --no-TTY \
                  db \
-                 mariadb \
-                 vaultwarden \
-    < {{ vaultwarden_root | ansible.builtin.quote }}/backups/vaultwarden.sql
+                 psql \
+                 --no-psqlrc \
+                 --dbname=postgres \
+    < {{ vaultwarden_root | ansible.builtin.quote }}/backups/db.sql
 }
 
 db

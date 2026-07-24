@@ -1,36 +1,26 @@
-volumes:
-  vaultwarden:
-
 services:
   db:
-    image: mariadb:12.3.2
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+    image: postgres:18.4-alpine
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: true
-      MARIADB_DATABASE: vaultwarden
-      MARIADB_USER: vaultwarden
-      MARIADB_PASSWORD: vaultwarden
-      MARIADB_AUTO_UPGRADE: true
-      MARIADB_DISABLE_UPGRADE_BACKUP: true
-      # Create the mysql user with root permissions that is only able to connect
-      # via a Unix socket. Used for backups.
-      # docker exec --user mysql ...
-      MARIADB_MYSQL_LOCALHOST_USER: true
-      MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
+      POSTGRES_USER: vaultwarden
+      POSTGRES_PASSWORD: vaultwarden
+      POSTGRES_DB: vaultwarden
+      TZ: Europe/Berlin
+
+      # For psql invocations.
+      PGUSER: vaultwarden
+      PGPASSWORD: vaultwarden
+      PGDATABASE: vaultwarden
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./mariadb/data:/var/lib/mysql
+      - ./db:/var/lib/postgresql
     healthcheck:
       test:
         - CMD
-        - healthcheck.sh
-        - --su-mysql
-        - --connect
-        - --innodb_initialized
-      start_period: 5s
+        - psql
+        - --command=select 1
       interval: 5s
+      timeout: 5s
+      retries: 3
 
   app:
     image: vaultwarden/server:1.37.0-alpine

@@ -120,8 +120,8 @@ proxmox:
       options:
         mountoptions: discard;noatime
     mp16:
-      host_path: /tank/vaultwarden/mariadb
-      mountpoint: /data/vaultwarden/mariadb/data
+      host_path: /tank/vaultwarden/postgres
+      mountpoint: /data/vaultwarden/db
       options:
         mountoptions: discard;noatime
 
@@ -319,14 +319,13 @@ zfs_datasets:
     chown:
       owner: 101000
       group: 101000
-  tank/vaultwarden/mariadb:
+  tank/vaultwarden/postgres:
     chown:
-      owner: 100999
-      group: 100999
+      owner: 100070
+      group: 100070
     options:
       prefetch: none
-      # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
-      recordsize: 16K
+      recordsize: 8K
 
   tank/prometheus/app:
     chown:
