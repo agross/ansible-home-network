@@ -86,8 +86,8 @@ proxmox:
         mountoptions: discard;noatime
 
     mp10:
-      host_path: /tank/commafeed/mysql
-      mountpoint: /data/commafeed/mysql/data
+      host_path: /tank/commafeed/postgres
+      mountpoint: /data/commafeed/db
       options:
         mountoptions: discard;noatime
 
@@ -264,14 +264,13 @@ zfs_datasets:
       recordsize: 8K
     snapshot:
 
-  tank/commafeed/mysql:
+  tank/commafeed/postgres:
     chown:
-      owner: 100999
-      group: 100999
+      owner: 100070
+      group: 100070
     options:
       prefetch: none
-      # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
-      recordsize: 16K
+      recordsize: 8K
 
   tank/feedr/postgres:
     chown:
