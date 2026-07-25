@@ -16,32 +16,17 @@ cleanup() {
   rm -rf -- "${target:?}"/*.sql "${target:?}"/*.tar
 }
 
-mariadb() {
+db() {
   printf 'Dumping database.\n'
 
-  local -a exec=(docker compose exec --user mysql db)
-
-  mapfile -t dbs < <("${exec[@]}" mariadb --execute 'show databases' \
-                                          --silent \
-                                          --skip-column-names)
-
-  for db in "${dbs[@]}"; do
-    if [[ "$db" == information_schema ]] || \
-       [[ "$db" == performance_schema ]] || \
-       [[ "$db" == sys ]]; then
-      continue
-    fi
-
-    printf 'Backing up database: %s\n' "$db"
-
-    # https://serversforhackers.com/c/mysqldump-with-modern-mysql
-    "${exec[@]}" mariadb-dump --skip-lock-tables \
-                              --single-transaction \
-                              "$db" > "$target/$db.sql"
-  done
-
-  "${exec[@]}" mariadb-check --check --medium-check --all-databases
-  "${exec[@]}" mariadb-check --analyze --all-databases
+  docker compose \
+        exec \
+        db \
+        pg_dumpall \
+        --clean \
+        --if-exists \
+        --quote-all-identifiers \
+    > "$target/db.sql"
 }
 
 elastic() {
@@ -107,7 +92,7 @@ case "${1-}" in
     "${occ[@]}" maintenance:mode --on
 
     cleanup
-    mariadb
+    db
     elastic
     qdrant
     ;;

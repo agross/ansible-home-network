@@ -3,35 +3,27 @@ networks:
 
 services:
   db:
-    image: mariadb:12.3.2
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-
-    mem_limit: 8192m
+    image: postgres:18.4-alpine
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: true
-      MARIADB_DATABASE: nextcloud
-      MARIADB_USER: nextcloud
-      MARIADB_PASSWORD: nextcloud
-      MARIADB_AUTO_UPGRADE: true
-      MARIADB_DISABLE_UPGRADE_BACKUP: true
-      # Create the mysql user with root permissions that is only able to connect
-      # via a Unix socket. Used for backups.
-      # docker exec --user mysql ...
-      MARIADB_MYSQL_LOCALHOST_USER: true
-      MARIADB_MYSQL_LOCALHOST_GRANTS: ALL
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: nextcloud
+      POSTGRES_DB: nextcloud
+      TZ: Europe/Berlin
+
+      # For psql invocations.
+      PGUSER: nextcloud
+      PGPASSWORD: nextcloud
+      PGDATABASE: nextcloud
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./mariadb/conf:/etc/mysql/conf.d:ro
-      - ./mariadb/data:/var/lib/mysql
+      - ./db:/var/lib/postgresql
     healthcheck:
       test:
         - CMD
-        - healthcheck.sh
-        - --su-mysql
-        - --connect
-        - --innodb_initialized
-      start_period: 5s
+        - psql
+        - --command=select 1
       interval: 5s
+      timeout: 5s
+      retries: 3
 
   valkey:
     image: valkey/valkey:9.1.1-alpine
@@ -110,7 +102,7 @@ services:
       - 8001:7867
     environment:
       LOG: notify_push=trace
-      DATABASE_URL: mysql://nextcloud:nextcloud@db/nextcloud
+      DATABASE_URL: postgres://nextcloud:nextcloud@db/nextcloud
       DATABASE_PREFIX: oc_
       REDIS_URL: redis://valkey
       NEXTCLOUD_URL: http://app
