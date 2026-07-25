@@ -1,33 +1,36 @@
-- name: Set bind mount
-  when: >-
-    (
-      config.proxmox_vms |
-      selectattr('id', 'equalto', 'lxc/' ~ item.0.lxc.id)
-    )[0].config[item.1.key] | default('') != options_string
-  ansible.builtin.command:
-    argv:
-      - pct
-      - set
-      - "{{ item.0.lxc.id | ansible.builtin.mandatory }}"
-      - "-{{ item.1.key }}"
-      - "{{ options_string }}"
-  loop: >-
-    {{
-      mount_guests |
-      ansible.builtin.subelements('mount_volumes')
-    }}
-  loop_control:
-    label: >-
-      {{ item.0.inventory_hostname }}
-      id={{ item.0.lxc.id }}
-      {{ item.1.key }}={{ options_string }}
-  changed_when: true
+- name: Configure bind mounts
   vars:
     mount_guests_yaml: |
       {% for guest in guests %}
+      {% set guest_config = (
+        config.proxmox_vms |
+        selectattr('id', 'equalto', 'lxc/' ~ guest.lxc.id)
+      )[0].config %}
+      {% set mount_volumes = namespace(items=[]) %}
+      {% if guest.lxc.mount_volumes is mapping %}
+      {% for key, value in guest.lxc.mount_volumes.items() %}
+      {% set mount_volumes.items = mount_volumes.items + [
+        {'key': key, 'value': value}
+      ] %}
+      {% endfor %}
+      {% else %}
+      {% for value in guest.lxc.mount_volumes %}
+      {% set mount_volumes.items = mount_volumes.items + [
+        {'key': 'mp' ~ loop.index0, 'value': value}
+      ] %}
+      {% endfor %}
+      {% endif %}
       - inventory_hostname: {{ guest.inventory_hostname }}
         lxc: {{ guest.lxc }}
-        mount_volumes: {{ guest.lxc.mount_volumes | ansible.builtin.dict2items }}
+        config: {{ guest_config | ansible.builtin.to_json }}
+        mount_volumes: {{ mount_volumes.items | ansible.builtin.to_json }}
+        configured_mount_volumes: {{
+          guest_config |
+          ansible.builtin.dict2items |
+          selectattr('key', 'match', '^mp[0-9]+$') |
+          list |
+          ansible.builtin.to_json
+        }}
       {% endfor %}
     mount_guests: >-
       {{
@@ -36,25 +39,74 @@
         default([], true) |
         list
       }}
-    options_yaml: |
-      {% for k, v in (item.1.value.options | default({})).items() %}
-      - {{ k }}={{ v }}
-      {% endfor %}
-    options_string: >-
-      {{
-        (
-          [
-            item.1.value.host_path,
-            'mp=' ~ item.1.value.mountpoint
-          ]
-          +
-          (
-            [
-              options_yaml | ansible.builtin.from_yaml
-            ] |
-            ansible.builtin.flatten |
-            sort
-          )
-        ) |
-        join(',')
-      }}
+  block:
+    - name: Set bind mount
+      when: >-
+        item.0.config[item.1.key] | default('') != options_string
+      ansible.builtin.command:
+        argv:
+          - pct
+          - set
+          - "{{ item.0.lxc.id | ansible.builtin.mandatory }}"
+          - "-{{ item.1.key }}"
+          - "{{ options_string }}"
+      loop: >-
+        {{
+          mount_guests |
+          ansible.builtin.subelements('mount_volumes')
+        }}
+      loop_control:
+        label: >-
+          {{ item.0.inventory_hostname }}
+          id={{ item.0.lxc.id }}
+          {{ item.1.key }}={{ options_string }}
+      changed_when: true
+      vars:
+        options_yaml: |
+          {% for k, v in (item.1.value.options | default({})).items() %}
+          - {{ k }}={{ v }}
+          {% endfor %}
+        options_string: >-
+          {{
+            (
+              [
+                item.1.value.host_path,
+                'mp=' ~ item.1.value.mountpoint
+              ]
+              +
+              (
+                [
+                  options_yaml | ansible.builtin.from_yaml
+                ] |
+                ansible.builtin.flatten |
+                sort
+              )
+            ) |
+            join(',')
+          }}
+
+    - name: Remove stale bind mount
+      when: >-
+        item.1.key not in (
+          item.0.mount_volumes |
+          map(attribute='key') |
+          list
+        )
+      ansible.builtin.command:
+        argv:
+          - pct
+          - set
+          - "{{ item.0.lxc.id | ansible.builtin.mandatory }}"
+          - -delete
+          - "{{ item.1.key }}"
+      loop: >-
+        {{
+          mount_guests |
+          ansible.builtin.subelements('configured_mount_volumes')
+        }}
+      loop_control:
+        label: >-
+          {{ item.0.inventory_hostname }}
+          id={{ item.0.lxc.id }}
+          {{ item.1.key }}
+      changed_when: true
