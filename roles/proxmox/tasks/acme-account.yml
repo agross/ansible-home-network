@@ -1,131 +1,38 @@
-- name: Check if the default ACME account has been configured
-  ansible.builtin.stat:
-    path: /etc/pve/priv/acme/{{ pve_acme_account_id | ansible.builtin.mandatory }}
-  register: proxmox_acme_account
-
+# The crap Proxmox APIs for ACME do not work with tokens and the user ID MUST be
+# root@pam. Of course, we also need to pass the TOTP and generate it manually.
+# What a shit show.
+#
+# https://forum.proxmox.com/threads/111745/#post-482006
 - name: Register ACME account
-  when: not proxmox_acme_account.stat.exists
-  block:
-    - name: Install required packages for unattended setup
-      ansible.builtin.package:
-        name: python3-pexpect
+  community.proxmox.proxmox_acme_account:
+    api_user: root@pam
+    api_password: "{{ proxmox_api_password | ansible.builtin.mandatory }}"
+    api_otp: "{{ proxmox_api_totp_secret | ansible.builtin.mandatory | totp }}"
 
-    - name: Register default ACME account
-      ansible.builtin.expect:
-        command: >-
-          pvenode
-            acme
-            account
-            register
-            {{ pve_acme_account_id | ansible.builtin.quote }}
-            {{ pve_acme_account_email | ansible.builtin.mandatory | ansible.builtin.quote }}
-            --directory https://acme-v02.api.letsencrypt.org/directory
-        responses:
-          "Do you agree to the above terms?": "y"
-        echo: true
-
-- name: Check if the ACME plugin is configured
-  ansible.builtin.command:
-    argv:
-      - pvenode
-      - acme
-      - plugin
-      - config
-      - desec
-  register: proxmox_acme_plugin
-  changed_when: false
-  failed_when: false
+    name: "{{ pve_acme_account_id }}"
+    contact: "{{ pve_acme_account_email }}"
+    directory: https://acme-v02.api.letsencrypt.org/directory
 
 - name: Configure ACME plugin
-  when: proxmox_acme_plugin.rc != 0
-  block:
-    - name: Create file with ACME authentication data
-      ansible.builtin.copy:
-        dest: /tmp/acme-auth
-        content: |
-          DEDYN_TOKEN={{ desec_acme_token | ansible.builtin.mandatory }}
-        owner: 0
-        group: 0
-        mode: "400"
+  community.proxmox.proxmox_acme_plugin_dns:
+    api_user: root@pam
+    api_password: "{{ proxmox_api_password | ansible.builtin.mandatory }}"
+    api_otp: "{{ proxmox_api_totp_secret | ansible.builtin.mandatory | totp }}"
 
-    - name: Register ACME plugin
-      ansible.builtin.command:
-        argv:
-          - pvenode
-          - acme
-          - plugin
-          - add
-          - dns
-          - desec
-          - --api
-          - desec
-          - --data
-          - /tmp/acme-auth
-          - --validation-delay
-          - 120
-      changed_when: true
+    name: desec
+    plugin: desec
+    data:
+      DEDYN_TOKEN: "{{ desec_acme_token }}"
+    validation_delay: 120
 
-  always:
-    - name: Remove ACME authentication data file
-      ansible.builtin.file:
-        dest: /tmp/acme-auth
-        state: absent
+- name: Order ACME certificate
+  community.proxmox.proxmox_acme_certificate:
+    api_user: root@pam
+    api_password: "{{ proxmox_api_password | ansible.builtin.mandatory }}"
+    api_otp: "{{ proxmox_api_totp_secret | ansible.builtin.mandatory | totp }}"
 
-- name: Get default ACME account
-  ansible.builtin.command:
-    argv:
-      - pvenode
-      - config
-      - get
-      - -property
-      - acme
-  register: proxmox_acme_account
-  changed_when: false
-
-- name: Configure default ACME account
-  when: not 'account=' ~ pve_acme_account_id in proxmox_acme_account.stdout
-  ansible.builtin.command:
-    argv:
-      - pvenode
-      - config
-      - set
-      - -acme
-      - "account={{ pve_acme_account_id }}"
-  changed_when: true
-
-- name: Get ACME domain
-  ansible.builtin.command:
-    argv:
-      - pvenode
-      - config
-      - get
-      - -property
-      - acmedomain0
-  register: proxmox_acme_domain
-  changed_when: false
-
-- name: Configure ACME domain
-  when: not pve_fqdn ~ ',plugin=desec' in proxmox_acme_domain.stdout
-  ansible.builtin.command:
-    argv:
-      - pvenode
-      - config
-      - set
-      - -acmedomain0
-      - "{{ pve_fqdn }},plugin=desec"
-  changed_when: true
-
-# Not sure if this works. Ordering seems impossible when a certificate is still
-# available, albeit deleted from the UI.
-- name: Order certificate
-  ansible.builtin.command:
-    argv:
-      - pvenode
-      - acme
-      - cert
-      - order
-  register: proxmox_acme_order
-  failed_when: >-
-    proxmox_acme_order.rc != 0 and
-    not 'Custom certificate exists' in proxmox_acme_order.stderr
-  changed_when: proxmox_acme_order.rc == 0
+    node_name: "{{ ansible_facts.hostname }}"
+    account: "{{ pve_acme_account_id }}"
+    domains:
+      - domain: "{{ pve_fqdn }}"
+        plugin: desec

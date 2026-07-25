@@ -1,3 +1,23 @@
+- name: Ensure pip is installed
+  ansible.builtin.package:
+    name:
+      - python3-pip
+  tags:
+    - lxc
+    - vm
+
+- name: Ensure proxmoxer and requests are installed
+  ansible.builtin.pip:
+    name:
+      # renovate: pypi
+      - proxmoxer==2.3.0
+      # renovate: pypi
+      - requests==2.34.2
+    break_system_packages: true
+  tags:
+    - lxc
+    - vm
+
 - name: Configure DNS
   ansible.builtin.import_tasks: dns.yml
 
@@ -20,26 +40,6 @@
 - name: Install fake subscription such that package update notifications work
   when: pve_remove_subscription_warning | ansible.builtin.bool
   ansible.builtin.import_tasks: subscription.yml
-
-- name: Ensure pip is installed
-  ansible.builtin.package:
-    name:
-      - python3-pip
-  tags:
-    - lxc
-    - vm
-
-- name: Ensure proxmoxer and requests are installed
-  ansible.builtin.pip:
-    name:
-      # renovate: pypi
-      - proxmoxer==2.3.0
-      # renovate: pypi
-      - requests==2.34.2
-    break_system_packages: true
-  tags:
-    - lxc
-    - vm
 
 - name: Create ZFS datasets
   ansible.builtin.import_tasks:

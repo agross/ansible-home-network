@@ -28,8 +28,9 @@ collections:
     version: 13.2.0
   - name: community.healthchecksio
     version: 1.5.2
-  - name: community.proxmox
-    version: 2.0.0
+  - name: https://github.com/ansible-collections/community.proxmox.git
+    type: git
+    version: 841cdf965a250fab5a2bac1d5c7ecd75dc73b9bd
   - name: devsec.hardening
     version: 10.6.0
   - name: hifis.toolkit
