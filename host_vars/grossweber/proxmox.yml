@@ -5,7 +5,6 @@ proxmox:
   tags:
     - gw
   protection: true
-  startup: order=any
   ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
   hookscript: lxc-fedora.sh
   features:
