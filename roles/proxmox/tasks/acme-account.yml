@@ -1,24 +1,11 @@
-# The crap Proxmox APIs for ACME do not work with tokens and the user ID MUST be
-# root@pam. Of course, we also need to pass the TOTP and generate it manually.
-# What a shit show.
-#
-# https://forum.proxmox.com/threads/111745/#post-482006
 - name: Register ACME account
   community.proxmox.proxmox_acme_account:
-    api_user: root@pam
-    api_password: "{{ proxmox_api_password | ansible.builtin.mandatory }}"
-    api_otp: "{{ proxmox_api_totp_secret | ansible.builtin.mandatory | totp }}"
-
     name: "{{ pve_acme_account_id }}"
     contact: "{{ pve_acme_account_email }}"
     directory: https://acme-v02.api.letsencrypt.org/directory
 
 - name: Configure ACME plugin
   community.proxmox.proxmox_acme_plugin_dns:
-    api_user: root@pam
-    api_password: "{{ proxmox_api_password | ansible.builtin.mandatory }}"
-    api_otp: "{{ proxmox_api_totp_secret | ansible.builtin.mandatory | totp }}"
-
     name: desec
     plugin: desec
     data:
@@ -27,10 +14,6 @@
 
 - name: Order ACME certificate
   community.proxmox.proxmox_acme_certificate:
-    api_user: root@pam
-    api_password: "{{ proxmox_api_password | ansible.builtin.mandatory }}"
-    api_otp: "{{ proxmox_api_totp_secret | ansible.builtin.mandatory | totp }}"
-
     node_name: "{{ ansible_facts.hostname }}"
     account: "{{ pve_acme_account_id }}"
     domains:
