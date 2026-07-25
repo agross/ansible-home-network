@@ -75,8 +75,8 @@ proxmox:
       options:
         mountoptions: discard;noatime
     mp8:
-      host_path: /tank/nextcloud/mariadb
-      mountpoint: /data/nextcloud/mariadb/data
+      host_path: /tank/nextcloud/postgres
+      mountpoint: /data/nextcloud/db
       options:
         mountoptions: discard;noatime
     mp9:
@@ -252,14 +252,13 @@ zfs_datasets:
     chown:
       owner: 100000
       group: 100000
-  tank/nextcloud/mariadb:
+  tank/nextcloud/postgres:
     chown:
-      owner: 100999
-      group: 100999
+      owner: 100070
+      group: 100070
     options:
       prefetch: none
-      # https://www.reddit.com/r/zfs/comments/u1xklc/mariadbmysql_database_settings_for_zfs/
-      recordsize: 16K
+      recordsize: 8K
     snapshot:
   tank/nextcloud/elasticsearch:
     chown:
