@@ -84,97 +84,102 @@ proxmox:
       mountpoint: /data/nextcloud/elasticsearch/data
       options:
         mountoptions: discard;noatime
-
     mp10:
+      host_path: /tank/nextcloud/qdrant
+      mountpoint: /data/nextcloud/qdrant
+      options:
+        mountoptions: discard;noatime
+
+    mp11:
       host_path: /tank/commafeed/postgres
       mountpoint: /data/commafeed/db
       options:
         mountoptions: discard;noatime
 
-    mp11:
+    mp12:
       host_path: /tank/feedr/postgres
       mountpoint: /data/feedr/db
       options:
         mountoptions: discard;noatime
 
-    mp12:
+    mp13:
       host_path: /tank/freshrss/postgres
       mountpoint: /data/freshrss/db
       options:
         mountoptions: discard;noatime
 
-    mp13:
+    mp14:
       host_path: /tank/tandoor/app
       mountpoint: /data/tandoor/app
       options:
         mountoptions: discard;noatime
-    mp14:
+    mp15:
       host_path: /tank/tandoor/postgres
       mountpoint: /data/tandoor/db
       options:
         mountoptions: discard;noatime
 
-    mp15:
+    mp16:
       host_path: /tank/vaultwarden/app
       mountpoint: /data/vaultwarden/app
       options:
         mountoptions: discard;noatime
-    mp16:
+    mp17:
       host_path: /tank/vaultwarden/postgres
       mountpoint: /data/vaultwarden/db
       options:
         mountoptions: discard;noatime
 
-    mp17:
+    mp18:
       host_path: /tank/prometheus/app
       mountpoint: /data/prometheus/app
       options:
         mountoptions: discard;noatime
-    mp18:
+    mp19:
       host_path: /tank/prometheus/app/data
       mountpoint: /data/prometheus/app/data
       options:
         mountoptions: discard;noatime
-    mp19:
+    mp20:
       host_path: /tank/prometheus/backups
       mountpoint: /data/prometheus/backups
       options:
         mountoptions: discard;noatime
 
-    mp20:
+    mp21:
       host_path: /tank/renovate/app
       mountpoint: /data/renovate/app
       options:
         mountoptions: discard;noatime
-    mp21:
+    mp22:
       host_path: /tank/renovate/postgres
       mountpoint: /data/renovate/db
       options:
         mountoptions: discard;noatime
 
-    mp22:
+    mp23:
       host_path: /tank/harbor/app
       mountpoint: /data/harbor/app
       options:
         mountoptions: discard;noatime
-    mp23:
+    mp24:
       host_path: /tank/harbor/postgres
       mountpoint: /data/harbor/app/database
       options:
         mountoptions: discard;noatime
-    mp24:
+    mp25:
       host_path: /tank/harbor/redis
       mountpoint: /data/harbor/app/redis
       options:
         mountoptions: discard;noatime
 
-    mp25:
+    mp26:
       host_path: /tank/anytype
       mountpoint: /data/anytype/data
       options:
         mountoptions: discard;noatime
 
-    mp26:
+    mp27:
       host_path: /tank/downloads
       mountpoint: /data/jdownloader/data
       options:
@@ -261,6 +266,15 @@ zfs_datasets:
       owner: 101000
       group: 100000
     options:
+      prefetch: none
+      recordsize: 8K
+    snapshot:
+  tank/nextcloud/qdrant:
+    chown:
+      owner: 100000
+      group: 100000
+    options:
+      prefetch: none
       recordsize: 8K
     snapshot:
 
