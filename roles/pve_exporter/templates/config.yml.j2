@@ -1,5 +1,4 @@
 default:
-  user: "{{ proxmox_api_user | ansible.builtin.mandatory }}"
-  token_name: ansible
-  token_value: "{{ proxmox_api_token_secret | ansible.builtin.mandatory }}"
+  user: "{{ pve_exporter_user | ansible.builtin.mandatory }}"
+  password: "{{ pve_exporter_password | ansible.builtin.mandatory }}"
   verify_ssl: false

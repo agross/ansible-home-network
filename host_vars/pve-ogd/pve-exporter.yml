@@ -1,0 +1,2 @@
+pve_exporter_user: pve-exporter@pve
+pve_exporter_password: "{{ vault_pve_exporter_password }}"

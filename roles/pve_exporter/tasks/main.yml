@@ -1,3 +1,16 @@
+- name: Ensure exporter user exists
+  community.proxmox.proxmox_user:
+    name: "{{ pve_exporter_user | ansible.builtin.mandatory }}"
+    password: "{{ pve_exporter_password | ansible.builtin.mandatory }}"
+    comment: Used by pve_exporter
+
+- name: Add exporter user permissions
+  community.proxmox.proxmox_access_acl:
+    type: user
+    ugid: "{{ pve_exporter_user }}"
+    path: /
+    roleid: PVEAuditor
+
 - name: Ensure pip and venv are installed
   ansible.builtin.package:
     name:
