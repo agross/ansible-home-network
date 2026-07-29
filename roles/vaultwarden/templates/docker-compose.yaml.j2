@@ -23,7 +23,7 @@ services:
       retries: 3
 
   app:
-    image: vaultwarden/server:1.37.0-alpine
+    image: vaultwarden/server:1.37.1-alpine
     restart: unless-stopped
     user: "{{ vaultwarden_uid_gid | ansible.builtin.mandatory }}:{{ vaultwarden_uid_gid }}"
     ports:
