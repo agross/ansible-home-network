@@ -11,7 +11,7 @@ roles:
   - name: geerlingguy.postfix
     version: 2.1.0
   - name: geerlingguy.swap
-    version: 2.0.0
+    version: 2.1.0
   - name: lae.proxmox
     version: v1.10.1
   - name: xanmanning.k3s
