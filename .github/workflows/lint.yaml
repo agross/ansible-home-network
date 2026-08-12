@@ -32,12 +32,27 @@ jobs:
       - name: Get latest code
         uses: actions/checkout@v7.0.1
 
+      - name: Save ansible vault password for vault ID "agross2"
+        run: |
+          printf '%s' "$ANSIBLE_VAULT_AGROSS2" > .ansible-vault-agross2
+          chmod 600 .ansible-vault-agross2
+        env:
+          ANSIBLE_VAULT_AGROSS2: ${{ secrets.ANSIBLE_VAULT_AGROSS2 }}
+
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v26.6.0
         with:
           setup_python: false
           requirements_file: requirements.yml
           args: --exclude .ansible .github
+        env:
+          ANSIBLE_VAULT_IDENTITY_LIST: agross2@.ansible-vault-agross2
+
+      - name: Clean up secrets
+        if: always()
+        run: |
+          rm --force \
+             .ansible-vault-agross2
 
   actionlint:
     name: GitHub Actions Lint
