@@ -215,6 +215,8 @@ services:
     cpus: 10
     restart: unless-stopped
     environment:
+      FORWARDED_ALLOW_IPS: {{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
+
       # Cannot use http://app because MCP would use https://app/apps/oidc (TLS)
       # to connect to Nextcloud.
       NEXTCLOUD_HOST: https://{{ nextcloud_domain | ansible.builtin.mandatory }}
