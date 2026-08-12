@@ -52,11 +52,14 @@
         ansible.builtin.dict2items
       }}
 
-- name: Forward IPv4 ports # noqa args[module]
+- name: Forward IPv4 ports
   ansible.posix.firewalld:
     zone: "{{ item.0.key }}"
     port_forward:
-      - "{{ item.1 }}"
+      - proto: "{{ item.1.proto }}"
+        port: "{{ item.1.port }}"
+        toaddr: "{{ item.1.toaddr }}"
+        toport: "{{ item.1.toport }}"
     immediate: false
     permanent: true
     state: enabled
