@@ -23,7 +23,7 @@ logger:
 auth:
   cookie_secure: true
   trusted_proxies:
-    - {{ network.ip4 }}
+    - {{ hostvars['proxy-ogd'].interfaces.lan.ip4.address }}
   failed_login_rate_limit: 1/second;5/minute;20/hour
   session_length: {{ '7d' | community.general.to_seconds | int }}
 
