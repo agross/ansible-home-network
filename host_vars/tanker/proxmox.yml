@@ -62,6 +62,10 @@ proxmox:
       mountpoint: /data/nextcloud/app/data
       options:
         mountoptions: discard;noatime
+    - host_path: /tank/nextcloud/html
+      mountpoint: /data/nextcloud/app/html
+      options:
+        mountoptions: discard;noatime
     - host_path: /tank/nextcloud/backups
       mountpoint: /data/nextcloud/backups
       options:
@@ -219,6 +223,11 @@ zfs_datasets:
       group: 100033
     options:
       recordsize: 32K
+    snapshot:
+  tank/nextcloud/html:
+    chown:
+      owner: 100033
+      group: 100033
     snapshot:
   tank/nextcloud/backups:
     chown:
