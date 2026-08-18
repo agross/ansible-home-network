@@ -255,6 +255,7 @@ services:
     # Used as the qdrant collection name prefix, needs to be stable.
     hostname: mcp
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./mcp/data:/app/data
       - ./mcp/oauth:/app/.oauth
     ports:
