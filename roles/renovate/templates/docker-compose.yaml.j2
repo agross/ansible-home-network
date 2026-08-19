@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17.10-alpine
+    image: postgres:18.4-alpine
     environment:
       POSTGRES_USER: renovate
       POSTGRES_PASSWORD: renovate
@@ -11,7 +11,7 @@ services:
       PGPASSWORD: renovate
       PGDATABASE: renovate
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql
     healthcheck:
       test:
         - CMD
