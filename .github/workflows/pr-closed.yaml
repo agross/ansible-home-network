@@ -108,16 +108,10 @@ jobs:
             paste --serial --delimiter=,
 
             echo ROLES
-          } >> "$GITHUB_OUTPUT"
+          } | tee --append "$GITHUB_OUTPUT"
         env:
           CHANGE_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
           CHANGE_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.after }}
-
-      - name: Show roles
-        run: |
-          printf 'Roles affected by the change: %s\n' "$ROLES"
-        env:
-          ROLES: ${{ steps.affected-roles.outputs.roles }}
 
   run-ansible:
     name: Run Ansible with tags ${{ needs.affected-roles.outputs.roles }}

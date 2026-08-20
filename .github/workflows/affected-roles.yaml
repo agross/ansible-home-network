@@ -57,13 +57,7 @@ jobs:
             paste --serial --delimiter=' '
 
             echo ROLES
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Show roles
-        run: |
-          printf 'Roles affected by the PR: %s\n' "$ROLES"
-        env:
-          ROLES: ${{ steps.affected-roles.outputs.roles }}
+          } | tee --append "$GITHUB_OUTPUT"
 
       - name: Set role labels
         if: steps.affected-roles.outputs.roles != ''
