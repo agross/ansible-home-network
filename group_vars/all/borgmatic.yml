@@ -10,14 +10,15 @@ borgmatic_ssh_command: >-
 
 borgmatic_ssh_host: 172.16.0.10
 borgmatic_borg_remote_path: /usr/local/bin/borg
+
+borgmatic_archive_hostname: "{{ ansible_facts.hostname }}"
+
 borgmatic_repository: >-
   ssh://{{
     borgmatic_ssh_host | ansible.builtin.mandatory
   }}/volume2/NetBackup/borg/{{
     site | ansible.builtin.mandatory
-  }}/{{
-    borgmatic_server_name | default(ansible_facts.hostname)
-  }}
+  }}/{{ borgmatic_archive_hostname }}
 
 borgmatic_extra_config:
   # Constants to use in the configuration file. Within option values, all
@@ -28,13 +29,17 @@ borgmatic_extra_config:
   constants:
     name: system
 
+  # Hostname to use for the {hostname} placeholder in archive_name_format,
+  # match_archives, and other archive options.
+  archive_hostname: "{{ borgmatic_archive_hostname }}"
+
   # A Borg pattern for filtering down the archives used by borgmatic actions
   # that operate on multiple archives. For Borg 1.x, use a shell pattern here
   # and see the output of "borg help placeholders" for details. For Borg 2.x,
   # see the output of "borg help match-archives". If match_archives is not
   # specified, borgmatic defaults to deriving the match_archives value from
   # archive_name_format.
-  match_archives: "sh:{{ borgmatic_server_name | default('{hostname}') }}-{name}-*"
+  match_archives: "sh:{hostname}-{name}-*"
 
   # Name of the archive to create. Borg placeholders can be used. See the output
   # of "borg help placeholders" for details. Defaults to
