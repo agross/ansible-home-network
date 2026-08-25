@@ -6,31 +6,32 @@ set -euo pipefail
 cd -- {{ ccu_root | ansible.builtin.quote }}
 
 ccu() {
-  local -a files_by_mtime
   local newest_file
+
+  newest_file="$(
+    LC_ALL=C find {{ ccu_root | ansible.builtin.quote }}/backups \
+                  -maxdepth 1 \
+                  -type f \
+                  -name '*.sbk' \
+                  -printf '%T@\t%f\n' |
+      LC_ALL=C sort --numeric-sort |
+      tail --lines=1 |
+      cut --fields=2-
+  )"
+
+  if [[ -z "$newest_file" ]]; then
+    printf 'No .sbk backup found\n' >&2
+    return 1
+  fi
 
   docker compose up \
                  --wait \
                  ccu
 
-  mapfile -t files_by_mtime < \
-    <(find {{ ccu_root | ansible.builtin.quote }}/backups \
-                -maxdepth 1 \
-                -type f \
-                -name '*.sbk' \
-                -printf '%T@\t%p\n' |
-      sort --reverse |
-      cut --fields=2-)
-
-  newest_file="${files_by_mtime[0]}"
-  newest_file="${newest_file##*/}"
-
   docker compose \
          exec \
          ccu \
          /bin/restoreBackup.sh "/backups/$newest_file"
-
-  docker compose stop ccu
 }
 
 ccu
