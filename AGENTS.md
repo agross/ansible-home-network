@@ -5,15 +5,15 @@ running in my networks at the `home` and `OGD` sites.
 
 ## Project Setup
 
-1. Clone repository
-2. Install dependencies (`bootstrap` in the project root)
+Run `bootstrap` after checkout or when `requirements.yml` changes.
 
 ## Ansible
 
 * Use fully-qualified modules, e.g., `ansible.builtin.file` instead of `file`.
 * Use fully-qualified filters, e.g., `ansible.builtin.mandatory` instead of `mandatory`
 * Jinja-builtins can be used in short form, e.g., `map`.
-* End comments with a dot (`.`).
+* End prose comments with a dot (`.`). Preserve machine-readable directives
+  such as `# renovate:` and `# noqa`.
 * Put `when` before the module name.
 * Put the following keys after the module:
   * `loop`,
@@ -24,63 +24,19 @@ running in my networks at the `home` and `OGD` sites.
   but NOTHING else.
 * Do not use `---` at the beginning of YAML files.
 
-## Codex Review Guidelines
-
-When reviewing Renovate pull requests for dependency upgrades, identify
-potential breaking changes in the target versions in the context of the
-Ansible role or deployed service affected by the PR.
-
-Use the local filesystem context whenever possible. Read the PR metadata,
-changed files, affected roles, diff, release notes, and migration guide
-content before writing findings. Inspect affected role files directly,
-especially templates, rendered configuration inputs, defaults, handlers,
-host vars, group vars, and Docker Compose files.
-
-Focus findings on breaking changes, migration steps, removed or renamed
-options, changed defaults, config/schema changes, data migration
-requirements, operational downtime, image/runtime requirements, removed API
-endpoints, and behavior that could affect this repository's deployment.
-
-Do not list generic release-note items that are not relevant to the deployed
-role. If a finding is uncertain, say why and cite the file or setting that
-caused the uncertainty. If release notes are available but no relevant
-breaking changes are found, say that directly. If no release notes or
-changelog are available after checking the PR body and obvious upstream
-release pages, say that directly.
-
-PR comments must start with:
-
-```markdown
-<!-- codex-renovate-release-review -->
-```
-
-Use this structure:
-
-```markdown
-## Codex Renovate release review
-
-One short sentence naming the dependency upgrade and affected role or service.
-
-### Potential breaking changes
-
-- Impact.
-  Repository context, citing changed files or role files.
-  Suggested manual check or mitigation.
-
-### Release notes checked
-
-- Release-note or changelog URL.
-```
-
-Do not edit files during a Renovate review unless explicitly asked to fix the
-PR.
-
 ## Agent skills
+
+### Renovate reviews
+
+Before reviewing, commenting on, or editing a Renovate dependency PR, read
+`docs/agents/renovate-review.md`.
 
 ### Issue tracker
 
-Issues are tracked with Beads (`bd`) in this repository. See `docs/agents/issue-tracker.md`.
+Before creating, claiming, updating, or closing work, read
+`docs/agents/issue-tracker.md`.
 
 ### Domain docs
 
-This repository uses a single-context domain documentation layout. See `docs/agents/domain.md`.
+Before changing domain vocabulary or ADR-governed behavior, read
+`docs/agents/domain.md`.
