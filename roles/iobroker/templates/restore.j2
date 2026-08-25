@@ -11,7 +11,7 @@ iobroker() {
   # the container entered maintenance mode while it is actually still running
   # locking the database files we want to restore.
 
-  local -a iob files_by_mtime
+  local -a iob
   local newest_file
 
   iob=(docker compose run --rm --user iobroker --entrypoint iobroker app)
@@ -25,17 +25,21 @@ iobroker() {
   "${iob[@]}" version
 
   printf 'Finding newest backup\n'
-  mapfile -t files_by_mtime < \
-    <(find {{ iobroker_root | ansible.builtin.quote }}/backups \
-                -maxdepth 1 \
-                -type f \
-                -name 'iobroker_*.tar.gz' \
-                -printf '%T@\t%p\n' |
-      sort --reverse |
-      cut --fields=2-)
+  newest_file="$(
+    LC_ALL=C find {{ iobroker_root | ansible.builtin.quote }}/backups \
+                  -maxdepth 1 \
+                  -type f \
+                  -name 'iobroker_*.tar.gz' \
+                  -printf '%T@\t%f\n' |
+      LC_ALL=C sort --numeric-sort |
+      tail --lines=1 |
+      cut --fields=2-
+  )"
 
-  newest_file="${files_by_mtime[0]}"
-  newest_file="${newest_file##*/}"
+  if [[ -z "$newest_file" ]]; then
+    printf 'No ioBroker backup found\n' >&2
+    return 1
+  fi
 
   printf 'Restoring backup %s\n' "$newest_file"
   "${iob[@]}" restore "$newest_file"
