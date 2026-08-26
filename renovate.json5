@@ -52,6 +52,7 @@
       matchPackageNames: [
         'ghcr.io/agross/feedr',
         'ghcr.io/cbcoutinho/nextcloud-mcp-server',
+        'ollama/ollama',
       ],
       automerge: true,
       automergeType: 'branch',
