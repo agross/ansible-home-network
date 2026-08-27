@@ -45,6 +45,7 @@
     path: "/usr/local/bin/{{ item }}"
   loop:
     - influx-drop
+    - influx-measurements
     - influx-rename
 
 - name: Symlink backup configuration

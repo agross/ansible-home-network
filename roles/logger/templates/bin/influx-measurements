@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:s
+
+set -euo pipefail
+
+influxdb=(docker compose \
+                 --project-name logger \
+                 exec \
+                 --no-TTY \
+                 influxdb)
+
+measurements() {
+  if [[ "${1-}" == --prefix ]]; then
+    local prefix="${2?Need measurement prefix}"
+    shift 2
+  fi
+
+  local bucket="${1?Need bucket}"
+  local query
+
+  if [[ -v prefix ]]; then
+    query=$(cat <<EOF
+      import "influxdata/influxdb/schema"
+      import "strings"
+
+      schema.measurements(bucket: "$bucket")
+      |> filter(fn: (r) => strings.hasPrefix(v: r._value, prefix: "$prefix"))
+EOF
+)
+  else
+    query=$(cat <<EOF
+      import "influxdata/influxdb/schema"
+
+      schema.measurements(bucket: "$bucket")
+EOF
+)
+  fi
+
+  local -a result
+  mapfile -t -s 4 result < <("${influxdb[@]}" influx query --raw "$query")
+
+  local measurement
+  for measurement in "${result[@]}"; do
+    # ,,0,What we are interested in.
+    measurement="${measurement:4:-1}"
+
+    # Last line: a single \r.
+    [[ -z "$measurement" ]] && break
+
+    printf '%s\n' "$measurement"
+  done
+}
+
+measurements "${@}"

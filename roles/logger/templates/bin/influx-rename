@@ -5,6 +5,7 @@ set -euo pipefail
 influxdb=(docker compose \
                  --project-name logger \
                  exec \
+                 --no-TTY \
                  influxdb)
 
 create-swap() {
