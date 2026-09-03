@@ -15,6 +15,21 @@ mqtt:
   user: '{FRIGATE_MQTT_USER}'
   password: '{FRIGATE_MQTT_PASSWORD}'
 
+{% if frigate_openrouter_api_key | default('', true) | length > 0 %}
+genai:
+  provider: openai
+  api_key: '{FRIGATE_OPENAI_API_KEY}'
+  model: {{ frigate_genai_model }}
+
+review:
+  genai:
+    enabled: true
+    # Analyze images with higher resolution.
+    image_source: recordings
+    additional_concerns:
+      - animals in the garden
+{% endif %}
+
 logger:
   default: info
   # logs:
