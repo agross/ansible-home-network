@@ -26,6 +26,6 @@ services:
       - qdrant
 
   qdrant:
-    image: qdrant/qdrant:v1.19.0
+    image: qdrant/qdrant:v1.19.1
     volumes:
       - ./mediakit/qdrant:/qdrant/storage
