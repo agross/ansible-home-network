@@ -296,7 +296,7 @@ services:
       start_interval: 3s
 
   qdrant:
-    image: qdrant/qdrant:v1.19.0
+    image: qdrant/qdrant:v1.19.1
     environment:
       QDRANT__SERVICE__API_KEY: {{ nextcloud_mcp_qdrant_admin_api_key }}
       QDRANT__SERVICE__READ_ONLY_API_KEY: {{ nextcloud_mcp_qdrant_readonly_api_key }}
