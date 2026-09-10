@@ -30,7 +30,7 @@ collections:
     version: 2.0.0
   - name: https://github.com/ansible-collections/community.proxmox.git
     type: git
-    version: bee717ffc65c70277eac6cfe0c299adae9bd6cdb
+    version: 6650aa5535cd25a740e54d7b5259666fc31683b4
   - name: devsec.hardening
     version: 10.6.0
   - name: hifis.toolkit
