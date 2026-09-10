@@ -16,7 +16,7 @@
     directory: "templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
     target: "{{ traefik_cert_exporter_root }}/hooks"
     files:
-      "*":
+      "":
         mode: "750"
       "**/*":
         mode: "750"

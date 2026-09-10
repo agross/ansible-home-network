@@ -1,3 +1,6 @@
+# File settings use source-relative globs, including the .j2 suffix.
+# Exact paths win, followed by the first matching pattern; settings are not merged.
+# A trailing slash matches directories only; the empty key configures the root.
 - name: Create directories
   ansible.builtin.file:
     path: "{{ target }}/{{ item.path }}"
@@ -5,23 +8,24 @@
     owner: "{{ settings.owner | default(omit) }}"
     group: "{{ settings.group | default(omit) }}"
     mode: "{{ settings.mode | default('755', true) }}"
+    recurse: "{{ settings.recurse | default(omit) }}"
   vars:
     settings: >-
       {{
         files[item.path] |
-        default(fnmatch_candidates | first) |
+        default(glob_candidates | first) |
         default(None)
       }}
-    fnmatch_candidates_yaml: |
+    glob_candidates_yaml: |
       {% for entry in files | ansible.builtin.dict2items %}
-      {% if item.path is fnmatch(entry.key) %}
-      - # for debugging, the key of the follow object is: {{ entry.key }}
+      {% if item.path is globmatch(entry.key, item.state) %}
+      - # For debugging, the key of the following object is: {{ entry.key }}.
         {{ entry.value }}
       {% endif %}
       {% endfor %}
-    fnmatch_candidates: >-
+    glob_candidates: >-
       {{
-        fnmatch_candidates_yaml |
+        glob_candidates_yaml |
         ansible.builtin.from_yaml |
         default([], true) |
         list
@@ -29,7 +33,8 @@
     root_directory: >-
       {{
         {
-          'path': ''
+          'path': '',
+          'state': 'directory'
         }
       }}
   loop: >-
@@ -55,19 +60,19 @@
     settings: >-
       {{
         files[item.path] |
-        default(fnmatch_candidates | first) |
+        default(glob_candidates | first) |
         default(None)
       }}
-    fnmatch_candidates_yaml: |
+    glob_candidates_yaml: |
       {% for entry in files | ansible.builtin.dict2items %}
-      {% if item.path is fnmatch(entry.key) %}
-      - # for debugging, the key of the follow object is: {{ entry.key }}
+      {% if item.path is globmatch(entry.key, item.state) %}
+      - # For debugging, the key of the following object is: {{ entry.key }}.
         {{ entry.value }}
       {% endif %}
       {% endfor %}
-    fnmatch_candidates: >-
+    glob_candidates: >-
       {{
-        fnmatch_candidates_yaml |
+        glob_candidates_yaml |
         ansible.builtin.from_yaml |
         default([], true) |
         list
@@ -105,19 +110,19 @@
     settings: >-
       {{
         files[item.path] |
-        default(fnmatch_candidates | first) |
+        default(glob_candidates | first) |
         default(None)
       }}
-    fnmatch_candidates_yaml: |
+    glob_candidates_yaml: |
       {% for entry in files | ansible.builtin.dict2items %}
-      {% if item.path is fnmatch(entry.key) %}
-      - # for debugging, the key of the follow object is: {{ entry.key }}
+      {% if item.path is globmatch(entry.key, item.state) %}
+      - # For debugging, the key of the following object is: {{ entry.key }}.
         {{ entry.value }}
       {% endif %}
       {% endfor %}
-    fnmatch_candidates: >-
+    glob_candidates: >-
       {{
-        fnmatch_candidates_yaml |
+        glob_candidates_yaml |
         ansible.builtin.from_yaml |
         default([], true) |
         list
