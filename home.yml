@@ -117,13 +117,6 @@
     - role: clear-temp-share
       tags: clear-temp-share
 
-- name: OpenClaw
-  hosts: claw
-  become: true
-  gather_facts: false
-  roles:
-    - role: openclaw
-      tags: openclaw
 
 - name: Hosted services on grossweber
   hosts: grossweber
