@@ -1,0 +1,66 @@
+hermes_dashboard_basic_auth_username: agross
+hermes_dashboard_basic_auth_password: "{{ vault_hermes_dashboard_basic_auth_password }}"
+
+hermes_dashboard_enabled: true
+
+hermes_api_server_enabled: false
+hermes_api_server_key: "{{ vault_hermes_api_server_key }}"
+
+hermes_browser_tools_enabled: true
+
+hermes_native_approvals_mode: smart
+hermes_native_approvals_cron_mode: approve
+
+hermes_profile:
+  default:
+    telegram:
+      bot_token: "{{ vault_hermes_profile.default.telegram.bot_token }}"
+      allowed_users: 755375788
+
+  the_dude:
+    anytype:
+      api_key: "{{ vault_hermes_profile.the_dude.anytype.api_key }}"
+
+    exa:
+      api_key: "{{ vault_hermes_profile.the_dude.exa.api_key }}"
+
+    immich:
+      api_key: "{{ vault_hermes_profile.the_dude.immich.api_key }}"
+
+    iobroker:
+      home:
+        host: https://iobroker.home.therightstuff.de
+        username: "{{ vault_hermes_profile.the_dude.iobroker.home.username }}"
+        password: "{{ vault_hermes_profile.the_dude.iobroker.home.password }}"
+      ogd:
+        host: https://iobroker.ogd.therightstuff.de
+        username: "{{ vault_hermes_profile.the_dude.iobroker.ogd.username }}"
+        password: "{{ vault_hermes_profile.the_dude.iobroker.ogd.password }}"
+
+    kodi:
+      host: firetv
+      port: 8081
+      username: "{{ vault_hermes_profile.the_dude.kodi.username }}"
+      password: "{{ vault_hermes_profile.the_dude.kodi.password }}"
+
+    minimax:
+      api_key: "{{ vault_hermes_profile.the_dude.minimax.api_key }}"
+
+    opencode_go:
+      api_key: "{{ vault_hermes_profile.the_dude.opencode_go.api_key }}"
+
+    tandoor:
+      api_key: "{{ vault_hermes_profile.the_dude.tandoor.api_key }}"
+
+    telegram:
+      bot_token: "{{ vault_hermes_profile.the_dude.telegram.bot_token }}"
+      group_allowed_chats:
+        - "-1003674919630"
+      allowed_chats:
+        - "755375788"
+      allowed_users:
+        - "755375788"
+
+    trello:
+      api_key: "{{ vault_hermes_profile.the_dude.trello.api_key }}"
+      token: "{{ vault_hermes_profile.the_dude.trello.token }}"

@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+docker compose \
+       --project-directory {{ hermes_root | ansible.builtin.quote }} \
+       exec \
+       app \
+       hermes \
+       "$@"

@@ -117,6 +117,13 @@
     - role: clear-temp-share
       tags: clear-temp-share
 
+- name: Hermes Agent
+  hosts: hermes
+  become: true
+  gather_facts: false
+  roles:
+    - role: hermes-agent
+      tags: hermes-agent
 
 - name: Hosted services on grossweber
   hosts: grossweber

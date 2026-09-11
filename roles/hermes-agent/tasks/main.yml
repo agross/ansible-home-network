@@ -1,0 +1,98 @@
+- name: Install scripts
+  ansible.builtin.template:
+    src: "templates/bin/{{ item }}.j2"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: 0
+    group: 0
+    mode: "755"
+  loop:
+    - hermes
+
+- name: Ensure backup healthcheck exists
+  ansible.builtin.import_tasks:
+    file: healthcheck.yml
+  vars:
+    healthcheck_name: "{{ ansible_role_name }}"
+    healthcheck_tags:
+      - "site:{{ site }}"
+      - "host:{{ inventory_hostname }}"
+
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    paths:
+      - "{{ playbook_dir }}/templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
+    directory: "{{ lookup('ansible.builtin.first_found', paths, skip=false) }}"
+    target: "{{ hermes_root }}"
+    notify_: Restart hermes-agent service
+    files:
+      app:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "700"
+      app/config.yaml.j2:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "640"
+      app/.env.j2:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "600"
+      app/profiles/*/config.yaml.j2:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "640"
+      app/profiles/*/.env.j2:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "600"
+      app/profiles/**/*/:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "700"
+
+      anytype/home/config.json:
+        owner: 0
+        group: 0
+        mode: "600"
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks: docker-compose-update.yml
+  vars:
+    directory: "{{ hermes_root }}"
+    pull: true
+    build: true
+    notify_: Restart hermes-agent service
+
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ hermes_root }}"
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ hermes_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ hermes_root }}/systemd"
+    local_units: templates/systemd
+    notify_: Restart hermes-agent service
+
+- name: Start service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: hermes_started
+
+- name: Register with loadbalancer
+  ansible.builtin.import_tasks:
+    file: register-with-loadbalancer.yml

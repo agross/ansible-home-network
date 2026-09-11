@@ -1,0 +1,5 @@
+- name: Restart hermes-agent service
+  when: hermes_started is not changed
+  ansible.builtin.systemd:
+    name: hermes-agent.service
+    state: restarted

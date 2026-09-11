@@ -1,0 +1,126 @@
+services:
+  app:
+    image: nousresearch/hermes-agent:v2026.9.7
+    command: gateway run
+    restart: unless-stopped
+    {% if hermes_browser_tools_enabled %}
+    shm_size: {{ hermes_shm_size }}
+    {% endif %}
+    environment:
+      PUID: {{ hermes_uid }}
+      PGID: {{ hermes_gid }}
+
+      # Timezone for cron jobs.
+      HERMES_TIMEZONE: {{ hermes_timezone }}
+
+      {% if hermes_dashboard_enabled %}
+      HERMES_DASHBOARD: 1
+      HERMES_DASHBOARD_HOST: {{ hermes_dashboard_host }}
+      HERMES_DASHBOARD_PORT: {{ hermes_dashboard_port }}
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: {{ hermes_dashboard_basic_auth_username }}
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: {{ hermes_dashboard_basic_auth_password }}
+      {% endif %}
+
+      {% if hermes_api_server_enabled %}
+      API_SERVER_ENABLED: true
+      API_SERVER_HOST: {{ hermes_api_server_host }}
+      API_SERVER_PORT: {{ hermes_api_server_port }}
+      {% if hermes_api_server_cors_origins %}
+      API_SERVER_CORS_ORIGINS: {{ hermes_api_server_cors_origins }}
+      {% endif %}
+      {% endif %}
+    volumes:
+      - ./app:/opt/data
+      - /var/run/docker.sock:/var/run/docker.sock:z
+    {% if hermes_dashboard_enabled or hermes_api_server_enabled %}
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail-with-body
+        {% if hermes_dashboard_enabled %}
+        # Web dashboard.
+        - http://localhost:{{ hermes_dashboard_port }}/api/status
+        {% endif %}
+        {% if hermes_api_server_enabled %}
+        # OpenAI-compatible API server.
+        - http://localhost:{{ hermes_api_server_port }}/health
+        {% endif %}
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+      start_interval: 2s
+    ports:
+      {% if hermes_dashboard_enabled %}
+      # Web dashboard.
+      - {{ hermes_dashboard_port }}:{{ hermes_dashboard_port }}
+      {% endif %}
+      {% if hermes_api_server_enabled %}
+      # OpenAI-compatible API server.
+      - {{ hermes_api_server_port }}:{{ hermes_api_server_port }}
+      {% endif %}
+    {% endif %}
+
+  immich-mcp:
+    image: ghcr.io/joeru/claw2immich:sha-a39ae71
+    environment:
+      IMMICH_BASE_URL: https://{{ immich_domain | ansible.builtin.mandatory }}
+      # Required because /api/server-config no longer exists.
+      IMMICH_EXTERNAL_DOMAIN: https://{{ immich_domain | ansible.builtin.mandatory }}
+      IMMICH_API_KEY: {{ hermes_profile.the_dude.immich.api_key }}
+      IMMICH_PROFILE: read_only
+
+      MCP_TRANSPORT: streamable-http
+      MCP_HOST: 0.0.0.0
+      # MCP_LOG_LEVEL: DEBUG
+
+  kodi-tracker:
+    image: nousresearch/hermes-agent:v2026.9.7
+    entrypoint: [python3, -u]
+    command: /opt/data/profiles/the-dude/skills/personal/kodi-music-summary/scripts/stream.py
+    user: "{{ hermes_uid }}:{{ hermes_gid }}"
+    restart: unless-stopped
+    environment:
+      HERMES_HOME: /opt/data/profiles/the-dude
+      TZ: {{ hermes_timezone }}
+      KODI_HOST: {{ hermes_profile.the_dude.kodi.host }}
+      KODI_PORT: {{ hermes_profile.the_dude.kodi.port }}
+      KODI_USER: {{ hermes_profile.the_dude.kodi.username }}
+      KODI_PASS: {{ hermes_profile.the_dude.kodi.password }}
+    volumes:
+      - ./app:/opt/data
+
+  kodi-mcp:
+    image: kodi-mcp
+    build:
+      context: https://github.com/laHeud/kodi-mcp-server.git
+    environment:
+      KODI_HOST: {{ hermes_profile.the_dude.kodi.host }}
+      KODI_PORT: {{ hermes_profile.the_dude.kodi.port }}
+      KODI_USERNAME: {{ hermes_profile.the_dude.kodi.username }}
+      KODI_PASSWORD: {{ hermes_profile.the_dude.kodi.password }}
+
+      MCP_SERVER_NAME: kodi-controller
+
+      LOG_LEVEL: INFO
+      LOG_FORMAT: json
+
+      ENVIRONMENT: production
+
+  # Needs manual setup:
+  # anytype auth apikey create mcp
+  #
+  # The key needs to be added to the OPENAPI_MCP_HEADERS for anytype-mcp
+  # via the .env file: ANYTYPE_CLI_TOKEN.
+  anytype-cli:
+    image: anyproto/anytype-cli:v0.3.7
+    command:
+      - serve
+      - --listen-address
+      - 0.0.0.0:31012
+    environment:
+      ANYTYPE_API_ALLOWED_HOSTS: anytype-cli
+    volumes:
+      - ./anytype/home:/root/.anytype
+      - ./anytype/config:/root/.config/anytype

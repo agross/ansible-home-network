@@ -1,0 +1,150 @@
+# {{ ansible_managed }}
+
+terminal:
+  cwd: /opt/data/profiles/the-dude
+
+platforms:
+  telegram:
+    enabled: true
+    home_channel:
+      platform: telegram
+      name: Alexander Groß
+      chat_id: "{{ hermes_profile.the_dude.telegram.allowed_users | first }}"
+      user_id: "{{ hermes_profile.the_dude.telegram.allowed_users | first }}"
+
+gateway:
+  platforms:
+    telegram:
+      extra:
+        {% if hermes_profile.the_dude.telegram.allowed_users | default([], true) | length > 0 %}
+        # Global access (DMs + groups). Users here can always invoke the bot.
+        allow_from: {{
+          hermes_profile.the_dude.telegram.allowed_users |
+          ansible.builtin.to_json }}
+        {% endif %}
+        {% if hermes_profile.the_dude.telegram.group_allowed_chats | default([], true) | length > 0 %}
+        # Entire groups — any member is authorized.
+        group_allowed_chats: {{
+          hermes_profile.the_dude.telegram.group_allowed_chats |
+          ansible.builtin.to_json }}
+        observe_unmentioned_group_messages: true
+        {% endif %}
+
+plugins:
+  enabled:
+    - browser-browser-use
+
+model:
+  provider: opencode-go
+  default: glm-5.3-flash
+
+fallback_providers:
+  # docker exec -it hermes-agent-app-1 hermes --profile the-dude auth
+  - provider: openai-codex
+    model: gpt-5.6-luna
+
+approvals:
+  mode: {{ hermes_native_approvals_mode }}
+  cron_mode: {{ hermes_native_approvals_cron_mode }}
+
+display:
+  busy_input_mode: queue
+
+mcp_servers:
+  anytype:
+    command: npx
+    args:
+      - --yes
+      - "@anyproto/anytype-mcp"
+    env:
+      ANYTYPE_API_BASE_URL: http://anytype-cli:31012
+      OPENAPI_MCP_HEADERS: >-
+        { "Authorization": "Bearer ${ANYTYPE_CLI_TOKEN}" }
+
+  immich:
+    url: http://immich-mcp:8000/mcp
+
+  iobroker-home:
+    command: npx
+    args:
+      - --yes
+      - github:agross/iobroker-mcp-server
+    env:
+      IOB_HOST: {{ hermes_profile.the_dude.iobroker.home.host }}
+      IOB_AUTH_TYPE: basic
+      IOB_USER: {{ hermes_profile.the_dude.iobroker.home.username }}
+      IOB_PASS: "${IOBROKER_HOME_PASSWORD}"
+
+  iobroker-ogd:
+    command: npx
+    args:
+      - --yes
+      - github:agross/iobroker-mcp-server
+    env:
+      IOB_HOST: {{ hermes_profile.the_dude.iobroker.ogd.host }}
+      IOB_AUTH_TYPE: basic
+      IOB_USER: {{ hermes_profile.the_dude.iobroker.ogd.username }}
+      IOB_PASS: "${IOBROKER_OGD_PASSWORD}"
+
+  kodi:
+    url: http://kodi-mcp:8080
+
+  tandoor:
+    command: npx
+    args:
+      - --yes
+      - github:starbuck93/tandoor-mcp-server
+    env:
+      TANDOOR_URL: https://{{ tandoor_domain | ansible.builtin.mandatory }}
+      TANDOOR_API_TOKEN: "${TANDOOR_API_TOKEN}"
+
+  trello:
+    command: npx
+    args:
+      - --yes
+      - "@delorenj/mcp-server-trello"
+    env:
+      TRELLO_API_KEY: "${TRELLO_API_KEY}"
+      TRELLO_TOKEN: "${TRELLO_TOKEN}"
+
+skills:
+  disabled:
+    - airtable
+    - architecture-diagram
+    - arxiv
+    - baoyu-infographic
+    - box
+    - claude-code
+    - claude-design
+    - codebase-inspection
+    - codex
+    - competitor-news-monitor
+    - computer-use
+    - design-md
+    - dogfood
+    - gif-search
+    - github
+    - himalaya
+    - inspecting-hermes-desktop-dom
+    - legacy-openclaw-workflows
+    - llm-wiki
+    - manim-video
+    - node-inspect-debugger
+    - notion
+    - obsidian
+    - opencode
+    - p5js
+    - popular-web-designs
+    - powerpoint
+    - python-debugpy
+    - reddit-reading
+    - requesting-code-review
+    - simplify-code
+    - songwriting-and-ai-music
+    - spike
+    - systematic-debugging
+    - teams-meeting-pipeline
+    - test-driven-development
+    - weekly-review-planning
+    - xlsx
+    - xurl

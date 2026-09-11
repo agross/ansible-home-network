@@ -1,0 +1,31 @@
+proxmox:
+  host: pve-home
+  type: lxc
+  id: 1003
+  tags:
+    - service
+  protection: true
+  ostemplate: local:vztmpl/fedora-44-default_20260713_amd64.tar.xz
+  hookscript: lxc-fedora.sh
+  features:
+    - nesting=1
+    - fuse=1
+  password: "{{ vault_proxmox_default_root_password }}"
+  ssh_public_key_github_account: agross
+  memory: 4096
+  swap: 4096
+  # Re-applying the same network config removes the gateway.
+  # Running networkctl reconfigure eth0 helps.
+  netif:
+    net0: >-
+      name=eth0,ip=dhcp,bridge=vmbr0
+  disk_volume:
+    storage: local-zfs
+    size: 20
+    options:
+      mountoptions: discard;noatime
+  custom:
+    - reason: systemd kernel mounts
+      # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
+      key: lxc.cap.drop
+      value: sys_rawio

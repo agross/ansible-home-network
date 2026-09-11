@@ -1,0 +1,1 @@
+borgmatic_encryption_passphrase: "{{ vault_borgmatic_encryption_passphrase }}"

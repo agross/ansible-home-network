@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+
+terminal:
+  cwd: /opt/data/profiles/local-ai
+
+plugins:
+  enabled:
+    - browser-browser-use
+
+model:
+  provider: lmstudio
+  base_url: http://firiel-m2:1234/api/v1
+  model: qwen/qwen3.5-9b
+
+approvals:
+  mode: {{ hermes_native_approvals_mode }}
+  cron_mode: {{ hermes_native_approvals_cron_mode }}

@@ -1,0 +1,32 @@
+# {{ ansible_managed }}
+
+platforms:
+  api_server:
+    enabled: true
+  telegram:
+    enabled: true
+
+# Serve all profiles from the main gateway process.
+gateway:
+  multiplex_profiles: true
+
+plugins:
+  enabled:
+    - browser-browser-use
+
+model:
+  # Requires manual setup:
+  # docker exec -it hermes-agent-app-1 hermes --profile default model
+  provider: openai-codex
+  default: gpt-5.6-terra
+
+approvals:
+  mode: {{ hermes_native_approvals_mode }}
+  cron_mode: {{ hermes_native_approvals_cron_mode }}
+
+onboarding:
+  seen:
+    profile_build_offered: true
+
+trusted_proxies:
+  - {{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
