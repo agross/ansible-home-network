@@ -4,8 +4,9 @@
 # https://www.reddit.com/r/frigate_nvr/comments/1ak5j2q/
 
 # Frigate reformats this files to single-quoted strings during startup. Follow
-# this convention. A new key "version:" is also added.
-# This file will always be "changed" when deploying with Ansible.
+# this convention.
+
+version: 0.18-0
 
 mqtt:
   enabled: true
@@ -17,9 +18,14 @@ mqtt:
 
 {% if frigate_openrouter_api_key | default('', true) | length > 0 %}
 genai:
-  provider: openai
-  api_key: '{FRIGATE_OPENAI_API_KEY}'
-  model: {{ frigate_genai_model }}
+  openai:
+    provider: openai
+    base_url: https://openrouter.ai/api/v1
+    api_key: '{FRIGATE_OPENROUTER_API_KEY}'
+    model: {{ frigate_genai_model }}
+    roles:
+      - descriptions
+      - chat
 
 review:
   genai:
@@ -29,6 +35,11 @@ review:
     additional_concerns:
       - animals in the garden
 {% endif %}
+
+objects:
+  track:
+    - person
+    - cat
 
 logger:
   default: info
@@ -105,7 +116,11 @@ cameras:
             - record
 
     motion:
-      mask: 0.791,0.124,0.84,0,0,0,0,0.122
+      mask:
+        timestamp:
+          friendly_name: Timestamp
+          enabled: true
+          coordinates: 0.791,0.124,0.84,0,0,0,0,0.122
 
     live:
       streams:
@@ -132,7 +147,11 @@ cameras:
       password: '{FRIGATE_RTSP_PASSWORD}'
 
     motion:
-      mask: 0.30,0.07,0.30,0.02,0,0.02,0,0.07
+      mask:
+        timestamp:
+          friendly_name: Timestamp
+          enabled: true
+          coordinates: 0.30,0.07,0.30,0.02,0,0.02,0,0.07
 
     live:
       streams:
@@ -153,7 +172,11 @@ cameras:
             - record
 
     motion:
-      mask: 0.42,0.074,0.42,0.014,0,0.014,0,0.074
+      mask:
+        timestamp:
+          friendly_name: Timestamp
+          enabled: true
+          coordinates: 0.42,0.074,0.42,0.014,0,0.014,0,0.074
 
     live:
       streams:

@@ -1,13 +1,11 @@
 services:
   app:
-    image: ghcr.io/blakeblackshear/frigate:0.17.2
+    image: ghcr.io/blakeblackshear/frigate:0.18.0
     restart: unless-stopped
     stop_grace_period: 30s
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/apex_0:/dev/apex_0
-    cap_add:
-      - CAP_PERFMON # Intel GPU performance counters.
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./app:/config
@@ -23,8 +21,7 @@ services:
       FRIGATE_RTSP_PASSWORD: {{ frigate_camera_password | urlencode }}
       {% endif %}
       {% if frigate_openrouter_api_key | default('', true) | length > 0 %}
-      FRIGATE_OPENAI_API_KEY: {{ frigate_openrouter_api_key }}
-      OPENAI_BASE_URL: https://openrouter.ai/api/v1
+      FRIGATE_OPENROUTER_API_KEY: {{ frigate_openrouter_api_key }}
       {% endif %}
     ports:
       - 1984:1984 # go2rtc UI.
