@@ -97,6 +97,12 @@ streams:
   west-preview:
     - rtsp://{{ frigate_camera_user | urlencode }}:{{ frigate_camera_password | default('') | urlencode }}@west.cam.{{ network.domain }}:554/Preview_01_sub
 
+api:
+  username: {{ frigate_go2rtc_api_username | ansible.builtin.mandatory }}
+  password: {{ frigate_go2rtc_api_password | ansible.builtin.mandatory }}
+  # localhost access is OK without auth.
+  local_auth: false
+
 webrtc:
   candidates:
     - {{ interfaces.lan.ip4.address }}:8555

@@ -1,5 +1,15 @@
 frigate_camera_password: "{{ vault_frigate_camera_password }}"
 
+frigate_go2rtc_api_password: "{{ vault_frigate_go2rtc_api_password }}"
+
+frigate_go2rtc_public_streams:
+  - east
+  - east-preview
+  - south
+  - south-preview
+  - west
+  - west-preview
+
 frigate_mqtt_user: frigate
 frigate_mqtt_password: "{{ vault_frigate_mqtt_password }}"
 

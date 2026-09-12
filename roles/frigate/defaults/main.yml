@@ -4,6 +4,9 @@ frigate_root: "/data/{{ ansible_role_name }}"
 frigate_go2rtc_release_version: v1.9.14
 frigate_go2rtc_release_file: go2rtc_linux_amd64
 
+frigate_go2rtc_api_username: go2rtc
+frigate_go2rtc_public_streams: []
+
 frigate_camera_user: frigate
 
 frigate_mqtt_topic_prefix: "{{ site }}/frigate"

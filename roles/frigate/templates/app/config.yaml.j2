@@ -185,15 +185,10 @@ go2rtc:
       - ws
 
   api:
-    allow_paths:
-      - / # For UI and HTML pages like /webrtc.html.
-      - /api
-      - /api/log
-      - /api/schemes
-      - /api/streams
-      - /api/streams.dot
-      - /api/webrtc
-      - /api/ws
+    username: {{ frigate_go2rtc_api_username | ansible.builtin.mandatory }}
+    password: {{ frigate_go2rtc_api_password | ansible.builtin.mandatory }}
+    # localhost access from Frigate is OK without auth.
+    local_auth: false
 
   # https://github.com/AlexxIT/go2rtc/issues/1368#issuecomment-2467363295
   ffmpeg:

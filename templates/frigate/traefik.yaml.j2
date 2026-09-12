@@ -8,8 +8,33 @@ http:
 
     {{ ansible_role_name }}-go2rtc:
       entrypoints: https
-      rule: Host(`go2rtc.{{ network.domain }}`)
+      rule: Host(`{{ frigate_go2rtc_domain }}`)
       service: {{ ansible_role_name }}-go2rtc
+
+    {{ ansible_role_name }}-go2rtc-public:
+      entrypoints: https
+      rule: >-
+        Host(`{{ frigate_go2rtc_domain }}`) &&
+        Method(`GET`) &&
+        ( Path(`/webrtc.html`) || Path(`/api/ws`) ) &&
+        (
+        {% for stream in frigate_go2rtc_public_streams %}
+          Query(`src`, `{{ stream }}`){% if not loop.last %} ||{% endif %}
+        {% endfor %}
+        )
+      service: {{ ansible_role_name }}-go2rtc
+      middlewares:
+        - {{ ansible_role_name }}-go2rtc-upstream-auth
+
+  middlewares:
+    {{ ansible_role_name }}-go2rtc-upstream-auth:
+      headers:
+        customRequestHeaders:
+          Authorization: >-
+            Basic {{
+              (frigate_go2rtc_api_username ~ ':' ~ frigate_go2rtc_api_password) |
+              ansible.builtin.b64encode
+            }}
 
   services:
     {{ ansible_role_name }}:
