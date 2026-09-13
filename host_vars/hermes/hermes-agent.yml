@@ -46,6 +46,16 @@ hermes_profile:
     minimax:
       api_key: "{{ vault_hermes_profile.the_dude.minimax.api_key }}"
 
+    nextcloud:
+      gw:
+        host: https://cloud.grossweber.com
+        username: "{{ vault_hermes_profile.the_dude.nextcloud.gw.username }}"
+        password: "{{ vault_hermes_profile.the_dude.nextcloud.gw.password }}"
+      trs:
+        host: https://{{ nextcloud_domain }}
+        username: "{{ vault_hermes_profile.the_dude.nextcloud.trs.username }}"
+        password: "{{ vault_hermes_profile.the_dude.nextcloud.trs.password }}"
+
     opencode_go:
       api_key: "{{ vault_hermes_profile.the_dude.opencode_go.api_key }}"
 
