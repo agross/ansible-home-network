@@ -55,6 +55,12 @@
         owner: 0
         group: 0
         mode: "600"
+        notify_: null
+      docker-compose.yaml.j2:
+        owner: 0
+        group: 0
+        mode: "600"
+        notify_: Reload hermes-agent service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -62,7 +68,7 @@
     directory: "{{ hermes_root }}"
     pull: true
     build: true
-    notify_: Restart hermes-agent service
+    notify_: Reload hermes-agent service
 
 - name: Restore from backup if requested
   when: restore is defined
