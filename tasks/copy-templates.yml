@@ -47,7 +47,7 @@
     }}
   loop_control:
     label: "{{ item.path }}{{ ' settings=' ~ settings if settings }}"
-  notify: "{{ notify_ | default(omit) }}"
+  register: copy_template_directory_results
 
 - name: Copy non-template files
   ansible.builtin.copy:
@@ -88,7 +88,7 @@
     }}
   loop_control:
     label: "{{ item.path }}{{ ' settings=' ~ settings if settings }}"
-  notify: "{{ notify_ | default(omit) }}"
+  register: copy_template_file_results
 
 - name: Copy template files
   ansible.builtin.template:
@@ -138,4 +138,58 @@
     }}
   loop_control:
     label: "{{ item.path }}{{ ' settings=' ~ settings if settings }}"
-  notify: "{{ notify_ | default(omit) }}"
+  register: copy_template_template_results
+
+- name: Notify changed template groups
+  when: copy_template_notifications | length > 0
+  ansible.builtin.debug:
+    msg: "{{ copy_template_notifications | ansible.builtin.to_nice_yaml }}"
+  vars:
+    copy_template_changed_results: >-
+      {{
+        (
+          copy_template_directory_results.results +
+          copy_template_file_results.results +
+          copy_template_template_results.results
+        ) |
+        selectattr('changed') |
+        list
+      }}
+    copy_template_notifications_yaml: |
+      {% for result in copy_template_changed_results %}
+      {% set item = result.item %}
+      {% set glob_candidates_yaml %}
+      {% for entry in files | ansible.builtin.dict2items %}
+      {% if item.path is globmatch(entry.key, item.state) %}
+      - {{ entry.value | ansible.builtin.to_json }}
+      {% endif %}
+      {% endfor %}
+      {% endset %}
+      {% set settings =
+          files[item.path] |
+          default(glob_candidates_yaml | ansible.builtin.from_yaml | first) |
+          default({})
+      %}
+      {% set notification =
+          settings.notify_
+          if 'notify_' in settings
+          else notify_ | default(none)
+      %}
+      {% if notification is string and notification != omit and notification | length > 0 %}
+      - {{ notification | ansible.builtin.to_json }}
+      {% elif notification is sequence %}
+      {% for handler in notification %}
+      - {{ handler | ansible.builtin.to_json }}
+      {% endfor %}
+      {% endif %}
+      {% endfor %}
+    copy_template_notifications: >-
+      {{
+        copy_template_notifications_yaml |
+        ansible.builtin.from_yaml |
+        default([], true) |
+        ansible.builtin.unique |
+        list
+      }}
+  changed_when: true
+  notify: "{{ copy_template_notifications }}"
