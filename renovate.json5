@@ -101,6 +101,13 @@
       allowedVersions: '/^\\d+\\.\\d+\\.\\d+-\\d{4}-\\d{2}-\\d{2}$/',
     },
     {
+      description: 'Hermes Agent image omits the source URL needed for release notes',
+      matchPackageNames: [
+        'nousresearch/hermes-agent',
+      ],
+      sourceUrl: 'https://github.com/NousResearch/hermes-agent',
+    },
+    {
       description: 'ti-cc-tool uses release dates as versions',
       matchPackageNames: [
         'ckware/ti-cc-tool',
