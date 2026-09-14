@@ -5,8 +5,9 @@ hermes_timezone: Europe/Berlin
 hermes_uid: 10000
 hermes_gid: 10000
 
-hermes_native_approvals_mode: manual
-hermes_native_approvals_cron_mode: deny
+hermes_approvals_mode: manual
+hermes_approvals_cron_mode: deny
+hermes_approvals_unattended_mode: deny
 
 hermes_browser_tools_enabled: false
 hermes_shm_size: 1g

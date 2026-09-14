@@ -10,8 +10,9 @@ hermes_webhooks_enabled: true
 
 hermes_browser_tools_enabled: true
 
-hermes_native_approvals_mode: smart
-hermes_native_approvals_cron_mode: approve
+hermes_approvals_mode: smart
+hermes_approvals_cron_mode: approve
+hermes_approvals_unattended_mode: approve
 
 hermes_profile:
   default:
@@ -76,3 +77,18 @@ hermes_profile:
     trello:
       api_key: "{{ vault_hermes_profile.the_dude.trello.api_key }}"
       token: "{{ vault_hermes_profile.the_dude.trello.token }}"
+
+  gw_developer:
+    github:
+      username: "{{ vault_hermes_profile.gw_developer.github.username }}"
+      token: "{{ vault_hermes_profile.gw_developer.github.token }}"
+      webhook_secret: "{{ vault_hermes_profile.gw_developer.github.webhook_secret }}"
+
+  gw_reviewer:
+    github:
+      username: "{{ vault_hermes_profile.gw_reviewer.github.username }}"
+      token: "{{ vault_hermes_profile.gw_reviewer.github.token }}"
+      webhook_secret: "{{ vault_hermes_profile.gw_reviewer.github.webhook_secret }}"
+
+    opencode_go:
+      api_key: "{{ vault_hermes_profile.gw_reviewer.opencode_go.api_key }}"

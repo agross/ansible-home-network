@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+
+model:
+  provider: openai-codex
+  default: openai-codex/gpt-5.6-terra
+
+agent:
+  max_turns: 150
+  reasoning_effort: medium
+
+approvals:
+  mode: {{ hermes_approvals_mode }}
+  cron_mode: {{ hermes_approvals_cron_mode }}
+  unattended_mode: {{ hermes_approvals_unattended_mode }}
+
+terminal:
+  home_mode: profile
+  cwd: /opt/data/profiles/gw-developer/workspace

@@ -56,6 +56,12 @@
         group: 0
         mode: "600"
         notify_: null
+
+      app/profiles/**/gh/hosts.yml.j2:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "600"
+
       docker-compose.yaml.j2:
         owner: 0
         group: 0
