@@ -93,7 +93,10 @@
   ansible.builtin.import_tasks: systemd-install-units.yml
   vars:
     directory: "{{ hermes_root }}/systemd"
-    local_units: templates/systemd
+    paths:
+      - "{{ playbook_dir }}/templates/{{ ansible_role_name }}/{{ inventory_hostname }}/systemd"
+      - templates/systemd
+    local_units: "{{ lookup('ansible.builtin.first_found', paths, skip=false) }}"
     notify_: Restart hermes-agent service
 
 - name: Start service
