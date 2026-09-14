@@ -1,7 +1,9 @@
 # {{ ansible_managed }}
 
 terminal:
-  cwd: /opt/data/profiles/the-dude
+  home_mode: profile
+  # No environment variable expansion here.
+  cwd: /opt/data/profiles/the-dude/workspace
 
 platforms:
   telegram:

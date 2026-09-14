@@ -6,6 +6,11 @@ platforms:
   telegram:
     enabled: true
 
+terminal:
+  home_mode: profile
+  # No environment variable expansion here.
+  cwd: /opt/data/workspace
+
 # Serve all profiles from the main gateway process.
 gateway:
   multiplex_profiles: true
