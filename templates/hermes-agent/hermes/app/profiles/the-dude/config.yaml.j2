@@ -15,6 +15,10 @@ platforms:
       user_id: "{{ hermes_profile.the_dude.telegram.allowed_users | first }}"
 
 gateway:
+  media_delivery_allow_dirs:
+    # For e.g. On This Day skill.
+    - "${HERMES_HOME}/workspace"
+
   platforms:
     telegram:
       extra:
