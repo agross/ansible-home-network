@@ -12,6 +12,7 @@ proxmox:
     - fuse=1
   password: "{{ vault_proxmox_default_root_password }}"
   ssh_public_key_github_account: agross
+  cores: 16
   memory: 4096
   swap: 4096
   # Re-applying the same network config removes the gateway.
@@ -21,7 +22,7 @@ proxmox:
       name=eth0,ip=dhcp,bridge=vmbr0
   disk_volume:
     storage: local-zfs
-    size: 20
+    size: 50
     options:
       mountoptions: discard;noatime
   custom:
