@@ -39,7 +39,7 @@ pve_zfs_zed_email: root
 pve_zfs_zed_healthcheck: "{{ vault_pve_zfs_zed_healthcheck }}"
 
 proxmox_zfs_scrub_nvme_max_temp: 55
-proxmox_zfs_scrub_nvme_controller_max_temp: 65
+proxmox_zfs_scrub_nvme_controller_max_temp: 60
 
 # lae.proxmox has pve_zfs_options, but does not run update-initramfs after
 # setting these.
