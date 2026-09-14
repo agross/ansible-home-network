@@ -33,3 +33,7 @@ dns_cname_records:
   - "{{ renovate_domain | ansible.builtin.mandatory }}"
 
   - "{{ harbor_domain | ansible.builtin.mandatory }}"
+
+  - "{{ hermes_domain | ansible.builtin.mandatory }}"
+  - "api.{{ hermes_domain }}"
+  - "hooks.{{ hermes_domain }}"

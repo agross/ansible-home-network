@@ -1,0 +1,47 @@
+# {{ ansible_managed }}
+{% if hermes_dashboard_enabled or hermes_api_server_enabled or hermes_webhooks_enabled %}
+http:
+  routers:
+    {% if hermes_dashboard_enabled %}
+    {{ ansible_role_name }}-dashboard:
+      entrypoints: https
+      rule: Host(`{{ hermes_domain }}`)
+      service: {{ ansible_role_name }}-dashboard
+    {% endif %}
+
+    {% if hermes_api_server_enabled %}
+    {{ ansible_role_name }}-api:
+      entrypoints: https
+      rule: Host(`api.{{ hermes_domain }}`)
+      service: {{ ansible_role_name }}-api
+    {% endif %}
+
+    {% if hermes_webhooks_enabled %}
+    {{ ansible_role_name }}-webhooks:
+      entrypoints: https
+      rule: Host(`hooks.{{ hermes_domain }}`)
+      service: {{ ansible_role_name }}-webhooks
+    {% endif %}
+
+  services:
+    {% if hermes_dashboard_enabled %}
+    {{ ansible_role_name }}-dashboard:
+      loadBalancer:
+        servers:
+          - url: http://{{ ansible_facts.default_ipv4.address }}:{{ hermes_dashboard_port}}
+    {% endif %}
+
+    {% if hermes_api_server_enabled %}
+    {{ ansible_role_name }}-api:
+      loadBalancer:
+        servers:
+          - url: http://{{ ansible_facts.default_ipv4.address }}:{{ hermes_api_server_port}}
+    {% endif %}
+
+    {% if hermes_webhooks_enabled %}
+    {{ ansible_role_name }}-webhooks:
+      loadBalancer:
+        servers:
+          - url: http://{{ ansible_facts.default_ipv4.address }}:{{ hermes_webhooks_port}}
+    {% endif %}
+{% endif %}

@@ -2,8 +2,14 @@
 
 platforms:
   api_server:
-    enabled: true
+    enabled:  {{ hermes_api_server_enabled | bool }}
+    host: 0.0.0.0
+    port: 8642
+    key: "${API_SERVER_KEY}"
+    cors_origins: {{ hermes_api_server_cors_origins }}
   telegram:
+    enabled: true
+  webhook:
     enabled: true
 
 terminal:
@@ -14,6 +20,9 @@ terminal:
 # Serve all profiles from the main gateway process.
 gateway:
   multiplex_profiles: true
+
+streaming:
+  enabled: true
 
 plugins:
   enabled:
@@ -33,5 +42,7 @@ onboarding:
   seen:
     profile_build_offered: true
 
-trusted_proxies:
-  - {{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
+dashboard:
+  public_url: https://{{ hermes_domain }}
+  trusted_proxies:
+    - {{ hostvars['proxy-home'].interfaces.lan.ip4.address }}

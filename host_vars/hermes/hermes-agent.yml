@@ -6,6 +6,8 @@ hermes_dashboard_enabled: true
 hermes_api_server_enabled: false
 hermes_api_server_key: "{{ vault_hermes_api_server_key }}"
 
+hermes_webhooks_enabled: true
+
 hermes_browser_tools_enabled: true
 
 hermes_native_approvals_mode: smart

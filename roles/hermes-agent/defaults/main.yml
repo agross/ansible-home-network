@@ -13,14 +13,16 @@ hermes_shm_size: 1g
 
 # Web dashboard.
 hermes_dashboard_enabled: false
-hermes_dashboard_host: "0.0.0.0"
 hermes_dashboard_port: 9119
 hermes_dashboard_basic_auth_username: hermes
 hermes_dashboard_basic_auth_password: ""
 
 # OpenAI-compatible API server.
 hermes_api_server_enabled: false
-hermes_api_server_host: "0.0.0.0"
 hermes_api_server_port: 8642
 hermes_api_server_key: ""
 hermes_api_server_cors_origins: ""
+
+# Webhooks.
+hermes_webhooks_enabled: false
+hermes_webhooks_port: 8644

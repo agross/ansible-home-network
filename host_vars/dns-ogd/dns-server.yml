@@ -21,6 +21,9 @@ dns_server_remote_servers:
       - bitwarden.therightstuff.de
       - feedr.therightstuff.de
       - feeds.therightstuff.de
+      - hermes.therightstuff.de
+      - api.hermes.therightstuff.de
+      - hooks.hermes.therightstuff.de
       - photos.therightstuff.de
       - rss.therightstuff.de
       - tandoor.therightstuff.de

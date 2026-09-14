@@ -14,25 +14,30 @@ services:
       HERMES_TIMEZONE: {{ hermes_timezone }}
 
       {% if hermes_dashboard_enabled %}
-      HERMES_DASHBOARD: 1
-      HERMES_DASHBOARD_HOST: {{ hermes_dashboard_host }}
-      HERMES_DASHBOARD_PORT: {{ hermes_dashboard_port }}
+      HERMES_DASHBOARD: true
+      HERMES_DASHBOARD_HOST: 0.0.0.0
+      HERMES_DASHBOARD_PORT: 9119
       HERMES_DASHBOARD_BASIC_AUTH_USERNAME: {{ hermes_dashboard_basic_auth_username }}
       HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: {{ hermes_dashboard_basic_auth_password }}
-      {% endif %}
-
-      {% if hermes_api_server_enabled %}
-      API_SERVER_ENABLED: true
-      API_SERVER_HOST: {{ hermes_api_server_host }}
-      API_SERVER_PORT: {{ hermes_api_server_port }}
-      {% if hermes_api_server_cors_origins %}
-      API_SERVER_CORS_ORIGINS: {{ hermes_api_server_cors_origins }}
-      {% endif %}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: >-
+        {{
+          hermes_dashboard_basic_auth_password |
+          password_hash('bcrypt',
+                        ('./abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890' |
+                          shuffle(seed = inventory_hostname) |
+                          join)[:21]
+                        +
+                        ('.Oeu' |
+                          shuffle(seed = inventory_hostname) |
+                          join)[1]
+                      ) |
+          ansible.builtin.b64encode
+        }}
       {% endif %}
     volumes:
       - ./app:/opt/data
       - /var/run/docker.sock:/var/run/docker.sock:z
-    {% if hermes_dashboard_enabled or hermes_api_server_enabled %}
+    {% if hermes_dashboard_enabled or hermes_api_server_enabled or hermes_webhooks_enabled %}
     healthcheck:
       test:
         - CMD
@@ -40,11 +45,15 @@ services:
         - --fail-with-body
         {% if hermes_dashboard_enabled %}
         # Web dashboard.
-        - http://localhost:{{ hermes_dashboard_port }}/api/status
+        - http://localhost:9119/api/status
         {% endif %}
         {% if hermes_api_server_enabled %}
         # OpenAI-compatible API server.
-        - http://localhost:{{ hermes_api_server_port }}/health
+        - http://localhost:8642/health
+        {% endif %}
+        {% if hermes_webhooks_enabled %}
+        # Webhooks.
+        - http://localhost:8644/health
         {% endif %}
       interval: 60s
       timeout: 5s
@@ -54,11 +63,15 @@ services:
     ports:
       {% if hermes_dashboard_enabled %}
       # Web dashboard.
-      - {{ hermes_dashboard_port }}:{{ hermes_dashboard_port }}
+      - {{ hermes_dashboard_port }}:9119
       {% endif %}
       {% if hermes_api_server_enabled %}
       # OpenAI-compatible API server.
-      - {{ hermes_api_server_port }}:{{ hermes_api_server_port }}
+      - {{ hermes_api_server_port }}:8642
+      {% endif %}
+      {% if hermes_webhooks_enabled %}
+      # Webhooks.
+      - {{ hermes_webhooks_port }}:8644
       {% endif %}
     {% endif %}
 
