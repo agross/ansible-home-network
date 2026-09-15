@@ -2,7 +2,7 @@
 
 platforms:
   api_server:
-    enabled:  {{ hermes_api_server_enabled | bool }}
+    enabled: {{ hermes_api_server_enabled | bool }}
     host: 0.0.0.0
     port: 8642
     key: "${API_SERVER_KEY}"
@@ -10,7 +10,7 @@ platforms:
   telegram:
     enabled: true
   webhook:
-    enabled: true
+    enabled: {{ hermes_webhooks_enabled | bool }}
     extra:
       routes:
         github-issue-work:
