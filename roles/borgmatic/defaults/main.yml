@@ -19,7 +19,7 @@ borgmatic_borgbackup_config:
   one_file_system: false
   store_atime: false
   relocated_repo_access_is_ok: true
-  remote_path: "{{ borgmatic_borg_remote_path }}"
+  remote_path: "{{ borgmatic_borg_remote_path | default('borg') }}"
   encryption_passphrase: "{{ borgmatic_encryption_passphrase }}"
   hooks:
     healthchecks:
