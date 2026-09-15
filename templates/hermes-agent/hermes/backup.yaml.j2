@@ -18,8 +18,18 @@ source_directories: !retain
 # absolute path. Do not backslash spaces in path names. See the output of "borg
 # help patterns" for more details.
 exclude_patterns:
+  - {{ hermes_root }}/app/bin
+  - {{ hermes_root }}/app/cache
   - {{ hermes_root }}/app/logs
+  - {{ hermes_root }}/app/lsp
+  - {{ hermes_root }}/app/home
+  - {{ hermes_root }}/app/tools
+  - sh:{{ hermes_root }}/app/profiles/*/bin
+  - sh:{{ hermes_root }}/app/profiles/*/cache
   - sh:{{ hermes_root }}/app/profiles/*/logs
+  - sh:{{ hermes_root }}/app/profiles/*/lsp
+  - sh:{{ hermes_root }}/app/profiles/*/home
+  - sh:{{ hermes_root }}/app/profiles/*/tool
 
 # Configuration for a monitoring integration with Healthchecks. Create an
 # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
