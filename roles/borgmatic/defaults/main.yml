@@ -12,8 +12,7 @@ borgmatic_borgbackup_ssh:
   command: "{{ borgmatic_ssh_command }}"
 
 borgmatic_borgbackup_config:
-  repositories:
-    - "{{ borgmatic_repository }}"
+  repositories: "{{ borgmatic_repositories }}"
   source_directories:
     - /etc
   one_file_system: false
