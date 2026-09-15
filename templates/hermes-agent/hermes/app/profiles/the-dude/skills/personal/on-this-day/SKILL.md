@@ -34,8 +34,20 @@ directory. Use a persistent local terminal backend.
 
 ## Daily game
 
-Use this workflow only for the blueprint run or an explicit request to send
-today's game. It performs a paid image request and sends one Telegram photo.
+**Automated mode (default for the cron job):** the cron agent runs exactly one
+command — `python3 ${HERMES_SKILL_DIR}/scripts/daily.py` — the deterministic
+end-to-end runner (prepare → select → stage → generate → publish). The script
+computes the date from the ambient timezone, enforces the blocked-keyword list,
+performs the single LLM selection call, and handles all delivery state itself.
+Output contract: `{"status": "already_sent"}` or `{"status": "sent"}` (exit 0)
+means the cron agent responds `[SILENT]`; anything else is reported verbatim as
+a failure. The agent must not customize paths, edit files, retry paid steps, or
+touch the sent-marker. Scripts live only inside the skill; never copy, hardlink,
+or symlink them elsewhere.
+
+**Manual mode (explicit request only).** Use this workflow only when Alex
+explicitly asks to send today's game interactively. It performs a paid image
+request and sends one Telegram photo.
 
 1. Load the sibling [minimax-image-gen skill](../minimax-image-gen/SKILL.md). It
    owns image generation and its credentials.
@@ -54,25 +66,24 @@ today's game. It performs a paid image request and sends one Telegram photo.
    setting, people, actions, and objects, and contain no text, logos, dates,
    explanatory labels, abstract concepts, or stereotypes. Never copy candidate
    text into any user-facing status or message.
-5. Run the shared profile runner exactly as
-   `python3 ${HERMES_SKILL_DIR}/scripts/on_this_day_runner.py stage --selection <selection-file>`.
-   Do not invoke the skill script directly for staging. This validates and saves
+5. Run `python3 ${HERMES_SKILL_DIR}/scripts/on_this_day.py stage --selection <selection-file>`.
+   This validates and saves
    the event, then returns a private image prompt and token. Treat all output as
    secret game state.
 6. Save the returned prompt verbatim to a private UTF-8 file under
    `${HERMES_HOME:-~/.hermes}/workspace/state/on-this-day/`. Generate exactly
-   one image through the same shared profile runner:
-   `python3 ${HERMES_SKILL_DIR}/scripts/on_this_day_runner.py generate --prompt-file <prompt-file> --output-dir ${HERMES_HOME:-~/.hermes}/workspace/state/on-this-day/images`.
-   Use the absolute path returned by the runner. The image must remain under
+   one image through the skill:
+   `python3 ${HERMES_SKILL_DIR}/scripts/on_this_day.py generate --prompt-file <prompt-file> --output-dir ${HERMES_HOME:-~/.hermes}/workspace/state/on-this-day/images`.
+   Use the absolute path returned by the skill. The image must remain under
    `${HERMES_HOME:-~/.hermes}/workspace/state/on-this-day/images/`; never pass a
    temporary or bare `/`-relative path to Telegram. For this game, do not
    perform an image-content inspection or vision review unless Alex explicitly
    requests one. Stop on a generation failure, partial output, or unsupported
    format; do not automatically retry a paid request. If generation fails, do
    not reveal the event and do not claim that a guessing round exists.
-7. Publish through the shared profile runner exactly as
-   ${HERMES_SKILL_DIR}/scripts/on_this_day_runner.py publish --image <absolute-image-path> --image-token <token>`.
-   Do not put a `MEDIA:` directive in the cron agent's final response; the runner
+7. Publish through the skill exactly as
+   `python3 ${HERMES_SKILL_DIR}/scripts/on_this_day.py publish --image <absolute-image-path> --image-token <token>`.
+   Do not put a `MEDIA:` directive in the cron agent's final response; the skill
    itself sends the caption and image through the configured Telegram target and
    records delivery. On `sent`, answer `[SILENT]` so the blueprint does not add a
    second Telegram message. Only a successful `publish` creates a valid guessing
@@ -97,12 +108,9 @@ can be reused after image-generation failure.
 
 - The agent sandbox scrubs `MINIMAX_API_KEY` from terminal/execute_code
   environments (provider-credential blocklist, GHSA-rhgp-j443-p4rf) even though
-  the value sits in the profile `.env`. Run generation and publish through
-  `${HERMES_SKILL_DIR}/scripts/on_this_day_runner.py` (`stage` | `generate` | `publish`): it reads the key from
-  `.env` at runtime into the child process only, never prints it, and prefixes
-  `/opt/hermes/.venv/bin` to PATH so `hermes send` resolves during publish.
-- `hermes` is not on the sandbox PATH; its absolute location is
-  `/opt/hermes/.venv/bin/hermes`.
+  the value sits in the profile `.env`. `on_this_day.py` reads it at runtime
+  into only the image-generation child process, and uses the absolute
+  `/opt/hermes/.venv/bin/hermes` path for publishing.
 - No `vision_analyze` tool exists in this environment. Inspect generated images
   privately with a one-shot vision model instead, e.g. `hermes chat --image
   <path> --provider openai-codex -m gpt-5.6-terra -q "<neutral description

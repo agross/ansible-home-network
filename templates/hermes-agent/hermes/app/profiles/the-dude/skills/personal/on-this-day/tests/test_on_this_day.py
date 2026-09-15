@@ -53,7 +53,7 @@ class OnThisDayTests(unittest.TestCase):
         with patch.object(MODULE.subprocess, 'run') as send:
             self.assertEqual(MODULE.publish(self.state, self.image, staged['image_token']), {'status': 'sent'})
         send.assert_called_once_with(
-            ['hermes', 'send', '--to', 'telegram:755375788',
+            ['/opt/hermes/.venv/bin/hermes', 'send', '--to', 'telegram:755375788',
              f'Guten Morgen! Was geschah heute vor {int(MODULE.today()[:4]) - 1900} Jahren? Errätst du, was als Nächstes passierte? MEDIA:{self.image.resolve()}'],
             check=True,
             timeout=300,

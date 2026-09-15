@@ -17,6 +17,22 @@ PREFERENCES = json.loads((Path(__file__).resolve().parents[1] / 'references/pref
 BERLIN = ZoneInfo('Europe/Berlin')
 
 
+def profile_home():
+    return Path(os.environ.get('HERMES_HOME', '/opt/data/profiles/the-dude'))
+
+
+def profile_env():
+    environment = dict(os.environ)
+    dotenv = profile_home() / '.env'
+    if dotenv.exists():
+        for line in dotenv.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, _, value = line.partition('=')
+                environment.setdefault(key, value)
+    return environment
+
+
 def today():
     return datetime.now(BERLIN).date().isoformat()
 
@@ -109,10 +125,25 @@ def stage(state, selection):
 
 def telegram(path, caption, chat):
     subprocess.run(
-        ['hermes', 'send', '--to', f'telegram:{chat}', f'{caption} MEDIA:{path.resolve()}'],
+        ['/opt/hermes/.venv/bin/hermes', 'send', '--to', f'telegram:{chat}', f'{caption} MEDIA:{path.resolve()}'],
         check=True,
         timeout=300,
     )
+
+
+def generate(prompt_file, output_dir):
+    generator = profile_home() / 'skills/media/minimax-image-gen/scripts/generate.py'
+    if not generator.exists():
+        raise ValueError(f'Missing image generator: {generator}.')
+    result = subprocess.run(
+        [sys.executable, str(generator), '--prompt-file', str(prompt_file), '--output-dir', str(output_dir)],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=600,
+        env=profile_env(),
+    )
+    return json.loads(result.stdout)
 
 
 def publish(state, image_path, image_token, dry_run=False):
@@ -139,11 +170,13 @@ def publish(state, image_path, image_token, dry_run=False):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['prepare', 'stage', 'publish', 'answer'])
+    parser.add_argument('command', choices=['prepare', 'stage', 'generate', 'publish', 'answer'])
     parser.add_argument('--state-dir', type=Path, default=Path(os.environ.get('HERMES_HOME', '~/.hermes')).expanduser() / 'workspace/state/on-this-day')
     parser.add_argument('--selection', type=Path)
     parser.add_argument('--image', type=Path)
     parser.add_argument('--image-token')
+    parser.add_argument('--prompt-file', type=Path)
+    parser.add_argument('--output-dir', type=Path)
     parser.add_argument('--dry-run', action='store_true')
     args = parser.parse_args()
     args.state_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -161,6 +194,10 @@ def main():
             result = stage(args.state_dir, read(args.selection))
         elif args.command == 'answer':
             result = read(args.state_dir / 'event.json') or {'status': 'no_saved_event'}
+        elif args.command == 'generate':
+            if args.prompt_file is None or args.output_dir is None:
+                parser.error('generate requires --prompt-file and --output-dir')
+            result = generate(args.prompt_file, args.output_dir)
         else:
             if args.image is None or not args.image_token:
                 parser.error('publish requires --image and --image-token')
