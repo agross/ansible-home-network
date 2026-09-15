@@ -114,6 +114,7 @@ onboarding:
     profile_build_offered: true
 
 dashboard:
+  show_token_analytics: true
   public_url: https://{{ hermes_domain }}
   trusted_proxies:
     - {{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
