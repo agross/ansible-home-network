@@ -101,8 +101,11 @@ jobs:
                 -- \
                 host_vars \
                 group_vars \
-                roles |
-            sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' -e 's|roles/\([^/]*\)/.*|\1|' |
+                roles \
+                templates |
+            sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' \
+                -e 's|roles/\([^/]*\)/.*|\1|' \
+                -e 's|templates/\([^/]*\)/.*|\1|' |
             sort |
             uniq |
             paste --serial --delimiter=,
