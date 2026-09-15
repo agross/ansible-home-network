@@ -4,6 +4,7 @@ borgmatic_ssh_key_name: borg-backup
 borgmatic_ssh_key_path: "/root/.ssh/{{ borgmatic_ssh_key_name }}"
 borgmatic_ssh_command: >-
   ssh
+  -4
   -i "{{ borgmatic_ssh_key_path }}"
   -o StrictHostKeyChecking=accept-new
 
