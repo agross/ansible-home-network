@@ -12,8 +12,10 @@
   vars:
     directory: ../templates
     target: "{{ banking_root }}"
-    notify_: Restart banking service
+    notify_: Reload banking service
     files:
+      systemd/**:
+        notify_: Restart banking service
       app/.hbci-pinfile:
         owner: 1000
         group: 1000
@@ -26,7 +28,7 @@
     directory: "{{ banking_root }}"
     pull: true
     build: true
-    notify_: Restart banking service
+    notify_: Reload banking service
 
 - name: Restore from backup if requested
   when: restore is defined

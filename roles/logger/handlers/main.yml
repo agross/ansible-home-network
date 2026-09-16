@@ -2,4 +2,10 @@
   when: logger_started is not changed
   ansible.builtin.systemd:
     name: logger.service
+    state: restarted
+
+- name: Reload logger service
+  when: logger_started is not changed
+  ansible.builtin.systemd:
+    name: logger.service
     state: reloaded

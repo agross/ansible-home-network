@@ -1,5 +1,11 @@
 - name: Restart tandoor service
   when: tandoor_started is not changed
   ansible.builtin.systemd:
+    name: tandoor.service
+    state: restarted
+
+- name: Reload tandoor service
+  when: tandoor_started is not changed
+  ansible.builtin.systemd:
     name: "{{ ansible_role_name }}.service"
     state: reloaded

@@ -23,19 +23,19 @@
   vars:
     directory: ../templates
     target: "{{ mqtt_root }}"
-    notify_: Restart mqtt service
+    notify_: Reload mqtt service
     files:
+      systemd/**:
+        notify_: Restart mqtt service
       mosquitto/mosquitto.conf.j2:
         owner: 1883
         group: 1883
+        notify_: Restart mqtt service
       mosquitto/auth.j2:
         owner: 1883
         group: 1883
         mode: "640"
-      systemd/mqtt.service.j2:
-        owner: 0
-        group: 0
-        mode: "640"
+        notify_: Restart mqtt service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks:

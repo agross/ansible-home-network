@@ -12,12 +12,16 @@
   vars:
     directory: ../templates
     target: "{{ prometheus_root }}"
-    notify_: Restart prometheus service
+    notify_: Reload prometheus service
     files:
+      systemd/**:
+        notify_: Restart prometheus service
       docker-compose.yaml.j2:
         owner: 0
         group: 0
         mode: '640'
+      app/conf.d/**:
+        notify_: Reload Prometheus configuration
       app/data:
         owner: 65534
         group: 65534
@@ -42,7 +46,7 @@
     directory: "{{ prometheus_root }}"
     pull: true
     build: true
-    notify_: Restart prometheus service
+    notify_: Reload prometheus service
 
 - name: Restore from backup if requested
   when: restore is defined

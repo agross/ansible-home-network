@@ -10,8 +10,10 @@
   vars:
     directory: ../templates
     target: "{{ feedr_root }}"
-    notify_: Restart feedr service
+    notify_: Reload feedr service
     files:
+      systemd/**:
+        notify_: Restart feedr service
       .env.j2:
         mode: "640"
 
@@ -30,7 +32,7 @@
     directory: "{{ feedr_root }}"
     pull: always
     build: true
-    notify_: Restart feedr service
+    notify_: Reload feedr service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml

@@ -3,3 +3,9 @@
   ansible.builtin.systemd:
     name: commafeed.service
     state: restarted
+
+- name: Reload commafeed service
+  when: commafeed_started is not changed
+  ansible.builtin.systemd:
+    name: commafeed.service
+    state: reloaded

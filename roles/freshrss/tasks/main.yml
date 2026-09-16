@@ -12,8 +12,10 @@
   vars:
     directory: ../templates
     target: "{{ freshrss_root }}"
-    notify_: Restart freshrss service
+    notify_: Reload freshrss service
     files:
+      systemd/**:
+        notify_: Restart freshrss service
       .env.j2:
         mode: "640"
 
@@ -23,7 +25,7 @@
     directory: "{{ freshrss_root }}"
     pull: true
     build: true
-    notify_: Restart freshrss service
+    notify_: Reload freshrss service
 
 - name: Restore from backup if requested
   when: restore is defined

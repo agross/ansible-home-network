@@ -12,7 +12,12 @@
   vars:
     directory: ../templates
     target: "{{ jdownloader_root }}"
-    notify_: Restart jdownloader service
+    notify_: Reload jdownloader service
+    files:
+      systemd/**:
+        notify_: Restart jdownloader service
+      app/webauth-htpasswd.j2:
+        notify_: Restart jdownloader service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -20,7 +25,7 @@
     directory: "{{ jdownloader_root }}"
     pull: true
     build: true
-    notify_: Restart jdownloader service
+    notify_: Reload jdownloader service
 
 - name: Restore from backup if requested
   when: restore is defined
@@ -40,7 +45,7 @@
   vars:
     directory: "{{ jdownloader_root }}/systemd"
     local_units: templates/systemd
-    notify_: Restart jdownloader service
+    notify_: Reload jdownloader service
 
 - name: Start service
   ansible.builtin.systemd:

@@ -13,7 +13,10 @@
   vars:
     directory: ../templates
     target: "{{ teamcity_root }}"
-    notify_: Restart teamcity service
+    notify_: Reload teamcity service
+    files:
+      systemd/**:
+        notify_: Restart teamcity service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
@@ -22,7 +25,7 @@
     directory: "{{ teamcity_root }}"
     pull: true
     build: true
-    notify_: Restart teamcity service
+    notify_: Reload teamcity service
 
 - name: Ensure unzip is installed (used for backup script)
   ansible.builtin.package:

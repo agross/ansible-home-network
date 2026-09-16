@@ -2,4 +2,10 @@
   when: banking_started is not changed
   ansible.builtin.systemd:
     name: banking.service
+    state: restarted
+
+- name: Reload banking service
+  when: banking_started is not changed
+  ansible.builtin.systemd:
+    name: banking.service
     state: reloaded

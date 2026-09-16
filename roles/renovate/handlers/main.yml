@@ -2,4 +2,10 @@
   when: renovate_started is not changed
   ansible.builtin.systemd:
     name: renovate.service
+    state: restarted
+
+- name: Reload renovate service
+  when: renovate_started is not changed
+  ansible.builtin.systemd:
+    name: renovate.service
     state: reloaded

@@ -12,7 +12,10 @@
   vars:
     directory: ../templates
     target: "{{ commafeed_root }}"
-    notify_: Restart commafeed service
+    notify_: Reload commafeed service
+    files:
+      systemd/**:
+        notify_: Restart commafeed service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -20,7 +23,7 @@
     directory: "{{ commafeed_root }}"
     pull: true
     build: true
-    notify_: Restart commafeed service
+    notify_: Reload commafeed service
 
 - name: Restore from backup if requested
   when: restore is defined

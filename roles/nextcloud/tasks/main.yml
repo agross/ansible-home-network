@@ -18,12 +18,16 @@
   vars:
     directory: ../templates
     target: "{{ nextcloud_root }}"
-    notify_: Restart nextcloud service
+    notify_: Reload nextcloud service
     files:
+      systemd/**:
+        notify_: Restart nextcloud service
       app/config:
         owner: 33
         group: 33
         mode: "750"
+      app/config/**:
+        notify_: Restart nextcloud service
       app/hooks/post-upgrade/occ-tasks.sh:
         owner: 33
         group: 33
@@ -75,7 +79,7 @@
     directory: "{{ nextcloud_root }}"
     pull: true
     build: true
-    notify_: Restart nextcloud service
+    notify_: Reload nextcloud service
 
 - name: Add vm.overcommit_memory sysctl for Redis
   when: >-
@@ -124,7 +128,7 @@
   vars:
     directory: "{{ nextcloud_root }}/systemd"
     local_units: templates/systemd
-    notify_: Restart nextcloud service
+    notify_: Reload nextcloud service
 
 - name: Start systemd units
   ansible.builtin.systemd:

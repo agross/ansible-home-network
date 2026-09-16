@@ -13,8 +13,10 @@
   vars:
     directory: ../templates
     target: "{{ logger_root }}"
-    notify_: Restart logger service
+    notify_: Reload logger service
     files:
+      systemd/**:
+        notify_: Restart logger service
       backup.j2:
         mode: "700"
       restore.j2:
@@ -29,7 +31,7 @@
     directory: "{{ logger_root }}"
     pull: true
     build: true
-    notify_: Restart logger service
+    notify_: Reload logger service
 
 - name: Restore from backup if requested
   when: restore is defined

@@ -13,8 +13,10 @@
   vars:
     directory: ../templates
     target: "{{ netboot_root }}"
-    notify_: Restart netboot service
+    notify_: Reload netboot service
     files:
+      systemd/**:
+        notify_: Restart netboot service
       .env.j2:
         mode: "640"
 
@@ -25,7 +27,7 @@
     directory: "{{ netboot_root }}"
     pull: true
     build: true
-    notify_: Restart netboot service
+    notify_: Reload netboot service
 
 - name: Symlink backup configuration
   ansible.builtin.file:

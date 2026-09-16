@@ -2,6 +2,12 @@
   when: iobroker_started is not changed
   ansible.builtin.systemd:
     name: iobroker.service
+    state: restarted
+
+- name: Reload iobroker service
+  when: iobroker_started is not changed
+  ansible.builtin.systemd:
+    name: iobroker.service
     state: reloaded
 
 - name: Restart iobroker healthcheck timer

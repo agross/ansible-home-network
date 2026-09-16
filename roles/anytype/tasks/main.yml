@@ -12,7 +12,10 @@
   vars:
     directory: ../templates
     target: "{{ anytype_root }}"
-    notify_: Restart anytype service
+    notify_: Reload anytype service
+    files:
+      systemd/**:
+        notify_: Restart anytype service
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
@@ -20,7 +23,7 @@
     directory: "{{ anytype_root }}"
     pull: true
     build: true
-    notify_: Restart anytype service
+    notify_: Reload anytype service
 
 - name: Restore from backup if requested
   when: restore is defined

@@ -32,7 +32,14 @@
   vars:
     directory: ../templates
     target: "{{ frigate_root }}"
-    notify_: Restart frigate service
+    notify_: Reload frigate service
+    files:
+      systemd/**:
+        notify_: Restart frigate service
+      app/**:
+        notify_: Restart frigate service
+      go2rtc/**:
+        notify_: Restart frigate service
 
 - name: Download custom go2rtc release
   ansible.builtin.include_tasks:
@@ -63,7 +70,7 @@
     directory: "{{ frigate_root }}"
     pull: true
     build: true
-    notify_: Restart frigate service
+    notify_: Reload frigate service
 
 - name: Restore from backup if requested
   when: restore is defined

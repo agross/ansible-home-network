@@ -1,5 +1,11 @@
 - name: Restart teamcity service
   when: teamcity_started is not changed
   ansible.builtin.systemd:
+    name: teamcity.service
+    state: restarted
+
+- name: Reload teamcity service
+  when: teamcity_started is not changed
+  ansible.builtin.systemd:
     name: "{{ ansible_role_name }}.service"
     state: reloaded

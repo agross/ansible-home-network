@@ -4,6 +4,12 @@
     name: "{{ ansible_role_name }}.service"
     state: restarted
 
+- name: Reload prometheus service
+  when: prometheus_started is not changed
+  ansible.builtin.systemd:
+    name: "{{ ansible_role_name }}.service"
+    state: reloaded
+
 - name: Reload Prometheus configuration
   ansible.builtin.command:
     argv:

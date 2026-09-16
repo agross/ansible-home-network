@@ -24,9 +24,11 @@
     directory: ../templates
     target: "{{ iobroker_root }}"
     notify_:
-      - Restart iobroker service
+      - Reload iobroker service
       - Restart iobroker healthcheck timer
     files:
+      systemd/**:
+        notify_: Restart iobroker service
       backups:
         owner: 1000
         group: 1000
@@ -65,7 +67,7 @@
     directory: "{{ iobroker_root }}"
     pull: true
     build: true
-    notify_: Restart iobroker service
+    notify_: Reload iobroker service
 
 - name: Add vm.overcommit_memory sysctl for Redis
   ansible.posix.sysctl:

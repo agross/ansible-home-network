@@ -3,8 +3,10 @@
   vars:
     directory: ../templates
     target: "{{ renovate_root }}"
-    notify_: Restart renovate service
+    notify_: Reload renovate service
     files:
+      systemd/**:
+        notify_: Restart renovate service
       docker-compose.yaml.j2:
         owner: 0
         group: 0
@@ -16,7 +18,7 @@
     directory: "{{ renovate_root }}"
     pull: true
     build: true
-    notify_: Restart renovate service
+    notify_: Reload renovate service
 
 - name: Install systemd units
   ansible.builtin.import_tasks: systemd-install-units.yml

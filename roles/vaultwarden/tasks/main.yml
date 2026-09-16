@@ -12,8 +12,10 @@
   vars:
     directory: ../templates
     target: "{{ vaultwarden_root }}"
-    notify_: Restart vaultwarden service
+    notify_: Reload vaultwarden service
     files:
+      systemd/**:
+        notify_: Restart vaultwarden service
       .env.vaultwarden.j2:
         owner: 0
         group: 0
@@ -26,7 +28,7 @@
     directory: "{{ vaultwarden_root }}"
     pull: true
     build: true
-    notify_: Restart vaultwarden service
+    notify_: Reload vaultwarden service
 
 - name: Restore from backup if requested
   when: restore is defined

@@ -5,4 +5,10 @@
   when: ccu_started is not changed
   ansible.builtin.systemd:
     name: ccu.service
+    state: restarted
+
+- name: Reload ccu service
+  when: ccu_started is not changed
+  ansible.builtin.systemd:
+    name: ccu.service
     state: reloaded
