@@ -10,9 +10,6 @@ services:
       PUID: {{ hermes_uid }}
       PGID: {{ hermes_gid }}
 
-      # Timezone for cron jobs.
-      HERMES_TIMEZONE: {{ hermes_timezone }}
-
       {% if hermes_dashboard_enabled %}
       HERMES_DASHBOARD: true
       HERMES_DASHBOARD_HOST: 0.0.0.0
