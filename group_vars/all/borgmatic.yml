@@ -36,7 +36,7 @@ borgmatic_extra_config:
 
   # Hostname to use for the {hostname} placeholder in archive_name_format,
   # match_archives, and other archive options.
-  archive_hostname: "{{ borgmatic_archive_hostname }}"
+  # archive_hostname: "{{ borgmatic_archive_hostname }}"
 
   # A Borg pattern for filtering down the archives used by borgmatic actions
   # that operate on multiple archives. For Borg 1.x, use a shell pattern here
