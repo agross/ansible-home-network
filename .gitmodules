@@ -1,0 +1,4 @@
+[submodule "templates/hermes-agent/hermes/app/profiles/the-dude/plugins/minimax-image"]
+	path = templates/hermes-agent/hermes/app/profiles/the-dude/plugins/minimax-image
+	url = https://github.com/rriggs/hermes-plugin-minimax-image
+	branch = main

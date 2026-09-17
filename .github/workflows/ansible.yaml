@@ -43,6 +43,8 @@ jobs:
     steps:
       - name: Get latest code
         uses: actions/checkout@v7.0.1
+        with:
+          submodules: recursive
 
       - name: Save SSH keyfile
         run: |
