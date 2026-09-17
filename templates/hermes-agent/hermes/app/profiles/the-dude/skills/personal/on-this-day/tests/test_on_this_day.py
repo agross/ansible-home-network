@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -43,6 +44,21 @@ class OnThisDayTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             MODULE.stage(self.state, self.selection)
 
+    def test_generate_uses_configured_hermes_image_provider(self):
+        prompt = self.state / 'prompt.txt'
+        prompt.write_text('A botanical garden opens.', encoding='utf-8')
+        output_dir = self.state / 'images'
+        expected = {'paths': [str(output_dir / 'image.png')], 'partial': False}
+        with patch.object(MODULE.subprocess, 'run') as run:
+            run.return_value.stdout = json.dumps(expected)
+            self.assertEqual(MODULE.generate(prompt, output_dir), expected)
+        command = run.call_args.args[0]
+        self.assertEqual(command[:2], ['/opt/hermes/.venv/bin/python', '-c'])
+        self.assertIn('get_active_provider', command[2])
+        self.assertIn('_ensure_plugins_discovered', command[2])
+        self.assertEqual(command[3:], [str(prompt), str(output_dir)])
+        self.assertEqual(run.call_args.kwargs['env'], MODULE.profile_env())
+
     def test_dry_run_does_not_mark_delivery_attempted(self):
         staged = MODULE.stage(self.state, self.selection)
         self.assertEqual(MODULE.publish(self.state, self.image, staged['image_token'], dry_run=True), {'status': 'dry_run'})
@@ -51,12 +67,19 @@ class OnThisDayTests(unittest.TestCase):
     def test_success_uses_hermes_media_delivery(self):
         staged = MODULE.stage(self.state, self.selection)
         with patch.object(MODULE.subprocess, 'run') as send:
-            self.assertEqual(MODULE.publish(self.state, self.image, staged['image_token']), {'status': 'sent'})
+            send.return_value.stdout = json.dumps({'success': True, 'delivered': True, 'message_id': 42})
+            self.assertEqual(
+                MODULE.publish(self.state, self.image, staged['image_token']),
+                {'status': 'sent', 'telegram_message_id': '42'},
+            )
         send.assert_called_once_with(
-            ['/opt/hermes/.venv/bin/hermes', 'send', '--to', 'telegram:755375788',
+            ['/opt/hermes/.venv/bin/hermes', 'send', '--json', '--to', 'telegram:755375788',
              f'Guten Morgen! Was geschah heute vor {int(MODULE.today()[:4]) - 1900} Jahren? Errätst du, was als Nächstes passierte? MEDIA:{self.image.resolve()}'],
             check=True,
             timeout=300,
+            capture_output=True,
+            text=True,
+            env=MODULE.profile_env(),
         )
         self.assertEqual(MODULE.read(self.state / 'sent.json')['status'], 'sent')
 

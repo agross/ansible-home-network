@@ -124,19 +124,60 @@ def stage(state, selection):
 
 
 def telegram(path, caption, chat):
-    subprocess.run(
-        ['/opt/hermes/.venv/bin/hermes', 'send', '--to', f'telegram:{chat}', f'{caption} MEDIA:{path.resolve()}'],
+    """Send media and require Telegram's concrete message receipt."""
+    result = subprocess.run(
+        ['/opt/hermes/.venv/bin/hermes', 'send', '--json', '--to', f'telegram:{chat}',
+         f'{caption} MEDIA:{path.resolve()}'],
         check=True,
         timeout=300,
+        capture_output=True,
+        text=True,
+        env=profile_env(),
     )
+    try:
+        receipt = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError('Telegram send returned no machine-readable receipt.') from exc
+    message_id = receipt.get('message_id')
+    if not receipt.get('success') or receipt.get('delivered') is False or message_id is None:
+        raise RuntimeError('Telegram send was not positively acknowledged with a message ID.')
+    return {'telegram_message_id': str(message_id)}
 
 
 def generate(prompt_file, output_dir):
-    generator = profile_home() / 'skills/media/minimax-image-gen/scripts/generate.py'
-    if not generator.exists():
-        raise ValueError(f'Missing image generator: {generator}.')
+    runner = '''
+import json
+import shutil
+import sys
+import urllib.request
+import uuid
+from pathlib import Path
+
+from agent.image_gen_registry import get_active_provider
+from hermes_cli.plugins import _ensure_plugins_discovered
+
+prompt = Path(sys.argv[1]).read_text(encoding='utf-8')
+output_dir = Path(sys.argv[2])
+output_dir.mkdir(parents=True, exist_ok=True)
+_ensure_plugins_discovered()
+provider = get_active_provider()
+if provider is None:
+    raise RuntimeError('No configured Hermes image generation provider.')
+payload = provider.generate(prompt, aspect_ratio='landscape')
+if not payload.get('success'):
+    raise RuntimeError(payload.get('error', 'Hermes image generation failed.'))
+source = payload.get('image')
+if not isinstance(source, str) or not source:
+    raise RuntimeError('Hermes image generation returned no image.')
+destination = output_dir / f'on-this-day-{uuid.uuid4().hex}.png'
+if source.startswith(('https://', 'http://')):
+    urllib.request.urlretrieve(source, destination)
+else:
+    shutil.copyfile(source, destination)
+print(json.dumps({'paths': [str(destination)], 'partial': False}))
+'''
     result = subprocess.run(
-        [sys.executable, str(generator), '--prompt-file', str(prompt_file), '--output-dir', str(output_dir)],
+        ['/opt/hermes/.venv/bin/python', '-c', runner, str(prompt_file), str(output_dir)],
         check=True,
         capture_output=True,
         text=True,
@@ -162,10 +203,11 @@ def publish(state, image_path, image_token, dry_run=False):
     delivery = {'date': event['date'], 'status': 'attempted'}
     write(state / 'sent.json', delivery)
     caption = f"Guten Morgen! Was geschah heute vor {event['years_ago']} Jahren? Errätst du, was als Nächstes passierte?"
-    telegram(path, caption, os.environ.get('ONTHISDAY_CHAT_ID', '755375788'))
+    receipt = telegram(path, caption, os.environ.get('ONTHISDAY_CHAT_ID', '755375788'))
+    delivery.update(receipt)
     delivery['status'] = 'sent'
     write(state / 'sent.json', delivery)
-    return {'status': 'sent'}
+    return {'status': 'sent', **receipt}
 
 
 def main():

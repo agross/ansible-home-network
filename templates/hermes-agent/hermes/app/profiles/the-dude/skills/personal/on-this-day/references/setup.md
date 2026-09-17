@@ -2,7 +2,7 @@
 
 The skill blueprint proposes a daily 06:30 schedule. Set the Hermes profile timezone to `Europe/Berlin` so `30 6 * * *` runs at 06:30 Berlin time, including daylight-saving changes. Hermes presents the blueprint as a suggestion; accept it only when the Telegram destination is configured as intended.
 
-This skill uses Hermes’ configured Telegram integration through `hermes send`; it has no Telegram credential of its own. `MINIMAX_API_KEY` is declared by this blueprint so Hermes passes it securely into the terminal sandbox at blueprint startup. It is also declared by `minimax-image-gen` for standalone use. The value stays in the profile environment and is never included in prompts or commands.
+This skill uses Hermes’ configured Telegram integration through `hermes send`; it has no Telegram credential of its own.
 
 State is stored in `${HERMES_HOME:-~/.hermes}/on-this-day`. Retain it across restarts and backups. A `sent.json` entry for today blocks all later automatic delivery attempts, including after a timeout.
 

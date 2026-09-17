@@ -45,6 +45,18 @@ fallback_providers:
   - provider: openai-codex
     model: gpt-5.6-luna
 
+plugins:
+  enabled:
+    - minimax-image
+    - web-exa
+
+image_gen:
+  provider: minimax
+  minimax:
+    api: https://api.minimax.io
+    key_env: MINIMAX_API_KEY
+    model: image-01
+
 dashboard:
   show_token_analytics: true
 
