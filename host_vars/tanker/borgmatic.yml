@@ -1,1 +1,9 @@
 borgmatic_encryption_passphrase: "{{ vault_borgmatic_encryption_passphrase }}"
+
+borgmatic_repositories:
+  - label: hetzner
+    path: >-
+      ssh://u619662-sub3@u619662-sub3.your-storagebox.de:23/./borgmatic/{{
+        site | ansible.builtin.mandatory
+      }}/{{ borgmatic_archive_hostname }}
+    encryption: repokey
