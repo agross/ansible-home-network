@@ -124,7 +124,17 @@ def stage(state, selection):
 
 
 def telegram(path, caption, chat):
-    """Send media and require Telegram's concrete message receipt."""
+    """Send media and require Telegram's concrete message receipt.
+
+    The cron agent's final response is auto-delivered to the same Telegram chat.
+    This helper performs the real media delivery, so it removes the cron
+    duplicate-delivery context before invoking ``hermes send``. Otherwise the
+    CLI returns a successful-but-skipped response without a message ID.
+    """
+    send_env = profile_env()
+    for key in tuple(send_env):
+        if key.startswith('HERMES_CRON_AUTO_DELIVER_'):
+            send_env.pop(key, None)
     result = subprocess.run(
         ['/opt/hermes/.venv/bin/hermes', 'send', '--json', '--to', f'telegram:{chat}',
          f'{caption} MEDIA:{path.resolve()}'],
@@ -132,7 +142,7 @@ def telegram(path, caption, chat):
         timeout=300,
         capture_output=True,
         text=True,
-        env=profile_env(),
+        env=send_env,
     )
     try:
         receipt = json.loads(result.stdout)

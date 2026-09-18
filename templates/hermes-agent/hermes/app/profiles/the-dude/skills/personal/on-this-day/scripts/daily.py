@@ -91,33 +91,46 @@ def pick_event(events):
         t = t.casefold()
         return any(w in t for w in blocked)
 
-    cand = [e for e in events if not bm(e['text'])]
+    # The feed's keyword blocklist handles broad themes.  These additional
+    # terms reject negative current-affairs/disaster items that would otherwise
+    # make a poor guessing game even when an LLM happens to return valid JSON.
+    negative_markers = (
+        'skandal', 'betrug', 'korruption', 'unglück', 'katastrophe', 'brand',
+        'todes', 'getötet', 'ermordet', 'absturz', 'hurrikan', 'flut',
+    )
+    cand = [e for e in events if not bm(e['text'])
+            and not any(marker in e['text'].casefold() for marker in negative_markers)]
     if not cand:
         return None, None
-    listing = '\n'.join(f"{e['id']} ({e['year']}): {e['text']}" for e in cand[:25])
-    prompt = (
-        "You help pick one historical daily-guess event from a German list. "
-        "Return ONLY compact JSON: {\"event_id\": <int>, \"visual_description\": \"<english 60-90 words>\"}. "
-        "Choose the first POSITIV-relevant event you are fairly sure Alex (a German tech-savvy adult) would know; "
-        "skip war/terror/violence-like events entirely. The visual_description must show the moment seconds BEFORE the "
-        "event happened: visible setting, people, actions, objects — no text, logos, dates, or labels in the scene.\n\n"
-        + listing)
-    out = llm(prompt)
-    m = re.search(r'\{.*\}', out, re.S)
-    desc, eid = None, None
-    if m:
+    # Evaluate candidates one by one. If a candidate has no concrete, positive
+    # visual scene, move to the next feed item instead of giving up after an
+    # arbitrary retry limit. This spends text-selection calls only; MiniMax is
+    # called exactly once, after a candidate passes validation.
+    generic_markers = ('quiet everyday scene related to', 'show the seconds before it happened through')
+    for candidate in cand:
+        prompt = (
+            "You evaluate ONE historical event for Alex's daily image guessing game. "
+            "Return ONLY compact JSON: {\"visual_description\": \"<english 60-90 words>\"} "
+            "when the event is positive or neutral, relevant to a German tech-savvy adult, "
+            "and can be shown through specific people, actions, setting and objects seconds before it happened. "
+            "Return ONLY null if it is negative, unsuitable, or cannot yield concrete visual clues. "
+            "Never include text, logos, dates or labels in the scene.\n\n"
+            f"Event: {candidate['year']}: {candidate['text']}"
+        )
+        out = llm(prompt)
+        m = re.search(r'\{.*\}', out, re.S)
+        if not m:
+            continue
         try:
-            d = json.loads(m.group(0))
-            eid, desc = d.get('event_id'), (d.get('visual_description') or '').strip()
+            desc = (json.loads(m.group(0)).get('visual_description') or '').strip()
         except Exception:
-            pass
-    ev = next((e for e in cand if eid is not None and e['id'] == eid), None)
-    if ev is None:
-        ev = cand[0]  # deterministic fallback: first non-blocked entry
-    if not desc or not (10 <= len(desc.split()) <= 110):
-        desc = ('A quiet everyday scene related to: ' + ev['text'][:120] +
-                '. Show the seconds before it happened through setting, people and objects only.')
-    return ev, desc
+            continue
+        if not (20 <= len(desc.split()) <= 110):
+            continue
+        if any(marker in desc.casefold() for marker in generic_markers):
+            continue
+        return candidate, desc
+    return None, None
 
 
 def main():
