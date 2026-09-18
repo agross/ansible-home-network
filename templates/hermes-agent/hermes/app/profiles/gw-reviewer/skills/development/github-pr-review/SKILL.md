@@ -17,10 +17,10 @@ the system package manager. Then check if GitHub authentication works:
 
 ## Lifecycle labels
 
-A work item normally has one Hermes lifecycle label: `hermes:next`,
-`hermes:implementing`, `hermes:in-review`, or `hermes:needs-human`. A
-human-created PR with unresolved reviewer findings carries both
-`hermes:in-review` and `hermes:needs-human`. Remove legacy
+A work item normally has one lifecycle label: `hermes:implementing`,
+`hermes:in-review`, or `hermes:needs-human`. `hermes:developer` is a role
+label and may coexist. A human-created PR with unresolved reviewer findings
+carries both `hermes:in-review` and `hermes:needs-human`. Remove legacy
 `hermes:gw-developer` and `hermes:gw-reviewer` labels during transitions.
 
 ## Eligibility
@@ -61,9 +61,12 @@ human-created PR with unresolved reviewer findings carries both
      unresolved reviewer findings remain.
 3. Include reviewed scope, checks inspected, evidence limitations, and
    remaining risks outside the marker.
-4. Keep `hermes:in-review` when corrections remain. If the PR body lacks
-   `<!-- hermes-origin: gw-developer -->`, also add `hermes:needs-human` so
-   the human author is notified. A developer-created PR's clean marker wakes
-   `gw-developer` for handoff; otherwise replace the PR label with
+4. Keep `hermes:in-review` when corrections remain. If the PR is neither
+   developer-origin nor labeled `hermes:developer`, also add
+   `hermes:needs-human` so the human author is notified. End that general
+   review comment with this human-facing handoff hint: `You can address this
+   feedback yourself. To delegate it, apply \`hermes:developer\` to this PR.`
+   A developer-origin or `hermes:developer` PR's clean marker wakes
+   `gw-developer`; otherwise replace the lifecycle label with
    `hermes:needs-human`.
 5. Never submit an approval or request human review.
