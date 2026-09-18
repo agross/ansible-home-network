@@ -16,6 +16,9 @@
       '/(^|/)docker-compose.override\\.yaml\\.disabled$/',
     ],
   },
+  'git-submodules': {
+    enabled: true
+  },
   customManagers: [
     {
       description: 'Magic comments',
