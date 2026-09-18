@@ -136,14 +136,14 @@ services:
       - ./anytype/config:/root/.config/anytype
 
   nextcloud-gw-mcp:
-    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.193.0
+    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.193.1
     environment:
       NEXTCLOUD_HOST: {{ hermes_profile.the_dude.nextcloud.gw.host }}
       NEXTCLOUD_USERNAME: {{ hermes_profile.the_dude.nextcloud.gw.username }}
       NEXTCLOUD_PASSWORD: {{ hermes_profile.the_dude.nextcloud.gw.password }}
 
   nextcloud-trs-mcp:
-    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.193.0
+    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:0.193.1
     environment:
       NEXTCLOUD_HOST: {{ hermes_profile.the_dude.nextcloud.trs.host }}
       NEXTCLOUD_USERNAME: {{ hermes_profile.the_dude.nextcloud.trs.username }}
