@@ -102,9 +102,9 @@ services:
       - ./app:/opt/data
 
   kodi-mcp:
-    image: kodi-mcp
+    image: kodi-mcp:local
     build:
-      context: https://github.com/laHeud/kodi-mcp-server.git
+      context: https://github.com/laHeud/kodi-mcp-server.git#8b42eace32f5a6b04982fdee0ff96596ba6580b2
     environment:
       KODI_HOST: {{ hermes_profile.the_dude.kodi.host }}
       KODI_PORT: {{ hermes_profile.the_dude.kodi.port }}
