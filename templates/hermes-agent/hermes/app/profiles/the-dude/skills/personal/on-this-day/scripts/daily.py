@@ -77,9 +77,33 @@ def run_py(args, timeout=600):
 
 def llm(prompt):
     """One small inference call for selection + visual description."""
-    r = subprocess.run([HERMES, 'chat', '--provider', 'opencode-go', '-m', 'glm-5.3-flash', '-q', prompt],
+    r = subprocess.run([HERMES, 'chat', '-Q', '--provider', 'opencode-go', '-m', 'glm-5.3-flash', '-q', prompt],
                        env=env(), capture_output=True, text=True, timeout=240)
     return r.stdout.strip() if r.returncode == 0 else ''
+
+
+def extract_json_string(text, key):
+    """Return the value for *key* from the last valid JSON object/line in *text*.
+
+    CLI banners wrap the answer box around the JSON, and the model may emit
+    literal newlines inside string values. Try tolerant parses over progressively
+    smaller candidate objects instead of a single greedy regex shot.
+    """
+    candidates = []
+    trimmed = text.strip()
+    for start in range(len(trimmed)):
+        if trimmed[start] == '{':
+            candidates.append(trimmed[start:])
+    # Prefer compact single-line candidates: find the LAST balanced {...}
+    # (grep-like) as well as the greedy one.
+    for m in list(re.finditer(r'\{[^{}]*\}', trimmed)):
+        candidates.append(m.group(0))
+    for cand in candidates:
+        try:
+            return json.loads(cand).get(key)
+        except Exception:
+            continue
+    return None
 
 
 def pick_event(events):
@@ -102,10 +126,13 @@ def pick_event(events):
             and not any(marker in e['text'].casefold() for marker in negative_markers)]
     if not cand:
         return None, None
-    # Evaluate candidates one by one. If a candidate has no concrete, positive
-    # visual scene, move to the next feed item instead of giving up after an
-    # arbitrary retry limit. This spends text-selection calls only; MiniMax is
-    # called exactly once, after a candidate passes validation.
+    # Evaluate candidates in feed order and stop at the first acceptable one.
+    # Events must not be ranked against each other; the first candidate that
+    # passes is chosen, so later candidates are never evaluated once a match
+    # exists. If a candidate has no concrete, positive visual scene, move to
+    # the next feed item instead of giving up after an arbitrary retry limit.
+    # This spends text-selection calls only; MiniMax is called exactly once,
+    # after a candidate passes validation.
     generic_markers = ('quiet everyday scene related to', 'show the seconds before it happened through')
     for candidate in cand:
         prompt = (
@@ -118,13 +145,10 @@ def pick_event(events):
             f"Event: {candidate['year']}: {candidate['text']}"
         )
         out = llm(prompt)
-        m = re.search(r'\{.*\}', out, re.S)
-        if not m:
+        desc = extract_json_string(out, 'visual_description')
+        if desc is None:
             continue
-        try:
-            desc = (json.loads(m.group(0)).get('visual_description') or '').strip()
-        except Exception:
-            continue
+        desc = desc.strip()
         if not (20 <= len(desc.split()) <= 110):
             continue
         if any(marker in desc.casefold() for marker in generic_markers):
@@ -191,14 +215,17 @@ def main():
         return 1
     img = paths[0]
 
-    pub = run_py([str(SKILL_DIR / 'scripts/on_this_day.py'), 'publish',
-                  '--image', img, '--image-token', sd['image_token']], timeout=380)
-    try:
-        pd = json.loads(pub.stdout)
-    except Exception:
-        print(json.dumps({'status': 'error', 'stage': 'publish'}))
-        return 1
-    return 0 if pd.get('status') == 'sent' else 1
+    # Delivery path: the scheduler auto-delivers this job's FINAL RESPONSE to the
+    # configured Telegram home channel (same proven mechanism as the other daily
+    # jobs). No direct hermes send from inside the cron agent — it trips the
+    # cron duplicate-delivery skip. Record the marker locally and return the
+    # caption plus image as the final response.
+    delivery = {'date': now, 'status': 'sent'}
+    write_json(state / 'sent.json', delivery)
+    caption = (f"Guten Morgen! Was geschah heute vor {int(now[:4]) - ev['year']} Jahren? "
+               "Errätst du, was als Nächstes passierte?")
+    print(f"{caption}\nMEDIA:{img}")
+    return 0
 
 
 if __name__ == '__main__':
