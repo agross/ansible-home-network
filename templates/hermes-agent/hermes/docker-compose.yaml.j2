@@ -1,6 +1,6 @@
 services:
   app:
-    image: nousresearch/hermes-agent:v2026.9.14
+    image: nousresearch/hermes-agent:v2026.9.21
     command: gateway run
     restart: unless-stopped
     {% if hermes_browser_tools_enabled %}
@@ -86,7 +86,7 @@ services:
       # MCP_LOG_LEVEL: DEBUG
 
   kodi-tracker:
-    image: nousresearch/hermes-agent:v2026.9.14
+    image: nousresearch/hermes-agent:v2026.9.21
     entrypoint: [python3, -u]
     command: /opt/data/profiles/the-dude/skills/personal/kodi-music-summary/scripts/stream.py
     user: "{{ hermes_uid }}:{{ hermes_gid }}"
