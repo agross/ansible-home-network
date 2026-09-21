@@ -9,7 +9,7 @@ metadata:
     blueprint:
       schedule: "30 6 * * *"
       deliver: telegram
-      prompt: "Run exactly one command: python3 ${HERMES_SKILL_DIR}/scripts/daily.py. Do nothing else: do not read files, inspect state, retry, or send a message yourself. If the command exits 0 AND its stdout contains a line starting with 'MEDIA:', echo that stdout verbatim as your final response (caption plus MEDIA line) — never answer [SILENT] in that case; the scheduler delivers it as the Telegram photo. If it exits 0 but stdout is plain JSON status ({\"status\":\"already_sent\"} or {\"status\":\"no_event\"}), respond with exactly [SILENT]. If it exits non-zero, respond exactly: 'On This Day konnte heute nicht gesendet werden; es gibt keine Raterunde.' Do not infer or report a failure after a zero exit."
+      prompt: "Run exactly one command: python3 ${HERMES_SKILL_DIR}/scripts/daily.py. Do nothing else: do not read files, inspect state, retry, or send a message yourself. If the command exits 0 AND its stdout contains a line starting with 'MEDIA:', echo that stdout verbatim as your final response (caption plus MEDIA line) — never answer [SILENT] in that case; the scheduler delivers it as the Telegram photo. If it exits 0 but stdout is plain JSON status ({\"status\":\"already_sent\"} or {\"status\":\"no_event\"}), respond with exactly [SILENT]. If it exits non-zero, respond exactly: 'On This Day konnte heute nicht gesendet werden; es gibt keine Raterunde. Ursache: Der AI-Provider (opencode-go) war zur Laufzeit nicht erreichbar.' Do not infer or report a failure after a zero exit."
       no_agent: false
 ---
 
@@ -99,6 +99,19 @@ Bildtest ist fehlgeschlagen; es wurde kein Bild gesendet.” Never explain why a
 image failed inspection unless Alex explicitly asks after the game state is
 closed. A failed or unsent image is not a round: do not accept a guess, reveal
 the event, say “richtig”, or congratulate Alex.
+
+**Failure vs. no-event (lesson from 2026-09-21):** `daily.py` distinguishes a technical
+failure in the `hermes chat` selection subcalls (rc != 0 → exit 1, stdout empty →
+cron agent reports the failure line mentioning that the AI provider was
+unreachable) from a genuinely unsuitable candidate pool (`no_event`, exit 0 →
+`[SILENT]`). Never collapse provider/credential errors into `no_event`.
+Validate changes to `daily.py` against the triple (exit code, stdout shape,
+cron prompt contract) before the next 06:30 run.
+
+**Spoiler guard (lesson learned 2026-09-21):** in interactive manual runs,
+narrating the candidate evaluation in the chat leaks the selected event —
+candidate text is private game state and belongs in tool output only, never in
+a user-visible message. Narrate selection without naming events or years.
 
 The helper records an attempted delivery before Telegram is called. Never clear
 that marker or automatically retry after an ambiguous failure. A staged event

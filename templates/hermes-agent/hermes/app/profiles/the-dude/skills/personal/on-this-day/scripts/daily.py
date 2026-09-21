@@ -79,7 +79,9 @@ def llm(prompt):
     """One small inference call for selection + visual description."""
     r = subprocess.run([HERMES, 'chat', '-Q', '--provider', 'opencode-go', '-m', 'glm-5.3-flash', '-q', prompt],
                        env=env(), capture_output=True, text=True, timeout=240)
-    return r.stdout.strip() if r.returncode == 0 else ''
+    if r.returncode != 0:
+        log(f'llm failed rc={r.returncode}: {r.stdout.strip()[:200]}')
+    return r.stdout.strip(), r.returncode
 
 
 def extract_json_string(text, key):
@@ -144,7 +146,15 @@ def pick_event(events):
             "Never include text, logos, dates or labels in the scene.\n\n"
             f"Event: {candidate['year']}: {candidate['text']}"
         )
-        out = llm(prompt)
+        out, rc = llm(prompt)
+        if rc != 0:
+            # Infrastructure failure (no credentials, network, CLI error): this
+            # is NOT an unsuitable candidate. Abort loudly instead of burning
+            # every remaining candidate and silently reporting no_event.
+            log('llm subcall failed; aborting run as error.')
+            import builtins
+            builtins.OTD_ABORT = 'PROVIDER_UNREACHABLE'
+            return None, None
         desc = extract_json_string(out, 'visual_description')
         if desc is None:
             continue
@@ -179,7 +189,11 @@ def main():
         print(json.dumps({'status': 'no_event'}))
         return 0
 
+    import builtins
+    builtins.OTD_ABORT = None
     ev, desc = pick_event(data['events'])
+    if builtins.OTD_ABORT:
+        return 1
     if ev is None:
         log('no candidate')
         print(json.dumps({'status': 'no_event'}))
