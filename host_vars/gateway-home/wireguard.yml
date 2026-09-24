@@ -2,6 +2,15 @@ wireguard:
   private_key: "{{ vault_wireguard_private_key }}"
 
   peers:
+    ogd:
+      public_key: Xovvu810xYuzxfKDcBrBE9fJFg30apC0d3nd0hElWyU=
+      psk: "{{ vault_wireguard_peer_ogd_psk }}"
+      allowed_ips:
+        - "{{ hostvars['gateway-ogd'].network.wireguard.ip4 }}"
+        - "{{ hostvars['gateway-ogd'].network.wireguard.ip6 }}"
+        - "{{ hostvars['gateway-ogd'].network.ip4 }}"
+        - "{{ hostvars['gateway-ogd'].network.ip6 }}"
+
     android:
       public_key: 9tBj6SRjDMu3BO9ZX7zI1C7SiuWbDocwl8QEJWIfxwc=
       psk: "{{ vault_wireguard_peer_android_psk }}"
@@ -35,20 +44,3 @@ wireguard:
             ansible.utils.nthhost(0x3) |
             ansible.utils.ipaddr('host/prefix')
           }}
-
-    ogd:
-      public_key: Xovvu810xYuzxfKDcBrBE9fJFg30apC0d3nd0hElWyU=
-      psk: "{{ vault_wireguard_peer_ogd_psk }}"
-      allowed_ips:
-        - >-
-          {{
-            hostvars['gateway-ogd'].interfaces.wireguard.ip4.address |
-            ansible.utils.ipaddr('host/prefix')
-          }}
-        - >-
-          {{
-            hostvars['gateway-ogd'].interfaces.wireguard.ip6.address |
-            ansible.utils.ipaddr('host/prefix')
-          }}
-        - "{{ hostvars['gateway-ogd'].network.ip4 }}"
-        - "{{ hostvars['gateway-ogd'].network.ip6 }}"

@@ -7,8 +7,8 @@ network:
     ip6: >-
       {{
         he_ipv6.network48 |
-          ansible.utils.ipaddr(0xc0de0000000000000000) |
-          ansible.utils.ipaddr('address')
+        ansible.utils.ipaddr(0xc0de0000000000000000) |
+        ansible.utils.ipaddr('address')
       }}/64
 
 network_gateway:
