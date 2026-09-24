@@ -24,6 +24,7 @@ services:
       - data:/usr/local
       - /etc/localtime:/etc/localtime:ro
       - /lib/modules:/lib/modules:ro
+      - /run/udev/control:/run/udev/control
       - ./backups:/backups
     networks:
       default:
