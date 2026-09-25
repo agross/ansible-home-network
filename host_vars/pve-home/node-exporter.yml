@@ -1,9 +1,17 @@
 node_exporter_extras:
   - role: prometheus.prometheus.smartctl_exporter
-    port: 9633
+    port: >-
+      {{
+        ('//' ~ smartctl_exporter_web_listen_address) |
+        ansible.builtin.urlsplit('port')
+      }}
     job: smartctl
   - role: prometheus.prometheus.ipmi_exporter
-    port: 9290
+    port: >-
+      {{
+        ('//' ~ ipmi_exporter_web_listen_address) |
+        ansible.builtin.urlsplit('port')
+      }}
     job: ipmi
   - role: pve_exporter
     port: 9221

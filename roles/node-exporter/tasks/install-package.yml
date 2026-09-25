@@ -1,9 +1,11 @@
 - name: Install exporter role
   ansible.builtin.include_role:
-    name: "{{ item.role }}"
-  loop: "{{ node_exporter_roles }}"
+    name: "{{ role }}"
+    # Provide role's vars to be used later.
+    public: true
+  loop: "{{ node_exporter_roles | map(attribute='role') }}"
   loop_control:
-    label: "{{ item.role }}"
+    loop_var: role
 
 - name: Get Proxmox node info
   ansible.builtin.stat:

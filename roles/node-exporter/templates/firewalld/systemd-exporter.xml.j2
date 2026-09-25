@@ -2,5 +2,8 @@
 <service>
   <short>systemd-exporter</short>
   <description>Prometheus SystemD Exporter</description>
-  <port port="{{ 9558 }}" protocol="tcp"/>
+  <port port="{{
+    ('//' ~ systemd_exporter_web_listen_address) |
+    ansible.builtin.urlsplit('port')
+  }}" protocol="tcp"/>
 </service>
