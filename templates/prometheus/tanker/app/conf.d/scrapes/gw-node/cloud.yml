@@ -1,0 +1,4 @@
+- targets:
+    - node.cloud.prom.grossweber.com
+  labels:
+    instance: gw:cloud

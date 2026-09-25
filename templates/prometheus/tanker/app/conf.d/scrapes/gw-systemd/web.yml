@@ -1,0 +1,4 @@
+- targets:
+    - systemd.web.prom.grossweber.com
+  labels:
+    instance: gw:web

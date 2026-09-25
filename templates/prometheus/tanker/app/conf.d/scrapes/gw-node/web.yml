@@ -1,0 +1,4 @@
+- targets:
+    - node.web.prom.grossweber.com
+  labels:
+    instance: gw:web

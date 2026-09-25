@@ -7,7 +7,7 @@
       - "site:{{ site }}"
       - "host:{{ inventory_hostname }}"
 
-- name: Copy templates
+- name: Copy default templates
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     directory: ../templates
@@ -33,6 +33,20 @@
         mode: '750'
         owner: 0
         group: 0
+
+- name: Copy templates for {{ inventory_hostname }}
+  when: directory | length > 0
+  ansible.builtin.include_tasks:
+    file: copy-templates.yml
+  vars:
+    paths:
+      - "{{ playbook_dir }}/templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
+    directory: "{{ lookup('ansible.builtin.first_found', paths, skip=true) }}"
+    target: "{{ prometheus_root }}"
+    notify_: Reload prometheus service
+    files:
+      app/conf.d/**:
+        notify_: Reload Prometheus configuration
 
 - name: Ensure jq is installed (used for backup script)
   ansible.builtin.package:

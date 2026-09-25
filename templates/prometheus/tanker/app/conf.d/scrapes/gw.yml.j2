@@ -1,0 +1,59 @@
+scrape_configs:
+  - job_name: gw-node
+    relabel_configs:
+      - target_label: job
+        replacement: node
+      - target_label: tenant
+        replacement: gw
+    metric_relabel_configs:
+      - source_labels: [__name__, nodename]
+        regex: ^node_uname_info;(.+)$
+        target_label: nodename
+        replacement: gw:$1
+    basic_auth:
+      username: {{ prometheus_gw_username }}
+      password: {{ prometheus_gw_password }}
+    file_sd_configs:
+      - files:
+        - gw-node/*.yml
+
+  - job_name: gw-cadvisor
+    # https://github.com/prometheus-community/ansible/tree/main/roles/cadvisor#prometheus-config
+    track_timestamps_staleness: true
+    relabel_configs:
+      - target_label: job
+        replacement: cadvisor
+      - target_label: tenant
+        replacement: gw
+    basic_auth:
+      username: {{ prometheus_gw_username }}
+      password: {{ prometheus_gw_password }}
+    file_sd_configs:
+      - files:
+        - gw-cadvisor/*.yml
+
+  - job_name: gw-systemd
+    relabel_configs:
+      - target_label: job
+        replacement: systemd
+      - target_label: tenant
+        replacement: gw
+    basic_auth:
+      username: {{ prometheus_gw_username }}
+      password: {{ prometheus_gw_password }}
+    file_sd_configs:
+      - files:
+        - gw-systemd/*.yml
+
+  - job_name: gw-app
+    relabel_configs:
+      - target_label: job
+        replacement: app
+      - target_label: tenant
+        replacement: gw
+    basic_auth:
+      username: {{ prometheus_gw_app_username }}
+      password: {{ prometheus_gw_app_password }}
+    file_sd_configs:
+      - files:
+        - gw-app/*.yml

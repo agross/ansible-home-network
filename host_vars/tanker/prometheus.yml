@@ -1,0 +1,5 @@
+prometheus_gw_username: "{{ vault_prometheus_gw_username }}"
+prometheus_gw_password: "{{ vault_prometheus_gw_password }}"
+
+prometheus_gw_app_username: "{{ vault_prometheus_gw_app_username }}"
+prometheus_gw_app_password: "{{ vault_prometheus_gw_app_password }}"

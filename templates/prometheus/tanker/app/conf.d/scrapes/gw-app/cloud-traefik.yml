@@ -1,0 +1,5 @@
+- targets:
+    - traefik.cloud.prom.grossweber.com
+  labels:
+    instance: gw:cloud
+    app: traefik

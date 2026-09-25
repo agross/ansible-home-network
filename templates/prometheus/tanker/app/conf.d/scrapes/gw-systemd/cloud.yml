@@ -1,0 +1,4 @@
+- targets:
+    - systemd.cloud.prom.grossweber.com
+  labels:
+    instance: gw:cloud
