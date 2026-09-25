@@ -20,9 +20,12 @@ http:
           - 127.0.0.1/32
           - {{ network.ip4 }}
           - {{ network.ip6 }}
+          - {{ network.wireguard.ip4 }}
+          - {{ network.wireguard.ip6 }}
           - {{ hostvars['gateway-ogd'].network.ip4 }}
           - {{ hostvars['gateway-ogd'].network.ip6 }}
-          - {{ network.wireguard.ip4 }}
+          - {{ hostvars['gateway-ogd'].network.wireguard.ip4 }}
+          - {{ hostvars['gateway-ogd'].network.wireguard.ip6 }}
           - fe80::/10
           - fc00::/7
 
