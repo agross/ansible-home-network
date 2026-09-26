@@ -4,7 +4,7 @@ proxmox:
   id: "{{ github_runner_proxmox_vm_id }}"
   tags: "{{ github_runner_proxmox_vm_tags | default(['gw']) }}"
   cores: 8
-  memory: 10240
+  memory: "{{ '8 GB' | ansible.builtin.human_to_bytes // 1024**2 }}"
   net:
     net0: virtio,bridge=vmbr0,firewall=1
   efi_disk:
