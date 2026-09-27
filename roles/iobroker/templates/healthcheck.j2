@@ -3,19 +3,19 @@
 
 set -euo pipefail
 
-unhealthy="$(docker container ls \
-                    --format {% raw %}'{{ .Names }}'{% endraw %} \
-                    --filter health=unhealthy \
-                    --filter "label=com.docker.compose.project=iobroker")"
+mapfile -t unhealthy < <(docker container ls \
+                                --format {% raw %}'{{ .Label "com.docker.compose.service" }}'{% endraw %} \
+                                --filter health=unhealthy \
+                                --filter "label=com.docker.compose.project=iobroker")
 
-if [[ -z "$unhealthy" ]]; then
-  printf 'No unhealthy iobroker containers\n'
+if (( {% raw %}${#unhealthy[@]}{% endraw %}  == 0 )); then
+  printf 'No unhealthy iobroker services\n'
   exit 0
 fi
 
-printf 'Unhealthy iobroker containers:\n%s\n' "$unhealthy"
+printf 'Unhealthy iobroker services:\n%s\n' "${unhealthy[@]}"
 
-if [[ "$unhealthy" == *_redis_* ]]; then
+if [[ " ${unhealthy[*]} " == *' redis '* ]]; then
   printf 'Redis is unhealthy, reboot.\n'
   systemctl reboot
 fi
