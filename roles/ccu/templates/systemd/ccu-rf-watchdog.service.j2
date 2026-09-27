@@ -1,0 +1,14 @@
+[Unit]
+Description=Ensure OpenCCU RF hardware initialization succeeds
+Requires=ccu.service
+After=ccu.service
+PartOf=ccu.service
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+Type=simple
+ExecStart={{ ccu_root }}/bin/ccu-rf-watchdog
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

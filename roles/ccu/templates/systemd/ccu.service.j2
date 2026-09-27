@@ -3,6 +3,7 @@ Description=OpenCCU
 BindsTo=docker.service
 After=docker.service pivccu-dkms.service
 Requires=pivccu-dkms.service
+Wants=ccu-rf-watchdog.service
 OnFailure=unit-status-mail@%n.service
 
 [Service]

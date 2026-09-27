@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+readonly timeout_seconds={{ ccu_rf_watchdog_timeout_seconds | int }}
+
+is_rf_adapter_attached() {
+  grep --quiet --fixed-strings 'HB-RF-USB-2' /sys/bus/usb/devices/*/product 2>/dev/null
+}
+
+is_rf_ready() {
+  [[ -c /dev/raw-uart ]] &&
+  [[ -c /dev/mmd_hmip ]] &&
+  [[ -c /dev/mmd_bidcos ]]
+}
+
+printf 'Waiting up to %s seconds for HB-RF-USB-2 to become available.\n' "$timeout_seconds"
+
+for ((second = 0; second < timeout_seconds; second += 1)); do
+  if ! is_rf_adapter_attached; then
+    printf 'HB-RF-USB-2 is not attached; skipping automatic reboot.\n'
+    exit 0
+  fi
+
+  if is_rf_ready; then
+    printf 'HB-RF-USB-2 is attached and working; skipping automatic reboot.\n'
+    exit 0
+  fi
+
+  sleep 1
+done
+
+if ! is_rf_adapter_attached; then
+  printf 'HB-RF-USB-2 disappeared while waiting; skipping automatic reboot.\n'
+  exit 0
+fi
+
+{
+  printf 'RF device nodes\n'
+  stat --format='%n char-device major=%t minor=%T' \
+       /dev/raw-uart \
+       /dev/eq3loop \
+       /dev/mmd_hmip \
+       /dev/mmd_bidcos
+
+  printf '\nRF modules\n'
+  lsmod | grep --extended-regexp '^(hb_rf_usb_2|generic_raw_uart|eq3_char_loop)'
+
+  printf '\nRF kernel log\n'
+  journalctl --dmesg --boot --no-pager |
+    grep --ignore-case --extended-regexp 'hb-rf|raw-uart|eq3(loop|_char)'
+
+  printf '\nOpenCCU startup log\n'
+  journalctl --unit ccu.service --boot --no-pager |
+    grep --ignore-case --extended-regexp \
+         'Identifying Homematic RF-Hardware|Updating Homematic RF-Hardware|HmRF:|HmIP:'
+} || true
+
+printf '\nHB-RF-USB-2 is attached but OpenCCU RF device nodes are missing; rebooting host.\n'
+systemctl reboot --message='OpenCCU RF hardware did not initialize'

@@ -33,6 +33,11 @@
     target: "{{ ccu_root }}"
     notify_: Reload ccu service
     files:
+      bin/*:
+        mode: "775"
+        owner: 0
+        group: 0
+        notify_: Restart ccu-rf-watchdog service
       systemd/**:
         notify_: Restart ccu service
 

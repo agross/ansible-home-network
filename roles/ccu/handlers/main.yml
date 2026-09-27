@@ -7,6 +7,12 @@
     name: ccu.service
     state: restarted
 
+- name: Restart ccu-rf-watchdog service
+  when: ccu_started is not changed
+  ansible.builtin.systemd:
+    name: ccu-rf-watchdog.service
+    state: restarted
+
 - name: Reload ccu service
   when: ccu_started is not changed
   ansible.builtin.systemd:
