@@ -30,6 +30,7 @@ collections:
     version: 2.0.0
   - name: https://github.com/ansible-collections/community.proxmox.git
     type: git
+    # renovate: git-refs=https://github.com/ansible-collections/community.proxmox ref=main
     version: 6650aa5535cd25a740e54d7b5259666fc31683b4
   - name: devsec.hardening
     version: 10.6.0
