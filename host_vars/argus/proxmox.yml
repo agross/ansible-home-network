@@ -39,19 +39,20 @@ proxmox:
       mountpoint: /data/frigate/media
       options:
         mountoptions: discard;noatime
+  mount_devices:
+    - # Hardware video acceleration.
+      id: dev0
+      path: /dev/dri/renderD128
+      mode: "0666"
+    - # Coral Edge TPU.
+      id: dev1
+      path: /dev/apex_0
+      mode: "0666"
   custom:
     - reason: systemd kernel mounts
       # https://www.enricobassetti.it/2023/05/proxmox-lxc-systemd-and-linux-capabilities/
       key: lxc.cap.drop
       value: sys_rawio
-
-    - reason: Hardware video acceleration
-      key: dev0
-      value: /dev/dri/renderD128,mode=0666
-
-    - reason: Coral Edge TPU
-      key: dev1
-      value: /dev/apex_0,mode=0666
 
 zfs_datasets:
   rpool/tank/frigate/media:
