@@ -1,0 +1,49 @@
+tasmota_config_room: Connection Box
+tasmota_config_purpose: Smart Meter
+
+tasmota_config_friendly_name:
+  - mdi:meter-electric-outline
+  - "{{ tasmota_config_purpose }}"
+  - "{{ tasmota_config_purpose }}"
+
+tasmota_config_device_model: bitShake SmartMeterReader
+
+tasmota_config_template: >-
+  {"NAME":"{{
+    tasmota_config_device_model
+  }}","GPIO":[0,0,0,0,1,0,0,0,0,32,0,0,0,0,0,0,0,0,0,0,0,0],"FLAG":0,"BASE":18}
+
+# https://tasmota.github.io/docs/Smart-Meter-Interface/
+tasmota_config_script: |
+  >D
+  ; aktuelle Version unter https://bitshake.de/skripte
+  >B
+  ->sensor53 r
+  >M 1
+  +1,5,s,0,9600,Meter,4
+  1,=soC,1024,0
+  1,77070100010800ff@1000,Consumption,kWh,Consumption,3
+  1,77070100020800ff@1000,Feed-in,kWh,Feed-in,3
+  1,77070100100700ff@1,Live Consumption,W,Live Consumption,0
+  1,=h—
+  1,77070100010801ff@1000,Consumption HT,kWh,Consumption HT,3
+  1,77070100010802ff@1000,Consumption NT,kWh,Consumption NT,3
+  1,77070100020801ff@1000,Feed-In HT,kWh,Feed-In HT,3
+  1,77070100020802ff@1000,Feed-In NT,kWh,Feed-In NT,3
+  1,77070100240700ff@1,L1 Power,W,L1 Power,0
+  1,77070100380700ff@1,L2 Power,W,L2 Power,0
+  1,770701004c0700ff@1,L3 Power,W,L3 Power,0
+  1,77070100200700ff@1,L1 Voltage,V,L1 Voltage,1
+  1,77070100340700ff@1,L2 Voltage,V,L2 Voltage,1
+  1,77070100480700ff@1,L3 Voltage,V,L3 Voltage,1
+  1,770701001f0700ff@1,L1 Current,A,L1 Current,2
+  1,77070100330700ff@1,L2 Current,A,L2 Current,2
+  1,77070100470700ff@1,L3 Current,A,L3 Current,2
+  1,77070100510701ff@1,Phase Angle L2/L1,deg,Phase Angle L2/L1,0
+  1,77070100510702ff@1,Phase Angle L3/L1,deg,Phase Angle L3/L1,0
+  1,77070100510704ff@1,Phase Angle I/U L1,deg,Phase Angle L1,1
+  1,7707010051070fff@1,Phase Angle I/U L2,deg,Phase Angle L2,1
+  1,7707010051071aff@1,Phase Angle I/U L3,deg,Phase Angle L3,1
+  1,770701000e0700ff@1,Grid Frequency,Hz,Grid Frequency,1
+  1,77070100600100ff@#,Server ID,,Server ID,0
+  #

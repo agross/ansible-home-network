@@ -1,3 +1,28 @@
+# SML script comes first, because backlog causes a reset.
+- name: Upload SML script
+  when: tasmota_config_script is defined
+  delegate_to: localhost
+  ansible.builtin.uri:
+    url: >-
+      http://{{
+        hostvars[inventory_hostname].ansible_host | default(inventory_hostname)
+      }}/ta
+    method: POST
+    body_format: form-multipart
+    body:
+      # Enable script.
+      c1: "on"
+      t1: "{{ tasmota_config_script }}"
+      save: ""
+    return_content: true
+  register: tasmota_config_script_result
+  changed_when: true
+
+- name: Print SML script upload result
+  when: tasmota_config_script is defined
+  ansible.builtin.debug:
+    var: tasmota_config_script_result
+
 - name: Generate backlog
   ansible.builtin.set_fact:
     # The select filter removes empty strings.

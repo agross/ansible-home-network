@@ -1,0 +1,2 @@
+mqtt_accounts:
+  smart-meter-reader: "{{ vault_mqtt_accounts_smart_meter_reader }}"

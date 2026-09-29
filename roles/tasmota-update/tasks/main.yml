@@ -1,11 +1,14 @@
-- name: Get latest release
-  ansible.builtin.import_tasks:
-    file: update-required.yml
+- name: Process devices that support the official firmware
+  when: tasmota_update_not_supported is not defined
+  block:
+    - name: Get latest release
+      ansible.builtin.import_tasks:
+        file: update-required.yml
 
-- name: Determine upgrade URL
-  ansible.builtin.import_tasks:
-    file: upgrade-url.yml
+    - name: Determine upgrade URL
+      ansible.builtin.import_tasks:
+        file: upgrade-url.yml
 
-- name: Perform upgrade
-  ansible.builtin.import_tasks:
-    file: upgrade.yml
+    - name: Perform upgrade
+      ansible.builtin.import_tasks:
+        file: upgrade.yml
