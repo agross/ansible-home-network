@@ -7,7 +7,7 @@ tasmota_config_function: shutter
 tasmota_config_template: >-
   {"NAME":"Shelly 2.5 PM","GPIO":[320,0,0,0,224,193,0,0,640,192,608,225,3456,4736],"FLAG":0,"BASE":18}
 
-# Enable shutter support
+# Enable shutter support.
 tasmota_config_custom_backlog: |
   # Shutter support.
   SetOption80 1

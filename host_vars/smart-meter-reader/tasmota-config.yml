@@ -13,6 +13,10 @@ tasmota_config_template: >-
     tasmota_config_device_model
   }}","GPIO":[0,0,0,0,1,0,0,0,0,32,0,0,0,0,0,0,0,0,0,0,0,0],"FLAG":0,"BASE":18}
 
+tasmota_config_custom_backlog: |
+  # Disable mDNS service.
+  SetOption55 0
+
 # https://tasmota.github.io/docs/Smart-Meter-Interface/
 tasmota_config_script: |
   >D
