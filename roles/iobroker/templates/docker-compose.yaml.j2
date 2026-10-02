@@ -78,4 +78,6 @@ services:
       default:
     volumes:
       - /etc/localtime:/etc/localtime
+    profiles:
+      - not-working-service-disabled
   {% endif %}
