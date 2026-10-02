@@ -12,7 +12,7 @@ networks:
     ipam:
       config:
         - subnet: {{ network.ip4 }}
-          ip_range: {{ ccu_ip4_range | ansible.builtin.mandatory }}
+          ip_range: {{ ccu_ip4 | ansible.builtin.mandatory | ansible.utils.ipaddr('host/prefix') }}
 
 services:
   ccu:

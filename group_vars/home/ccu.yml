@@ -1,0 +1,1 @@
+ccu_ip4: "{{ network.ip4 | ansible.utils.nthhost(240) }}"

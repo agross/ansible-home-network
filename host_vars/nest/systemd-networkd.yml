@@ -1,6 +1,16 @@
 systemd_networkd_netdev:
+  ccu:
+    - NetDev:
+        - Description: Required for CCU host access.
+        - Name: ccu
+        - Kind: macvlan
+
+    - MACVLAN:
+        - Mode: bridge
+
   iobroker:
     - NetDev:
+        - Description: Required for ioBroker host access.
         - Name: iobroker
         - Kind: macvlan
 
@@ -35,14 +45,30 @@ systemd_networkd_network:
         - Gateway: "{{ network_gateway.ip4 }}"
         - Gateway: "{{ network_gateway.ip6 }}"
 
+        - MACVLAN: ccu
         - MACVLAN: iobroker
+
+  ccu:
+    - Match:
+        - Name: ccu
+
+    - Network:
+        - Description: Required for CCU host access.
+        - Address: "{{ network.ip4 | ansible.utils.nthhost(241) | ansible.utils.ipaddr('host/prefix') }}"
+        - LinkLocalAddressing: false
+        - IPv6AcceptRA: false
+        - ConfigureWithoutCarrier: true
+
+    - Route:
+        - Destination: "{{ ccu_ip4 }}"
 
   iobroker:
     - Match:
         - Name: iobroker
 
     - Network:
-        - Address: "{{ iobroker_ip4_range | ansible.utils.next_nth_usable(2) }}"
+        - Description: Required for ioBroker host access.
+        - Address: "{{ network.ip4 | ansible.utils.nthhost(243) | ansible.utils.ipaddr('host/prefix') }}"
         - LinkLocalAddressing: false
         - IPv6AcceptRA: false
         - ConfigureWithoutCarrier: true
