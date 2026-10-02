@@ -1,7 +1,7 @@
 ---
 name: on-this-day
 description: Send Alex a daily German historical-image guessing game, or reveal the current image's event after a guess.
-version: 1.3.0
+version: 1.4.0
 platforms: [linux, macos]
 metadata:
   hermes:
@@ -112,6 +112,16 @@ cron prompt contract) before the next 06:30 run.
 narrating the candidate evaluation in the chat leaks the selected event —
 candidate text is private game state and belongs in tool output only, never in
 a user-visible message. Narrate selection without naming events or years.
+
+**Silent detail-drop guard (lesson from 2026-10-02):** the MiniMax image-01
+renderer silently drops prompt-described details (verified repeatedly: 09-22
+broadcast screen/mics missing, 09-25 ballot papers/guard missing, 10-02 all
+satellite specks missing). A hard-coded prompt suffix worsened this by
+emphasizing human figures and blurring background objects; the suffix must name
+*features* ("every described object clearly visible and unobstructed"), never
+*framing* (focus/whole-body/perspective). Captions must never claim picture
+details the visible image does not show; check the actual image before
+explaining it.
 
 The helper records an attempted delivery before Telegram is called. Never clear
 that marker or automatically retry after an ambiguous failure. A staged event

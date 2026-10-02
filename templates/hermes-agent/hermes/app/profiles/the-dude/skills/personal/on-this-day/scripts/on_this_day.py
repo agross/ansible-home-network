@@ -106,7 +106,7 @@ def select(state, selection):
 def image_request(event):
     return {'status': 'image_required', 'image_token': event['image_token'],
             'prompt': 'MODERN DIGITAL ILLUSTRATION: ' + event['image_prompt'] +
-            ', WHOLE BODY/FULL FIGURE focus on human figures when present, warm bright lighting, '
+            ', every described object clearly visible and unobstructed, warm bright lighting, '
             'contemporary art aesthetic, NO text/logos/dates'}
 
 
