@@ -8,12 +8,15 @@ enable: 1
 
 [IPSET management] # Allow PVE management (22/tcp, 8006/tcp).
 
+{{ network.ip4 | ansible.builtin.mandatory }} # Local IPv4 subnet.
 {{ network.ip6 | ansible.builtin.mandatory }} # Local IPv6 subnet.
-
 {{ network.wireguard.ip4 | ansible.builtin.mandatory }} # WireGuard IPv4 subnet.
 {{ network.wireguard.ip6 | ansible.builtin.mandatory }} # WireGuard IPv6 subnet.
 
-{{ hostvars['gateway-ogd'].network.ip6 | ansible.builtin.mandatory }} # {{ hostvars['gateway-ogd'].site }} IPv6 subnet.
+{{ hostvars['gateway-ogd'].network.ip4 }} # {{ hostvars['gateway-ogd'].site }} IPv4 subnet.
+{{ hostvars['gateway-ogd'].network.ip6 }} # {{ hostvars['gateway-ogd'].site }} IPv6 subnet.
+{{ hostvars['gateway-ogd'].network.wireguard.ip4 }} # {{ hostvars['gateway-ogd'].site }} WireGuard IPv4 subnet.
+{{ hostvars['gateway-ogd'].network.wireguard.ip6 }} # {{ hostvars['gateway-ogd'].site }} WireGuard IPv6 subnet.
 
 [RULES]
 
