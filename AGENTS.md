@@ -33,10 +33,10 @@ Before reviewing, commenting on, or editing a Renovate dependency PR, read
 
 ### Issue tracker
 
-Before creating, claiming, updating, or closing work, read
-`docs/agents/issue-tracker.md`.
+Work is tracked in GitHub Issues. Before creating, claiming, updating, or
+closing work, read `docs/agents/issue-tracker.md`.
 
 ### Domain docs
 
-Before changing domain vocabulary or ADR-governed behavior, read
-`docs/agents/domain.md`.
+This repository uses a single-context layout. Before exploring domain
+behavior or changing domain vocabulary, read `docs/agents/domain.md`.
