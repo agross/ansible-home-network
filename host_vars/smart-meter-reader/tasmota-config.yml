@@ -6,23 +6,63 @@ tasmota_config_friendly_name:
   - "{{ tasmota_config_purpose }}"
   - "{{ tasmota_config_purpose }}"
 
-tasmota_config_device_model: bitShake SmartMeterReader
+tasmota_config_device_model: bitShake SmartMeterReader Air
 
 tasmota_config_template: >-
   {"NAME":"{{
     tasmota_config_device_model
   }}","GPIO":[0,0,0,0,1,0,0,0,0,32,0,0,0,0,0,0,0,0,0,0,0,0],"FLAG":0,"BASE":18}
 
+tasmota_config_timezone: |
+  # Requirement for https://www.ortsnetz-auslastung.de/.
+  Timezone 0
+
 tasmota_config_custom_backlog: |
   # Disable mDNS service.
   SetOption55 0
 
-# https://tasmota.github.io/docs/Smart-Meter-Interface/
+# Combination of https://bitshake.de/skripte and the reference at
+# https://tasmota.github.io/docs/Smart-Meter-Interface/ and
+# https://github.com/thomaslehmann1234/datenerfassung-ortsnetz-auslastung/blob/master/tasmota-ortsnetz-auslastung/ortsnetz-auslastung.tasmota
+# yamllint disable rule:line-length
 tasmota_config_script: |
-  >D
-  ; aktuelle Version unter https://bitshake.de/skripte
+  >D 64
+  latitude=50.733780
+  longitude=12.195532
+  l1=0
+  l2=0
+  l3=0
+  frequency=0
+
   >B
+  ; Allow space for the WebQuery command and JSON payload.
+  cbs=512
+
+  ; Initialize the smart meter interface after every boot / script save.
   ->sensor53 r
+
+  >S
+  ; Numeric descriptor order below determines these indices.
+  l1=sml[11]
+  l2=sml[12]
+  l3=sml[13]
+  frequency=sml[22]
+
+  ; Upload every 5 minutes after NTP and all required values are available.
+  if upsecs%300==0
+  and year>=2026
+  and l1>=150
+  and l1<=300
+  and l2>=150
+  and l2<=300
+  and l3>=150
+  and l3<=300
+  and frequency>0
+  then
+  ; Timezone 0 is required because tstamp supplies local time.
+  =>WebQuery https://www.ortsnetz-auslastung.de/v1/measurements POST [Content-Type:application/json]{"observed_at":"%tstamp%Z","latitude":%6latitude%,"longitude":%6longitude%,"l1_v":%2l1%,"l2_v":%2l2%,"l3_v":%2l3%,"grid_frequency_hz":%2frequency%,"smartmeter_model":"bitShake SmartMeterReader Air","integration_version":"tasmota-0.1.0"}
+  endif
+
   >M 1
   +1,5,s,0,9600,Meter,4
   1,=soC,1024,0
@@ -51,3 +91,4 @@ tasmota_config_script: |
   1,770701000e0700ff@1,Grid Frequency,Hz,Grid Frequency,1
   1,77070100600100ff@#,Server ID,,Server ID,0
   #
+# yamllint enable rule:line-length
