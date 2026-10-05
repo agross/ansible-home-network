@@ -24,18 +24,6 @@
         mode: "644"
       notify: restart docker
 
-- name: Support Ansible pip module
-  ansible.builtin.package:
-    name: python3-packaging
-    state: present
-
-- name: Support docker management via Ansible
-  ansible.builtin.include_role:
-    name: geerlingguy.pip
-  vars:
-    pip_install_packages:
-      - name: docker
-
 - name: Enable daily image pruning
   when: docker_image_prune_enabled | default(true)
   block:
