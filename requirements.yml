@@ -33,7 +33,7 @@ collections:
     # renovate: git-refs=https://github.com/ansible-collections/community.proxmox ref=main
     version: 5e9e6882fbfaac64c9a92747ecb1ab7625f49909
   - name: devsec.hardening
-    version: 10.6.0
+    version: 11.0.0
   - name: hifis.toolkit
     version: 6.3.2
   - name: prometheus.prometheus
