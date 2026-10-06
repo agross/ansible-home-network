@@ -29,7 +29,7 @@ collections:
   - name: https://github.com/ansible-collections/community.proxmox.git
     type: git
     # renovate: git-refs=https://github.com/ansible-collections/community.proxmox ref=main
-    version: 5e9e6882fbfaac64c9a92747ecb1ab7625f49909
+    version: 15d01ca8efd37946c79433c97fbba6c3e0d46ef3
   - name: devsec.hardening
     version: 11.0.0
   - name: hifis.toolkit
