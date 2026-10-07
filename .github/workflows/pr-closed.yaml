@@ -82,39 +82,13 @@ jobs:
             echo SHA
           } >> "$GITHUB_OUTPUT"
 
-      - name: Show affected files
-        run: |
-          git diff --name-status "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA"
-        env:
-          CHANGE_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
-          CHANGE_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.after }}
-
       - name: Determine roles from affected files
         id: affected-roles
-        run: |
-          {
-            echo 'roles<<ROLES'
-
-            git diff \
-                --name-only \
-                "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA" \
-                -- \
-                host_vars \
-                group_vars \
-                roles \
-                templates |
-            sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' \
-                -e 's|roles/\([^/]*\)/.*|\1|' \
-                -e 's|templates/\([^/]*\)/.*|\1|' |
-            sort |
-            uniq |
-            paste --serial --delimiter=,
-
-            echo ROLES
-          } | tee --append "$GITHUB_OUTPUT"
-        env:
-          CHANGE_BASE_SHA: ${{ steps.base-commit.outputs.sha }}
-          CHANGE_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.after }}
+        uses: ./.github/actions/affected-roles
+        with:
+          base-sha: ${{ steps.base-commit.outputs.sha }}
+          head-sha: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.after }}
+          delimiter: ','
 
   run-ansible:
     name: Run Ansible with tags ${{ needs.affected-roles.outputs.roles }}

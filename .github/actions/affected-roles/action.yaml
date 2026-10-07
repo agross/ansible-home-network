@@ -1,0 +1,58 @@
+name: Determine affected roles
+description: Determine roles from changed files between two commits. Requires checkout with full commit history.
+
+inputs:
+  base-sha:
+    description: Base commit for the comparison.
+    required: true
+  head-sha:
+    description: Head commit for the comparison.
+    required: true
+  delimiter:
+    description: Delimiter for the role list.
+    default: ' '
+
+outputs:
+  roles:
+    description: Sorted, unique list of affected roles.
+    value: ${{ steps.affected-roles.outputs.roles }}
+
+runs:
+  using: composite
+  steps:
+    - name: Show affected files
+      shell: bash
+      run: |
+        git diff --name-status "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA"
+      env:
+        CHANGE_BASE_SHA: ${{ inputs.base-sha }}
+        CHANGE_HEAD_SHA: ${{ inputs.head-sha }}
+
+    - name: Determine roles from affected files
+      id: affected-roles
+      shell: bash
+      run: |
+        {
+          echo 'roles<<ROLES'
+
+          git diff \
+              --name-only \
+              "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA" \
+              -- \
+              host_vars \
+              group_vars \
+              roles \
+              templates |
+          sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' \
+              -e 's|roles/\([^/]*\)/.*|\1|' \
+              -e 's|templates/\([^/]*\)/.*|\1|' |
+          sort |
+          uniq |
+          paste --serial --delimiter="$ROLE_DELIMITER"
+
+          echo ROLES
+        } | tee --append "$GITHUB_OUTPUT"
+      env:
+        CHANGE_BASE_SHA: ${{ inputs.base-sha }}
+        CHANGE_HEAD_SHA: ${{ inputs.head-sha }}
+        ROLE_DELIMITER: ${{ inputs.delimiter }}

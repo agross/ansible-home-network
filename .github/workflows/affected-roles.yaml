@@ -34,33 +34,12 @@ jobs:
           echo "pull_request.base.sha=$PR_BASE_SHA"
           echo "pull_request.head.sha=$PR_HEAD_SHA"
 
-      - name: Show affected files
-        run: |
-          git diff --name-status "$PR_BASE_SHA..$PR_HEAD_SHA"
-
       - name: Determine roles from affected files
         id: affected-roles
-        run: |
-          {
-            echo 'roles<<ROLES'
-
-            git diff \
-                --name-only \
-                "$PR_BASE_SHA..$PR_HEAD_SHA" \
-                -- \
-                host_vars \
-                group_vars \
-                roles \
-                templates |
-            sed -e 's|.*_vars/.*/\([^.]*\).*|\1|' \
-                -e 's|roles/\([^/]*\)/.*|\1|' \
-                -e 's|templates/\([^/]*\)/.*|\1|' |
-            sort |
-            uniq |
-            paste --serial --delimiter=' '
-
-            echo ROLES
-          } | tee --append "$GITHUB_OUTPUT"
+        uses: ./.github/actions/affected-roles
+        with:
+          base-sha: ${{ github.event.pull_request.base.sha }}
+          head-sha: ${{ github.event.pull_request.head.sha }}
 
       - name: Set role labels
         if: steps.affected-roles.outputs.roles != ''
