@@ -31,7 +31,7 @@ collections:
   - name: devsec.hardening
     version: 11.0.0
   - name: hifis.toolkit
-    version: 6.3.2
+    version: 7.0.0
   - name: prometheus.prometheus
     version: 0.30.2
   - name: vladgh.samba
