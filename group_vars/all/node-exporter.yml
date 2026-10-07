@@ -13,7 +13,7 @@ ipmi_exporter_version: 1.10.1
 ipmi_exporter_system_user: root
 
 # renovate: github-releases=prometheus-community/smartctl_exporter
-smartctl_exporter_version: 0.14.0
+smartctl_exporter_version: 0.15.0
 smartctl_exporter_system_user: root
 
 node_exporter_enabled_collectors:
