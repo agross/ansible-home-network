@@ -13,10 +13,6 @@ jobs:
       pull-requests: write
       issues: write
 
-    env:
-      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-
     steps:
       - name: Get full commit history
         uses: actions/checkout@v7.0.1
@@ -28,11 +24,6 @@ jobs:
           # not supported.
           # https://github.com/actions/checkout/issues/603
           filter: blob:none
-
-      - name: Show PR commit information
-        run: |
-          echo "pull_request.base.sha=$PR_BASE_SHA"
-          echo "pull_request.head.sha=$PR_HEAD_SHA"
 
       - name: Determine roles from affected files
         id: affected-roles
