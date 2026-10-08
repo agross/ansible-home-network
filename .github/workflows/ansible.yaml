@@ -40,6 +40,8 @@ jobs:
         # The container image provides bash.
         shell: bash
 
+    cache-mode: write
+
     steps:
       - name: Get latest code
         uses: actions/checkout@v7.0.1

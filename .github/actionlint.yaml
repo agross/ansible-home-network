@@ -2,3 +2,9 @@ self-hosted-runner:
   labels:
     - home
     - ogd
+
+paths:
+  .github/workflows/ansible.yaml:
+    ignore:
+      # https://github.com/rhysd/actionlint/pull/745
+      - 'unexpected key "cache-mode"'
