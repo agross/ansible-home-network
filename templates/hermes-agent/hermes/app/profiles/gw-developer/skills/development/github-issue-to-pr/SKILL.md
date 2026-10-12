@@ -45,6 +45,36 @@ other lifecycle labels and any legacy `hermes:gw-developer` or
    changing labels or code. Before handling authorized feedback, set the PR
    lifecycle label to `hermes:in-review` and retain `hermes:developer`.
 
+## Acknowledge work
+
+After the selected issue or PR passes the authorization checks above, add an
+👀 (`eyes`) reaction to its opening post before implementation or feedback
+handling. Use the repository and issue or PR number fetched through GitHub:
+
+```sh
+gh api --method POST repos/OWNER/REPO/issues/NUMBER/reactions --raw-field content=eyes
+```
+
+The issue reactions endpoint also covers PR opening posts. An existing
+reaction from the authenticated account counts as success. On an issue,
+remove that account's previous 🚀 (`rocket`) reaction when work restarts.
+For PR feedback, clear that account's previous 👍 (`+1`) and 👎 (`-1`)
+reactions so they cannot imply a review verdict for work in progress.
+Skipped or unauthorized events receive no reaction. Report reaction failures
+and continue the authorized work.
+
+To remove a reaction, identify the authenticated account with `gh api user`,
+list all opening-post reactions with
+`gh api --paginate repos/OWNER/REPO/issues/NUMBER/reactions`, and delete only
+matching reactions whose `user.id` equals that account's ID:
+
+```sh
+gh api --method DELETE repos/OWNER/REPO/issues/NUMBER/reactions/REACTION_ID
+```
+
+Preserve other users' reactions. Verify each completed reaction transition
+by fetching the opening-post reactions again.
+
 ## Implement
 
 1. Read repository guidance, the entire issue, and current working state.
@@ -54,7 +84,17 @@ other lifecycle labels and any legacy `hermes:gw-developer` or
    links the issue, acceptance evidence, checks, risks, and the current head
    SHA. Then replace the issue's `hermes:implementing` label with
    `hermes:in-review` and set the PR label to `hermes:in-review`.
-4. Do not merge, release, deploy, alter repository settings, or weaken checks.
+4. Verify the PR exists and both lifecycle labels are `hermes:in-review`.
+   Then replace the authenticated account's 👀 reaction on the issue's
+   opening post with 🚀 (`rocket`):
+
+   ```sh
+   gh api --method POST repos/OWNER/REPO/issues/NUMBER/reactions --raw-field content=rocket
+   ```
+
+   Use the issue number here. This marks implementation and PR handoff as
+   complete. Failed or incomplete implementation receives no 🚀 reaction.
+5. Do not merge, release, deploy, alter repository settings, or weaken checks.
 
 ## Handle reviewer feedback
 
@@ -74,6 +114,10 @@ other lifecycle labels and any legacy `hermes:gw-developer` or
 4. Stop after three repair/review rounds or on any scope conflict. Remove
    `hermes:developer` when present, replace the lifecycle label with
    `hermes:needs-human`, and report concise evidence.
+
+After pushing a repair or completing a human handoff, remove the
+authenticated account's 👀 reaction from the PR's opening post. The reviewer
+sets 👍 or 👎 after reviewing the current head SHA.
 
 ## Webhook safety
 

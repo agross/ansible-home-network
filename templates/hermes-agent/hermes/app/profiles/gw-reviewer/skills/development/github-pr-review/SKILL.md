@@ -36,6 +36,34 @@ carries both `hermes:in-review` and `hermes:needs-human`. Remove legacy
 4. Ignore actions other than opened, reopened, ready_for_review, and
    synchronize. Ignore a head SHA that already has a reviewer marker.
 
+## Acknowledge work
+
+After all eligibility checks pass, add an 👀 (`eyes`) reaction to the PR's
+opening post before reviewing. Use the repository and PR number fetched
+through GitHub:
+
+```sh
+gh api --method POST repos/OWNER/REPO/issues/NUMBER/reactions --raw-field content=eyes
+```
+
+The issue reactions endpoint also covers PR opening posts. An existing
+reaction from the authenticated account counts as success. Remove that
+account's previous 👍 (`+1`) and 👎 (`-1`) reactions before reviewing the new
+head SHA. Skipped or ineligible events receive no reaction. Report reaction
+failures and continue the review.
+
+To remove a reaction, identify the authenticated account with `gh api user`,
+list all opening-post reactions with
+`gh api --paginate repos/OWNER/REPO/issues/NUMBER/reactions`, and delete only
+matching reactions whose `user.id` equals that account's ID:
+
+```sh
+gh api --method DELETE repos/OWNER/REPO/issues/NUMBER/reactions/REACTION_ID
+```
+
+Preserve other users' reactions. Verify each completed reaction transition
+by fetching the opening-post reactions again.
+
 ## Review
 
 1. Derive requirements from the linked issue's acceptance criteria and
@@ -69,4 +97,16 @@ carries both `hermes:in-review` and `hermes:needs-human`. Remove legacy
    A developer-origin or `hermes:developer` PR's clean marker wakes
    `gw-developer`; otherwise replace the lifecycle label with
    `hermes:needs-human`.
-5. Never submit an approval or request human review.
+5. After posting the marker and completing the lifecycle handoff, re-fetch
+   the PR head SHA. If it still matches the reviewed SHA, replace the
+   authenticated account's 👀 reaction on the PR's opening post with 👍
+   (`+1`) for `state=clean` or 👎 (`-1`) for `state=changes-requested`:
+
+   ```sh
+   gh api --method POST repos/OWNER/REPO/issues/NUMBER/reactions --raw-field content=+1
+   ```
+
+   Use `content=-1` for requested changes. Remove that account's opposite
+   outcome reaction. An incomplete review or changed head SHA receives no
+   outcome reaction. These reactions summarize the completed review round.
+6. Never submit an approval or request human review.
