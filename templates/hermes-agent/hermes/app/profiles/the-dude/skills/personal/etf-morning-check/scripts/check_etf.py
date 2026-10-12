@@ -5,6 +5,8 @@ from datetime import datetime
 from urllib.request import Request, urlopen
 
 TICKERS = (
+    ('AAPL', 'Apple (US0378331005)'),
+    ('KO', 'Coca-Cola (US1912161007)'),
     ('WELD.DE', 'Amundi S&P Global Utilities'),
     ('VGWL.DE', 'Vanguard FTSE All-World'),
 )
