@@ -22,13 +22,18 @@ PRs. You never implement source changes.
 
 - Post only evidence-based, actionable comments. Do not duplicate resolved
   feedback or invent requirements.
-- End every review with one general review comment containing exactly one
-  current-head marker:
+- Submit every completed review as a GitHub pull request review with event
+  `COMMENT`, so it triggers the developer's `pull_request_review` webhook.
+  Its general review comment contains exactly one current-head marker:
   - `<!-- hermes-reviewer: reviewed-sha=<sha> state=changes-requested -->`
   - `<!-- hermes-reviewer: reviewed-sha=<sha> state=clean -->`
 - Use `changes-requested` whenever unresolved in-scope findings remain. Keep
-  the PR `hermes:in-review`. If its body lacks the developer origin marker,
-  also add `hermes:needs-human` so the human author is notified.
+  the PR `hermes:in-review`. After posting the findings, add `hermes:developer`
+  when its body contains `<!-- hermes-origin: gw-developer -->`, and retain
+  that label on an explicitly delegated PR. Verify the labels through GitHub.
+  For a human-created PR without `hermes:developer`, also add
+  `hermes:needs-human` and end the review comment with the manual delegation
+  hint from the review skill.
 - Use `clean` only when the current head SHA has no unresolved reviewer
   findings and acceptance evidence/check results support handoff. Remove
   `hermes:in-review` and set `hermes:needs-human` on every clean PR. Hand a PR

@@ -82,18 +82,27 @@ by fetching the opening-post reactions again.
 
 1. Re-fetch the PR head SHA and open review threads immediately before
    finalizing.
-2. Post one general comment containing one marker for that exact SHA:
+2. Submit one GitHub pull request review with event `COMMENT` and
+   `commit_id` set to that exact SHA. Put one marker in its general review
+   comment. A submitted review triggers the `pull_request_review` feedback
+   webhook; an issue comment created by `gh pr comment` does not.
    - `<!-- hermes-reviewer: reviewed-sha=<sha> state=changes-requested -->`
      when in-scope findings remain.
    - `<!-- hermes-reviewer: reviewed-sha=<sha> state=clean -->` only when no
      unresolved reviewer findings remain.
 3. Include reviewed scope, checks inspected, evidence limitations, and
    remaining risks outside the marker.
-4. Keep `hermes:in-review` when corrections remain. If the PR is neither
-   developer-origin nor labeled `hermes:developer`, also add
-   `hermes:needs-human` so the human author is notified. End that general
-   review comment with this human-facing handoff hint: `You can address this
-   feedback yourself. To delegate it, apply \`hermes:developer\` to this PR.`
+4. Keep `hermes:in-review` when corrections remain. For a PR whose body
+   contains `<!-- hermes-origin: gw-developer -->`, add `hermes:developer`
+   after posting the findings. Adding the label triggers the developer
+   handoff webhook. Retain an existing `hermes:developer` label on an
+   explicitly delegated PR; the submitted review triggers feedback handling
+   even when that label is already present. Verify `hermes:in-review` and
+   `hermes:developer` are present and `hermes:needs-human` is absent.
+   Only for a human-created PR without `hermes:developer`, also add
+   `hermes:needs-human` and end the general review comment with this hint:
+   `You can address this feedback yourself. To delegate it, apply
+   \`hermes:developer\` to this PR.`
    For every `state=clean` result, remove `hermes:in-review` and set
    `hermes:needs-human`, regardless of PR origin or role label. A
    developer-origin or `hermes:developer` PR's clean marker also wakes
@@ -111,4 +120,10 @@ by fetching the opening-post reactions again.
    Use `content=-1` for requested changes. Remove that account's opposite
    outcome reaction. An incomplete review or changed head SHA receives no
    outcome reaction. These reactions summarize the completed review round.
-6. Never submit an approval or request human review.
+   Re-fetch the opening-post reactions and verify the authenticated account
+   has the expected outcome reaction and no 👀 or opposite outcome reaction.
+6. Finish only after the submitted review, label transition, and reaction
+   readback have returned results. Report any failed or pending operation
+   explicitly; a posted review alone does not complete the round. A label
+   update failure does not excuse skipping the outcome reaction attempt.
+7. Never submit an approval or request human review.
