@@ -113,6 +113,8 @@ narrating the candidate evaluation in the chat leaks the selected event —
 candidate text is private game state and belongs in tool output only, never in
 a user-visible message. Narrate selection without naming events or years.
 
+**Lettering guard (2026-10-12):** Alex explicitly asked for readable text/logos/signage in the images — generic halls of suited people make rounds unguessable. Both former NO-text prohibitions were replaced: the LLM selection prompt now instructs "explicitly include readable period-accurate lettering that names the event or place", and the hardcoded prompt suffix asks for "realistic period-accurate visible lettering/signage ... NO dates" (dates only stay banned so guessing isn't trivially solved by a year). Never reintroduce blanket NO text/logos wording.
+
 **Silent detail-drop guard (lesson from 2026-10-02):** the MiniMax image-01
 renderer silently drops prompt-described details (verified repeatedly: 09-22
 broadcast screen/mics missing, 09-25 ballot papers/guard missing, 10-02 all

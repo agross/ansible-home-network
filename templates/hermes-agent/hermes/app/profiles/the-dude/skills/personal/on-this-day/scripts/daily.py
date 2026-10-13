@@ -143,7 +143,8 @@ def pick_event(events):
             "when the event is positive or neutral, relevant to a German tech-savvy adult, "
             "and can be shown through specific people, actions, setting and objects seconds before it happened. "
             "Return ONLY null if it is negative, unsuitable, or cannot yield concrete visual clues. "
-            "Never include text, logos, dates or labels in the scene.\n\n"
+            "If the historical event is identifiable by signage, banners, flags, plaques or lettering on objects "
+            "in the scene, explicitly include readable period-accurate lettering that names the event or place. "
             f"Event: {candidate['year']}: {candidate['text']}"
         )
         out, rc = llm(prompt)

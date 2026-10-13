@@ -107,7 +107,8 @@ def image_request(event):
     return {'status': 'image_required', 'image_token': event['image_token'],
             'prompt': 'MODERN DIGITAL ILLUSTRATION: ' + event['image_prompt'] +
             ', every described object clearly visible and unobstructed, warm bright lighting, '
-            'contemporary art aesthetic, NO text/logos/dates'}
+            'contemporary art aesthetic, realistic period-accurate visible lettering/signage naming the '
+            'event or place where such signage would naturally appear, NO dates'}
 
 
 def stage(state, selection):
