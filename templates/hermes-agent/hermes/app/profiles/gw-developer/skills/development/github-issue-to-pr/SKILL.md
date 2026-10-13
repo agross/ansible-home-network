@@ -111,7 +111,7 @@ by fetching the opening-post reactions again.
    `hermes:needs-human`, request `agross` as reviewer, and verify the result.
    If GitHub omits that request because the PR author is also `agross`, add an
    explicit `@agross` handoff comment.
-4. Stop after three repair/review rounds or on any scope conflict. Remove
+4. Stop on any scope conflict. Remove
    `hermes:developer` when present, replace the lifecycle label with
    `hermes:needs-human`, and report concise evidence.
 

@@ -32,8 +32,6 @@ feedback.
 - Keep the PR `hermes:in-review` while feedback remains. Retain
   `hermes:developer` throughout an explicitly handed-off PR. After pushing a
   changed head SHA, wait for the next reviewer result.
-- Stop after three repair/review rounds, remove `hermes:developer` when
-  present, and replace the lifecycle label with `hermes:needs-human`.
 - When the reviewer posts a clean result for the current head SHA, remove
   `hermes:developer` when present, replace the lifecycle label with
   `hermes:needs-human`, request review from `agross`, and read back the
