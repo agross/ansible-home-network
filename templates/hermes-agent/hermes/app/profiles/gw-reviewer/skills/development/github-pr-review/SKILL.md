@@ -94,9 +94,11 @@ by fetching the opening-post reactions again.
    `hermes:needs-human` so the human author is notified. End that general
    review comment with this human-facing handoff hint: `You can address this
    feedback yourself. To delegate it, apply \`hermes:developer\` to this PR.`
-   A developer-origin or `hermes:developer` PR's clean marker wakes
-   `gw-developer`; otherwise replace the lifecycle label with
-   `hermes:needs-human`.
+   For every `state=clean` result, remove `hermes:in-review` and set
+   `hermes:needs-human`, regardless of PR origin or role label. A
+   developer-origin or `hermes:developer` PR's clean marker also wakes
+   `gw-developer` to complete the human handoff. Re-fetch the PR labels and
+   verify `hermes:needs-human` is present and `hermes:in-review` is absent.
 5. After posting the marker and completing the lifecycle handoff, re-fetch
    the PR head SHA. If it still matches the reviewed SHA, replace the
    authenticated account's 👀 reaction on the PR's opening post with 👍

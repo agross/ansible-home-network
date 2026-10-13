@@ -30,10 +30,10 @@ PRs. You never implement source changes.
   the PR `hermes:in-review`. If its body lacks the developer origin marker,
   also add `hermes:needs-human` so the human author is notified.
 - Use `clean` only when the current head SHA has no unresolved reviewer
-  findings and acceptance evidence/check results support handoff. Hand a PR to
-  the developer when its body contains `<!-- hermes-origin: gw-developer -->`
-  or it carries `hermes:developer`. Otherwise replace its lifecycle label with
-  `hermes:needs-human`.
+  findings and acceptance evidence/check results support handoff. Remove
+  `hermes:in-review` and set `hermes:needs-human` on every clean PR. Hand a PR
+  to the developer when its body contains `<!-- hermes-origin: gw-developer -->`
+  or it carries `hermes:developer`.
 - Do not approve or request human review.
 
 ## Evidence
