@@ -94,3 +94,44 @@
 - name: Show restore output
   ansible.builtin.debug:
     var: borgmatic_extract_output
+
+- name: Query archived database dumps
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      # https://projects.torsion.org/borgmatic-collective/borgmatic/issues/1374
+      - --verbosity=0
+      - --config
+      - "{{ restore_target_dir }}/backup.yaml"
+      - list
+      - --repository
+      - "{{ borgmatic_archive_result.repository.label }}"
+      - --archive
+      - "{{ borgmatic_archive_result.archives[0].name }}"
+      - --find
+      - sh:borgmatic/*_databases
+      - --json
+  register: borgmatic_database_dumps_json
+  changed_when: false
+
+- name: Restore databases
+  # https://projects.torsion.org/borgmatic-collective/borgmatic/issues/1374
+  when: borgmatic_database_dumps_json.stdout_lines | length > 1
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - --config
+      - "{{ restore_target_dir }}/backup.yaml"
+      - restore
+      - --repository
+      - "{{ borgmatic_archive_result.repository.label }}"
+      - --archive
+      - "{{ borgmatic_archive_result.archives[0].name }}"
+  register: borgmatic_restore_output
+  changed_when: true
+
+- name: Show database restore output
+  # https://projects.torsion.org/borgmatic-collective/borgmatic/issues/1374
+  when: borgmatic_database_dumps_json.stdout_lines | length > 1
+  ansible.builtin.debug:
+    var: borgmatic_restore_output
