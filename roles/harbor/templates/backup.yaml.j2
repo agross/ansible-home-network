@@ -12,7 +12,6 @@ constants:
 # List of source directories and files to back up. Globs and tildes
 # are expanded. Do not backslash spaces in path names.
 source_directories: !retain
-  - {{ harbor_root }}/backups
   - {{ harbor_root }}/app
 
 # Any paths matching these patterns are excluded from backups. Globs and tildes
@@ -24,34 +23,54 @@ exclude_patterns:
   - {{ harbor_root }}/app/job_logs
   - {{ harbor_root }}/app/trivy-adapter
 
+# Stream the database dump directly to Borg using the container's PostgreSQL tools.
+postgresql_databases:
+  - name: registry
+    format: custom
+    compression: none
+    options: --quote-all-identifiers
+    pg_dump_command: >-
+      docker compose --project-directory {{ (harbor_installer_directory ~ '/harbor') | ansible.builtin.quote }}
+                     exec
+                     --no-TTY
+                     postgresql
+                     pg_dump
+    pg_restore_command: >-
+      docker compose --project-directory {{ (harbor_installer_directory ~ '/harbor') | ansible.builtin.quote }}
+                     exec
+                     --no-TTY
+                     postgresql
+                     pg_restore
+    psql_command: >-
+      docker compose --project-directory {{ (harbor_installer_directory ~ '/harbor') | ansible.builtin.quote }}
+                     exec
+                     --no-TTY
+                     postgresql
+                     psql
+
 # List of one or more command hooks to execute, triggered at particular points
 # during borgmatic's execution. For each command hook, specify one of "before"
 # or "after", not both.
 commands:
-  - before: configuration
-    # Only trigger the hook when borgmatic is run with particular actions listed
-    # here. Defaults to running for all actions.
-    when:
-      - create
-    run:
-      - {{ harbor_root }}/backup
-
   - before: action
     when:
       - extract
+      - restore
     run:
       - |
         if systemctl is-active --quiet {unit}; then
           systemctl stop {unit}
         fi
 
-  - after: action
+  - before: action
     when:
-      - extract
-    states:
-      - finish
+      - restore
     run:
-      - {{ harbor_root }}/restore
+      - >-
+        docker compose --project-directory {{ (harbor_installer_directory ~ '/harbor') | ansible.builtin.quote }}
+                       up
+                       --wait
+                       postgresql
 
 # Configuration for a monitoring integration with Healthchecks. Create an
 # account at https://healthchecks.io (or self-host Healthchecks) if you'd like
