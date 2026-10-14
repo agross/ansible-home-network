@@ -5,6 +5,18 @@ hermes_timezone: Europe/Berlin
 hermes_uid: 10000
 hermes_gid: 10000
 
+# Current plugin admission and dependency preparation require a recent Hermes image.
+hermes_image: nousresearch/hermes-agent:v0.22.0
+
+# Local Hindsight memory processing; no cloud LLM credentials.
+hermes_hindsight_llm_model: qwen3.5:4b
+hermes_hindsight_llm_context: 16384
+hermes_hindsight_llm_timeout: 600
+hermes_hindsight_embedding_model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+hermes_hindsight_reranker_model: cross-encoder/mmarco-mMiniLMv2-L12-H384-v1
+# Reviewed catalog pin shipped with Hermes v0.22.0.
+hermes_hindsight_plugin_ref: f843f173bb41f001e322cc83c917371639e47fbf
+
 hermes_approvals_mode: manual
 hermes_approvals_cron_mode: deny
 hermes_approvals_unattended_mode: deny

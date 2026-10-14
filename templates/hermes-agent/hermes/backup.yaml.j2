@@ -12,6 +12,24 @@ constants:
 # are expanded. Do not backslash spaces in path names.
 source_directories: !retain
   - {{ hermes_root }}/app
+  - {{ hermes_root }}/hindsight/data
+
+# Stop embedded PostgreSQL cleanly while its files are backed up.
+commands:
+  - before: configuration
+    when:
+      - create
+    run:
+      - cd {{ hermes_root | ansible.builtin.quote }} && docker compose stop hindsight
+
+  - after: configuration
+    when:
+      - create
+    states:
+      - finish
+      - fail
+    run:
+      - cd {{ hermes_root | ansible.builtin.quote }} && docker compose start hindsight
 
 # Any paths matching these patterns are excluded from backups. Globs and tildes
 # are expanded. Note that a glob pattern must either start with a glob or be an

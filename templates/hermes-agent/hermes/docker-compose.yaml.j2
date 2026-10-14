@@ -1,14 +1,19 @@
 services:
   app:
-    image: nousresearch/hermes-agent:v0.21.5
+    image: {{ hermes_image }}
     command: gateway run
     restart: unless-stopped
+    depends_on:
+      hindsight:
+        condition: service_healthy
     {% if hermes_browser_tools_enabled %}
     shm_size: {{ hermes_shm_size }}
     {% endif %}
     environment:
       PUID: {{ hermes_uid }}
       PGID: {{ hermes_gid }}
+      # Abort startup if provider installation fails in the s6 init hook.
+      S6_BEHAVIOUR_IF_STAGE2_FAIL: "2"
 
       {% if hermes_dashboard_enabled %}
       HERMES_DASHBOARD: true
@@ -33,6 +38,7 @@ services:
       {% endif %}
     volumes:
       - ./app:/opt/data
+      - ./hindsight/install-plugins.sh:/etc/cont-init.d/03-hindsight-plugins:ro
       - /var/run/docker.sock:/var/run/docker.sock:z
     {% if hermes_dashboard_enabled or hermes_api_server_enabled or hermes_webhooks_enabled %}
     healthcheck:
@@ -71,6 +77,65 @@ services:
       - {{ hermes_webhooks_port }}:8644
       {% endif %}
     {% endif %}
+
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:1.0.0
+    restart: unless-stopped
+    user: "{{ hermes_uid }}:{{ hermes_gid }}"
+    depends_on:
+      ollama-model:
+        condition: service_completed_successfully
+    environment:
+      HINDSIGHT_ENABLE_CP: "false"
+      HINDSIGHT_API_LLM_PROVIDER: ollama
+      HINDSIGHT_API_LLM_BASE_URL: http://ollama:11434/v1
+      HINDSIGHT_API_LLM_MODEL: {{ hermes_hindsight_llm_model | ansible.builtin.to_json }}
+      HINDSIGHT_API_LLM_OLLAMA_NUM_CTX: {{ hermes_hindsight_llm_context }}
+      HINDSIGHT_API_LLM_TIMEOUT: {{ hermes_hindsight_llm_timeout }}
+      HINDSIGHT_API_REFLECT_LLM_TIMEOUT: {{ hermes_hindsight_llm_timeout }}
+      # Avoid concurrent CPU inference competing across profiles.
+      HINDSIGHT_API_LLM_MAX_CONCURRENT: 1
+      HINDSIGHT_API_EMBEDDINGS_PROVIDER: local
+      HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL: {{ hermes_hindsight_embedding_model | ansible.builtin.to_json }}
+      HINDSIGHT_API_RERANKER_PROVIDER: local
+      HINDSIGHT_API_RERANKER_LOCAL_MODEL: {{ hermes_hindsight_reranker_model | ansible.builtin.to_json }}
+      HINDSIGHT_API_TEXT_SEARCH_EXTENSION_NATIVE_LANGUAGE: german
+      HF_HOME: /home/hindsight/.cache/huggingface
+    volumes:
+      - ./hindsight/data:/home/hindsight/.pg0
+      - ./hindsight/cache:/home/hindsight/.cache
+    healthcheck:
+      test: [CMD, curl, --fail-with-body, http://localhost:8888/health]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # Multilingual models are downloaded on the first start.
+      start_period: 10m
+      start_interval: 5s
+
+  ollama:
+    image: ollama/ollama:0.40.4
+    restart: unless-stopped
+    environment:
+      OLLAMA_NO_CLOUD: "1"
+    volumes:
+      - ./ollama:/root/.ollama
+    healthcheck:
+      test: [CMD, ollama, list]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Fetch the configured model before Hindsight starts; cached pulls are incremental.
+  ollama-model:
+    image: ollama/ollama:0.40.4
+    command: [pull, {{ hermes_hindsight_llm_model | ansible.builtin.to_json }}]
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
 
   immich-mcp:
     image: ghcr.io/joeru/claw2immich:sha-a39ae71

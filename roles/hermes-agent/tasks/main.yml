@@ -17,6 +17,17 @@
       - "site:{{ site }}"
       - "host:{{ inventory_hostname }}"
 
+- name: Create Hindsight data directories
+  ansible.builtin.file:
+    path: "{{ hermes_root }}/hindsight/{{ item }}"
+    state: directory
+    owner: "{{ hermes_uid }}"
+    group: "{{ hermes_gid }}"
+    mode: "700"
+  loop:
+    - data
+    - cache
+
 - name: Copy templates
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
@@ -38,6 +49,18 @@
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
         mode: "600"
+      app/hindsight/:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "700"
+      app/hindsight/config.json.j2:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "640"
+      app/profiles/*/hindsight/config.json.j2:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "640"
       app/profiles/*/config.yaml.j2:
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
@@ -67,6 +90,11 @@
         group: 0
         mode: "600"
         notify_: Reload hermes-agent service
+
+      hindsight/install-plugins.sh.j2:
+        owner: 0
+        group: 0
+        mode: "755"
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml

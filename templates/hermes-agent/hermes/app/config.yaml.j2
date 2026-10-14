@@ -140,3 +140,6 @@ dashboard:
   public_url: https://{{ hermes_domain }}
   trusted_proxies:
     - {{ hostvars['proxy-home'].interfaces.lan.ip4.address }}
+
+memory:
+  provider: hindsight

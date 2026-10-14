@@ -1,0 +1,32 @@
+#!/command/with-contenv bash
+# {{ ansible_managed }}
+
+set -euo pipefail
+
+# s6 runs init hooks as root, after 01-hermes-setup has remapped the Hermes user.
+if [[ "$(id -u)" == 0 ]]; then
+  exec s6-setuidgid hermes bash "$0"
+fi
+export HOME=/opt/data
+
+# The default profile has its own bank and also needs the provider installed.
+profiles=(default)
+for config in /opt/data/profiles/*/hindsight/config.json; do
+  [[ -f "$config" ]] || continue
+  profile="${config%/hindsight/config.json}"
+  profiles+=("${profile##*/}")
+done
+
+for profile in "${profiles[@]}"; do
+  # Reinstall the same reviewed revision to repair missing dependencies after image changes.
+  hermes --profile "$profile" plugins install hindsight \
+    --ref {{ hermes_hindsight_plugin_ref | ansible.builtin.quote }} \
+    --force --enable --yes-deps
+  status="$(hermes --profile "$profile" memory status)"
+  printf '%s\n' "$status"
+  # The installer can report dependency refusal without returning a failing exit code.
+  if [[ "$status" != *"Status:    available ✓"* ]]; then
+    printf 'Hindsight is unavailable for profile %s.\n' "$profile" >&2
+    exit 1
+  fi
+done
