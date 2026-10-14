@@ -49,10 +49,6 @@ proxmox:
       mountpoint: /data/immich/app/library
       options:
         mountoptions: discard;noatime
-    - host_path: /tank/immich/backups
-      mountpoint: /data/immich/backups
-      options:
-        mountoptions: discard;noatime
     - host_path: /tank/immich/cache
       mountpoint: /data/immich/cache
       options:
@@ -196,12 +192,6 @@ zfs_datasets:
       group: 100000
     options:
       recordsize: 512K
-  tank/immich/backups:
-    chown:
-      owner: 100000
-      group: 100000
-    options:
-      recordsize: 1M
   tank/immich/cache:
     chown:
       owner: 100000

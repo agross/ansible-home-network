@@ -6,25 +6,6 @@ set -euo pipefail
 cd -- {{ immich_root | ansible.builtin.quote }}
 
 immich_admin=(docker compose exec server immich-admin)
-target={{ immich_root | ansible.builtin.quote }}/backups
-
-cleanup() {
-  printf 'Cleaning up backup directory.\n'
-
-  mkdir --parents -- "$target"
-  rm -rf -- "${target:?}"/{*,.*}
-}
-
-db() {
-  docker compose \
-         exec \
-         db \
-         pg_dumpall \
-         --clean \
-         --if-exists \
-         --quote-all-identifiers \
-    > "$target/db.sql"
-}
 
 clean-uploads() {
   printf 'Removing empty upload directories.\n'
@@ -35,14 +16,10 @@ clean-uploads() {
        -delete
 }
 
-trap cleanup ERR SIGINT SIGTERM
-
 case "${1-}" in
   start)
     "${immich_admin[@]}" enable-maintenance-mode
 
-    cleanup
-    db
     clean-uploads
     ;;
 

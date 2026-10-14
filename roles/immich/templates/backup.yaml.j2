@@ -12,7 +12,6 @@ constants:
 # List of source directories and files to back up. Globs and tildes
 # are expanded. Do not backslash spaces in path names.
 source_directories: !retain
-  - {{ immich_root }}/backups
   - {{ immich_root }}/app
   - {{ immich_root }}/redis
 
@@ -27,6 +26,31 @@ exclude_patterns:
   - {{ immich_root }}/app/library/amay
   - {{ immich_root }}/app/library/jbecker
   - {{ immich_root }}/app/library/kfochtmann
+
+# Stream the database dump directly to Borg using the container's PostgreSQL tools.
+postgresql_databases:
+  - name: immich
+    format: custom
+    compression: none
+    options: --quote-all-identifiers
+    pg_dump_command: >-
+      docker compose --project-directory {{ immich_root | ansible.builtin.quote }}
+                     exec
+                     --no-TTY
+                     db
+                     pg_dump
+    pg_restore_command: >-
+      docker compose --project-directory {{ immich_root | ansible.builtin.quote }}
+                     exec
+                     --no-TTY
+                     db
+                     pg_restore
+    psql_command: >-
+      docker compose --project-directory {{ immich_root | ansible.builtin.quote }}
+                     exec
+                     --no-TTY
+                     db
+                     psql
 
 # List of one or more command hooks to execute, triggered at particular points
 # during borgmatic's execution. For each command hook, specify one of "before"
@@ -51,11 +75,22 @@ commands:
   - before: action
     when:
       - extract
+      - restore
     run:
       - |
         if systemctl is-active --quiet {unit}; then
           systemctl stop {unit}
         fi
+
+  - before: action
+    when:
+      - restore
+    run:
+      - >-
+        docker compose --project-directory {{ immich_root | ansible.builtin.quote }}
+                       up
+                       --wait
+                       db
 
   - after: action
     when:
