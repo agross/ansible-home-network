@@ -9,7 +9,7 @@ hermes_gid: 10000
 hermes_image: nousresearch/hermes-agent:v0.22.0
 
 # Local Hindsight memory processing; no cloud LLM credentials.
-hermes_hindsight_llm_model: qwen3.5:4b
+hermes_hindsight_llm_model: qwen3.5:2b-q4_K_M
 hermes_hindsight_llm_context: 16384
 hermes_hindsight_llm_timeout: 600
 hermes_hindsight_embedding_model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2

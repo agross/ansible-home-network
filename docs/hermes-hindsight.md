@@ -2,7 +2,7 @@
 
 The Hermes stack runs Hindsight with embedded PostgreSQL and a local Ollama
 server. Memory extraction and reflection use `hermes_hindsight_llm_model`
-(`qwen3.5:4b` by default). Embeddings and reranking run inside Hindsight with
+(`qwen3.5:2b-q4_K_M` by default). Embeddings and reranking run inside Hindsight with
 multilingual models. No cloud LLM credentials are needed. Initial provisioning
 downloads container images, the Ollama model, and the embedding/reranking models.
 Subsequent inference runs locally.
