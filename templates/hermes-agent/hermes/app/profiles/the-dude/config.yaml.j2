@@ -98,6 +98,7 @@ mcp_servers:
       - --yes
       - github:agross/iobroker-mcp-server
     env:
+      NPM_CONFIG_ALLOW_GIT: all
       IOB_HOST: {{ hermes_profile.the_dude.iobroker.home.host }}
       IOB_AUTH_TYPE: basic
       IOB_USER: {{ hermes_profile.the_dude.iobroker.home.username }}
@@ -109,6 +110,7 @@ mcp_servers:
       - --yes
       - github:agross/iobroker-mcp-server
     env:
+      NPM_CONFIG_ALLOW_GIT: all
       IOB_HOST: {{ hermes_profile.the_dude.iobroker.ogd.host }}
       IOB_AUTH_TYPE: basic
       IOB_USER: {{ hermes_profile.the_dude.iobroker.ogd.username }}
@@ -129,6 +131,7 @@ mcp_servers:
       - --yes
       - github:starbuck93/tandoor-mcp-server
     env:
+      NPM_CONFIG_ALLOW_GIT: all
       TANDOOR_URL: https://{{ tandoor_domain | ansible.builtin.mandatory }}
       TANDOOR_API_TOKEN: "${TANDOOR_API_TOKEN}"
 
