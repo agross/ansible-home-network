@@ -279,6 +279,8 @@ services:
   ollama:
     image: ollama/ollama:0.40.4
     cpus: 10
+    environment:
+      OLLAMA_NO_CLOUD: 1
     volumes:
       - ./ollama:/root/.ollama
     healthcheck:
