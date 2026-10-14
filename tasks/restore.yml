@@ -11,6 +11,8 @@
       - --config
       - "{{ restore_target_dir }}/backup.yaml"
       - info
+      - --repository
+      - "{{ restore_repository | default('hetzner') }}"
       - "{{ '--archive=' ~ restore_archive if restore_archive is defined else omit }}"
       - --last=1
       - --json
@@ -75,6 +77,8 @@
       - --config
       - "{{ restore_target_dir }}/backup.yaml"
       - extract
+      - --repository
+      - "{{ borgmatic_archive_result.repository.label }}"
       - --archive
       - "{{ borgmatic_archive_result.archives[0].name }}"
       - --strip-components=all
