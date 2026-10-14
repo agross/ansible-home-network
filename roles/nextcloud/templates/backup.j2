@@ -13,20 +13,7 @@ cleanup() {
 
   # Directory needs to be kept because it is mounted on the Elasticsearch container.
   mkdir --parents -- "$target"
-  rm -rf -- "${target:?}"/*.sql "${target:?}"/*.tar
-}
-
-db() {
-  printf 'Dumping database.\n'
-
-  docker compose \
-        exec \
-        db \
-        pg_dumpall \
-        --clean \
-        --if-exists \
-        --quote-all-identifiers \
-    > "$target/db.sql"
+  rm -rf -- "${target:?}"/*.tar
 }
 
 elastic() {
@@ -92,7 +79,6 @@ case "${1-}" in
     "${occ[@]}" maintenance:mode --on
 
     cleanup
-    db
     elastic
     qdrant
     ;;

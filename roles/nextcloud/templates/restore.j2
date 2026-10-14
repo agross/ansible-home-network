@@ -5,24 +5,6 @@ set -euo pipefail
 
 cd -- {{ nextcloud_root | ansible.builtin.quote }}
 
-db() {
-  printf 'Restoring database.\n'
-
-  docker compose up \
-                 --wait \
-                 db
-
-  # Because we backed up with --clean we must connect to the postgres database.
-  # https://www.postgresql.org/docs/current/app-pg-dumpall.html#APP-PG-DUMPALL-EX
-  docker compose exec \
-                 --no-TTY \
-                 db \
-                 psql \
-                 --no-psqlrc \
-                 --dbname=postgres \
-    < {{ nextcloud_root | ansible.builtin.quote }}/backups/db.sql
-}
-
 elastic() {
   printf 'Restoring search database.\n'
 
@@ -91,6 +73,5 @@ qdrant() {
   fi
 }
 
-db
 elastic
 qdrant
