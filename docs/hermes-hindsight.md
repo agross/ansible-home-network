@@ -13,9 +13,9 @@ to `http://hindsight:8888` over the Compose network.
 
 The s6 init hook mounted at `/etc/cont-init.d/03-hindsight-plugins` runs after
 Hermes' user setup and profile reconciliation, before gateways and the dashboard
-start. It drops privileges to the remapped Hermes user and installs the reviewed
-Hindsight plugin revision and its Python dependencies for every configured
-profile. Installation is repeated at the same revision on container startup to
+start. It drops privileges to the remapped Hermes user and installs the current catalog
+version of Hindsight and its Python dependencies for every configured profile.
+Installation is repeated on container startup to pick up catalog updates and
 repair dependencies after image changes. A failed hook aborts startup. The Hermes
 image version remains managed directly in the Compose template.
 
@@ -36,7 +36,7 @@ When adding a profile, give it a `hindsight/config.json` with a unique bank and
 enable the provider in its `config.yaml`. The startup hook discovers those configs.
 
 Role defaults configure the LLM model, context window, timeout, multilingual
-embedding/reranker models and plugin revision. Ollama uses CPU inference by
+embedding/reranker models. Ollama uses CPU inference by
 default; latency and RAM usage depend on the selected model and host. Choose a
 larger model or configure GPU access if needed. The Hermes chat model settings
 remain independent of the memory-processing model.

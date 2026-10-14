@@ -18,9 +18,8 @@ for config in /opt/data/profiles/*/hindsight/config.json; do
 done
 
 for profile in "${profiles[@]}"; do
-  # Reinstall the same reviewed revision to repair missing dependencies after image changes.
+  # Install the current catalog version and repair dependencies after image changes.
   hermes --profile "$profile" plugins install hindsight \
-    --ref {{ hermes_hindsight_plugin_ref | ansible.builtin.quote }} \
     --force --enable --yes-deps
   status="$(hermes --profile "$profile" memory status)"
   printf '%s\n' "$status"
