@@ -10,6 +10,7 @@ proxmox:
   ostemplate: local:vztmpl/fedora-41-default_20241118_amd64.tar.xz
   hookscript: lxc-fedora.sh
   features:
+    - fuse=1
     - nesting=1
   password: "{{ vault_proxmox_default_root_password }}"
   ssh_public_key_github_account: agross
