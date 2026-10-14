@@ -17,7 +17,7 @@ start. It drops privileges to the remapped Hermes user and installs the reviewed
 Hindsight plugin revision and its Python dependencies for every configured
 profile. Installation is repeated at the same revision on container startup to
 repair dependencies after image changes. A failed hook aborts startup. The Hermes
-image is updated to v0.22.0 for its current catalog/dependency installation CLI.
+image version remains managed directly in the Compose template.
 
 Each profile activates `memory.provider: hindsight` and has its own
 `hindsight/config.json`:

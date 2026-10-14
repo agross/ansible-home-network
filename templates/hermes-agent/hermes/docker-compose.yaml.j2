@@ -1,6 +1,6 @@
 services:
   app:
-    image: {{ hermes_image }}
+    image: nousresearch/hermes-agent:v0.22.0
     command: gateway run
     restart: unless-stopped
     depends_on:

@@ -5,9 +5,6 @@ hermes_timezone: Europe/Berlin
 hermes_uid: 10000
 hermes_gid: 10000
 
-# Current plugin admission and dependency preparation require a recent Hermes image.
-hermes_image: nousresearch/hermes-agent:v0.22.0
-
 # Local Hindsight memory processing; no cloud LLM credentials.
 hermes_hindsight_llm_model: qwen3.5:2b-q4_K_M
 hermes_hindsight_llm_context: 16384
