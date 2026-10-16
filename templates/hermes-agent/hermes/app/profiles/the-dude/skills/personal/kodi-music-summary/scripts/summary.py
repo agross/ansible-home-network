@@ -59,12 +59,32 @@ def main():
     if not entries:
         print('No songs played today!')
         return
-    print('🎧 Heute gehört:')
-    print('-' * 40)
+    try:
+        now = ZoneInfo('Europe/Berlin').key  # silence unused-var lints below
+    except Exception:
+        pass
+    parsed = []
     for timestamp, title, artist in entries:
         try:
-            time = datetime.fromisoformat(timestamp.replace('Z', '+00:00')).astimezone(ZoneInfo('Europe/Berlin')).strftime('%H:%M:%S')
+            dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00')).astimezone(ZoneInfo('Europe/Berlin'))
         except ValueError:
+            dt = None
+        parsed.append((dt, timestamp, title, artist))
+    days = sorted({dt.date() for dt, *_ in parsed if dt is not None})
+    today = datetime.now(ZoneInfo('Europe/Berlin')).date()
+    if days and days[-1] == today and days == [today]:
+        header = '🎧 Heute gehört:'
+    elif len(days) == 1:
+        header = f'🎧 Gehört am {days[0]:%d.%m.}:'
+    else:
+        header = f'🎧 Gehörte Titel {days[0]:%d.%m.}–{days[-1]:%d.%m.}:'
+    multi = len(days) > 1
+    print(header)
+    print('-' * 40)
+    for dt, timestamp, title, artist in parsed:
+        if dt:
+            time = dt.strftime('%d.%m. %H:%M:%S') if multi else dt.strftime('%H:%M:%S')
+        else:
             time = timestamp
         print(f'{time} – {title}')
         if artist:
