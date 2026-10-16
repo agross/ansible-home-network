@@ -7,6 +7,9 @@
   community.docker.docker_compose_v2_pull:
     project_src: "{{ directory }}"
     policy: "{{ pull if pull is string else 'missing' }}"
+    # Pull images regardless of compose profile activation.
+    profiles:
+      - "*"
     ignore_buildable: true
   notify: "{{ notify_ | default(omit) }}"
 
