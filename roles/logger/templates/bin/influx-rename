@@ -40,9 +40,22 @@ rename-one() {
   local to="${3?Need measurement that is copied to}"
 
   local copy
-  copy=$(cat <<EOF
+  local copy_start=1970
+  local copy_start_rfc3339
+  local copy_stop
+  local copy_stop_rfc3339
+  local final_stop
+
+  final_stop="$(date --utc +'%Y')"
+
+  while (( copy_start <= final_stop )); do
+    copy_stop=$(( copy_start + 1 ))
+    copy_start_rfc3339="$copy_start-01-01T00:00:00Z"
+    copy_stop_rfc3339="$copy_stop-01-01T00:00:00Z"
+
+    copy=$(cat <<EOF
     from(bucket: "$bucket")
-    |> range(start: 0, stop: now())
+    |> range(start: $copy_start_rfc3339, stop: $copy_stop_rfc3339)
     |> filter(fn: (r) => r["_measurement"] == "$from")
     |> set(key: "_measurement", value: "$to")
     |> to(bucket: "$bucket")
@@ -51,12 +64,17 @@ rename-one() {
 EOF
 )
 
-  printf 'Copying measurement "%s" to "%s" (bucket: %s)...\n' \
-         "$from" \
-         "$to" \
-         "$bucket"
+    printf 'Copying measurement "%s" to "%s" (bucket: %s, window: %s to %s)...\n' \
+           "$from" \
+           "$to" \
+           "$bucket" \
+           "$copy_start_rfc3339" \
+           "$copy_stop_rfc3339"
 
-  "${influxdb[@]}" influx query "$copy"
+    "${influxdb[@]}" influx query "$copy"
+
+    copy_start="$copy_stop"
+  done
 
   printf 'Dropping measurement "%s" (bucket: %s)...\n' \
          "$from" \
@@ -65,7 +83,7 @@ EOF
   "${influxdb[@]}" influx delete \
                           --bucket "$bucket" \
                           --start 1970-01-01T00:00:00Z \
-                          --stop "$(date +'%Y-%m-%dT%H:%M:%SZ')" \
+                          --stop "$copy_stop_rfc3339" \
                           --predicate "_measurement=\"$from\""
 }
 
