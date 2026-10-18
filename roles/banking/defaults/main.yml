@@ -1,3 +1,0 @@
-banking_root: "/data/{{ ansible_role_name }}"
-
-banking_firewalld_services: []

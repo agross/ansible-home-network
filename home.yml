@@ -134,8 +134,6 @@
       tags: traefik
     - role: gitlab
       tags: gitlab
-    - role: banking
-      tags: banking
     - role: teamcity
       tags: teamcity
 
