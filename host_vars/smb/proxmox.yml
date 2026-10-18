@@ -31,25 +31,21 @@ proxmox:
     options:
       mountoptions: discard;noatime
   mount_volumes:
-    mp0:
-      host_path: /tank/immich/app/library
+    - host_path: /tank/immich/app/library
       mountpoint: /shares/immich
       options:
         ro: 1
         mountoptions: discard;noatime
-    mp1:
-      host_path: /tank/nextcloud/app
+    - host_path: /tank/nextcloud/app
       mountpoint: /shares/nextcloud
       options:
         ro: 1
         mountoptions: discard;noatime
-    mp2:
-      host_path: /tank/time-machine
+    - host_path: /tank/time-machine
       mountpoint: /shares/time-machine
       options:
         mountoptions: discard;noatime
-    mp3:
-      host_path: /tank/downloads
+    - host_path: /tank/downloads
       mountpoint: /shares/downloads
       options:
         mountoptions: discard;noatime

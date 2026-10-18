@@ -25,8 +25,7 @@ proxmox:
     options:
       mountoptions: discard;noatime
   mount_volumes:
-    mp0:
-      host_path: /tank/grossweber/teamcity/agent/docker
+    - host_path: /tank/grossweber/teamcity/agent/docker
       mountpoint: /var/lib/docker
       options:
         mountoptions: discard;noatime

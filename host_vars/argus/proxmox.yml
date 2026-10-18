@@ -34,8 +34,7 @@ proxmox:
     options:
       mountoptions: discard;noatime
   mount_volumes:
-    mp0:
-      host_path: /rpool/tank/frigate/media
+    - host_path: /rpool/tank/frigate/media
       mountpoint: /data/frigate/media
       options:
         mountoptions: discard;noatime

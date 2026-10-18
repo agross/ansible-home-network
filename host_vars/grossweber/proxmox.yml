@@ -34,44 +34,36 @@ proxmox:
     options:
       mountoptions: discard;noatime
   mount_volumes:
-    mp0:
-      host_path: /tank/grossweber/gitlab/app
+    - host_path: /tank/grossweber/gitlab/app
       mountpoint: /data/gitlab/app
       options:
         mountoptions: discard;noatime
-    mp1:
-      host_path: /tank/grossweber/gitlab/postgres
+    - host_path: /tank/grossweber/gitlab/postgres
       mountpoint: /data/gitlab/app/data/postgresql
       options:
         mountoptions: discard;noatime
-    mp2:
-      host_path: /tank/grossweber/gitlab/redis
+    - host_path: /tank/grossweber/gitlab/redis
       mountpoint: /data/gitlab/app/data/redis
       options:
         mountoptions: discard;noatime
 
-    mp3:
-      host_path: /tank/grossweber/teamcity/app
+    - host_path: /tank/grossweber/teamcity/app
       mountpoint: /data/teamcity/app
       options:
         mountoptions: discard;noatime
-    mp4:
-      host_path: /tank/grossweber/teamcity/mysql
+    - host_path: /tank/grossweber/teamcity/mysql
       mountpoint: /data/teamcity/mysql/data
       options:
         mountoptions: discard;noatime
-    mp5:
-      host_path: /tank/grossweber/teamcity/hub/backups
+    - host_path: /tank/grossweber/teamcity/hub/backups
       mountpoint: /data/teamcity/hub/backups
       options:
         mountoptions: discard;noatime
-    mp6:
-      host_path: /tank/grossweber/teamcity/hub/conf
+    - host_path: /tank/grossweber/teamcity/hub/conf
       mountpoint: /data/teamcity/hub/conf
       options:
         mountoptions: discard;noatime
-    mp7:
-      host_path: /tank/grossweber/teamcity/hub/data
+    - host_path: /tank/grossweber/teamcity/hub/data
       mountpoint: /data/teamcity/hub/data
       options:
         mountoptions: discard;noatime

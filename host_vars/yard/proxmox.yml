@@ -31,13 +31,11 @@ proxmox:
     options:
       mountoptions: discard;noatime
   mount_volumes:
-    mp0:
-      host_path: /rpool/tank/time-machine
+    - host_path: /rpool/tank/time-machine
       mountpoint: /shares/time-machine
       options:
         mountoptions: discard;noatime
-    mp1:
-      host_path: /home/agross/media
+    - host_path: /home/agross/media
       mountpoint: /home/agross/media
       options:
         mountoptions: discard;noatime;nodev;noexec;nosuid
