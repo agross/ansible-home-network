@@ -16,6 +16,8 @@
       - jq
       # For Ruby's mysql2 gem.
       - mariadb-connector-c-devel
+      # For Ruby's  gem.
+      - libpq-devel
     state: present
 
 - name: Ensure Chromium and Xvfb virtual display are installed
