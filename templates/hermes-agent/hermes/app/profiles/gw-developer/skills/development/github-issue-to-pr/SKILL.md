@@ -136,9 +136,13 @@ head. This prevents overwriting intervening author changes or reviewing the wron
 revision.
 
 1. Stop when the current PR head branch matches `renovate/*`, or when the PR
-   is neither developer-origin nor labeled `hermes:developer`. Otherwise read
-   all open review threads. A current reviewer marker identifies reviewer
-   workflow feedback; feedback without that marker is also handled.
+   is neither developer-origin nor labeled `hermes:developer`. Otherwise fetch
+   submitted reviews (`GET repos/OWNER/REPO/pulls/NUMBER/reviews`), PR issue
+   comments (`GET repos/OWNER/REPO/issues/NUMBER/comments`), and all open
+   review threads before judging feedback. Read review bodies as well as thread
+   comments: reviewer workflow markers can be posted in a submitted review,
+   not only as an inline or issue comment. A current reviewer marker identifies
+   reviewer workflow feedback; feedback without that marker is also handled.
 2. A `state=changes-requested` marker or an unresolved review comment starts
    one repair round. Keep the PR `hermes:in-review`, implement corrections
    within the PR's stated scope, run checks, and push one updated head SHA.
@@ -178,7 +182,10 @@ the cleanup as complete and record the verified absence rather than failing the
 handoff; concurrent automation can replace or remove reactions between reads. Do
 not reuse an earlier reaction ID: concurrent automation or reactions can replace it,
 and GitHub returns 404 for the stale ID. The reviewer sets 👍 or 👎 after reviewing
-the current head SHA.
+the current head SHA. Immediately before the final report, re-fetch the PR's state,
+head SHA, labels, and review requests; a human or concurrent automation can merge or
+otherwise transition the PR during handoff, and the report must distinguish that
+external transition from an action taken by this role.
 
 ## Webhook safety
 

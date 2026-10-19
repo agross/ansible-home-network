@@ -21,5 +21,15 @@ reviewing the destination.
 
 Run `python3 ${HERMES_SKILL_DIR}/scripts/check_etf.py`. Return its output
 unchanged. The script reads current prices from Yahoo Finance without
-credentials. It always reports both configured ETFs; individual lookup errors
+credentials. It always reports all configured symbols; individual lookup errors
 remain visible in the summary.
+
+## Maintaining the symbol list
+
+Symbols live in the `TICKERS` tuple in `scripts/check_etf.py`; each entry is
+`(yahoo_ticker, display_name)`, and US stocks carry their ISIN in parentheses
+in the display name. Never hardcode a currency in the output line — `quote()`
+returns the live `meta.currency` from Yahoo (USD for US listings, EUR for the
+German ETFs), so a new symbol needs no currency decision. After any script
+edit, re-verify on the next day's first run that the change survived: profile
+skill scripts have silently reverted overnight before.

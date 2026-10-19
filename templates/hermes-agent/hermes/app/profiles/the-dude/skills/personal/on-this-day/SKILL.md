@@ -135,7 +135,9 @@ Only a successfully delivered image starts a new game. One guess per delivered
 image; short contextual replies count as guesses. **A short, contextless DM sent
 shortly after the daily image (e.g. "Eine Demo. Keine Ahnung wofür") IS a guess —
 not confusion or an off-topic message. Load the skill, read event.json via
-`answer`, give the verdict, then reveal.** A message sent after a
+`answer`, give the verdict, then reveal.** **Guess triage before topic-answering (2026-10-18, third recurrence):** when any short reply from Alex arrives after the morning image, run `answer` FIRST and compare before classifying. If his words plausibly fit the image's subject, it is a guess even when it reads like a general question — e.g. "Sieht aus wie etwas im Aktienmarkt. Höchststand von irgendwas?" for the Dow-12.000 image got answered as a live-market question with web research. Never start web searches or topic answers while a round is open; check the round state first, then decide guess vs. conversation.
+
+A message sent after a
 failed/unsent run is ordinary conversation, not a guess. Direct answer requests
 reveal immediately only for the currently delivered image. Read `python3
 ${HERMES_SKILL_DIR}/scripts/on_this_day.py

@@ -7,6 +7,7 @@ from urllib.request import Request, urlopen
 TICKERS = (
     ('AAPL', 'Apple (US0378331005)'),
     ('KO', 'Coca-Cola (US1912161007)'),
+    ('AVGO', 'Broadcom (US11102F1032)'),
     ('WELD.DE', 'Amundi S&P Global Utilities'),
     ('VGWL.DE', 'Vanguard FTSE All-World'),
 )
@@ -22,7 +23,8 @@ def quote(ticker):
     meta = data['chart']['result'][0]['meta']
     price = meta['regularMarketPrice']
     previous = meta['chartPreviousClose']
-    return price, price - previous, (price - previous) / previous * 100
+    currency = meta.get('currency') or '?'
+    return price, price - previous, (price - previous) / previous * 100, currency
 
 
 def main():
@@ -31,10 +33,10 @@ def main():
     for ticker, name in TICKERS:
         print(name)
         try:
-            price, change, percent = quote(ticker)
+            price, change, percent, currency = quote(ticker)
             indicator = '📈' if change > 0 else '📉' if change < 0 else '➡️'
             sign = '+' if change > 0 else ''
-            print(f'  {price:.2f} EUR ({sign}{change:.2f} / {sign}{percent:.2f}%) {indicator}')
+            print(f'  {price:.2f} {currency} ({sign}{change:.2f} / {sign}{percent:.2f}%) {indicator}')
         except Exception as error:
             print(f'  ⚠️ Fehler: {error}')
         print()
