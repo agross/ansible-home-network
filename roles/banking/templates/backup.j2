@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+clean-logs() {
+  find {{ banking_root | ansible.builtin.quote }}/app \
+       -type f \
+       -name '*.log' \
+       -mtime +14 \
+       -delete
+
+  find {{ banking_root | ansible.builtin.quote }}/app \
+       -type d \
+       -empty \
+       -delete
+}
+
+clean-logs

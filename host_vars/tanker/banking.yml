@@ -1,0 +1,5 @@
+banking_finance_password: "{{ vault_banking_finance_password }}"
+banking_finance_readonly_password: "{{ vault_banking_finance_readonly_password }}"
+
+banking_gw_cr_user: "{{ vault_banking_gw_cr_user }}"
+banking_gw_cr_password: "{{ vault_banking_gw_cr_password }}"

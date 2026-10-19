@@ -1,0 +1,4 @@
+CREATE USER finance_readonly WITH PASSWORD '{{ banking_finance_readonly_password }}';
+
+GRANT USAGE ON SCHEMA public TO finance_readonly;
+ALTER DEFAULT PRIVILEGES FOR ROLE finance IN SCHEMA public GRANT SELECT ON TABLES TO finance_readonly;

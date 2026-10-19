@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+printf 'Info:\nhttps://www.aquamaniac.de/rdm/projects/aqbanking/wiki/SetupPinTan\n'
+
+docker compose \
+       --project-directory \
+       {{ banking_root | ansible.builtin.quote }} \
+       run \
+       --interactive \
+       --rm \
+       --entrypoint sh \
+       app

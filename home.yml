@@ -106,6 +106,8 @@
       tags: anytype
     - role: jdownloader
       tags: jdownloader
+    - role: banking
+      tags: banking
 
 - name: Hosted services on smb
   hosts: smb

@@ -1,0 +1,10 @@
+[Unit]
+Description=HBCI/FinTS updater
+BindsTo=banking.service
+
+[Timer]
+OnCalendar=18:00:00
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,79 @@
+- name: Ensure backup healthcheck exists
+  ansible.builtin.import_tasks:
+    file: healthcheck.yml
+  vars:
+    healthcheck_name: "{{ ansible_role_name }}"
+    healthcheck_tags:
+      - "site:{{ site }}"
+      - "host:{{ inventory_hostname }}"
+
+- name: Copy templates
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: ../templates
+    target: "{{ banking_root }}"
+    notify_: Reload banking service
+    files:
+      systemd/**:
+        notify_: Restart banking service
+      app/.hbci-pinfile:
+        owner: 1000
+        group: 1000
+        mode: "440"
+      docker-compose.yaml.j2:
+        owner: 0
+        group: 0
+        mode: "600"
+      postgres-init/**:
+        # Postgres user ID.
+        owner: 70
+        group: 0
+        mode: "660"
+
+- name: Log in to cr.grossweber.com
+  community.general.docker_login:
+    registry_url: cr.grossweber.com
+    username: "{{ banking_gw_cr_user }}"
+    password: "{{ banking_gw_cr_password }}"
+  register: banking_docker_login_result
+  retries: 5
+  delay: 60
+  until: banking_docker_login_result is not failed
+
+- name: Update docker-compose images
+  ansible.builtin.import_tasks:
+    file: docker-compose-update.yml
+  vars:
+    directory: "{{ banking_root }}"
+    pull: true
+    build: true
+    notify_: Reload banking service
+
+- name: Restore from backup if requested
+  when: restore is defined
+  ansible.builtin.import_tasks:
+    file: restore.yml
+  vars:
+    restore_target_dir: "{{ banking_root }}"
+
+- name: Symlink backup configuration
+  ansible.builtin.file:
+    state: link
+    src: "{{ banking_root }}/backup.yaml"
+    path: "/etc/borgmatic.d/{{ ansible_role_name }}.yaml"
+
+- name: Install systemd units
+  ansible.builtin.import_tasks: systemd-install-units.yml
+  vars:
+    directory: "{{ banking_root }}/systemd"
+    local_units: templates/systemd
+    notify_: Restart banking service
+
+- name: Start systemd units
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: "{{ item }}"
+    daemon_reload: true
+  loop: "{{ systemd_units_autostart }}"
+  register: banking_started
