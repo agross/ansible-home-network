@@ -11,9 +11,8 @@ frigate_camera_user: frigate
 
 frigate_mqtt_topic_prefix: "{{ site }}/frigate"
 
-# OpenRouter model ID. Must accept image input and use an instruct
-# (not thinking) variant.
-frigate_genai_model: openai/gpt-4o
+# OpenRouter model ID. Must accept image input.
+frigate_genai_model: google/gemma-3-4b-it
 
 # renovate: github-releases=dbro/frigate-detector-edgetpu-yolo9
 frigate_yolov9_release_version: v1.0
