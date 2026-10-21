@@ -1,1 +1,4 @@
 borgmatic_encryption_passphrase: "{{ vault_borgmatic_encryption_passphrase }}"
+
+# Hook scripts of banking need this to remove files owned by other users.
+borgmatic_systemd_capabilities: cap_dac_override
