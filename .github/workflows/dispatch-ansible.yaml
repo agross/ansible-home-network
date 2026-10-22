@@ -1,4 +1,4 @@
-name: PR closed
+name: Dispatch Ansible
 
 on:
   pull_request:
@@ -12,6 +12,10 @@ jobs:
   affected-roles:
     name: Determine affected roles
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      actions: write
 
     # Renovate triggers branch automerge pushes committed by GitHub. Rebased PR
     # pushes are triggered and committed by the user who merged the PR.
@@ -34,9 +38,6 @@ jobs:
       PR_MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
       PUSH_BASE_SHA: ${{ github.event.before }}
       PUSH_HEAD_SHA: ${{ github.event.after }}
-
-    outputs:
-      roles: ${{ steps.affected-roles.outputs.roles }}
 
     steps:
       - name: Get full commit history
@@ -87,17 +88,36 @@ jobs:
         uses: ./.github/actions/affected-roles
         with:
           base-sha: ${{ steps.base-commit.outputs.sha }}
-          head-sha: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.after }}
+          head-sha: >-
+            ${{
+              github.event_name == 'pull_request' &&
+              github.event.pull_request.head.sha ||
+              github.event.after
+            }}
           delimiter: ','
 
-  run-ansible:
-    name: Run Ansible with tags ${{ needs.affected-roles.outputs.roles }}
-
-    needs: affected-roles
-
-    if: needs.affected-roles.outputs.roles != ''
-
-    uses: ./.github/workflows/ansible.yaml
-    with:
-      tags: ${{ needs.affected-roles.outputs.roles }}
-    secrets: inherit
+      - name: Dispatch Ansible
+        if: steps.affected-roles.outputs.roles != ''
+        run: |
+          gh workflow run run-ansible.yaml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$DEFAULT_BRANCH" \
+            --raw-field "tags=$DEPLOYMENT_TAGS" \
+            --raw-field "revision=$DEPLOYMENT_REVISION" \
+            --raw-field "source=$DEPLOYMENT_SOURCE"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          DEPLOYMENT_TAGS: ${{ steps.affected-roles.outputs.roles }}
+          DEPLOYMENT_REVISION: >-
+            ${{
+              github.event_name == 'pull_request' &&
+              github.event.pull_request.merge_commit_sha ||
+              github.event.after
+            }}
+          DEPLOYMENT_SOURCE: >-
+            ${{
+              github.event_name == 'pull_request' &&
+              format('PR #{0}', github.event.pull_request.number) ||
+              'Renovate branch automerge'
+            }}

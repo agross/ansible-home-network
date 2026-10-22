@@ -1,18 +1,24 @@
 name: Run Ansible
+run-name: 'Ansible: ${{ inputs.tags }} · ${{ inputs.source }}'
 
 on:
-  workflow_call:
-    inputs:
-      tags:
-        description: Tags to apply (comma-separated)
-        required: true
-        type: string
   workflow_dispatch:
     inputs:
       tags:
         description: Tags to apply (comma-separated)
         required: true
         type: string
+      revision:
+        description: Commit SHA to deploy (defaults to the selected ref).
+        required: false
+        type: string
+      source:
+        description: Deployment origin.
+        default: Manual
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
   ansible:
@@ -43,9 +49,10 @@ jobs:
     cache-mode: write
 
     steps:
-      - name: Get latest code
+      - name: Get deployment code
         uses: actions/checkout@v7.0.1
         with:
+          ref: ${{ inputs.revision || github.sha }}
           submodules: recursive
 
       - name: Save SSH keyfile

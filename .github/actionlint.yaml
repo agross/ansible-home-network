@@ -4,7 +4,7 @@ self-hosted-runner:
     - ogd
 
 paths:
-  .github/workflows/ansible.yaml:
+  .github/workflows/run-ansible.yaml:
     ignore:
       # https://github.com/rhysd/actionlint/pull/745
       - 'unexpected key "cache-mode"'
