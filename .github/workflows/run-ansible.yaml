@@ -1,5 +1,5 @@
 name: Run Ansible
-run-name: 'Ansible: ${{ inputs.tags }} · ${{ inputs.source }}'
+run-name: '${{ inputs.tags }} · ${{ inputs.source }}'
 
 on:
   workflow_dispatch:
