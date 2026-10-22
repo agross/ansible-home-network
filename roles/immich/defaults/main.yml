@@ -1,4 +1,4 @@
 immich_root: /data/immich
 
 # renovate: docker=ghcr.io/immich-app/immich-server
-immich_version: v3.3.4
+immich_version: v3.3.5
