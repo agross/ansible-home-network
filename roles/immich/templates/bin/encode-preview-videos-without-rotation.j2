@@ -6,9 +6,6 @@ set -euo pipefail
 # renovate: docker=jlesage/mediainfo
 mediainfo_version=v26.10.1
 
-# renovate: docker=ghcr.io/immich-app/immich-server
-immich_version=v3.3.4
-
 immich_encoded_videos={{ immich_root | ansible.builtin.quote }}/app/encoded-video
 
 page_number=1
@@ -89,7 +86,7 @@ while [[ -n "$page_number" ]]; do
       #        --rm \
       #        --volume "$immich_encoded_videos:$immich_encoded_videos:ro" \
       #        --entrypoint ffmpeg \
-      #        "ghcr.io/immich-app/immich-server:$immich_version" \
+      #        "ghcr.io/immich-app/immich-server:{{ immich_version }}" \
       #        -loglevel error \
       #        ...
     fi
