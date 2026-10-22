@@ -207,7 +207,7 @@
       matchPackageNames: [
         '!*/**',
       ],
-      minimumReleaseAge: '2 days',
+      minimumReleaseAge: '1 day',
       internalChecksFilter: 'strict',
     },
   ],
