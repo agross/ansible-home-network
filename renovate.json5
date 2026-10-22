@@ -53,6 +53,7 @@
     {
       description: 'Automerges',
       matchPackageNames: [
+        'cr.grossweber.com/gw/aqbanking-sql',
         'ghcr.io/agross/feedr',
         'ghcr.io/cbcoutinho/nextcloud-mcp-server',
         'ollama/ollama',
