@@ -92,14 +92,18 @@ jobs:
         run: |
           ./gather-facts "$SITE" \
                          --user agross \
-                         --key-file .ansible-ssh-private-key
+                         --key-file .ansible-ssh-private-key || {
+            exit_code=$?
+            # Exit code 4 means some hosts were unreachable.
+            if [ "$exit_code" -ne 4 ]; then
+              exit "$exit_code"
+            fi
+          }
         env:
           ANSIBLE_VAULT_IDENTITY_LIST: agross2@.ansible-vault-agross2
           ANSIBLE_HOST_KEY_CHECKING: False
           ANSIBLE_FORCE_COLOR: True
           SITE: ${{ matrix.site }}
-        # Because some hosts might not be reachable.
-        continue-on-error: true
 
       - name: Run Ansible
         run: |
