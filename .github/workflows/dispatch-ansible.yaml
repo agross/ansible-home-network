@@ -96,6 +96,39 @@ jobs:
             }}
           delimiter: ','
 
+      - name: Determine deployment source
+        id: deployment-source
+        if: steps.affected-roles.outputs.roles != ''
+        run: |
+          title="${DEPLOYMENT_TITLE%%$'\n'*}"
+          source="$DEPLOYMENT_SOURCE"
+          pr_suffix=' \(#([0-9]+)\)$'
+          if [[ "$EVENT_NAME" == push && "$title" =~ $pr_suffix ]]; then
+            source="PR #${BASH_REMATCH[1]}"
+            title="${title%"${BASH_REMATCH[0]}"}"
+          fi
+          if [[ "$title" == 'Update '* ]]; then
+            title="$(printf '%s' "$title" |
+              sed --regexp-extended \
+                  --expression='s/^Update (dependency )?//' \
+                  --expression='s/ (Docker tag |Docker digest |action |digest )?to / /')"
+          fi
+          source="$title · $source"
+          printf 'source=%s\n' "$source" >> "$GITHUB_OUTPUT"
+        env:
+          DEPLOYMENT_TITLE: >-
+            ${{
+              github.event_name == 'pull_request' &&
+              github.event.pull_request.title ||
+              github.event.head_commit.message
+            }}
+          DEPLOYMENT_SOURCE: >-
+            ${{
+              github.event_name == 'pull_request' &&
+              format('PR #{0}', github.event.pull_request.number) ||
+              'Renovate branch automerge'
+            }}
+
       - name: Dispatch Ansible
         if: steps.affected-roles.outputs.roles != ''
         run: |
@@ -115,9 +148,4 @@ jobs:
               github.event.pull_request.merge_commit_sha ||
               github.event.after
             }}
-          DEPLOYMENT_SOURCE: >-
-            ${{
-              github.event_name == 'pull_request' &&
-              format('PR #{0}', github.event.pull_request.number) ||
-              'Renovate branch automerge'
-            }}
+          DEPLOYMENT_SOURCE: ${{ steps.deployment-source.outputs.source }}
