@@ -1,10 +1,3 @@
-- name: Generate htpasswd-compatible Traefik dashboard users
-  ansible.builtin.import_tasks:
-    file: htpasswd-users.yml
-  vars:
-    users: "{{ traefik_users.dashboard }}"
-    fact: traefik_dashboard_users
-
 - name: Ensure backup healthcheck exists
   ansible.builtin.import_tasks:
     file: healthcheck.yml

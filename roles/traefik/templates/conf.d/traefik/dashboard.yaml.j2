@@ -21,4 +21,9 @@ http:
       basicAuth:
         realm: Traefik
         users:
-          {{ traefik_dashboard_users | ansible.builtin.to_nice_yaml | indent(10) }}
+          {{
+            traefik_users.dashboard | default({}) |
+            htpasswd_users |
+            ansible.builtin.to_nice_yaml |
+            indent(10)
+          }}

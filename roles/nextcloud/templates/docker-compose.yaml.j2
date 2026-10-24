@@ -49,7 +49,13 @@ services:
       traefik.http.routers.nextcloud-kibana.rule: Host(`kibana.{{ nextcloud_domain | ansible.builtin.mandatory }}`)
       traefik.http.routers.nextcloud-kibana.middlewares: >-
         nextcloud-kibana-auth
-      traefik.http.middlewares.nextcloud-kibana-auth.basicauth.users: {{ nextcloud_kibana_auth | map('replace', '$', '$$') | join(',') }}
+      traefik.http.middlewares.nextcloud-kibana-auth.basicauth.users: >-
+        {{
+          nextcloud_kibana_users | default({}) |
+          htpasswd_users |
+          map('replace', '$', '$$') |
+          join(',')
+        }}
     healthcheck:
       test: curl --fail --dump-header /dev/stderr http://localhost:5601/api/status || exit 1
       start_period: 5s
