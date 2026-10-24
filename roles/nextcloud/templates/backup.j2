@@ -74,6 +74,12 @@ qdrant() {
   done
 }
 
+update-apps() {
+  printf 'Updating apps.\n'
+
+  "${occ[@]}" app:update --all
+}
+
 case "${1-}" in
   start)
     "${occ[@]}" maintenance:mode --on
@@ -84,6 +90,7 @@ case "${1-}" in
     ;;
 
   stop)
+    update-apps
     "${occ[@]}" maintenance:mode --off
     ;;
 
