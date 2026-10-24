@@ -1,9 +1,3 @@
-- name: Generate htpasswd-compatible Kibana users
-  ansible.builtin.import_tasks: htpasswd-users.yml
-  vars:
-    users: "{{ nextcloud_kibana_users }}"
-    fact: nextcloud_kibana_auth
-
 - name: Ensure backup healthcheck exists
   ansible.builtin.import_tasks:
     file: healthcheck.yml

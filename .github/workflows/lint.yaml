@@ -32,6 +32,9 @@ jobs:
       - name: Get latest code
         uses: actions/checkout@v7.0.1
 
+      - name: Test controller filters
+        run: python -m unittest discover --start-directory tests --verbose
+
       - name: Save ansible vault password for vault ID "agross2"
         run: |
           printf '%s' "$ANSIBLE_VAULT_AGROSS2" > .ansible-vault-agross2

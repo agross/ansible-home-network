@@ -78,7 +78,8 @@ http:
         removeHeader: true
         users:
           {{
-            nextcloud_kibana_auth |
+            nextcloud_kibana_users | default({}) |
+            htpasswd_users |
             ansible.builtin.to_nice_yaml(indent = 2) |
             indent(10)
           }}

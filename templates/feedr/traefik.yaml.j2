@@ -15,7 +15,8 @@ http:
         removeHeader: true
         users:
           {{
-            feedr_auth |
+            feedr_users | default({}) |
+            htpasswd_users |
             ansible.builtin.to_nice_yaml(indent = 2) |
             indent(10)
           }}
