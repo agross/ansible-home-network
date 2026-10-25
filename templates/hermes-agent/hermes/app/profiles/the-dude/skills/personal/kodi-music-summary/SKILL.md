@@ -44,5 +44,13 @@ Both scripts default to
 `${HERMES_HOME:-~/.hermes}/workspace/state/kodi-music-summary/listen.log`.
 Compose sets the tracker home to `/opt/data/profiles/the-dude`. For a custom
 log, set `KODI_MUSIC_LOG_FILE` to the same shared file for both processes. Keep
-the log, `.cursor`, and `.pending` files together; avoid truncating or rotating
-the log without migrating its cursor.
+`listen.log`, `listen.cursor`, and `listen.pending` together; avoid truncating or rotating
+the log without migrating the cursor.
+
+**Replay diagnostics:** the cursor is a byte offset into `listen.log` marking
+the acknowledged end. A record whose end offset is at or below the cursor is
+retired for good and will not resurface; records above it are unacknowledged
+backlog and WILL replay in the next run. When Alex questions an older title
+reappearing in a summary, compute each record's end byte offset and compare
+against the cursor value instead of touching delivery state — never clear or
+edit the log to retire a title; the cursor alone retires it.

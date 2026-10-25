@@ -115,6 +115,22 @@ a user-visible message. Narrate selection without naming events or years.
 
 **Lettering guard (2026-10-12):** Alex explicitly asked for readable text/logos/signage in the images — generic halls of suited people make rounds unguessable. Both former NO-text prohibitions were replaced: the LLM selection prompt now instructs "explicitly include readable period-accurate lettering that names the event or place", and the hardcoded prompt suffix asks for "realistic period-accurate visible lettering/signage ... NO dates" (dates only stay banned so guessing isn't trivially solved by a year). Never reintroduce blanket NO text/logos wording.
 
+**Garbled-lettering verdicts:** the renderer can turn required lettering into
+plausible-but-wrong words, not just obvious noise — an "ARIANE 5" prompt
+rendered "ARANNE B" on a fin, which Alex read off as a different rocket name.
+When a guess quotes lettering that contradicts the staged event, check the
+actual image with a real vision model before judging:
+`/opt/hermes/bin/hermes chat -q "<query>" --image <path> --provider
+openai-codex -m gpt-5.6-terra`, creds from the profile .env. Two gotchas:
+bare `hermes` is not on PATH (use the absolute install path), and in-profile
+vision_analyze asserts prompt text as pixels instead of reading the image, so
+all image checks go through the codex path. Credit a guess that faithfully
+reads what the image shows, and name the renderer failure in the reveal.
+
+Never assume skill-text edits survive: profile skill files (SKILL.md included)
+have gone back to an older version without notice — re-verify any skill edit
+before the next dependent run.
+
 **Silent detail-drop guard (lesson from 2026-10-02):** the MiniMax image-01
 renderer silently drops prompt-described details (verified repeatedly: 09-22
 broadcast screen/mics missing, 09-25 ballot papers/guard missing, 10-02 all
@@ -136,6 +152,15 @@ image; short contextual replies count as guesses. **A short, contextless DM sent
 shortly after the daily image (e.g. "Eine Demo. Keine Ahnung wofür") IS a guess —
 not confusion or an off-topic message. Load the skill, read event.json via
 `answer`, give the verdict, then reveal.** **Guess triage before topic-answering (2026-10-18, third recurrence):** when any short reply from Alex arrives after the morning image, run `answer` FIRST and compare before classifying. If his words plausibly fit the image's subject, it is a guess even when it reads like a general question — e.g. "Sieht aus wie etwas im Aktienmarkt. Höchststand von irgendwas?" for the Dow-12.000 image got answered as a live-market question with web research. Never start web searches or topic answers while a round is open; check the round state first, then decide guess vs. conversation.
+
+**Round attribution across silence:** Telegram replies can arrive DAYS apart —
+at every incoming reply re-check the system date and `answer` before
+classifying; a reply arriving after a day advance belongs to the newly
+delivered round, and attributing from a remembered date mislabels guesses and
+can leak events of expired rounds. A short reply is a guess for the CURRENT
+round only; Alex explicitly announces any retrospective guess on an older
+image — never ask which round he means, and never hunt or reveal expired
+rounds on a guessed attribution.
 
 A message sent after a
 failed/unsent run is ordinary conversation, not a guess. Direct answer requests
