@@ -53,6 +53,7 @@
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ target }}/{{ settings.rename | default(item.path) }}"
+    force: "{{ settings.force | default(omit) }}"
     owner: "{{ settings.owner | default(omit) }}"
     group: "{{ settings.group | default(omit) }}"
     mode: "{{ settings.mode | default('preserve', true) }}"
@@ -102,6 +103,7 @@
           item.path | ansible.builtin.regex_replace('\.j2$', '')
         )
       }}
+    force: "{{ settings.force | default(omit) }}"
     owner: "{{ settings.owner | default(omit) }}"
     group: "{{ settings.group | default(omit) }}"
     mode: "{{ settings.mode | default('preserve', true) }}"

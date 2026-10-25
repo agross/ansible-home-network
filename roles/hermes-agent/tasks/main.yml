@@ -46,6 +46,14 @@
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
         mode: "600"
+      app/profiles/*/skills/**/*:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "700"
+        # Do not overwrite skills if they already exist, as they may have been
+        # modified by the agent.
+        force: false
+
       app/profiles/**/*/:
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
