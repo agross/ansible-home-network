@@ -1,7 +1,7 @@
 ---
 name: kodi-music-summary
 description: Send Alex a daily Telegram summary of tracks recorded by the Kodi music tracker.
-version: 1.1.0
+version: 1.2.0
 platforms: [linux, macos]
 metadata:
   hermes:
@@ -9,7 +9,7 @@ metadata:
     blueprint:
       schedule: "0 20 * * *"
       deliver: telegram
-      prompt: "At 20:00 Europe/Berlin, run kodi-music-summary. If tracks were recorded, send the generated German summary and clear only those records after successful delivery. If no tracks were recorded, return [SILENT]."
+      prompt: "At 20:00 Europe/Berlin, run kodi-music-summary. If tracks were recorded, run `python3 \"${HERMES_SKILL_DIR}/scripts/summary.py\" --clear` in the SAME run right after generating the summary, then return the summary as final response (the scheduler delivers it; final-response delivery is treated as confirmed because the gateway cannot report delivery status back — waiting for confirmation replays the same batch forever, observed 24.-26.10.2026 with one batch delivered three times). Retain the batch only if `--clear` exits non-zero. If no tracks were recorded, return [SILENT]."
       no_agent: false
 ---
 
@@ -27,13 +27,15 @@ recorded plays as the summary source.
    records into a pending batch. Run one summary delivery at a time.
 2. If it prints `No songs played today!`, return `[SILENT]`. A missing log is a
    tracker error: report it rather than treating it as no plays.
-3. Send the generated German summary unchanged to Alex through Telegram. After
-   confirmed delivery, run
-   `python3 "${HERMES_SKILL_DIR}/scripts/summary.py" --clear`, then return
-   `[SILENT]` to avoid duplicate cron delivery. If delivery fails or remains
-   uncertain, retain the pending batch for retry. If only automatic
-   final-response delivery is available, return the summary and retain the
-   batch until delivery can be confirmed.
+3. Run `python3 "${HERMES_SKILL_DIR}/scripts/summary.py" --clear` in the SAME
+   run, right after generating the summary and before responding, then return
+   the German summary unchanged as the final response. Final-response delivery
+   is treated as confirmed: the gateway cannot report delivery status back to
+   the cron agent, so retaining a delivered batch until "confirmation" replays
+   it on every following run (observed 24.–26.10.2026: one batch delivered
+   three times). Retain the batch only if `--clear` exits non-zero; retry then
+   on the next run as usual. Never return `[SILENT]` after generating a
+   summary — that would suppress its delivery.
 
 `--clear` acknowledges only the pending batch using a cursor; it preserves the
 append-only log and tracks recorded during delivery. Retries render the same
