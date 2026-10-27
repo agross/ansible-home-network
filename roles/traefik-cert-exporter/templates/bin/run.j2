@@ -27,25 +27,29 @@ for acmefile in "${acmefiles[@]}"; do
 done
 
 mapfile -d '' -t certs < <(
-  find "$export_dir/certs" -type f -name '*.crt' -newermt "$now" -print0
+  find "$export_dir/certs" -type f -name '*.fullchain.crt' \
+    -newermt "$now" -print0
 )
 mapfile -d '' -t hooks < <(find "$hooks_dir" -type f -executable -print0)
 
 failed_hooks=0
 
 for cert in "${certs[@]}"; do
-  domain="${cert%.crt}"
+  domain="${cert%.fullchain.crt}"
   domain="${domain##*/}"
 
   key="$export_dir/private/$domain.key"
+  intermediate="${cert%.fullchain.crt}.intermediate.crt"
+  leaf="${cert%.fullchain.crt}.leaf.crt"
   this_cert_failed=0
 
-  printf 'DOMAIN=%s\nCERT=%s\nCERT_KEY=%s\n' "$domain" "$cert" "$key"
+  printf 'DOMAIN=%s\nCERT_FULLCHAIN=%s\nCERT_LEAF=%s\nCERT_INTERMEDIATE=%s\nCERT_KEY=%s\n' \
+    "$domain" "$cert" "$leaf" "$intermediate" "$key"
 
   for hook in "${hooks[@]}"; do
     printf 'Executing hook: %s\n' "$hook"
 
-    if ! DOMAIN=$domain CERT=$cert CERT_KEY=$key "$hook"; then
+    if ! DOMAIN=$domain CERT_FULLCHAIN=$cert CERT_LEAF=$leaf CERT_INTERMEDIATE=$intermediate CERT_KEY=$key "$hook"; then
       printf 'Hook failed; certificate will be exported again\n'
       this_cert_failed=1
       (( ++failed_hooks ))
@@ -53,7 +57,7 @@ for cert in "${certs[@]}"; do
   done
 
   if (( this_cert_failed )); then
-    rm --force -- "$cert" "$key"
+    rm --force -- "$cert" "$intermediate" "$leaf" "$key"
   fi
 done
 

@@ -159,12 +159,10 @@ echo -e "-----BEGIN RSA PRIVATE KEY-----\n${priv}\n-----END RSA PRIVATE KEY-----
    | openssl rsa -inform pem -out "${pdir}/letsencrypt.key" >/dev/null
 
 write-if-changed() {
-  local target cert decoded existing
+  local target decoded existing
 
   target="${1?Need target file}"
-  cert="${2?Need cert contents}"
-
-  decoded="$("${CMD_DECODE_BASE64[@]}" <<< "$cert")"
+  decoded="${2?Need cert contents}"
 
   if [[ -f "$target" ]]; then
     existing="$(<"$target")"
@@ -175,22 +173,52 @@ write-if-changed() {
     fi
   fi
 
-  echo "$decoded" > "$target"
+  printf '%s\n' "$decoded" > "$target"
+  changed=1
 }
 
 # Process the certificates for each of the domains in acme.json
-for domain in $(jq -r '.[].Certificates[].domain.main' ${acmefile}); do
+for domain in $(jq -r '[.[].Certificates[].domain.main] | unique[]' "$acmefile"); do
+  changed=0
   # Traefik stores a cert bundle for each domain.  Within this cert
   # bundle there is both proper the certificate and the Let's Encrypt CA
   echo "Extracting cert bundle for ${domain}"
   cert=$(jq -e -r --arg domain "$domain" '.[].Certificates[] |
-           select (.domain.main == $domain )| .certificate' ${acmefile}) || bad_acme
+           select (.domain.main == $domain )| .certificate' "${acmefile}") || bad_acme
 
-  write-if-changed "${cdir}/${domain}.crt" "$cert"
+  decoded="$("${CMD_DECODE_BASE64[@]}" <<< "$cert")"
+  write-if-changed "${cdir}/${domain}.fullchain.crt" "$decoded"
+
+  # Preserve bundle contents above, but derive variants from one matching cert/key pair.
+  cert=$(jq -e -r --arg domain "$domain" '
+    [.[].Certificates[] | select(.domain.main == $domain)] | first | .certificate
+  ' "$acmefile") || bad_acme
+  decoded="$("${CMD_DECODE_BASE64[@]}" <<< "$cert")"
+  leaf=$(awk '
+    /-----BEGIN CERTIFICATE-----/ { inside = 1 }
+    inside { print }
+    /-----END CERTIFICATE-----/ { exit }
+  ' <<< "$decoded")
+  chain=$(awk '
+    /-----BEGIN CERTIFICATE-----/ { number++; inside = 1 }
+    inside && number > 1 { print }
+    /-----END CERTIFICATE-----/ { inside = 0 }
+  ' <<< "$decoded")
+  write-if-changed "${cdir}/${domain}.leaf.crt" "$leaf"
+  write-if-changed "${cdir}/${domain}.intermediate.crt" "$chain"
 
   echo "Extracting private key for ${domain}"
   key=$(jq -e -r --arg domain "$domain" '.[].Certificates[] |
-    select (.domain.main == $domain )| .key' ${acmefile}) || bad_acme
+    select (.domain.main == $domain )| .key' "${acmefile}") || bad_acme
 
-  write-if-changed "${pdir}/${domain}.key" "$key"
+  decoded="$("${CMD_DECODE_BASE64[@]}" <<< "$key")"
+  write-if-changed "${pdir}/${domain}.key" "$decoded"
+
+  # New or changed variants must also trigger hooks for the domain.
+  if (( changed )); then
+    touch -- "${cdir}/${domain}.fullchain.crt"
+  fi
+
+  # Remove the former bundle filename after all variants have been exported.
+  rm --force -- "${cdir}/${domain}.crt"
 done

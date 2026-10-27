@@ -11,7 +11,7 @@ cameras=(east south west)
 user={{ reolink_camera_user | ansible.builtin.quote }}
 password={{ reolink_camera_password | ansible.builtin.quote }}
 
-crt="$(base64 --wrap=0 "$CERT")"
+crt="$(base64 --wrap=0 "$CERT_FULLCHAIN")"
 key="$(base64 --wrap=0 "$CERT_KEY")"
 
 {% raw %}

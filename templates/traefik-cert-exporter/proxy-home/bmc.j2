@@ -12,45 +12,45 @@ bmc_user={{ bmc_user | ansible.builtin.quote }}
 bmc_password={{ bmc_password | ansible.builtin.quote }}
 
 curl_cookie_jar="$(mktemp)"
-trap '{ rm -f -- "$curl_cookie_jar"; }' EXIT
+trap 'rm -f -- "$curl_cookie_jar"' EXIT
 
 curl=(curl --insecure
            --silent
            --show-error
            --fail-with-body
+           --connect-timeout 10
+           --max-time 60
            --cookie-jar "$curl_cookie_jar"
            --cookie "$curl_cookie_jar")
 
 >&2 printf "Updating cert on BMC %s for domain %s\n" "$bmc" "$DOMAIN"
 
+>&2 printf 'Logging in: POST /api/session\n'
 if ! token="$("${curl[@]}" \
-                --data-raw "username=$bmc_user&password=$bmc_password" \
+                --data-urlencode "username=$bmc_user" \
+                --data-urlencode "password=$bmc_password" \
                 "$bmc/api/session" |
-              jq --raw-output .CSRFToken)"; then
+              jq --exit-status --raw-output '
+                select(.ok == 0) | .CSRFToken |
+                select(type == "string" and length > 0)
+              ')"; then
   >&2 printf 'Login failed\n'
   exit 1
 fi
 
 >&2 printf 'Logged in with CSRF token %s\n' "$token"
 
-"${curl[@]}" \
-  --header "X-CSRFTOKEN: $token" \
-  --header "Content-Type: application/json" \
-  --data-raw '{"uid_command":1}' \
-  "$bmc/api/actions/chassis-led"
-
->&2 printf '\nUID LED blinks temporarily\n'
-
+>&2 printf 'Uploading leaf certificate and private key: POST /api/settings/ssl/certificate\n'
 if ! response="$("${curl[@]}" \
                    --header "X-CSRFTOKEN: $token" \
-                   --form "new_certificate=@$CERT" \
-                   --form "new_private_key=@$CERT_KEY" \
+                   --form "new_certificate=@$CERT_LEAF;filename=certificate.pem" \
+                   --form "new_private_key=@$CERT_KEY;filename=private-key.pem" \
                    "$bmc/api/settings/ssl/certificate")"; then
   >&2 printf 'Certificate upload failed:\n%s\n' "$response"
   exit 1
 fi
 
-printf '%s\n' "$response"
+printf 'Upload response: %s\n' "$response"
 
 # Firmware may prepend status text to the JSON response.
 if ! grep --extended-regexp --quiet '"cc"[[:space:]]*:[[:space:]]*0[[:space:]]*([,}]|$)' <<< "$response"; then
@@ -58,4 +58,74 @@ if ! grep --extended-regexp --quiet '"cc"[[:space:]]*:[[:space:]]*0[[:space:]]*(
   exit 1
 fi
 
->&2 printf '\nDone\n'
+>&2 printf 'Certificate and private key upload accepted (cc=0)\n'
+
+# Read the updated certificate resource after the upload.
+>&2 printf 'Reading uploaded certificate information: GET /api/settings/ssl/certificate-info\n'
+if ! certificate_info="$("${curl[@]}" \
+                           --header "X-CSRFTOKEN: $token" \
+                           "$bmc/api/settings/ssl/certificate-info" |
+                         jq --exit-status 'select(type == "object" and .id != null)')"; then
+  >&2 printf 'Reading certificate information failed\n'
+  exit 1
+fi
+
+jq --raw-output '
+  "Certificate information received: id=\(.id), available=\(.certificate_available)",
+  "Certificate uploaded at: \((.certificate_date // "not reported") | rtrimstr("\n"))",
+  "Private key uploaded at: \((.private_key_date // "not reported") | rtrimstr("\n"))"
+' <<< "$certificate_info" >&2
+
+# AMI requires a separate request to activate the uploaded certificate and key.
+>&2 printf 'Activating uploaded certificate and private key: PUT /api/settings/ssl/certificate-info\n'
+activation_status=0
+response="$("${curl[@]}" \
+               --request PUT \
+               --header "X-CSRFTOKEN: $token" \
+               --header "Content-Type: application/json" \
+               --data-raw "$certificate_info" \
+               "$bmc/api/settings/ssl/certificate-info")" || activation_status=$?
+
+if (( activation_status == 0 )); then
+  if ! jq --exit-status '.id != null and .certificate_available == 1' <<< "$response" >/dev/null; then
+    >&2 printf 'Certificate activation failed:\n%s\n' "$response"
+    exit 1
+  fi
+  >&2 printf 'Activation confirmed: certificate available\n'
+else
+  case "$activation_status" in
+    52|56)
+      >&2 printf 'Activation connection closed (curl %s); checking whether BMC restarted successfully\n' "$activation_status"
+      ;;
+    *)
+      >&2 printf 'Certificate activation failed (curl %s):\n%s\n' "$activation_status" "$response"
+      exit 1
+      ;;
+  esac
+
+  expected_fingerprint="$(openssl x509 -in "$CERT_LEAF" -noout -fingerprint -sha256)"
+  verified=0
+  for attempt in {1..12}; do
+    >&2 printf 'Checking BMC HTTPS certificate (attempt %s/12)\n' "$attempt"
+    if served_fingerprint="$(
+         "${curl[@]}" \
+           --connect-timeout 2 \
+           --max-time 4 \
+           --output /dev/null \
+           --write-out '%{certs}' \
+           "$bmc/redfish/v1/" 2>/dev/null |
+         openssl x509 -noout -fingerprint -sha256 2>/dev/null
+       )" && [[ "$served_fingerprint" == "$expected_fingerprint" ]]; then
+      verified=1
+      break
+    fi
+    sleep 2
+  done
+
+  if (( ! verified )); then
+    >&2 printf 'Could not verify the uploaded certificate after activation\n'
+    exit 1
+  fi
+  >&2 printf 'Served certificate matches uploaded leaf; activation confirmed\n'
+fi
+>&2 printf '\nDone: certificate update completed\n'
