@@ -8,15 +8,23 @@ export_dir="$root/export"
 hooks_dir="$root/hooks"
 acme={{ traefik_config_root_dir | ansible.builtin.quote }}/acme
 
-mkdir --parents -- "$export_dir" "$hooks_dir"
+mkdir --parents -- "$export_dir/certs" "$export_dir/private" "$hooks_dir"
 
 printf -v now "@%(%s)T"
 
-find "$acme" -type f -name '*.json' -exec \
-  "$root/bin/export-certs" \
-  {} \
-  "$export_dir" \
-  \;
+# Skip unused ACME stores and attempt every export before reporting failures.
+mapfile -d '' -t acmefiles < <(
+  find "$acme" -type f -name '*.json' -size +0c -print0
+)
+
+failed_exports=0
+
+for acmefile in "${acmefiles[@]}"; do
+  if ! "$root/bin/export-certs" "$acmefile" "$export_dir"; then
+    printf 'Certificate export failed: %s\n' "$acmefile" >&2
+    (( ++failed_exports ))
+  fi
+done
 
 mapfile -d '' -t certs < <(
   find "$export_dir/certs" -type f -name '*.crt' -newermt "$now" -print0
@@ -50,6 +58,13 @@ for cert in "${certs[@]}"; do
 done
 
 if (( failed_hooks > 0 )); then
-  printf '%s hooks failed' "$failed_hooks"
+   >&2 printf '%s hooks failed\n' "$failed_hooks"
+fi
+
+if (( failed_exports )); then
+   >&2 printf '%s exports failed\n' "$failed_exports"
+fi
+
+if (( failed_exports > 0 || failed_hooks > 0 )); then
   exit 1
 fi
