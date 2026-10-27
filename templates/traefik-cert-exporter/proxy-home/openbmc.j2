@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+if [[ "${DOMAIN-}" != therightstuff.de ]]; then
+  exit
+fi
+
+bmc=https://172.16.0.253
+bmc_user={{ bmc_user | ansible.builtin.quote }}
+bmc_password={{ bmc_password | ansible.builtin.quote }}
+certificate_uri=/redfish/v1/Managers/bmc/NetworkProtocol/HTTPS/Certificates/1
+replace_uri=/redfish/v1/CertificateService/Actions/CertificateService.ReplaceCertificate/
+
+work_dir="$(mktemp --directory)"
+trap 'rm -rf -- "$work_dir"' EXIT
+
+curl=(curl --insecure
+           --silent
+           --show-error
+           --fail-with-body
+           --connect-timeout 10
+           --max-time 60
+           --user "$bmc_user:$bmc_password")
+
+>&2 printf 'Updating OpenBMC certificate on %s for domain %s\n' "$bmc" "$DOMAIN"
+
+cat -- "$CERT_KEY" "$CERT_FULLCHAIN" > "$work_dir/certificate.pem"
+
+jq --null-input \
+   --rawfile certificate "$work_dir/certificate.pem" \
+   --arg certificate_uri "$certificate_uri" \
+   '{CertificateString: $certificate, CertificateType: "PEM", CertificateUri: {"@odata.id": $certificate_uri}}' \
+   > "$work_dir/request.json"
+
+>&2 printf 'Replacing HTTPS certificate and key: POST %s\n' "$replace_uri"
+curl_status=0
+http_status="$("${curl[@]}" \
+                  --header 'Content-Type: application/json' \
+                  --data-binary "@$work_dir/request.json" \
+                  --output "$work_dir/response.json" \
+                  --write-out '%{http_code}' \
+                  "$bmc$replace_uri")" || curl_status=$?
+
+case "$curl_status:$http_status" in
+  0:200|0:202|0:204)
+    >&2 printf 'Certificate replacement accepted (HTTP %s)\n' "$http_status"
+    ;;
+  *)
+    >&2 printf 'Certificate replacement failed (curl %s, HTTP %s)\n' "$curl_status" "$http_status"
+    exit 1
+    ;;
+esac
+
+>&2 printf 'Done: OpenBMC certificate update completed\n'
