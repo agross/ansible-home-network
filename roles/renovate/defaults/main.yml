@@ -1,1 +1,2 @@
 renovate_root: "/data/{{ ansible_role_name }}"
+renovate_host_rules: []

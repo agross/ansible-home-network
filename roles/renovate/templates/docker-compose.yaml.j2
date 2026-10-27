@@ -73,6 +73,9 @@ services:
       RENOVATE_REPOSITORY_CACHE: enabled
       RENOVATE_PERSIST_REPO_DATA: true
 
+      RENOVATE_HOST_RULES: >-
+        {{ renovate_host_rules | ansible.builtin.to_json | replace('$', '$$') }}
+
       # Renovate tries to detect host rules from environment variables.
       RENOVATE_DETECT_HOST_RULES_FROM_ENV: true
       {{
