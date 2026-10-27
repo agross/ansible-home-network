@@ -17,7 +17,7 @@ trap '{ rm -f -- "$curl_cookie_jar"; }' EXIT
 curl=(curl --insecure
            --silent
            --show-error
-           --fail
+           --fail-with-body
            --cookie-jar "$curl_cookie_jar"
            --cookie "$curl_cookie_jar")
 
@@ -41,10 +41,21 @@ fi
 
 >&2 printf '\nUID LED blinks temporarily\n'
 
-"${curl[@]}" \
-  --header "X-CSRFTOKEN: $token" \
-  --form "new_certificate=@$CERT" \
-  --form "new_private_key=@$CERT_KEY" \
-  "$bmc/api/settings/ssl/certificate"
+if ! response="$("${curl[@]}" \
+                   --header "X-CSRFTOKEN: $token" \
+                   --form "new_certificate=@$CERT" \
+                   --form "new_private_key=@$CERT_KEY" \
+                   "$bmc/api/settings/ssl/certificate")"; then
+  >&2 printf 'Certificate upload failed:\n%s\n' "$response"
+  exit 1
+fi
+
+printf '%s\n' "$response"
+
+# Firmware may prepend status text to the JSON response.
+if ! grep --extended-regexp --quiet '"cc"[[:space:]]*:[[:space:]]*0[[:space:]]*([,}]|$)' <<< "$response"; then
+  >&2 printf 'Certificate upload failed: expected cc to be 0\n'
+  exit 1
+fi
 
 >&2 printf '\nDone\n'
