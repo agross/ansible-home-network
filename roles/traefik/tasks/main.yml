@@ -32,7 +32,6 @@
     repo: "https://{{ item.moduleName }}"
     version: "{{ item.version | default('HEAD') }}"
     force: true
-    depth: 1
     dest: "{{ traefik_root }}/plugins-local/src/{{ item.moduleName }}"
   loop: "{{ traefik_plugins.values() }}"
   notify: Restart traefik service
