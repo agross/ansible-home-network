@@ -82,13 +82,21 @@ hermes_profile:
     github:
       username: "{{ vault_hermes_profile.gw_developer.github.username }}"
       token: "{{ vault_hermes_profile.gw_developer.github.token }}"
-      webhook_secret: "{{ vault_hermes_profile.gw_developer.github.webhook_secret }}"
+      webhook:
+        management:
+          username: "{{ vault_hermes_profile.gw_developer.github.webhook.management.username }}"
+          token: "{{ vault_hermes_profile.gw_developer.github.webhook.management.token }}"
+        secret: "{{ vault_hermes_profile.gw_developer.github.webhook.secret }}"
 
   gw_reviewer:
     github:
       username: "{{ vault_hermes_profile.gw_reviewer.github.username }}"
       token: "{{ vault_hermes_profile.gw_reviewer.github.token }}"
-      webhook_secret: "{{ vault_hermes_profile.gw_reviewer.github.webhook_secret }}"
+      webhook:
+        management:
+          username: "{{ vault_hermes_profile.gw_reviewer.github.webhook.management.username }}"
+          token: "{{ vault_hermes_profile.gw_reviewer.github.webhook.management.token }}"
+        secret: "{{ vault_hermes_profile.gw_reviewer.github.webhook.secret }}"
 
     opencode_go:
       api_key: "{{ vault_hermes_profile.gw_reviewer.opencode_go.api_key }}"

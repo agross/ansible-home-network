@@ -1,0 +1,4 @@
+- name: Install PyGithub
+  ansible.builtin.pip:
+    name: PyGithub>=1.3.5
+  become: false

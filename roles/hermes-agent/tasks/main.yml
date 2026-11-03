@@ -21,7 +21,12 @@
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
     paths:
-      - "{{ playbook_dir }}/templates/{{ ansible_role_name }}/{{ inventory_hostname }}"
+      - >-
+        {{ playbook_dir }}/templates/{{
+          ansible_role_name
+        }}/{{
+          inventory_hostname
+        }}/templates
     directory: "{{ lookup('ansible.builtin.first_found', paths, skip=false) }}"
     target: "{{ hermes_root }}"
     notify_: Restart hermes-agent service
@@ -102,7 +107,12 @@
   vars:
     directory: "{{ hermes_root }}/systemd"
     paths:
-      - "{{ playbook_dir }}/templates/{{ ansible_role_name }}/{{ inventory_hostname }}/systemd"
+      - >-
+        {{ playbook_dir }}/templates/{{
+          ansible_role_name
+        }}/{{
+          inventory_hostname
+        }}/templates/systemd
       - templates/systemd
     local_units: "{{ lookup('ansible.builtin.first_found', paths, skip=false) }}"
     notify_: Restart hermes-agent service
@@ -119,3 +129,17 @@
 - name: Register with loadbalancer
   ansible.builtin.import_tasks:
     file: register-with-loadbalancer.yml
+
+- name: Host-specific post configuration
+  ansible.builtin.include_tasks:
+    file: "{{ tasks_file }}"
+  loop_control:
+    loop_var: tasks_file
+  loop: "{{ query('ansible.builtin.fileglob', glob) | sort }}"
+  vars:
+    glob: >-
+      {{ playbook_dir }}/templates/{{
+        ansible_role_name
+      }}/{{
+        inventory_hostname
+      }}/ansible/post-config.d/*.yml
