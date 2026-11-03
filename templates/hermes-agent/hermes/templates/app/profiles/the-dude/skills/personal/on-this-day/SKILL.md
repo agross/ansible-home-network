@@ -162,12 +162,22 @@ round only; Alex explicitly announces any retrospective guess on an older
 image — never ask which round he means, and never hunt or reveal expired
 rounds on a guessed attribution.
 
+**Wording (Alex, 01.11.2026):** never label the date/round check "Drill" or use
+military phrasing — Alex rejected it ("Wir sind hier nicht bei der Armee").
+Run the check silently or name it neutrally (e.g. "kurz Datum und Runde
+geprüft").
+
 A message sent after a
 failed/unsent run is ordinary conversation, not a guess. Direct answer requests
 reveal immediately only for the currently delivered image. Read `python3
 ${HERMES_SKILL_DIR}/scripts/on_this_day.py
 answer` privately. For a valid guess, give a brief German verdict, then name
-and explain the event. If the event was already leaked by an assistant mistake,
+and explain the event. **Every reveal ends with the German Wikipedia article
+link of the selected event** (`https://de.wikipedia.org/wiki/<Artikel>`) —
+derive it at reveal time with a quick web lookup; the event pool carries no URL
+field (verified 2026-10-30). If no German article exists, link the English one
+and say so. The link is part of the post-guess reveal, so it never spoils an
+open round. If the event was already leaked by an assistant mistake,
 do not pretend the guess was independent and do not congratulate Alex;
 acknowledge the spoiler and close the invalid round. Do not offer another guess
 or keep score.

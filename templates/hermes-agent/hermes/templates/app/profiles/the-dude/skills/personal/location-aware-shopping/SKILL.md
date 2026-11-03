@@ -70,3 +70,16 @@ Use their exposed tool schemas; credentials remain in Hermes configuration.
 For every mutation, report the freshly read presence result, target board,
 active card and checklist, and the result of the checklist re-read. If the
 site or list is unresolved, confirm that Trello was not modified.
+
+## Adjacent: Alex's to-do list
+
+Alex's to-do list is not location-aware: it lives on the same `Personal Kanban`
+board as a card named `To-Do` in the `Ready` list, holding a checklist also
+named `To-Do` — the same card-plus-checklist pattern as the `Pantry` shopping
+card. Add dictated to-dos verbatim as checklist items there; no ioBroker
+presence read is needed. Re-use the card-discovery procedure above
+(list-scoped `get_cards_by_list_id` with `nameFilter`, fuzzy name matching for
+trailing whitespace). Do not probe Nextcloud or Anytype for list-like
+requests: Nextcloud carries no task list and the Anytype MCP key is
+scope-limited, so that loop finds nothing — if Alex names an unfamiliar list,
+ask which surface he means.

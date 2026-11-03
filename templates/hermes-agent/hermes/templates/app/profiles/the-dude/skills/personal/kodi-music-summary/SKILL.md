@@ -56,3 +56,12 @@ backlog and WILL replay in the next run. When Alex questions an older title
 reappearing in a summary, compute each record's end byte offset and compare
 against the cursor value instead of touching delivery state — never clear or
 edit the log to retire a title; the cursor alone retires it.
+
+Two retirement mechanisms exist and BOTH must be checked when old titles
+resurface: the cursor retires records permanently, but a frozen
+`listen.pending` batch replays independently of the cursor until `--clear`
+consumes it — advancing the cursor alone never stops a frozen batch from being
+delivered again. When a delivered summary contains titles the cursor already
+retired, inspect `listen.pending` (first line = batch boundary byte offset,
+following lines = records) and consume the delivered batch with `--clear`
+rather than deleting it.
