@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+
+model:
+  provider: openai-codex
+  default: openai-codex/gpt-6.1-sol
+
+dashboard:
+  show_token_analytics: true
+
+agent:
+  reasoning_effort: medium
+
+approvals:
+  mode: "off" # Otherwise "docker rm" must be approved.
+  cron_mode: {{ hermes_approvals_cron_mode }}
+  unattended_mode: {{ hermes_approvals_unattended_mode }}
+
+terminal:
+  home_mode: profile
+  cwd: /opt/data/profiles/ag-developer/workspace

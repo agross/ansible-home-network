@@ -100,3 +100,26 @@ hermes_profile:
 
     opencode_go:
       api_key: "{{ vault_hermes_profile.gw_reviewer.opencode_go.api_key }}"
+
+  ag_developer:
+    github:
+      username: "{{ vault_hermes_profile.ag_developer.github.username }}"
+      token: "{{ vault_hermes_profile.ag_developer.github.token }}"
+      webhook:
+        management:
+          username: "{{ vault_hermes_profile.ag_developer.github.webhook.management.username }}"
+          token: "{{ vault_hermes_profile.ag_developer.github.webhook.management.token }}"
+        secret: "{{ vault_hermes_profile.ag_developer.github.webhook.secret }}"
+
+  ag_reviewer:
+    github:
+      username: "{{ vault_hermes_profile.ag_reviewer.github.username }}"
+      token: "{{ vault_hermes_profile.ag_reviewer.github.token }}"
+      webhook:
+        management:
+          username: "{{ vault_hermes_profile.ag_reviewer.github.webhook.management.username }}"
+          token: "{{ vault_hermes_profile.ag_reviewer.github.webhook.management.token }}"
+        secret: "{{ vault_hermes_profile.ag_reviewer.github.webhook.secret }}"
+
+    opencode_go:
+      api_key: "{{ vault_hermes_profile.ag_reviewer.opencode_go.api_key }}"

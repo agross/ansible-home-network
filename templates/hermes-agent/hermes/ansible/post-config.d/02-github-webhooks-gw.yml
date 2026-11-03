@@ -16,19 +16,19 @@
     secret: "{{ hermes_profile[item.profile].github.webhook.secret }}"
   become: false
   loop:
-    - route: github-issue-work
+    - route: gw-github-issue-work
       profile: gw_developer
       events:
         - issues
-    - route: github-pr-developer-handoff
+    - route: gw-github-pr-developer-handoff
       profile: gw_developer
       events:
         - pull_request
-    - route: github-pr-review
+    - route: gw-github-pr-review
       profile: gw_reviewer
       events:
         - pull_request
-    - route: github-review-feedback
+    - route: gw-github-review-feedback
       profile: gw_developer
       events:
         - pull_request_review

@@ -1,0 +1,37 @@
+- name: Configure GitHub webhooks for agross/dyndns-updater
+  community.general.github_webhook:
+    repository: agross/dyndns-updater
+    url: >-
+      https://hooks.{{
+        hermes_domain
+      }}/p/{{
+        item.profile | replace('_', '-')
+      }}/webhooks/{{
+        item.route
+      }}
+    content_type: json
+    events: "{{ item.events }}"
+    user: "{{ hermes_profile[item.profile].github.webhook.management.username }}"
+    token: "{{ hermes_profile[item.profile].github.webhook.management.token }}"
+    secret: "{{ hermes_profile[item.profile].github.webhook.secret }}"
+  become: false
+  loop:
+    - route: ag-github-issue-work
+      profile: ag_developer
+      events:
+        - issues
+    - route: ag-github-pr-developer-handoff
+      profile: ag_developer
+      events:
+        - pull_request
+    - route: ag-github-pr-review
+      profile: ag_reviewer
+      events:
+        - pull_request
+    - route: ag-github-review-feedback
+      profile: ag_developer
+      events:
+        - pull_request_review
+        - pull_request_review_comment
+  loop_control:
+    label: "{{ item.route }}: {{ item.events | join(', ') }} to {{ item.profile }}"
