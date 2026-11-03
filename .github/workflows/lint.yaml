@@ -49,6 +49,7 @@ jobs:
           requirements_file: requirements.yml
           args: --exclude .ansible .github
         env:
+          ANSIBLE_COLLECTIONS_ON_ANSIBLE_VERSION_MISMATCH: ignore
           ANSIBLE_VAULT_IDENTITY_LIST: agross2@.ansible-vault-agross2
 
       - name: Clean up secrets
