@@ -12,7 +12,6 @@ BindsTo=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
 {% endif %}
 After=network.target
-Before=default.target
 
 [Service]
 # https://github.com/ppp-project/ppp/commit/d34159f417620eb7c481bf53f29fe04c86ccd223
@@ -57,4 +56,4 @@ RestrictRealtime=yes
 [Install]
 WantedBy=sys-devices-virtual-net-%j.device
 # Needed to start on boot.
-WantedBy=default.target
+WantedBy=multi-user.target
