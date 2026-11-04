@@ -51,6 +51,16 @@
   },
   packageRules: [
     {
+      description: 'Ansible execution environment appends a numeric build number',
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'ghcr.io/agross/ansible-ee',
+      ],
+      versioning: 'regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+)$',
+    },
+    {
       description: 'Automerges',
       matchPackageNames: [
         'cr.grossweber.com/gw/aqbanking-sql',
