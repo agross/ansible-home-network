@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/agross/ansible-ee:2.22.0-1
+      image: ghcr.io/agross/ansible-ee:2.22.0-6
       # --tty for unbuffered output.
       options: --tty
 
