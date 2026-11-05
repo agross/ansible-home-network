@@ -4,6 +4,10 @@ model:
   provider: opencode-go
   default: gemini-4-argon
 
+fallback_providers:
+  - provider: opencode-go
+    model: glm-5.3-flash
+
 dashboard:
   show_token_analytics: true
 
