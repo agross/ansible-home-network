@@ -10,9 +10,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ./app:/config
       - ./media:/media/frigate
-      - ./app/model_cache/edgetpu_tfl-{{
-          frigate_yolov9_release_version
-        }}.py:/opt/frigate/frigate/detectors/plugins/edgetpu_tfl.py:ro
     tmpfs:
       - /tmp/cache:size=1G
     shm_size: 256m
