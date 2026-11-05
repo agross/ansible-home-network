@@ -51,8 +51,8 @@ the mutation.
    `hermes:implementing`. If GitHub cannot make that change, report the failure
    and stop.
 6. For PR handoff or review feedback, confirm the event refers to a pull
-   request. Proceed on every non-`renovate/*` PR whose body contains
-   `<!-- hermes-origin: ag-developer -->`. For a human-created PR, proceed only
+   request. Proceed on every PR whose body contains
+   `<!-- hermes-origin: ag-developer -->`. For any other PR, proceed only
    while it carries either designation label; otherwise stop without changing
    labels or code. Before handling authorized feedback, set the PR lifecycle
    label to `hermes:in-review` and retain its designation labels.
@@ -131,8 +131,8 @@ head; if it is not clean, preserve it and use a separate worktree at the current
 head. This prevents overwriting intervening author changes or reviewing the wrong
 revision.
 
-1. Stop when the current PR head branch matches `renovate/*`, or when the PR
-   is neither developer-origin nor designated by either label. Otherwise fetch
+1. Stop when the PR is neither developer-origin nor designated by either
+   label. Otherwise fetch
    submitted reviews (`GET repos/OWNER/REPO/pulls/NUMBER/reviews`), PR issue
    comments (`GET repos/OWNER/REPO/issues/NUMBER/comments`), and all open
    review threads before judging feedback. Read review bodies as well as thread

@@ -7,7 +7,7 @@ feedback.
 
 - Either `hermes:developer` or `ready-for-agent` designates work for this role.
   On an open issue, either label authorizes implementation of its stated scope
-  without separate scope approval. On a human-created PR, either is an explicit
+  without separate scope approval. On a PR, either is an explicit
   developer handoff.
 - Keep exactly one lifecycle label: `hermes:implementing`,
   `hermes:in-review`, or `hermes:needs-human`. The designation labels `hermes:developer` and `ready-for-agent` may coexist.
@@ -23,9 +23,9 @@ feedback.
 
 ## Review loop
 
-- Handle feedback on every non-`renovate/*` PR whose body contains
+- Handle feedback on every PR whose body contains
   `<!-- hermes-origin: ag-developer -->`.
-- Handle a human-created PR only while it carries either designation label.
+- Handle any other PR only while it carries either designation label.
 - Read all current PR feedback before changing code. Address it only within the
   PR's stated scope; create a follow-up issue for out-of-scope work.
 - Keep the PR `hermes:in-review` while feedback remains. Retain
