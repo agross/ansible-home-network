@@ -23,6 +23,9 @@ metrics:
 log:
   level: INFO
 
+# Uncomment to enable access logs on stdout.
+# accessLog: {}
+
 {% if traefik_plugins.keys() | length > 0 %}
 experimental:
   localPlugins:
