@@ -131,6 +131,17 @@ head; if it is not clean, preserve it and use a separate worktree at the current
 head. This prevents overwriting intervening author changes or reviewing the wrong
 revision.
 
+For a delegated PR with an existing non-Codex head branch, keep the existing PR
+rather than opening a replacement. Fetch `pull/NUMBER/head`, create a local
+`codex/issue-<number>-<slug>` branch or worktree at that commit, and verify it
+matches the re-fetched PR head. If no linked issue exists, use the PR number in
+the local branch name and report that there is no linked issue. Push the repair
+with an explicit refspec, `git push origin HEAD:refs/heads/HEAD_BRANCH`, using
+the head branch fetched from GitHub; do not rename the remote branch or use
+force-push. Verify `git ls-remote origin refs/heads/HEAD_BRANCH` and the PR's
+`headRefOid` equal the local commit, because a differently named local branch
+must still update the original PR. Report both branch names when they differ.
+
 1. Stop when the PR is neither developer-origin nor designated by either
    label. Otherwise fetch
    submitted reviews (`GET repos/OWNER/REPO/pulls/NUMBER/reviews`), PR issue
@@ -153,6 +164,11 @@ revision.
    is conditional or does not expressly say “authoritative scope change.”
    After pushing, re-fetch the PR to record its new head SHA and use
    `gh run list --repo OWNER/REPO --commit HEAD_SHA` to report the CI state.
+   When CI is already running and can finish within the session, wait with
+   `gh run watch RUN_ID --repo OWNER/REPO --exit-status`, then re-query runs
+   for that SHA. Update recorded CI evidence after completion; an earlier
+   in-progress snapshot is not the final check result. Keep CI success separate
+   from independent reviewer approval, which must name the new head SHA.
    Re-read the PR body and update it through a temporary Markdown file and
    `gh pr edit --body-file` when its head SHA, stated scope, acceptance
    evidence, checks, or risks no longer describes the repaired revision; then

@@ -51,6 +51,12 @@ Use their exposed tool schemas; credentials remain in Hermes configuration.
    (e.g. a product or currency someone would actually say), name the suspected
    intended wording once in the confirmation and let Alex decide before
    rewriting; never silently correct or reformat a dictation.
+
+   Dictation may arrive as an untranscribed gateway voice note with an `.ogg`
+   path: transcribe it locally first (voice-transcription skill), then apply the
+   transcript under this same dictation rule. When a product word reads as
+   invented (ASR artifact), run the stronger transcription model before bothering
+   Alex.
 5. Before checking or removing an item, identify the exact open checklist entry.
    Apply the requested change only to that entry.
 6. Re-read the selected checklist. Confirm the requested item has the expected
@@ -64,6 +70,16 @@ Use their exposed tool schemas; credentials remain in Hermes configuration.
 - Do not use a card in Trello's Done column for "shopping yesterday"; only open
   items in the active `Einkauf` checklist count.
 - Preserve quantities and qualifiers in the requested item name.
+
+**Archived-card guard (2026-11-04):** when locating the shopping card, also
+verify it is NOT closed/archived — API reads of closed cards still return
+checklist data, so adds silently land on an invisible card (the home Pantry
+sat archived in „Done 🎉" since 31.10.2026 while items were added unnoticed,
+presence reads stayed correct). If closed, reopen before adding: the MCP has
+no unarchive tool and move_card alone does NOT unarchive — use Trello REST
+`PUT /1/cards/{id}` with `closed=false` plus the `idList` of the intended open
+list (credentials from profile .env: TRELLO_API_KEY + TRELLO_TOKEN, never
+printed). Report the reopen in the confirmation.
 
 ## Verification
 

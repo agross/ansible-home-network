@@ -69,7 +69,12 @@ by fetching the opening-post reactions again.
    exclusions when present, plus consistent local repository conventions.
 2. Compare requirements against the full current diff and tests. Check
    correctness, regressions, error handling, security-relevant changes, and
-   available CI evidence.
+   available CI evidence. On dependency major-version upgrades (e.g., Go module
+   `/vN` path bumps), verify that source imports are updated across the codebase
+   and the old major version is removed from the manifest (`go.mod`/`go.sum`) —
+   automated dependency bots often add the new module requirement without
+   rewriting import paths, leaving the new dependency unused and `go mod tidy`
+   dirty while CI still passes against the old version.
 3. Read existing threads. Do not repeat addressed or duplicate findings.
 4. Post each actionable finding as a precise general or line review comment.
    Explain evidence, impact, requested minimal correction, and objective
@@ -84,7 +89,10 @@ by fetching the opening-post reactions again.
 2. Submit one GitHub pull request review with event `COMMENT` and
    `commit_id` set to that exact SHA. Put one marker in its general review
    comment. A submitted review triggers the `pull_request_review` feedback
-   webhook; an issue comment created by `gh pr comment` does not.
+   webhook; an issue comment created by `gh pr comment` does not. Pass the
+   review `body` using single quotes (or `--field body=@file`) so shell
+   double-quote command substitution does not execute backticked filenames or
+   identifiers and strip them from the comment.
    - `<!-- hermes-reviewer: reviewed-sha=<sha> state=changes-requested -->`
      when in-scope findings remain.
    - `<!-- hermes-reviewer: reviewed-sha=<sha> state=clean -->` only when no
