@@ -1,0 +1,32 @@
+# {{ ansible_managed }}
+
+model:
+  provider: openai-codex
+  default: openai-codex/gpt-6.1-sol
+
+agent:
+  reasoning_effort: medium
+
+dashboard:
+  show_token_analytics: true
+
+plugins:
+  enabled:
+    - github-app
+
+approvals:
+  mode: "off" # Otherwise "docker rm" must be approved.
+  cron_mode: {{ hermes_approvals_cron_mode }}
+  unattended_mode: {{ hermes_approvals_unattended_mode }}
+
+terminal:
+  home_mode: profile
+  cwd: /opt/data/profiles/developer/workspace
+
+timezone: {{ hermes_timezone }}
+
+github_app:
+  client_id: {{ hermes_profile.developer.github.app.client_id }}
+  app_slug: {{ hermes_profile.developer.github.app.slug }}
+  installation_ids: {{ hermes_profile.developer.github.app.installation_ids | ansible.builtin.to_json }}
+  private_key_path: /opt/data/profiles/developer/github-app.pem

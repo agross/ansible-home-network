@@ -1,0 +1,39 @@
+# {{ ansible_managed }}
+
+model:
+  provider: opencode-go
+  default: gemini-4-argon
+
+fallback_providers:
+  - provider: opencode-go
+    model: glm-5.3-flash
+
+dashboard:
+  show_token_analytics: true
+
+agent:
+  max_turns: 150
+  reasoning_effort: medium
+
+plugins:
+  enabled:
+    - github-app
+
+approvals:
+  mode: {{ hermes_approvals_mode }}
+  cron_mode: {{ hermes_approvals_cron_mode }}
+  unattended_mode: {{ hermes_approvals_unattended_mode }}
+
+terminal:
+  home_mode: profile
+  cwd: /opt/data/profiles/reviewer/workspace
+
+timezone: {{ hermes_timezone }}
+
+{% if hermes_reviewer_github_app_enabled | default(false) | bool %}
+github_app:
+  client_id: {{ hermes_profile.reviewer.github.app.client_id | ansible.builtin.to_json }}
+  app_slug: {{ hermes_profile.reviewer.github.app.slug | ansible.builtin.to_json }}
+  installation_ids: {{ hermes_profile.reviewer.github.app.installation_ids | ansible.builtin.to_json }}
+  private_key_path: /opt/data/profiles/reviewer/github-app.pem
+{% endif %}

@@ -1,6 +1,9 @@
 services:
   app:
-    image: nousresearch/hermes-agent:v0.23.0
+    image: nousresearch/hermes-agent:custom
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
     command: gateway run
     restart: unless-stopped
     {% if hermes_browser_tools_enabled %}

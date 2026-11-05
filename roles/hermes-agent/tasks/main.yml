@@ -51,6 +51,10 @@
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
         mode: "600"
+      app/profiles/*/*.pem:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "600"
       app/profiles/*/skills/**/*:
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
