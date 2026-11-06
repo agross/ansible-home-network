@@ -12,50 +12,66 @@ BindsTo=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
 {% endif %}
 After=network.target
+# No limits on restarts.
+StartLimitIntervalSec=0
 
 [Service]
 # https://github.com/ppp-project/ppp/commit/d34159f417620eb7c481bf53f29fe04c86ccd223
 # Otherwise you can use 'forking' and replace 'up_sdnotify' with 'updetach'.
-# Fedora 37's pppd is not compiled with systemd support, hence up_sdnotify is
-# not available.
-# Type=notify
-Type=forking
+Type=notify
+
 # Avoid race waiting for systemd-networkd to configure interface.
 # https://github.com/systemd/systemd/issues/481#issuecomment-1010092917
 # systemd guarantees MTU is set before activating (carrier) link.
 # https://github.com/systemd/systemd/issues/481#issuecomment-1010159176
 ExecStartPre=/lib/systemd/systemd-networkd-wait-online --interface=%i \
                                                        --operational-state=carrier
-# Fedora 37's pppd is not compiled with systemd support, hence up_sdnotify is
-# not available.
 ExecStart=/usr/sbin/pppd plugin pppoe.so %i \
                          call %j \
                          linkname %i \
                          ifname %j \
-                         updetach
+                         up_sdnotify
 ExecStop=/bin/kill $MAINPID
 ExecReload=/bin/kill -HUP $MAINPID
 StandardOutput=null
+
 # https://github.com/systemd/systemd/issues/481#issuecomment-544341423
 Restart=always
-RestartSec=5s
+RestartSec=1s
+
+# Hardening options.
+PrivateMounts=yes
 PrivateTmp=yes
 ProtectHome=yes
 ProtectSystem=strict
-# dyndns-updater state.
-StateDirectory=dyndns-updater
-# dyndns-updater notifications.
-ReadWritePaths=/var/spool/postfix/maildrop
 # Allow /etc/ppp/resolv.conf to be written when using 'usepeerdns'
 # ReadWritePaths=/run/ /etc/ppp/
 # https://github.com/systemd/systemd/issues/481#issuecomment-610951209
 # ProtectKernelTunables=yes
 ProtectControlGroups=yes
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_ADMIN
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_ADMIN
+KeyringMode=private
+RestrictAddressFamilies=AF_NETLINK AF_PACKET AF_UNIX AF_PPPOX AF_INET AF_INET6
+ProtectProc=invisible
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RemoveIPC=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+SecureBits=no-setuid-fixup-locked noroot-locked
+SystemCallFilter=@system-service
 SystemCallFilter=~@mount
 SystemCallArchitectures=native
-LockPersonality=yes
-MemoryDenyWriteExecute=yes
-RestrictRealtime=yes
+
+# dyndns-updater state and notifications.
+StateDirectory=dyndns-updater
+ReadWritePaths=/var/spool/postfix/maildrop
 
 [Install]
 # Needed to start on boot.
