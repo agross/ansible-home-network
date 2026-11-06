@@ -31,7 +31,7 @@
         mode: "660"
 
 - name: Log in to cr.grossweber.com
-  community.general.docker_login:
+  community.docker.docker_login:
     registry_url: cr.grossweber.com
     username: "{{ banking_gw_cr_user }}"
     password: "{{ banking_gw_cr_password }}"

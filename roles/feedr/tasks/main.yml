@@ -12,7 +12,7 @@
         mode: "640"
 
 - name: Log in to ghcr.io
-  community.general.docker_login:
+  community.docker.docker_login:
     registry_url: ghcr.io
     username: "{{ github_read_packages_user }}"
     password: "{{ github_read_packages_token }}"
