@@ -68,7 +68,7 @@ services:
     volumes:
       - ./mediakit/:/app/data
       - ./mediakit/cache:/root/.cache/torch/
-      - ./app:/immich:ro
+      - ./app:/immich
     env_file:
       - .env
     environment:
