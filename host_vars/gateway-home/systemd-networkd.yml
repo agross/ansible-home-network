@@ -165,7 +165,7 @@ systemd_networkd_network:
         - UseDNS: false
         - UseDomains: false
     # Allow redirecting incoming traffic to telekom-ingress using a tc filter
-    # set up in /etc/networkd-dispatcher/configured.d/telekom.
+    # set up in /etc/ppp/ip-up.d/.
     - QDisc:
         - Parent: ingress
         - Handle: "0xffff"
@@ -196,7 +196,7 @@ systemd_networkd_network:
     - Network:
         - LinkLocalAddressing: false
     # Ingress qdisc. Needs to be configured by adding a tc filter in
-    # /etc/networkd-dispatcher/configured.d/telekom.
+    # /etc/ppp/ip-up.d/.
     - CAKE:
         - Bandwidth: "{{ pppoe.bandwidth.ingress }}"
         - PriorityQueueingPreset: besteffort

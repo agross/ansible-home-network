@@ -1,8 +1,5 @@
-- name: Install networkd-dispatcher
-  ansible.builtin.import_tasks: networkd-dispatcher.yml
-
 - name: Configure PPPoE
-  ansible.builtin.import_tasks: pppoe.yml
+  ansible.builtin.import_tasks: ppp.yml
 
 - name: Configure ddclient
   ansible.builtin.import_tasks: ddclient.yml

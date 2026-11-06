@@ -1,0 +1,18 @@
+gateway_interface: telekom
+
+gateway_pppoe_interface: "{{ interfaces[gateway_interface].pppoe }}"
+
+gateway_pppoe_interface_device: "{{ gateway_pppoe_interface['device'] }}"
+gateway_pppoe_interface_vlan: "{{ gateway_pppoe_interface['vlan'] }}"
+
+gateway_pppoe_device: >-
+  {{
+    gateway_pppoe_interface_device
+    ~ (
+      '.' ~ gateway_pppoe_interface_vlan if gateway_pppoe_interface_vlan | default(false)
+      else ''
+    )
+  }}
+
+gateway_pppoe_service: >-
+  pppoe-{{ gateway_interface }}@{{ gateway_pppoe_device }}.service

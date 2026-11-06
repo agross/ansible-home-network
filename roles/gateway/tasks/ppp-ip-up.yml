@@ -1,0 +1,36 @@
+- name: Ensure PPP ip-up script dependencies are installed
+  ansible.builtin.package:
+    name:
+      - bind-utils
+      - crontabs
+      - curl
+      - iproute-tc
+    state: present
+
+- name: Copy PPP ip-up scripts
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: >-
+      {{ playbook_dir }}/templates/{{
+        ansible_role_name
+      }}/{{
+        inventory_hostname
+      }}/ppp/ip-up.d
+    target: /etc/ppp/ip-up.d
+    files:
+      "":
+        owner: 0
+        group: 0
+        mode: "700"
+      "**":
+        owner: 0
+        group: 0
+        mode: "700"
+
+- name: Install PPP ip-up hook
+  ansible.builtin.copy:
+    src: ip-up.local
+    dest: /etc/ppp/ip-up.local
+    owner: 0
+    group: 0
+    mode: "755"

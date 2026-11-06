@@ -3,6 +3,9 @@
     name: ppp
     state: present
 
+- name: Configure PPP ip-up hooks
+  ansible.builtin.import_tasks: ppp-ip-up.yml
+
 - name: Ensure pppd configuration directory exists
   ansible.builtin.file:
     path: /etc/ppp/peers
@@ -14,34 +17,23 @@
 # https://forum.vyos.io/t/pppoe-client-with-vlan7-deutsche-telekom-viperoptic/6502/6
 - name: Copy PPPoE connection config file
   ansible.builtin.template:
-    src: templates/pppd/telekom.j2
-    dest: /etc/ppp/peers/telekom
+    src: "templates/pppd/{{ gateway_interface }}.j2"
+    dest: "/etc/ppp/peers/{{ gateway_interface }}"
     owner: 0
     group: 0
     mode: "640"
 
-- name: Determine network interface for the PPPoE connection
-  ansible.builtin.set_fact:
-    gateway_pppoe_device: >-
-      {{
-        interfaces.telekom.pppoe.device
-        ~ (interfaces.telekom.pppoe.vlan | default(None) | ansible.builtin.ternary('.', ''))
-        ~ (interfaces.telekom.pppoe.vlan | default('', true))
-      }}
-
 - name: Copy PPPoE connection service
   ansible.builtin.template:
     src: templates/pppoe@.service.j2
-    dest: >-
-      /etc/systemd/system/pppoe-{{ interfaces.telekom.device }}@{{ gateway_pppoe_device }}.service
+    dest: "/etc/systemd/system/{{ gateway_pppoe_service }}"
     owner: 0
     group: 0
     mode: "644"
 
 - name: Enable and start PPPoE connection service
   ansible.builtin.systemd:
-    name: >-
-      pppoe-{{ interfaces.telekom.device }}@{{ gateway_pppoe_device }}.service
+    name: "{{ gateway_pppoe_service }}"
     state: started
     no_block: true
     enabled: true

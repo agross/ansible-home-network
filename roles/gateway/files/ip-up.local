@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ "$(id -u)" -ne 0 ]]; then
+  >&2 printf '%s\n' 'PPP ip-up hook must run as root.'
+  exit 1
+fi
+
+export IFACE="$1"
+export ADDR="$4"
+
+exec systemd-cat --identifier=ppp-ip-up \
+                 --priority=info \
+                 /usr/bin/stdbuf --output=L \
+                                 --error=L \
+                                 /usr/bin/run-parts /etc/ppp/ip-up.d

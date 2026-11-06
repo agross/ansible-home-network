@@ -3,12 +3,12 @@
 
 # Log outputs with:
 #
-# journalctl --follow --unit networkd-dispatcher.service
+# journalctl --follow --identifier=ppp-ip-up
 
 set -euo pipefail
 shopt -s inherit_errexit
 
-[[ "${IFACE:-}" == {{ interfaces.telekom.device | mandatory | quote }} ]] || exit  0
+[[ "${IFACE:-}" == {{ gateway_interface | ansible.builtin.quote }} ]] || exit  0
 
 {#
 Broken in 4.x https://github.com/ddclient/ddclient/issues/856

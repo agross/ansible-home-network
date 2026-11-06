@@ -1,8 +1,3 @@
-- name: Restart networkd-dispatcher service
-  ansible.builtin.systemd:
-    name: networkd-dispatcher.service
-    state: restarted
-
 - name: Restart ddclient service
   ansible.builtin.systemd:
     name: ddclient.service
