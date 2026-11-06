@@ -1,0 +1,68 @@
+- name: Create download directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: "dyndns-updater-{{ gateway_dyndns_updater_release_version }}-"
+  changed_when: false
+  register: gateway_dyndns_updater_temp
+
+- name: Download GitHub release
+  ansible.builtin.include_tasks:
+    file: github-release.yml
+  vars:
+    url: https://api.github.com/repos/agross/dyndns-updater/releases
+    release: "{{ gateway_dyndns_updater_release_version }}"
+    asset_name_regex: >-
+      ^dyndns-updater_v.*_{{
+        ansible_facts.system | lower | ansible.builtin.regex_escape
+      }}_{{
+        gateway_dyndns_updater_arch_to_package_suffix[ansible_facts.architecture] |
+        ansible.builtin.regex_escape
+      }}\.tar\.gz$
+    dest: "{{ gateway_dyndns_updater_temp.path }}/dyndns-updater.tar.gz"
+
+- name: Extract downloaded release
+  ansible.builtin.unarchive:
+    src: "{{ gateway_dyndns_updater_temp.path }}/dyndns-updater.tar.gz"
+    remote_src: true
+    dest: /usr/local/sbin
+    owner: 0
+    group: 0
+    mode: "755"
+  changed_when: false
+
+- name: Template dyndns-updater config file
+  ansible.builtin.template:
+    src: dyndns-updater/dyndns-updater.yaml.j2
+    dest: /etc/dyndns-updater.yaml
+    owner: 0
+    group: 0
+    mode: "600"
+
+- name: Ensure dyndns-updater state directory exists
+  ansible.builtin.file:
+    path: /var/lib/dyndns-updater
+    state: directory
+    owner: 0
+    group: 0
+    mode: "755"
+
+- name: Install dyndns-updater service and timer
+  ansible.builtin.template:
+    src: "templates/dyndns-updater/{{ item }}"
+    dest: "/etc/systemd/system/{{ item | ansible.builtin.basename }}"
+    owner: 0
+    group: 0
+    mode: "644"
+    lstrip_blocks: true
+  loop:
+    - dyndns-updater.service
+    - dyndns-updater.timer
+  notify: Restart dyndns-updater timer
+
+- name: Enable and start dyndns-updater systemd timer
+  ansible.builtin.systemd:
+    name: dyndns-updater.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+  register: gateway_dyndns_updater_timer_started

@@ -16,3 +16,10 @@ gateway_pppoe_device: >-
 
 gateway_pppoe_service: >-
   pppoe-{{ gateway_interface }}@{{ gateway_pppoe_device }}.service
+
+# renovate: github-releases=agross/dyndns-updater
+gateway_dyndns_updater_release_version: v0.0.1
+
+gateway_dyndns_updater_arch_to_package_suffix:
+  arm64: arm64
+  x86_64: amd64

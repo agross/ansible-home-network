@@ -42,6 +42,10 @@ RestartSec=5s
 PrivateTmp=yes
 ProtectHome=yes
 ProtectSystem=strict
+# dyndns-updater state.
+StateDirectory=dyndns-updater
+# dyndns-updater notifications.
+ReadWritePaths=/var/spool/postfix/maildrop
 # Allow /etc/ppp/resolv.conf to be written when using 'usepeerdns'
 # ReadWritePaths=/run/ /etc/ppp/
 # https://github.com/systemd/systemd/issues/481#issuecomment-610951209

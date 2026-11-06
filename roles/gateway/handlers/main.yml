@@ -1,6 +1,7 @@
-- name: Restart ddclient service
+- name: Restart dyndns-updater timer
+  when: gateway_dyndns_updater_timer_started is not changed
   ansible.builtin.systemd:
-    name: ddclient.service
+    name: dyndns-updater.timer
     state: restarted
 
 - name: Restart wireguard-resolve-endpoint timer

@@ -1,8 +1,8 @@
 - name: Configure PPPoE
   ansible.builtin.import_tasks: ppp.yml
 
-- name: Configure ddclient
-  ansible.builtin.import_tasks: ddclient.yml
+- name: Configure dyndns-updater
+  ansible.builtin.import_tasks: dyndns-updater.yml
 
 - name: Configure WireGuard
   ansible.builtin.import_tasks: wireguard.yml

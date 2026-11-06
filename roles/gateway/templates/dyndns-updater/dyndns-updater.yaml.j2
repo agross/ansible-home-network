@@ -1,0 +1,18 @@
+state: /var/lib/dyndns-updater/state.json
+refresh: 600h # 25 days; Go duration syntax (h, m, s), not "25d"
+timeout: 30s # per provider request and sendmail invocation
+sendmail: /usr/sbin/sendmail
+recipient: root
+profiles:
+  deSEC:
+    provider: desec
+    interface: {{ gateway_interface | ansible.builtin.mandatory }}
+    target: {{ network.domain | ansible.builtin.mandatory }}
+    token: {{ gateway_dyndns_password | ansible.builtin.mandatory }}
+
+  Tunnel Broker:
+    provider: tunnelbroker
+    interface: {{ gateway_interface | ansible.builtin.mandatory }}
+    target: {{ he_ipv6.tunnel_id | ansible.builtin.mandatory }}
+    username: {{ he_ipv6.username | ansible.builtin.mandatory }}
+    password: {{ he_ipv6.update_key | ansible.builtin.mandatory }}
