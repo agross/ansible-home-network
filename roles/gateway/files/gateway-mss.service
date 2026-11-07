@@ -1,0 +1,22 @@
+[Unit]
+Description=Clamp forwarded TCP MSS for the PPPoE link
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft --file /etc/nftables/gateway-mss.nft
+ExecStop=/usr/sbin/nft delete table ip gateway_mss
+
+[Install]
+WantedBy=multi-user.target
+
+# Forwarded GitHub webhooks timed out when the proxy advertised MSS 1460 over
+# the PPPoE link with MTU 1492. Captures showed a missing first TLS segment;
+# a clamp to MSS 1452 restored delivery in an on-off-on test.
+# An external PMTU test received ICMP fragmentation needed with MTU 1492, but
+# whether GitHub received or acted on such a message remains unknown.
+# Firewalld's native MSS rules run after its DNAT and established-connection
+# accepts, so they miss the forwarded SYN and SYN-ACK. This separate table
+# clamps before those accepts without modifying firewalld's ruleset.

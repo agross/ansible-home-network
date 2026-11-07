@@ -1,0 +1,10 @@
+destroy table ip gateway_mss
+table ip gateway_mss {
+  chain forward {
+    type filter hook forward priority mangle; policy accept;
+    # Clamp before firewalld accepts forwarded DNAT and established traffic.
+    # PPPoE MTU 1492 minus IPv4 and TCP headers is MSS 1452.
+    iifname "{{ gateway_interface }}" tcp flags & syn == syn tcp option maxseg size set 1452
+    oifname "{{ gateway_interface }}" tcp flags & syn == syn tcp option maxseg size set 1452
+  }
+}

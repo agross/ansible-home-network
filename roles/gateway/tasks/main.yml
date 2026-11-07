@@ -1,6 +1,9 @@
 - name: Configure PPPoE
   ansible.builtin.import_tasks: ppp.yml
 
+- name: Configure TCP MSS clamp
+  ansible.builtin.import_tasks: mss-clamp.yml
+
 - name: Configure dyndns-updater
   ansible.builtin.import_tasks: dyndns-updater.yml
 

@@ -9,3 +9,8 @@
   ansible.builtin.systemd:
     name: wireguard-resolve-endpoint.timer
     state: restarted
+
+- name: Restart gateway MSS clamp
+  ansible.builtin.systemd_service:
+    name: gateway-mss.service
+    state: restarted
