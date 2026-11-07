@@ -142,14 +142,18 @@ do not allow a failed parser inside a shell pipeline to silently skip deletion.
    `git rev-parse HEAD`; a hook can rewrite files or alter the commit content.
    Confirm the pushed remote branch contains that exact SHA before using it in
    the PR body.
-4. Write the PR body to a temporary Markdown file and pass it with `gh-app --repo OWNER/REPO -- pr create
+4. Immediately before creating the PR, re-fetch the issue and all its comments.
+   Reconcile updates using the issue-selection rules above and address them in
+   the implementation and PR. Run relevant checks and commit and push any
+   resulting changes before creating the PR.
+5. Write the PR body to a temporary Markdown file and pass it with `gh-app --repo OWNER/REPO -- pr create
    --body-file`; this preserves Markdown backticks and prevents the shell from
    executing body text through command substitution. Its body starts with
    the developer origin marker and includes the exact issue marker
    `<!-- hermes-issue: OWNER/REPO#NUMBER -->` for the original issue, plus a
    link to the issue, acceptance evidence, checks, risks, and the current head SHA.
    Leave the `in-review` transition on the issue and PR to the reviewer.
-5. Verify the PR exists and links the issue.
+6. Verify the PR exists and links the issue.
    Query PR review/comments metadata separately from CI state, and use
    `gh-app --repo OWNER/REPO -- run list --repo OWNER/REPO --commit HEAD_SHA` for the current check
    evidence; optional GraphQL status fields can make an otherwise useful
@@ -162,7 +166,7 @@ do not allow a failed parser inside a shell pipeline to silently skip deletion.
 
    Use the issue number here. This marks implementation and PR handoff as
    complete. Failed or incomplete implementation receives no 🚀 reaction.
-5. Do not merge, release, deploy, alter repository settings, or weaken checks.
+7. Do not merge, release, deploy, alter repository settings, or weaken checks.
 
 ## Handle reviewer feedback
 
