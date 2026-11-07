@@ -1,9 +1,7 @@
 - name: Ensure PPP ip-up script dependencies are installed
   ansible.builtin.package:
     name:
-      - bind-utils
       - crontabs
-      - curl
       - iproute-tc
     state: present
 
