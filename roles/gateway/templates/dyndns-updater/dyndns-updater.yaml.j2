@@ -3,6 +3,7 @@ refresh: 600h # 25 days; Go duration syntax (h, m, s), not "25d"
 timeout: 30s # per provider request and sendmail invocation
 sendmail: /usr/sbin/sendmail
 recipient: root
+sender_name: dyndns-updater on {{ inventory_hostname }}
 profiles:
   deSEC:
     provider: desec
