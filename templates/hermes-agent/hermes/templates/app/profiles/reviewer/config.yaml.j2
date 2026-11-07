@@ -7,6 +7,9 @@ model:
 fallback_providers:
   - provider: opencode-go
     model: glm-5.3-flash
+  # docker exec -it hermes-agent-app-1 hermes --profile reviewer auth
+  - provider: openai-codex
+    model: openai-codex/gpt-5.6-terra
 
 dashboard:
   show_token_analytics: true
