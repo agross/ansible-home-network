@@ -134,9 +134,11 @@ do not allow a failed parser inside a shell pipeline to silently skip deletion.
 
 ## Implement
 
-1. Read repository guidance, the entire issue, and current working state.
+1. Read repository guidance, the entire issue, and current working state. Before editing, list open PRs and check for an existing implementation of the selected issue. If an owner PR already covers the scope, avoid creating a duplicate; apply PR handoff authorization before touching it. If it is neither developer-origin nor designated, report the overlap on the selected issue and request designation of the existing PR rather than taking it over.
 2. Create `codex/issue-<number>-<slug>`, implement the accepted scope, and run
-   relevant checks.
+   relevant checks. If the existing checkout is dirty or belongs to another task,
+   preserve it and create a separate worktree from the fetched default branch;
+   never discard or commit unrelated local changes.
 3. Commit only the scoped files and push the branch before creating the PR.
    After any commit hook or formatter runs, re-check `git status --short` and
    `git rev-parse HEAD`; a hook can rewrite files or alter the commit content.
@@ -196,7 +198,12 @@ must still update the original PR. Report both branch names when they differ.
    not only as an inline or issue comment. A current reviewer marker identifies
    reviewer workflow feedback; feedback without that marker is also handled.
 2. A `state=changes-requested` marker or an unresolved review comment starts
-   one repair round. Retain any reviewer-set `in-review` label, implement corrections
+   one repair round. First reconcile feedback with the current head and later
+   reviews: do not repeat a correction already implemented merely because an
+   older thread remains unresolved. If a current-head clean summary says the
+   findings are addressed but threads remain open, use the blocked-handoff
+   procedure below rather than making a duplicate repair commit.
+   Retain any reviewer-set `in-review` label, implement corrections
    within the PR's stated scope, run checks, and push one updated head SHA.
    A current PR review comment may override or extend that scope when it
    communicates a concrete requested change, even if it is phrased
@@ -222,7 +229,16 @@ must still update the original PR. Report both branch names when they differ.
    marker for the previous SHA as a result for the repair; wait for feedback
    on the new head.
 3. A `state=clean` marker is valid only when it names the current head SHA and
-   there are no unresolved review threads, including human feedback. Remove
+   there are no unresolved review threads, including human feedback. Fetch all
+   thread pages and inspect `isResolved`; a review summary saying findings are
+   resolved, an outdated inline location, or a `needs-human` label does not
+   establish thread closure. If a current-head clean marker coexists with open
+   threads, briefly re-fetch threads and labels to allow concurrent reviewer
+   finalization. If threads remain open, leave reviewer-owned labels unchanged,
+   do not self-resolve threads or complete assignment, and post or update a
+   concise blocker comment identifying pending thread closure. Read back that
+   comment and report the handoff as incomplete, distinguishing code findings
+   reported addressed from review threads still open. Remove
    `ready-for-agent` when present. Wait for the reviewer to remove `in-review`
    and set `needs-human` on the PR; re-fetch the labels to verify. If that
    transition does not complete during the session, report the incomplete

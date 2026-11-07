@@ -46,12 +46,13 @@ carries both `in-review` and `needs-human`.
    human-created PR. A PR marked `needs-human` has already been handed
    to a human and is not eligible for an automated review.
 3. Before reviewing, replace the PR's lifecycle label with `in-review`.
-   For a developer-origin PR, identify its original issue from the
-   `<!-- hermes-issue: OWNER/REPO#NUMBER -->` marker, or an unambiguous linked
-   issue for older PRs. Re-fetch the issue, replace its lifecycle label with
-   `in-review`, and verify both transitions. Preserve unrelated and designation
-   labels. If the issue cannot be identified or updated, report the incomplete
-   transition; do not guess. This does not select or block work on another PR.
+   Identify the PR's original issue from the `<!-- hermes-issue: OWNER/REPO#NUMBER -->`
+   marker on a developer-origin PR, or from an unambiguous linked/closing issue
+   (e.g., `closingIssuesReferences`) on any PR. Re-fetch the issue, replace its
+   lifecycle label with `in-review`, and verify both transitions. Preserve
+   unrelated and designation labels. If a developer-origin PR's issue cannot be
+   identified or updated, report the incomplete transition; do not guess. This
+   does not select or block work on another PR.
 4. Ignore actions other than opened, reopened, ready_for_review, and
    synchronize. Ignore a head SHA that already has a reviewer marker.
 
@@ -97,15 +98,21 @@ by fetching the opening-post reactions again.
    dirty while CI still passes against the old version.
 3. Read existing threads. Do not repeat addressed or duplicate findings.
 4. Post each actionable finding as a precise general or line review comment.
-   Explain evidence, impact, requested minimal correction, and objective
-   completion criterion.
+   When attaching an inline review comment (`comments[].line`), target a line
+   that appears inside a diff hunk of the PR (`repos/OWNER/REPO/pulls/NUMBER/files`
+   patch) — GitHub's create-review endpoint rejects lines outside the diff
+   hunks with `HTTP 422: Line could not be resolved`. Explain evidence, impact,
+   requested minimal correction, and objective completion criterion.
 5. Do not alter code, branches, PR settings, merge state, release state, or
    deployment state.
 
 ## Complete the round
 
 1. Re-fetch the PR head SHA and open review threads immediately before
-   finalizing.
+   finalizing. If the head SHA already has a reviewer marker in existing PR
+   reviews (for example, posted by a concurrent webhook session after rapid
+   `synchronize` pushes) or the PR is already closed/marked `needs-human`, stop
+   without posting a duplicate review, label write, or reaction mutation.
 2. Submit one GitHub pull request review with event `COMMENT` and
    `commit_id` set to that exact SHA. Put one marker in its general review
    comment. A submitted review triggers the `pull_request_review` feedback
