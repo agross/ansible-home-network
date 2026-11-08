@@ -33,10 +33,8 @@ terminal:
 
 timezone: {{ hermes_timezone }}
 
-{% if hermes_reviewer_github_app_enabled | default(false) | bool %}
 github_app:
-  client_id: {{ hermes_profile.reviewer.github.app.client_id | ansible.builtin.to_json }}
-  app_slug: {{ hermes_profile.reviewer.github.app.slug | ansible.builtin.to_json }}
+  client_id: {{ hermes_profile.reviewer.github.app.client_id }}
+  app_slug: {{ hermes_profile.reviewer.github.app.slug }}
   installation_ids: {{ hermes_profile.reviewer.github.app.installation_ids | ansible.builtin.to_json }}
   private_key_path: /opt/data/profiles/reviewer/github-app.pem
-{% endif %}

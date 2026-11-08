@@ -86,7 +86,6 @@ hermes_profile:
         slug: developer
         client_id: "{{ vault_hermes_profile.developer.github.app.client_id }}"
         installation_ids: "{{ vault_hermes_profile.developer.github.app.installation_ids }}"
-        private_key: "{{ vault_hermes_profile.developer.github.app.private_key }}"
 
   reviewer:
     github:
@@ -96,7 +95,6 @@ hermes_profile:
         slug: reviewer
         client_id: "{{ vault_hermes_profile.reviewer.github.app.client_id }}"
         installation_ids: "{{ vault_hermes_profile.reviewer.github.app.installation_ids }}"
-        private_key: "{{ vault_hermes_profile.reviewer.github.app.private_key }}"
 
     opencode_go:
       api_key: "{{ vault_hermes_profile.reviewer.opencode_go.api_key }}"
