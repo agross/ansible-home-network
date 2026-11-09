@@ -101,20 +101,13 @@ jobs:
         if: steps.affected-roles.outputs.roles != ''
         run: |
           title="${DEPLOYMENT_TITLE%%$'\n'*}"
-          source="$DEPLOYMENT_SOURCE"
-          pr_suffix=' \(#([0-9]+)\)$'
-          if [[ "$EVENT_NAME" == push && "$title" =~ $pr_suffix ]]; then
-            source="PR #${BASH_REMATCH[1]}"
-            title="${title%"${BASH_REMATCH[0]}"}"
-          fi
           if [[ "$title" == 'Update '* ]]; then
             title="$(printf '%s' "$title" |
               sed --regexp-extended \
                   --expression='s/^Update (dependency )?//' \
                   --expression='s/ (Docker tag |Docker digest |action |digest )?to / /')"
           fi
-          source="$title · $source"
-          printf 'source=%s\n' "$source" >> "$GITHUB_OUTPUT"
+          printf 'source=%s · %s\n' "$title" "$DEPLOYMENT_SOURCE" >> "$GITHUB_OUTPUT"
         env:
           DEPLOYMENT_TITLE: >-
             ${{
@@ -137,7 +130,8 @@ jobs:
             --ref "$DEFAULT_BRANCH" \
             --raw-field "tags=$DEPLOYMENT_TAGS" \
             --raw-field "revision=$DEPLOYMENT_REVISION" \
-            --raw-field "source=$DEPLOYMENT_SOURCE"
+            --raw-field "source=$DEPLOYMENT_SOURCE" \
+            --raw-field "pull-request=$DEPLOYMENT_PR"
         env:
           GH_TOKEN: ${{ github.token }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
@@ -149,3 +143,4 @@ jobs:
               github.event.after
             }}
           DEPLOYMENT_SOURCE: ${{ steps.deployment-source.outputs.source }}
+          DEPLOYMENT_PR: ${{ github.event.pull_request.number }}

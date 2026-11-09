@@ -16,6 +16,9 @@ on:
         description: Deployment origin.
         default: Manual
         type: string
+      pull-request:
+        description: Associated pull request number, if any.
+        type: string
 
 permissions:
   contents: read
@@ -126,3 +129,73 @@ jobs:
           rm --force \
              .ansible-ssh-private-key \
              .ansible-vault-agross2
+
+  report-failure:
+    name: Report deployment failure
+    needs: ansible
+    if: failure()
+    runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+      pull-requests: read
+
+    steps:
+      - name: Report the failed run on GitHub
+        shell: bash
+        run: |
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          report="$RUNNER_TEMP/ansible-failure.md"
+          {
+            printf '[Run Ansible failed (attempt %s)](%s/attempts/%s).\n' \
+              "$GITHUB_RUN_ATTEMPT" "$run_url" "$GITHUB_RUN_ATTEMPT"
+            printf '\nDeployment source\n\n'
+            printf '%s\n' "$DEPLOYMENT_SOURCE" | sed --expression='s/^/    /'
+          } > "$report"
+
+          pr_comment_status=0
+          if [[ -n "$DEPLOYMENT_PR" ]]; then
+            if [[ ! "$DEPLOYMENT_PR" =~ ^[1-9][0-9]*$ ]]; then
+              echo '::error::The associated pull request must be a positive integer.'
+              exit 1
+            fi
+
+            merger_type=''
+            if merger="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$DEPLOYMENT_PR" \
+                           --jq '.merged_by | [.type, .login] | @tsv')"; then
+              IFS=$'\t' read -r merger_type merger_login <<< "$merger"
+              if [[ "$merger_type" == User && -n "$merger_login" ]]; then
+                printf '\n@%s\n' "$merger_login" >> "$report"
+              fi
+            else
+              echo '::warning::Could not determine who merged the pull request.'
+            fi
+
+            gh pr comment "$DEPLOYMENT_PR" --repo "$GITHUB_REPOSITORY" --body-file "$report" || pr_comment_status=$?
+            if [[ "$merger_type" != Bot ]]; then
+              exit "$pr_comment_status"
+            fi
+
+            printf '\nPull request: %s/%s/pull/%s\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$DEPLOYMENT_PR" >> "$report"
+          fi
+
+          # Find the existing issue by run ID, which is stable across attempts.
+          title="Run Ansible failed (run $GITHUB_RUN_ID)"
+          marker="<!-- run-ansible-run:$GITHUB_RUN_ID -->"
+          issues="$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues?state=all&per_page=100" \
+                     --jq "first(.[] | select(.pull_request == null and .user.login == \"github-actions[bot]\" and
+                                                ((.body // \"\") | contains(\"$marker\"))) | .number) // empty")"
+          issue="${issues%%$'\n'*}"
+          if [[ -n "$issue" ]]; then
+            gh issue comment "$issue" --repo "$GITHUB_REPOSITORY" --body-file "$report"
+          else
+            printf '\n%s\n' "$marker" >> "$report"
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$report"
+          fi
+
+          exit "$pr_comment_status"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOYMENT_PR: ${{ inputs.pull-request }}
+          DEPLOYMENT_SOURCE: ${{ inputs.source }}
