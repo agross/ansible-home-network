@@ -40,7 +40,7 @@ jobs:
       - ${{ matrix.site }}
 
     container:
-      image: ghcr.io/agross/ansible-ee:2.22.0-6
+      image: ghcr.io/agross/ansible-ee:2.22.0-7
       # --tty for unbuffered output.
       options: --tty
 
