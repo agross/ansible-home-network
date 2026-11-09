@@ -1,8 +1,4 @@
 # renovate: github-releases=pdf/zfs_exporter
 zfs_exporter_release_version: v2.5.1
 
-zfs_exporter_arch_to_package_suffix:
-  arm64: arm64
-  x86_64: amd64
-
 zfs_exporter_service: "{{ ansible_role_name }}.service"

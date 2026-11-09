@@ -1,0 +1,4 @@
+github_release_arch_to_package_suffix:
+  aarch64: arm64
+  arm64: arm64
+  x86_64: amd64

@@ -4,10 +4,6 @@ dns_server_packages:
   dnsmasq:
     name: dnsmasq
 
-dns_server_adguard_arch_to_package_suffix:
-  arm64: arm64
-  x86_64: amd64
-
 # renovate: github-releases=agross/AdGuardHome depName=AdGuard
 dns_server_adguard_release_version: v0.107.80+fix-8024
 
@@ -22,7 +18,7 @@ dns_server_download_assets:
       ^AdGuardHome_{{
         ansible_facts.system | lower | ansible.builtin.regex_escape
       }}_{{
-        dns_server_adguard_arch_to_package_suffix[ansible_facts.architecture] |
+        github_release_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
     tmp: adguard.tar.gz

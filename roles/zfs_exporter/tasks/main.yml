@@ -15,7 +15,7 @@
       ^zfs_exporter-.*\.{{
         ansible_facts.system | lower | ansible.builtin.regex_escape
       }}-{{
-        zfs_exporter_arch_to_package_suffix[ansible_facts.architecture] |
+        github_release_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
     dest: "{{ zfs_exporter_download_temp.path }}/zfs_exporter.tar.gz"

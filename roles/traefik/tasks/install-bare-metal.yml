@@ -15,7 +15,7 @@
       ^traefik_v.*_{{
         ansible_facts.system | lower | ansible.builtin.regex_escape
       }}_{{
-        traefik_arch_to_package_suffix[ansible_facts.architecture] |
+        github_release_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
     dest: "{{ traefik_download_temp.path }}/traefik.tar.gz"

@@ -15,7 +15,7 @@
       ^dyndns-updater_v.*_{{
         ansible_facts.system | lower | ansible.builtin.regex_escape
       }}_{{
-        gateway_dyndns_updater_arch_to_package_suffix[ansible_facts.architecture] |
+        github_release_arch_to_package_suffix[ansible_facts.architecture] |
         ansible.builtin.regex_escape
       }}\.tar\.gz$
     dest: "{{ gateway_dyndns_updater_temp.path }}/dyndns-updater.tar.gz"
