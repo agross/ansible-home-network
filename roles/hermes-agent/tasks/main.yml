@@ -17,6 +17,19 @@
       - "site:{{ site }}"
       - "host:{{ inventory_hostname }}"
 
+- name: Check whether the Hermes config exists
+  ansible.builtin.stat:
+    path: "{{ hermes_root }}/app/config.yaml"
+    get_checksum: false
+  register: hermes_config_stat
+
+- name: Read the live Hermes config
+  when: hermes_config_stat.stat.exists
+  ansible.builtin.slurp:
+    src: "{{ hermes_root }}/app/config.yaml"
+  register: hermes_config_slurp
+  no_log: true
+
 - name: Copy templates
   ansible.builtin.import_tasks: copy-templates.yml
   vars:
@@ -30,6 +43,20 @@
     directory: "{{ lookup('ansible.builtin.first_found', paths, skip=false) }}"
     target: "{{ hermes_root }}"
     notify_: Restart hermes-agent service
+    # Hermes adds a _config_version key to the config file on startup. If the
+    # config file already exists, we want to avoid overwriting it unless the
+    # settings have changed.
+    hermes_live_config: >-
+      {{
+        hermes_config_slurp.content |
+        ansible.builtin.b64decode |
+        ansible.builtin.from_yaml
+      }}
+    hermes_rendered_config: >-
+      {{
+        lookup('ansible.builtin.template', directory ~ '/app/config.yaml.j2') |
+        ansible.builtin.from_yaml
+      }}
     files:
       app:
         owner: "{{ hermes_uid }}"
@@ -39,6 +66,21 @@
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
         mode: "640"
+        # Hermes stamps the file on startup. Compare settings before allowing a
+        # write.
+        force: >-
+          {{
+            not hermes_config_stat.stat.exists or
+            hermes_live_config is not mapping or
+            (
+              hermes_live_config |
+              ansible.builtin.dict2items |
+              rejectattr('key', 'equalto', '_config_version') |
+              ansible.builtin.items2dict |
+              ansible.builtin.to_json(sort_keys = true)
+            ) !=
+            (hermes_rendered_config | ansible.builtin.to_json(sort_keys = true))
+          }}
       app/.env.j2:
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
@@ -84,6 +126,15 @@
         group: 0
         mode: "600"
         notify_: Reload hermes-agent service
+
+- name: Enforce permissions on the existing Hermes config
+  when: hermes_config_stat.stat.exists
+  ansible.builtin.file:
+    path: "{{ hermes_root }}/app/config.yaml"
+    state: file
+    owner: "{{ hermes_uid }}"
+    group: "{{ hermes_gid }}"
+    mode: "640"
 
 - name: Update docker-compose images
   ansible.builtin.import_tasks: docker-compose-update.yml
