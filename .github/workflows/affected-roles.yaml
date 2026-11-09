@@ -1,7 +1,14 @@
 name: Affected roles
 
 on:
-  pull_request:
+  # This runs from the default branch.
+  pull_request_target:
+
+concurrency:
+  # Here, workflow_ref would be tied to the default branch, but we want to
+  # cancel in-progress runs for the same PR number.
+  group: ${{ github.workflow }}-${{ github.event.number }}
+  cancel-in-progress: true
 
 jobs:
   affected-roles:
@@ -14,16 +21,27 @@ jobs:
       issues: write
 
     steps:
-      - name: Get full commit history
+      - name: Check out default branch
         uses: actions/checkout@v7.0.1
         with:
-          fetch-depth: 0
           # We don't need the file contents (blobs), but we inspect commits and
           # trees.
           # This in combination with a bare repo would be even faster, but it's
           # not supported.
           # https://github.com/actions/checkout/issues/603
           filter: blob:none
+
+      - name: Fetch the PR base and head commits
+        # The fetched commits are the inputs to the diff that runs in the next
+        # step.
+        run: |
+          git fetch origin \
+                    --unshallow \
+                    "$PR_BASE_SHA" \
+                    "$PR_HEAD_SHA"
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
 
       - name: Determine roles from affected files
         id: affected-roles
@@ -32,14 +50,29 @@ jobs:
           base-sha: ${{ github.event.pull_request.base.sha }}
           head-sha: ${{ github.event.pull_request.head.sha }}
 
-      - name: Set role labels
-        if: steps.affected-roles.outputs.roles != ''
+      - name: Sync role labels
         run: |
+          pr=$(gh pr view "$PR_NUMBER" --json labels)
+          current_labels=$(jq --raw-output '.labels[].name | select(startswith("role:"))' <<< "$pr")
+          label_updates=()
+
           for role in $ROLES; do
             label="role:$role"
-            gh label create "$label" --color fbca04 --force
-            gh issue edit "$PR_NUMBER" --add-label "$label"
+            if [[ $'\n'"$current_labels"$'\n' != *$'\n'"$label"$'\n'* ]]; then
+              gh label create "$label" --color fbca04 --force
+              label_updates+=(--add-label "$label")
+            fi
           done
+
+          while IFS= read -r label; do
+            if [[ -n "$label" && " $ROLES " != *" ${label#role:} "* ]]; then
+              label_updates+=(--remove-label "$label")
+            fi
+          done <<< "$current_labels"
+
+          if (( ${#label_updates[@]} > 0 )); then
+            gh pr edit "$PR_NUMBER" "${label_updates[@]}"
+          fi
         env:
           ROLES: ${{ steps.affected-roles.outputs.roles }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

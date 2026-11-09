@@ -1,9 +1,9 @@
 name: Determine affected roles
-description: Determine roles from changed files between two commits. Requires checkout with full commit history.
+description: Determine roles from files changed since the merge base. Requires checkout with full commit history.
 
 inputs:
   base-sha:
-    description: Base commit for the comparison.
+    description: Ref or commit SHA used to find the merge base with the head commit.
     required: true
   head-sha:
     description: Head commit for the comparison.
@@ -23,7 +23,7 @@ runs:
     - name: Show affected files
       shell: bash
       run: |
-        git diff --name-status "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA"
+        git diff --name-status "$CHANGE_BASE_SHA...$CHANGE_HEAD_SHA"
       env:
         CHANGE_BASE_SHA: ${{ inputs.base-sha }}
         CHANGE_HEAD_SHA: ${{ inputs.head-sha }}
@@ -37,7 +37,7 @@ runs:
 
           git diff \
               --name-only \
-              "$CHANGE_BASE_SHA..$CHANGE_HEAD_SHA" \
+              "$CHANGE_BASE_SHA...$CHANGE_HEAD_SHA" \
               -- \
               host_vars \
               group_vars \
