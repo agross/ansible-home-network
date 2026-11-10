@@ -1,4 +1,4 @@
-FROM nousresearch/hermes-agent:v0.23.0
+FROM nousresearch/hermes-agent:v0.23.1
 
 # renovate: git-refs=https://github.com/Acrazt05/hermes_github_app_plugin.git ref=main
 ARG HERMES_GITHUB_APP_REV=4e9b4e24f751165253d7e4d4e81a4ec487515737
