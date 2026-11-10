@@ -68,11 +68,13 @@ services:
     {% endif %}
 
   immich-mcp:
-    image: ghcr.io/joeru/claw2immich:sha-a39ae71
+    image: ghcr.io/joeru/mcp4immich:1.0.1
     environment:
+      # Use bundled dependencies because the image's lockfile has a version mismatch.
+      # https://github.com/JoeRu/mcp4immich/issues/16
+      UV_NO_SYNC: "1"
+
       IMMICH_BASE_URL: https://{{ immich_domain | ansible.builtin.mandatory }}
-      # Required because /api/server-config no longer exists.
-      IMMICH_EXTERNAL_DOMAIN: https://{{ immich_domain | ansible.builtin.mandatory }}
       IMMICH_API_KEY: {{ hermes_profile.the_dude.immich.api_key }}
       IMMICH_PROFILE: read_only
 
