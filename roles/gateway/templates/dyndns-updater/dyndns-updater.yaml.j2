@@ -7,13 +7,19 @@ sender_name: dyndns-updater on {{ inventory_hostname }}
 profiles:
   deSEC:
     provider: desec
-    interface: {{ gateway_interface | ansible.builtin.mandatory }}
+    sources:
+      - if: {{ gateway_interface | ansible.builtin.mandatory }}
+      - web: ipify
+      - web: ifconfig.me
     target: {{ network.domain | ansible.builtin.mandatory }}
     token: {{ gateway_dyndns_password | ansible.builtin.mandatory }}
 
   Tunnel Broker:
     provider: tunnelbroker
-    interface: {{ gateway_interface | ansible.builtin.mandatory }}
+    sources:
+      - if: {{ gateway_interface | ansible.builtin.mandatory }}
+      - web: ipify
+      - web: ifconfig.me
     target: {{ he_ipv6.tunnel_id | ansible.builtin.mandatory }}
     username: {{ he_ipv6.username | ansible.builtin.mandatory }}
     password: {{ he_ipv6.update_key | ansible.builtin.mandatory }}
