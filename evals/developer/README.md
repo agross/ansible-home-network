@@ -1,26 +1,27 @@
 # Developer skill operation evals
 
 Sevro **1.1.2** owns host isolation, trials, grading, and retained evidence. The
-exact npm dependency and package lock pin that release. `run.py` only selects
-scenarios and invokes the local Sevro executable; it no longer launches Codex
-or grades action plans itself. The eight original scenario IDs, input evidence,
-and permitted outcomes remain in `cases.json`.
+root `package.json` and lockfile pin that release. The shared
+[`../run.py`](../run.py) selects scenarios and invokes the root Sevro executable.
+The eight original scenario IDs, input evidence, and permitted outcomes remain
+in `cases.json`.
 
 ## Install and check fixtures
 
 Use Node.js 24.13.0 or newer, Python 3, Git, and the native isolation prerequisites
 for Sevro's Codex host (macOS `sandbox-exec` or supported Linux `bubblewrap`).
-Install from the lockfile and run the local fixture/grader tests:
+From the repository root, install from the lockfile and run the local
+fixture/grader tests:
 
 ```sh
-npm --prefix evals/developer ci --ignore-scripts
+npm ci --ignore-scripts
 python3 -m unittest discover --start-directory evals/developer --pattern 'test_*.py' --verbose
 ```
 
 Prepare all eight cases without model calls:
 
 ```sh
-python3 evals/developer/run.py --dry --output-dir /tmp/developer-sevro-preparation-001
+python3 evals/run.py developer --dry --output-dir /tmp/developer-sevro-preparation-001
 ```
 
 Successful dry preparation is `not_assessed`, not a behavior pass.
@@ -34,7 +35,7 @@ Override `--model`, `--effort`, or `--codex-auth-file` explicitly when needed.
 Each native trial consumes the account's model quota.
 
 ```sh
-python3 evals/developer/run.py --output-dir /tmp/developer-sevro-run-001
+python3 evals/run.py developer --output-dir /tmp/developer-sevro-run-001
 ```
 
 Use `--case NAME` repeatedly to select scenarios and `--trials 3` for repeated

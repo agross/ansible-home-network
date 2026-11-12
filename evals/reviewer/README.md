@@ -1,8 +1,8 @@
 # Reviewer operation evals
 
 Sevro **1.1.2** owns isolated host execution, trials, grading, and retained
-artifacts. The exact npm dependency and lockfile pin that release. Python's
-`run.py` selects scenarios and invokes the local Sevro executable.
+artifacts. Root `package.json` and lockfile pin that release. The shared
+[`../run.py`](../run.py) selects scenarios and invokes the root Sevro executable.
 
 ## Install and run
 
@@ -10,11 +10,13 @@ Use Node.js 24.13.0 or newer, Python 3, Git, an authenticated Codex CLI with
 file-based authentication, and Sevro's native isolation prerequisites
 (macOS `sandbox-exec` or supported Linux `bubblewrap`).
 
+Run from the repository root:
+
 ```sh
-npm --prefix evals/reviewer ci --ignore-scripts
+npm ci --ignore-scripts
 python3 -m unittest discover --start-directory evals/reviewer --pattern 'test_*.py' --verbose
-python3 evals/reviewer/run.py --dry --output-dir /tmp/reviewer-sevro-preparation-001
-python3 evals/reviewer/run.py --output-dir /tmp/reviewer-sevro-run-001
+python3 evals/run.py reviewer --dry --output-dir /tmp/reviewer-sevro-preparation-001
+python3 evals/run.py reviewer --output-dir /tmp/reviewer-sevro-run-001
 ```
 
 Dry preparation returns `not_assessed`; it is not a behavior pass. Native trials

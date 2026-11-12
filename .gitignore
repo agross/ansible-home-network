@@ -1,3 +1,4 @@
 .ansible-facts/
 .ansible/
 __pycache__/
+node_modules/

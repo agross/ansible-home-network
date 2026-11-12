@@ -1,0 +1,16 @@
+{
+  "name": "ansible-home-network",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:developer && npm run test:reviewer",
+    "test:developer": "python3 -m unittest discover --start-directory evals/developer --pattern 'test_*.py' --verbose",
+    "test:reviewer": "python3 -m unittest discover --start-directory evals/reviewer --pattern 'test_*.py' --verbose",
+    "eval": "python3 evals/run.py"
+  },
+  "devDependencies": {
+    "@bjoernrochel/sevro": "1.1.2"
+  },
+  "engines": {
+    "node": ">=24.13.0"
+  }
+}
