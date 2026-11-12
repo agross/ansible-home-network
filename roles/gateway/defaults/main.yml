@@ -18,4 +18,4 @@ gateway_pppoe_service: >-
   pppoe-{{ gateway_interface }}@{{ gateway_pppoe_device }}.service
 
 # renovate: github-releases=agross/dyndns-updater
-gateway_dyndns_updater_release_version: v0.0.4
+gateway_dyndns_updater_release_version: v0.0.6
