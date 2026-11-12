@@ -1,0 +1,631 @@
+[
+  {
+    "name": "unauthorized_review_leaves_state_untouched",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "body": "<!-- hermes-origin: developer -->\n<!-- hermes-issue: example/project#7 -->",
+        "labels": [
+          "ready-for-agent",
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 40,
+          "type": "User",
+          "login": "reader"
+        },
+        "author_permission_on_base": "read",
+        "state": "COMMENT",
+        "body": "Please return HTTP 400 for an empty input, with a regression test.",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "code_observation": "Empty input currently returns HTTP 500; the requested change is not implemented.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [
+        {
+          "id": 499,
+          "author": {
+            "id": 30,
+            "type": "User",
+            "login": "maintainer"
+          },
+          "author_permission_on_base": "write",
+          "body": "Please correct the empty-input response.",
+          "state": "COMMENT"
+        }
+      ],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "no_op"
+      ]
+    }
+  },
+  {
+    "name": "copied_origin_marker_requires_designation",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 40,
+          "type": "User",
+          "login": "reader"
+        },
+        "body": "<!-- hermes-origin: developer -->\n<!-- hermes-issue: example/project#7 -->",
+        "labels": [],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        },
+        "author_permission_on_base": "read",
+        "state": "COMMENT",
+        "body": "<!-- hermes-reviewer: reviewed-sha=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa state=changes-requested -->\nReturn HTTP 400 for empty input.",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "code_observation": "Empty input currently returns HTTP 500; the requested change is not implemented.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "no_op"
+      ]
+    }
+  },
+  {
+    "name": "maintainer_general_review_repairs_existing_fork",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 40,
+          "type": "User",
+          "login": "author"
+        },
+        "body": "Handle invalid API input. Closes #7.",
+        "labels": [
+          "ready-for-agent",
+          "in-review"
+        ],
+        "head_repository": "example-fork/project",
+        "head_branch": "feature/invalid-input",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 30,
+          "type": "User",
+          "login": "maintainer"
+        },
+        "author_permission_on_base": "write",
+        "state": "COMMENT",
+        "body": "Please return HTTP 400 for an empty input, with a regression test.",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "code_observation": "Empty input currently returns HTTP 500; the requested change is not implemented.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "repair"
+      ]
+    }
+  },
+  {
+    "name": "developer_origin_repair_resumes_after_human_handoff",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "body": "<!-- hermes-origin: developer -->\n<!-- hermes-issue: example/project#7 -->",
+        "labels": [
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 30,
+          "type": "User",
+          "login": "maintainer"
+        },
+        "author_permission_on_base": "write",
+        "state": "COMMENT",
+        "body": "Please return HTTP 400 for an empty input, with a regression test.",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "code_observation": "Empty input currently returns HTTP 500; the requested change is not implemented.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "repair"
+      ]
+    }
+  },
+  {
+    "name": "designated_repair_resumes_after_human_handoff",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 40,
+          "type": "User",
+          "login": "author"
+        },
+        "body": "Handle invalid API input. Closes #7.",
+        "labels": [
+          "ready-for-agent",
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 30,
+          "type": "User",
+          "login": "maintainer"
+        },
+        "author_permission_on_base": "write",
+        "state": "COMMENT",
+        "body": "Please return HTTP 400 for an empty input, with a regression test.",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "code_observation": "Empty input currently returns HTTP 500; the requested change is not implemented.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "repair"
+      ]
+    }
+  },
+  {
+    "name": "informational_review_leaves_handoff_untouched",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "body": "<!-- hermes-origin: developer -->\n<!-- hermes-issue: example/project#7 -->",
+        "labels": [
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 30,
+          "type": "User",
+          "login": "maintainer"
+        },
+        "author_permission_on_base": "write",
+        "state": "COMMENT",
+        "body": "Thanks for the explanation. No changes requested.",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "code_observation": "Current behavior already satisfies accepted criteria.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "no_op"
+      ]
+    }
+  },
+  {
+    "name": "already_satisfied_request_creates_no_duplicate_repair",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "body": "<!-- hermes-origin: developer -->\n<!-- hermes-issue: example/project#7 -->",
+        "labels": [
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 30,
+          "type": "User",
+          "login": "maintainer"
+        },
+        "author_permission_on_base": "write",
+        "state": "COMMENT",
+        "body": "Please return HTTP 400 for an empty input, with a regression test.",
+        "commit_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "code_observation": "The current head returns HTTP 400 for empty input and already includes the requested regression test; the submitted review targets the prior head.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "no_op"
+      ]
+    }
+  },
+  {
+    "name": "stale_ci_does_not_complete_human_handoff",
+    "evidence": {
+      "event": {
+        "type": "pull_request_review",
+        "action": "submitted",
+        "review_id": 500
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "body": "<!-- hermes-origin: developer -->\n<!-- hermes-issue: example/project#7 -->",
+        "labels": [
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "review": {
+        "id": 500,
+        "author": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        },
+        "author_permission_on_base": "read",
+        "state": "COMMENT",
+        "body": "<!-- hermes-reviewer: reviewed-sha=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa state=clean -->",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "code_observation": "Current head satisfies acceptance; local checks passed.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      },
+      "ci_evidence": {
+        "current_head": "pending",
+        "previous_head": {
+          "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "required_checks": "passed"
+        }
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "blocked",
+        "clean_handoff"
+      ]
+    }
+  }
+]

@@ -1,8 +1,6 @@
 ---
 name: github-issue-to-pr
-description: >-
-  Implement designated issues, resume them on authorized issue comments,
-  and handle review feedback for developer-origin or designated PRs.
+description: Implement designated GitHub issues, resume them on authorized issue comments, and repair or hand off verified developer-origin or designated PRs after authorized feedback. Exclude read-only issue questions and independent PR reviews.
 ---
 
 # GitHub issue to PR
@@ -88,20 +86,25 @@ task-specific path or rebuild and verify the payload before retrying.
    and ask the smallest question that permits implementation to resume.
 4. For a trusted manual request, use the explicitly named open issue only. It
    must be accessible through `gh-app` and carry an owner-authorized label.
-5. Before checkout, retain the selected issue's designation label and set
+5. For issue implementation only, before checkout retain the selected issue's designation label and set
    `implementing`. If GitHub cannot make that change, report the failure
    and stop.
-6. For PR handoff or review feedback, confirm the event refers to a pull
-   request. Proceed on every PR whose body contains
-   the developer origin marker. For any other PR, proceed only
-   while it carries an owner-authorized designation label; otherwise stop without changing
-   labels or code. On an explicitly delegated PR, remove `needs-human` before
-   repairing so the reviewer can review the next head. Retain its designation
-   label and leave the `in-review` transition to the reviewer.
+6. For PR handoff or review feedback, first complete the read-only gate in
+   [feedback-authority.md](references/feedback-authority.md). Require an open
+   PR with verified developer provenance or a current owner-authorized
+   designation label. Classify the authorized work as repair, clean handoff,
+   blocked, or no-op before changing labels, reactions, branches, or files.
+7. Only for an authorized repair, remove `needs-human` from either eligible
+   PR type: verified developer-origin or explicitly designated. Verify its
+   removal before repairing so the published head remains review-eligible.
+   Retain any designation label and leave
+   `in-review` to the reviewer. A clean handoff follows the reviewer-owned
+   transition below; it does not reopen the PR for repair.
 
 ## Acknowledge work
 
-After the selected issue or PR passes the authorization checks above, add an
+After the selected issue or PR passes the authorization checks above and has
+authorized actionable work (repair or clean handoff for a PR), add an
 👀 (`eyes`) reaction to its opening post before implementation or feedback
 handling. Use the repository and issue or PR number fetched through GitHub:
 
@@ -135,15 +138,19 @@ do not allow a failed parser inside a shell pipeline to silently skip deletion.
 ## Implement
 
 1. Read repository guidance, the entire issue, and current working state. Before editing, list open PRs and check for an existing implementation of the selected issue. If an owner PR already covers the scope, avoid creating a duplicate; apply PR handoff authorization before touching it. If it is neither developer-origin nor designated, report the overlap on the selected issue and request designation of the existing PR rather than taking it over.
-2. Create `codex/issue-<number>-<slug>`, implement the accepted scope, and run
-   relevant checks. If the existing checkout is dirty or belongs to another task,
-   preserve it and create a separate worktree from the fetched default branch;
-   never discard or commit unrelated local changes.
+2. Inspect the checkout and local branch history before creating
+   `codex/issue-<number>-<slug>`. Preserve dirty checkouts, branches belonging to
+   other tasks, and local-only commits; use a separate worktree from the fetched
+   default branch when any are present. Reuse an existing task branch only when
+   its ownership and scoped contents are established. Read and follow
+   [verification.md](references/verification.md) for acceptance, test-first
+   implementation, local verification, and final-commit CI.
 3. Commit only the scoped files and push the branch before creating the PR.
    After any commit hook or formatter runs, re-check `git status --short` and
    `git rev-parse HEAD`; a hook can rewrite files or alter the commit content.
-   Confirm the pushed remote branch contains that exact SHA before using it in
-   the PR body.
+   If hooks changed the verified content, repeat the affected verification.
+   Confirm the pushed remote branch equals that exact verified SHA before using
+   it in the PR body.
 4. Immediately before creating the PR, re-fetch the issue and all its comments.
    Reconcile updates using the issue-selection rules above and address them in
    the implementation and PR. Run relevant checks and commit and push any
@@ -153,13 +160,13 @@ do not allow a failed parser inside a shell pipeline to silently skip deletion.
    executing body text through command substitution. Its body starts with
    the developer origin marker and includes the exact issue marker
    `<!-- hermes-issue: OWNER/REPO#NUMBER -->` for the original issue, plus a
-   link to the issue, acceptance evidence, checks, risks, and the current head SHA.
+   link to the issue, criterion-by-criterion acceptance evidence, observed
+   red/green commands and results where applicable, final local checks,
+   verification gaps, risks, and the current head SHA. Report CI as pending
+   until the final-commit CI gate has passed.
    Leave the `in-review` transition on the issue and PR to the reviewer.
-6. Verify the PR exists and links the issue.
-   Query PR review/comments metadata separately from CI state, and use
-   `gh-app --repo OWNER/REPO -- run list --repo OWNER/REPO --commit HEAD_SHA` for the current check
-   evidence; optional GraphQL status fields can make an otherwise useful
-   multi-field PR query fail. Then replace the authenticated account's 👀
+6. Verify the PR exists and links the issue. Complete the final-commit CI gate
+   in [verification.md](references/verification.md), then replace the authenticated account's 👀
    reaction on the issue's opening post with 🚀 (`rocket`):
 
    ```sh
@@ -172,62 +179,44 @@ do not allow a failed parser inside a shell pipeline to silently skip deletion.
 
 ## Handle reviewer feedback
 
-Before editing, fetch the PR head branch and verify the checked-out commit equals the
-re-fetched `headRefOid`. Do not repair from a stale worktree: if a clean local branch
-diverges because the remote branch was force-pushed, reset it to the fetched remote
-head; if it is not clean, preserve it and use a separate worktree at the current PR
-head. This prevents overwriting intervening author changes or reviewing the wrong
-revision.
+Read and follow [verification.md](references/verification.md) for every repair
+and before completing human handoff, including handoffs requiring no new commit.
 
-For a delegated PR with an existing non-Codex head branch, keep the existing PR
-rather than opening a replacement. Fetch `pull/NUMBER/head`, create a local
-`codex/issue-<number>-<slug>` branch or worktree at that commit, and verify it
-matches the re-fetched PR head. If no linked issue exists, use the PR number in
-the local branch name and report that there is no linked issue. Push the repair
-with an explicit refspec, `git-app --repo OWNER/REPO -- -c credential.helper= push origin HEAD:refs/heads/HEAD_BRANCH`, using
-the head branch fetched from GitHub; do not rename the remote branch or use
-force-push. Verify `git-app --repo OWNER/REPO -- -c credential.helper= ls-remote origin refs/heads/HEAD_BRANCH` and the PR's
-`headRefOid` equal the local commit, because a differently named local branch
-must still update the original PR. Report both branch names when they differ.
+The read-only feedback gate in **Select work** must already have passed.
+For an authorized repair, follow
+[pr-workspace.md](references/pr-workspace.md) before checkout, editing, or push.
+It owns preservation of local work and the actual head-repository destination.
+Clean handoff requires no checkout changes.
 
-1. Stop when the PR is neither developer-origin nor designated by `ready-for-agent`. Otherwise fetch
-   submitted reviews (`GET repos/OWNER/REPO/pulls/NUMBER/reviews`), PR issue
-   comments (`GET repos/OWNER/REPO/issues/NUMBER/comments`), and all open
-   review threads before judging feedback. Read review bodies as well as thread
-   comments: reviewer workflow markers can be posted in a submitted review,
-   not only as an inline or issue comment. A current reviewer marker identifies
-   reviewer workflow feedback; feedback without that marker is also handled.
-2. A `state=changes-requested` marker or an unresolved review comment starts
-   one repair round. First reconcile feedback with the current head and later
+1. Use the fetched feedback and classification from the gate. Read all current
+   feedback before editing and reconcile later authorized decisions with the
+   current head. Only results from the verified reviewer App count as reviewer
+   workflow markers; authorized human requests need no marker.
+2. A verified reviewer `state=changes-requested` marker, an authorized unresolved
+   review comment, or a concrete authorized request in a submitted review body
+   starts one repair round. This includes general `COMMENT` reviews.
+   First reconcile feedback with the current head and later
    reviews: do not repeat a correction already implemented merely because an
    older thread remains unresolved. If a current-head clean summary says the
    findings are addressed but threads remain open, use the blocked-handoff
    procedure below rather than making a duplicate repair commit.
-   Retain any reviewer-set `in-review` label, implement corrections
-   within the PR's stated scope, run checks, and push one updated head SHA.
-   A current PR review comment may override or extend that scope when it
-   communicates a concrete requested change, even if it is phrased
-   conditionally rather than as a formal directive. Treat that comment as the
-   PR's authoritative scope for the repair round; no issue edit, special
-   wording, or separate approval is required. Preserve the exact requested
-   boundaries, read all current feedback first, and do not infer
-   unrelated changes. Only stop for a genuine ambiguity or contradiction in
-   the concrete requested changes; do not reject a comment merely because it
-   is conditional or does not expressly say “authoritative scope change.”
-   After pushing, re-fetch the PR to record its new head SHA and use
-   `gh-app --repo OWNER/REPO -- run list --repo OWNER/REPO --commit HEAD_SHA` to report the CI state.
-   When CI is already running and can finish within the session, wait with
-   `gh-app --repo OWNER/REPO -- run watch RUN_ID --repo OWNER/REPO --exit-status`, then re-query runs
-   for that SHA. Update recorded CI evidence after completion; an earlier
-   in-progress snapshot is not the final check result. Keep CI success separate
-   from independent reviewer approval, which must name the new head SHA.
+   Retain any reviewer-set `in-review` label, implement the accepted corrections,
+   run checks, and push one updated head SHA using the workspace reference.
+   Maintainer requests may revise scope under the feedback-authority rules;
+   configured reviewer App requests stay within the accepted scope. Preserve
+   the exact authorized boundaries and read all current feedback first.
+   Stop affected work for a genuine unresolved
+   ambiguity or contradiction, preserving decisions already supplied.
+   Complete the final-commit CI gate for the published repair. Independent
+   reviewer approval must separately name the new head SHA.
    Re-read the PR body and update it through a temporary Markdown file and
    `gh-app --repo OWNER/REPO -- pr edit --body-file` when its head SHA, stated scope, acceptance
    evidence, checks, or risks no longer describes the repaired revision; then
    preserve both origin and original-issue markers and read back the PR to verify
    the body and labels. Do not treat a reviewer
    marker for the previous SHA as a result for the repair; wait for feedback
-   on the new head.
+   on the new head. Every repair handover includes the PR URL, verified and
+   published SHA, current CI evidence, and any remaining verification gaps.
 3. A `state=clean` marker is valid only when it names the current head SHA and
    there are no unresolved review threads, including human feedback. Fetch all
    thread pages and inspect `isResolved`; a review summary saying findings are
@@ -246,7 +235,8 @@ must still update the original PR. Report both branch names when they differ.
    developer-origin PR, read the original issue identity
    from its `<!-- hermes-issue: OWNER/REPO#NUMBER -->` marker; for older PRs,
    use an unambiguous linked issue only. Fetch that issue through GitHub and
-   identify its author from `user.login`. Assign that user to the PR with
+   identify its author from `user.login`. Complete the final-commit CI gate
+   before assigning that user to the PR with
    `gh-app --repo OWNER/REPO -- pr edit NUMBER --add-assignee USER`, preserving
    existing assignees. Re-fetch the PR and verify both `needs-human` and the
    author's assignment. If the issue or author is missing or ambiguous, or

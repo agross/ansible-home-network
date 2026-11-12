@@ -83,7 +83,7 @@ hermes_profile:
       webhook:
         secret: "{{ vault_hermes_profile.developer.github.webhook.secret }}"
       app:
-        slug: developer
+        slug: agross-developer
         client_id: "{{ vault_hermes_profile.developer.github.app.client_id }}"
         installation_ids: "{{ vault_hermes_profile.developer.github.app.installation_ids }}"
 
@@ -92,7 +92,7 @@ hermes_profile:
       webhook:
         secret: "{{ vault_hermes_profile.reviewer.github.webhook.secret }}"
       app:
-        slug: reviewer
+        slug: agross-reviewer
         client_id: "{{ vault_hermes_profile.reviewer.github.app.client_id }}"
         installation_ids: "{{ vault_hermes_profile.reviewer.github.app.installation_ids }}"
 

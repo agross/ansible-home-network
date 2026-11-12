@@ -1,0 +1,18 @@
+[
+  {"name": "head_change_stops_stale_session", "outcomes": ["stale_head"], "reviews": 0, "resolved": [], "restarts": 0},
+  {"name": "head_change_after_publication_stops_handoff", "outcomes": ["stale_head"], "reviews": 1, "resolved": [], "restarts": 0},
+  {"name": "target_tip_advance_keeps_same_comparison", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0},
+  {"name": "merge_base_change_reassesses_once", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 1},
+  {"name": "merge_base_churn_stops_after_two_restarts", "outcomes": ["blocked"], "reviews": 0, "resolved": [], "restarts": 2},
+  {"name": "verified_app_and_human_threads_are_resolved", "outcomes": ["complete"], "reviews": 1, "resolved": ["APP_THREAD", "HUMAN_THREAD"], "restarts": 0},
+  {"name": "unfixed_human_thread_stays_actionable", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0, "verdict": "changes-requested"},
+  {"name": "existing_marker_recovers_missing_finalization", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0},
+  {"name": "completed_marker_is_idempotent", "outcomes": ["already_complete", "complete"], "reviews": 1, "resolved": [], "restarts": 0},
+  {"name": "concurrent_result_prevents_duplicate_comments", "outcomes": ["already_complete", "complete"], "reviews": 1, "resolved": [], "restarts": 0, "verdict": "changes-requested"},
+  {"name": "new_findings_publish_one_pinned_batch", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0, "verdict": "changes-requested"},
+  {"name": "accepted_but_ambiguous_publication_is_reconciled", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0},
+  {"name": "published_marker_recovers_after_label_failure", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0},
+  {"name": "configured_app_identity_mismatch_blocks_before_writes", "outcomes": ["blocked"], "reviews": 0, "resolved": [], "restarts": 0},
+  {"name": "renovate_pr_without_designation_is_reviewed", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0, "non_developer": true},
+  {"name": "renovate_findings_publish_without_developer_delegation", "outcomes": ["complete"], "reviews": 1, "resolved": [], "restarts": 0, "verdict": "changes-requested", "non_developer": true}
+]

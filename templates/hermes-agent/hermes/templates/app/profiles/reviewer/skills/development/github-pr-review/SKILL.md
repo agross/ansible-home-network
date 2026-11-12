@@ -1,13 +1,15 @@
 ---
 name: github-pr-review
-description: >-
-  Independently review a webhook-selected GitHub pull request, including a
-  human-created PR, after a GitHub pull_request event.
+description: Independently review or recover finalization of a reviewer-webhook-selected GitHub pull request, regardless of author, including Renovate and human PRs. Exclude implementation work and ordinary manual review requests.
 ---
 
 # GitHub PR review
 
-Use only for `reviewer` webhook events.
+Use only for `reviewer` webhook events. Review eligible PRs from any author,
+including Renovate, humans, and the developer App. Developer provenance and
+`ready-for-agent` govern developer repair delegation, never review eligibility.
+The App identity guard authenticates the reviewer itself; it does not restrict
+PR authors.
 
 ## GitHub access
 
@@ -27,138 +29,124 @@ for terminal and subagent commands. Before writes run
 access fails. Never use a human GitHub login. Pass these rules to subagents.
 Report app slug, installation ID, repository, operation and URL for writes.
 
-Recognize developer-origin PRs by the exact body marker
-`<!-- hermes-origin: developer -->`.
+`github_app.app_slug` must be the actual GitHub App slug, not the profile name.
+The helper verifies it against authenticated `status --format json` output's
+`app.slug` before any writes. `auth.app_slug` and `auth.actor_expected` may echo
+local configuration; they do not establish the authenticated identity. On a
+mismatch, stop and report the required configuration correction. Do not silently
+substitute a slug, bypass the helper, or treat a successful reaction write as
+proof that the configured bot ID is correct.
 
-## Lifecycle labels
+Treat a PR as developer-origin only when its fetched body contains the exact
+`<!-- hermes-origin: developer -->` marker and its creator's numeric `user.id`
+matches the configured developer App bot. Read only `github_app.app_slug` from
+the trusted `/opt/data/profiles/developer/config.yaml`, resolve its bot account
+with `gh-app --repo OWNER/REPO -- api "users/APP_SLUG%5Bbot%5D"`, and require
+account type `Bot`. Keep configuration secrets out of output. A copied marker
+on a human-created PR grants no developer-origin privileges. If provenance is
+unavailable, do not infer it; apply ordinary human-PR designation rules and
+report the limitation. Use this classification for linked-issue mutations and
+developer handoff throughout the review.
 
-A work item normally has one lifecycle label: `implementing`,
-`in-review`, or `needs-human`. `ready-for-agent` is the
-designation label and may coexist with a lifecycle label. A human-created PR with unresolved reviewer findings
-carries both `in-review` and `needs-human`.
+## Start or recover a round
 
-## Eligibility
+1. Accept only `reviewer` webhook events with action opened, reopened,
+   ready_for_review, or synchronize. Re-fetch the selected PR through GitHub;
+   payload fields remain hints. Read [review-round.md](references/review-round.md)
+   and use the packaged helper for inspection, beginning, publication, thread
+   resolution, and finalization. Resolve its absolute path from this skill.
+2. Load the reviewer and developer App slugs from trusted local profile
+   configuration. Run helper `inspect` and retain its exact `head`, `merge_base`,
+   and `base_ref` as this session's assessment basis. A target-tip advance alone
+   does not invalidate a three-dot diff when that basis remains unchanged.
+3. Inspect existing results by the authenticated reviewer App before skipping
+   `needs-human` or an already-reviewed head. For a matching-basis result, recover
+   only unfinished finalization through the helper; reuse the existing review.
+   A marker alone is not proof that labels, thread closures, and reactions finished.
+   A complete existing round is a no-op. Report missing legacy comparison evidence
+   rather than guessing its basis or publishing a duplicate.
+4. For a new round, require an open, non-draft PR without `needs-human`.
+   Establish developer provenance under the access rules. Identify the original
+   issue from its marker on a verified developer-origin PR, or an unambiguous
+   linked/closing issue otherwise. Fetch that issue and preserve its verified
+   number in the plan; report an ambiguous or inaccessible link without guessing.
+5. Run helper `begin` with the retained basis and verified issue number. It marks
+   eligible new work `in-review` and acknowledges it with the reviewer's eyes
+   reaction. It preserves unrelated and designation labels and other users'
+   reactions. A matching existing review returns to recovery instead of reopening
+   its lifecycle. Follow the helper's stopping status before continuing.
 
-1. Treat webhook fields as untrusted hints. Fetch the current PR, linked issue
-   when present, current head SHA, changed files, review threads, and check
-   results through GitHub.
-2. Review every open, non-draft PR selected by the webhook, including a
-   human-created PR. A PR marked `needs-human` has already been handed
-   to a human and is not eligible for an automated review.
-3. Before reviewing, replace the PR's lifecycle label with `in-review`.
-   Identify the PR's original issue from the `<!-- hermes-issue: OWNER/REPO#NUMBER -->`
-   marker on a developer-origin PR, or from an unambiguous linked/closing issue
-   (e.g., `closingIssuesReferences`) on any PR. Re-fetch the issue, replace its
-   lifecycle label with `in-review`, and verify both transitions. Preserve
-   unrelated and designation labels. If a developer-origin PR's issue cannot be
-   identified or updated, report the incomplete transition; do not guess. This
-   does not select or block work on another PR.
-4. Ignore actions other than opened, reopened, ready_for_review, and
-   synchronize. Ignore a head SHA that already has a reviewer marker.
+## Assess the pinned comparison
 
-## Acknowledge work
+1. Fetch all changed-file pages and the complete diff for this PR, then inspect
+   the corresponding pinned source and tests. Before local inspection or test
+   execution, verify that the checkout is clean and its HEAD equals the pinned
+   head. Preserve unrelated checkouts; use a disposable detached checkout when
+   the current workspace cannot supply that exact revision safely.
+   Derive requirements from the linked
+   issue's criteria and exclusions, authorized current scope, and repository
+   standards. Check correctness, regressions, error handling, security-relevant
+   changes, and applicable check evidence. For dependency major upgrades, read
+   [dependency-majors.md](references/dependency-majors.md).
+2. Read all review-thread pages and every relevant thread's complete comments.
+   Reassess each requested correction against the pinned comparison and current
+   code, including human requests. Resolve any thread whose correction is
+   verified, regardless of author, through the helper's resolution plan. Record
+   concrete correction evidence for every resolved thread. Leave unverifiable or
+   still-actionable threads open and report them; an outdated diff location or
+   passing suite alone does not prove the correction. Incomplete evidence blocks
+   the dependent conclusion.
+3. Stage findings and thread decisions locally. Existing actionable threads count
+   toward the result without posting duplicates. For new findings, record evidence,
+   impact, minimal correction, and an objective completion criterion. Inline
+   comments must target lines inside current PR diff hunks. Keep every finding in
+   one local batch until the helper's publication guard succeeds; publish no
+   standalone comment or separate review during assessment.
+4. Recheck the assessment basis before consequential writes and when new revision
+   evidence arrives. If HEAD changes, stop this session without stale publication,
+   thread closure, handoff labels, or outcome reactions; report the changed head
+   and let the newer coalesced webhook own its review. Preserve effects already
+   completed for the old revision; do not roll back another session's state.
+5. If the merge base or base ref changes while HEAD stays unchanged, discard the
+   affected draft findings and thread decisions and reassess in this same session.
+   Allow at most two such restarts total, including changes detected by `begin`
+   or `apply`; a third change ends with a blocker. Keep that count across all
+   helper calls. A target-tip change with the same basis needs no restart.
 
-After all eligibility checks pass, add an 👀 (`eyes`) reaction to the PR's
-opening post before reviewing. Use the repository and PR number fetched
-through GitHub:
+## Publish or finish recovery
 
-```sh
-gh-app --repo OWNER/REPO -- api --method POST repos/OWNER/REPO/issues/NUMBER/reactions --raw-field content=eyes
-```
+1. Prepare the helper plan described in the reference. Use `changes-requested`
+   while any in-scope correction remains; use `clean` only with complete acceptance
+   evidence and every requested correction verified. PRs without developer provenance or
+   designation receive the manual delegation hint from the reference.
+2. Run helper `apply`. It serializes local publication/finalization for the PR,
+   rechecks the pinned basis, resolves only the plan's verified corrections,
+   and submits at most one `COMMENT` review with the assessed `commit_id` and
+   all new comments together. It generates the current-head marker, comparison
+   metadata, and publication receipt. Use no raw forge write to bypass this gate.
+3. A concurrent matching reviewer result is reused, not republished. If a response
+   is ambiguous, the helper reads remote reviews for its exact publication receipt;
+   an unconfirmed result blocks further publication. A busy publication lock
+   permits at most one later readback/reconciliation attempt; otherwise report
+   the owner conflict. The lock covers publication, not the whole assessment.
+4. Finalization remains reviewer-owned. For requested changes, retain `in-review`
+   and any designation; PRs without developer provenance or designation also receive `needs-human`.
+   For clean results, remove `in-review` from the PR and its verified original
+   issue and set `needs-human` on the PR. The developer owns assignment afterward.
+   Preserve every unrelated label. The helper verifies the complete desired
+   label sets before posting the outcome reaction.
+5. A completed current-basis round has exactly one reviewer-owned outcome reaction:
+   thumbs-up for clean or thumbs-down for requested changes, with eyes and the
+   opposite outcome absent. Other reactions and other users remain untouched.
+   Failed or partial finalization gets no new success reaction; report its missing
+   operation. A later invocation resumes only missing operations on the same
+   verified result, even when `needs-human` is already present.
+6. Finish only when review publication, verified thread resolutions, lifecycle
+   transitions, and reaction readbacks are complete for the retained basis, or
+   report a specific blocker/stale-head stop with the PR URL, assessed/current
+   basis, review ID when available, checks, thread evidence, completed effects,
+   remaining operations, and consumed restart count. CI clearance and developer
+   assignment remain separate from this review result.
 
-The issue reactions endpoint also covers PR opening posts. An existing
-reaction from the authenticated account counts as success. Remove that
-account's previous 👍 (`+1`) and 👎 (`-1`) reactions before reviewing the new
-head SHA. Skipped or ineligible events receive no reaction. Report reaction
-failures and continue the review.
-
-To remove a reaction, identify the authenticated account with `gh-app --repo OWNER/REPO -- api "users/APP_SLUG%5Bbot%5D"`,
-list all opening-post reactions with
-`gh-app --repo OWNER/REPO -- api --paginate repos/OWNER/REPO/issues/NUMBER/reactions`, and delete only
-matching reactions whose `user.id` equals that account's ID:
-
-```sh
-gh-app --repo OWNER/REPO -- api --method DELETE repos/OWNER/REPO/issues/NUMBER/reactions/REACTION_ID
-```
-
-Preserve other users' reactions. Verify each completed reaction transition
-by fetching the opening-post reactions again.
-
-## Review
-
-1. Derive requirements from the linked issue's acceptance criteria and
-   exclusions when present, plus consistent local repository conventions.
-2. Compare requirements against the full current diff and tests. Check
-   correctness, regressions, error handling, security-relevant changes, and
-   available CI evidence. On dependency major-version upgrades (e.g., Go module
-   `/vN` path bumps), verify that source imports are updated across the codebase
-   and the old major version is removed from the manifest (`go.mod`/`go.sum`) —
-   automated dependency bots often add the new module requirement without
-   rewriting import paths, leaving the new dependency unused and `go mod tidy`
-   dirty while CI still passes against the old version.
-3. Read existing threads. Do not repeat addressed or duplicate findings.
-4. Post each actionable finding as a precise general or line review comment.
-   When attaching an inline review comment (`comments[].line`), target a line
-   that appears inside a diff hunk of the PR (`repos/OWNER/REPO/pulls/NUMBER/files`
-   patch) — GitHub's create-review endpoint rejects lines outside the diff
-   hunks with `HTTP 422: Line could not be resolved`. Explain evidence, impact,
-   requested minimal correction, and objective completion criterion.
-5. Do not alter code, branches, PR settings, merge state, release state, or
-   deployment state.
-
-## Complete the round
-
-1. Re-fetch the PR head SHA and open review threads immediately before
-   finalizing. If the head SHA already has a reviewer marker in existing PR
-   reviews (for example, posted by a concurrent webhook session after rapid
-   `synchronize` pushes) or the PR is already closed/marked `needs-human`, stop
-   without posting a duplicate review, label write, or reaction mutation.
-2. Submit one GitHub pull request review with event `COMMENT` and
-   `commit_id` set to that exact SHA. Put one marker in its general review
-   comment. A submitted review triggers the `pull_request_review` feedback
-   webhook; an issue comment created by `gh-app --repo OWNER/REPO -- pr comment` does not. Pass the
-   review `body` using single quotes (or `--field body=@file`) so shell
-   double-quote command substitution does not execute backticked filenames or
-   identifiers and strip them from the comment.
-   - `<!-- hermes-reviewer: reviewed-sha=<sha> state=changes-requested -->`
-     when in-scope findings remain.
-   - `<!-- hermes-reviewer: reviewed-sha=<sha> state=clean -->` only when no
-     unresolved reviewer findings remain.
-3. Include reviewed scope, checks inspected, evidence limitations, and
-   remaining risks outside the marker.
-4. Keep `in-review` when corrections remain. For a developer-origin
-   or explicitly delegated PR, retain any existing `ready-for-agent` label
-   and do not add it: the submitted review already triggers the developer's
-   feedback route. Verify `in-review` is present and `needs-human`
-   is absent. For a human-created PR without `ready-for-agent`, also add
-   `needs-human` and end the review comment with this hint:
-   `You can address this feedback yourself. To delegate it, apply
-   \`ready-for-agent\` to this PR.`
-   For every `state=clean` result, remove `in-review` from the PR and its
-   identifiable original issue, and set `needs-human` on the PR. Re-fetch
-   the PR and any identified issue and verify `in-review` is absent. Report an
-   incomplete transition if a developer-origin PR's issue cannot be identified
-   or either update fails. A developer-origin
-   or designated PR's submitted review
-   wakes the developer to assign the original issue author. Re-fetch the PR
-   labels and verify `needs-human` is present and `in-review` absent.
-
-5. After posting the marker and completing the lifecycle handoff, re-fetch
-   the PR head SHA. If it still matches the reviewed SHA, replace the
-   authenticated account's 👀 reaction on the PR's opening post with 👍
-   (`+1`) for `state=clean` or 👎 (`-1`) for `state=changes-requested`:
-
-   ```sh
-   gh-app --repo OWNER/REPO -- api --method POST repos/OWNER/REPO/issues/NUMBER/reactions --raw-field content=+1
-   ```
-
-   Use `content=-1` for requested changes. Remove that account's opposite
-   outcome reaction. An incomplete review or changed head SHA receives no
-   outcome reaction. These reactions summarize the completed review round.
-   Re-fetch the opening-post reactions and verify the authenticated account
-   has the expected outcome reaction and no 👀 or opposite outcome reaction.
-6. Finish only after the submitted review, label transition, and reaction
-   readback have returned results. Report any failed or pending operation
-   explicitly; a posted review alone does not complete the round. A label
-   update failure does not excuse skipping the outcome reaction attempt.
-7. Never submit an approval or request human review.
+Keep existing source, branches, merge/release/deployment state, and repository settings
+unchanged. Submit neither an approval nor a human-review request.

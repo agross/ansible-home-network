@@ -1,0 +1,6 @@
+{
+  "format": "sevro.runtime.v1",
+  "environment": {
+    "inherit": ["PATH"]
+  }
+}
