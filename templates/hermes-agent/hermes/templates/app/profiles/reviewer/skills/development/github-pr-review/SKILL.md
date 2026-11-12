@@ -1,52 +1,18 @@
 ---
 name: github-pr-review
-description: Independently review or recover finalization of a reviewer-webhook-selected GitHub pull request, regardless of author, including Renovate and human PRs. Exclude implementation work and ordinary manual review requests.
+description: Review a GitHub PR selected by the reviewer webhook or recover its unfinished finalization. Includes all PR authors; excludes implementation and ordinary manual review requests.
 ---
 
 # GitHub PR review
 
-Use only for `reviewer` webhook events. Review eligible PRs from any author,
-including Renovate, humans, and the developer App. Developer provenance and
-`ready-for-agent` govern developer repair delegation, never review eligibility.
-The App identity guard authenticates the reviewer itself; it does not restrict
-PR authors.
+Use only for `reviewer` webhook events, regardless of PR author. Developer
+provenance and `ready-for-agent` govern repair delegation, not review eligibility.
 
 ## GitHub access
 
-For every GitHub command, use `gh-app --repo OWNER/REPO --` before the
-`gh` arguments. Notice that `gh-app`'s `--repo` flag only selects the GitHub App
-installation token and is stripped before invoking `gh`: when running `gh pr` or
-`gh issue` subcommands from outside a git checkout, also pass `--repo OWNER/REPO`
-after `--` (e.g., `gh-app --repo OWNER/REPO -- pr view NUMBER --repo OWNER/REPO`),
-or use `gh-app --repo OWNER/REPO -- api repos/OWNER/REPO/...`.
-Use `git-app --repo OWNER/REPO -- -c credential.helper=` for
-GitHub clone and fetch over HTTPS. When removing a temporary clone directory in
-`$TMPDIR`, `cd` back to the workspace first so the persistent shell's working
-directory does not remain inside a deleted directory.
-Set `HERMES_HOME=/opt/data/profiles/reviewer`
-for terminal and subagent commands. Before writes run
-`hermes-github-app status --repo OWNER/REPO`; stop if identity or repository
-access fails. Never use a human GitHub login. Pass these rules to subagents.
-Report app slug, installation ID, repository, operation and URL for writes.
-
-`github_app.app_slug` must be the actual GitHub App slug, not the profile name.
-The helper verifies it against authenticated `status --format json` output's
-`app.slug` before any writes. `auth.app_slug` and `auth.actor_expected` may echo
-local configuration; they do not establish the authenticated identity. On a
-mismatch, stop and report the required configuration correction. Do not silently
-substitute a slug, bypass the helper, or treat a successful reaction write as
-proof that the configured bot ID is correct.
-
-Treat a PR as developer-origin only when its fetched body contains the exact
-`<!-- hermes-origin: developer -->` marker and its creator's numeric `user.id`
-matches the configured developer App bot. Read only `github_app.app_slug` from
-the trusted `/opt/data/profiles/developer/config.yaml`, resolve its bot account
-with `gh-app --repo OWNER/REPO -- api "users/APP_SLUG%5Bbot%5D"`, and require
-account type `Bot`. Keep configuration secrets out of output. A copied marker
-on a human-created PR grants no developer-origin privileges. If provenance is
-unavailable, do not infer it; apply ordinary human-PR designation rules and
-report the limitation. Use this classification for linked-issue mutations and
-developer handoff throughout the review.
+Read [github-access.md](references/github-access.md) before GitHub commands. It
+owns App authentication, wrappers, checkout cleanup, and developer provenance.
+Apply its provenance check before linked-issue mutations or developer delegation.
 
 ## Start or recover a round
 
@@ -148,5 +114,5 @@ developer handoff throughout the review.
    remaining operations, and consumed restart count. CI clearance and developer
    assignment remain separate from this review result.
 
-Keep existing source, branches, merge/release/deployment state, and repository settings
-unchanged. Submit neither an approval nor a human-review request.
+Keep existing source, branches, merge/release/deployment state, and repository
+settings unchanged. Submit only `COMMENT` reviews; request no human review.

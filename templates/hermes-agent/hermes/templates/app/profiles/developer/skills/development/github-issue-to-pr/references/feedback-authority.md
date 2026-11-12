@@ -30,9 +30,9 @@ Verify relevant feedback under the rules below, then select one outcome:
 - Repair: a concrete authorized request remains unimplemented, including one
   in a submitted general `COMMENT` review or a verified changes-requested result.
 - Clean handoff: the verified reviewer App reports clean for the current head;
-  apply the parent skill's CI, thread-resolution, and lifecycle prerequisites.
+  apply [pr-feedback.md](pr-feedback.md) for CI, thread closure, and lifecycle prerequisites.
 - Blocked: verified actionable work has an unresolved scope conflict or required
-  evidence gap. Only the parent's authorized blocker procedure may mutate state;
+  evidence gap. Only the blocker procedure in [pr-feedback.md](pr-feedback.md) may mutate state;
   unavailable author verification permits a report only, without external writes.
 - No-op: the event is unauthorized, informational, or requests only corrections
   already present, with no current clean handoff to complete. Leave labels,
@@ -83,4 +83,4 @@ Reconcile authorized requests with the current code, accepted scope, and later
 authorized decisions before editing. Informational feedback and already-satisfied
 requests require no repair. Keep genuine unresolved conflicts explicit and ask
 only for the remaining decision. A verified reviewer marker must also satisfy
-the parent skill's current-head and thread-resolution checks before handoff.
+[pr-feedback.md](pr-feedback.md) current-head and thread-resolution checks before handoff.
