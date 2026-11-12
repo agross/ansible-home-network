@@ -6,3 +6,11 @@ After=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/dyndns-updater
+StateDirectory=dyndns-updater
+StateDirectoryMode=0700
+UMask=0077
+
+# If it doesn't finish in 2 minutes, stop it.
+TimeoutStartSec=2min
+# If it doesn't stop in 10 seconds, kill it.
+TimeoutStopSec=10s
