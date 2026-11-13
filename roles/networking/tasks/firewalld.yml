@@ -93,8 +93,15 @@
   notify: Reload firewalld
 
 - name: Copy policies
+  when: item.state in ["file", "link"]
   ansible.builtin.template:
-    src: "{{ item.src }}"
+    src: >-
+      {{
+        item.src if item.state == 'file' else
+        [item.root, item.path | ansible.builtin.dirname, item.src] |
+        ansible.builtin.path_join |
+        ansible.builtin.realpath
+      }}
     dest: >-
       /etc/firewalld/policies/{{
         item.path |
@@ -104,7 +111,6 @@
     owner: 0
     group: 0
     mode: "644"
-  when: item.state == "file"
   loop: >-
     {{
       lookup("community.general.filetree",
