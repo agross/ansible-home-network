@@ -51,7 +51,13 @@
 
 - name: Copy non-template files
   ansible.builtin.copy:
-    src: "{{ item.src }}"
+    src: >-
+      {{
+        item.src if item.state == 'file' else
+        [item.root, item.path | ansible.builtin.dirname, item.src] |
+        ansible.builtin.path_join |
+        ansible.builtin.realpath
+      }}
     dest: "{{ target }}/{{ settings.rename | default(item.path) }}"
     force: "{{ settings.force | default(omit) }}"
     owner: "{{ settings.owner | default(omit) }}"
@@ -83,7 +89,7 @@
       lookup('community.general.filetree',
              directory,
              wantlist = true) |
-      selectattr('state', 'eq', 'file') |
+      selectattr('state', 'in', ['file', 'link']) |
       rejectattr('path', 'ansible.builtin.search', '\.j2$') |
       rejectattr('path', 'ansible.builtin.search', '/\.gitignore$')
     }}
@@ -93,7 +99,13 @@
 
 - name: Copy template files
   ansible.builtin.template:
-    src: "{{ item.src }}"
+    src: >-
+      {{
+        item.src if item.state == 'file' else
+        [item.root, item.path | ansible.builtin.dirname, item.src] |
+        ansible.builtin.path_join |
+        ansible.builtin.realpath
+      }}
     dest: >-
       {{
         target
@@ -134,7 +146,7 @@
       lookup('community.general.filetree',
              directory,
              wantlist = true) |
-      selectattr('state', 'eq', 'file') |
+      selectattr('state', 'in', ['file', 'link']) |
       selectattr('path', 'ansible.builtin.search', '\.j2$') |
       rejectattr('path', 'ansible.builtin.search', '/\.gitignore$')
     }}
