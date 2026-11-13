@@ -97,6 +97,10 @@
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
         mode: "600"
+      app/profiles/*/scripts/*:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "600"
       app/profiles/*/skills/**/*:
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"

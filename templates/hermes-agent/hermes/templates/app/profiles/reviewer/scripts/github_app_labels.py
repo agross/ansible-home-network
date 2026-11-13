@@ -1,0 +1,1 @@
+../../developer/scripts/github_app_labels.py

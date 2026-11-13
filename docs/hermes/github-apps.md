@@ -71,6 +71,54 @@ The reviewer route handles `opened`, `reopened`, `ready_for_review`, and
 PR conversation comment alone does not trigger the developer route. Each route
 also filters on its configured installation IDs.
 
+Both routes also accept `installation.created` and
+`installation_repositories.added`. GitHub delivers these events to Apps
+automatically; they do not need an additional event subscription. The route's
+`github_webhook.py` entrypoint runs before agent dispatch. Its ordered
+`HANDLERS` list dispatches events to scripts. A handler returns `None` when the
+event does not apply, allowing the next handler to inspect it. The first
+handler returning a payload determines the result: `__hermes_ignore__: true`
+stops processing, while a normal payload continues to the route's skill.
+If no handler applies, the original payload continues to the skill.
+
+The label handler, `github_app_labels.py`, handles installation events using
+that profile's App credentials. It ensures these labels exist with the
+following colors and descriptions:
+
+| Label | Color | Description |
+| --- | --- | --- |
+| `implementing` | `29e884` | Agent implementation is in progress. |
+| `in-review` | `ededed` | Agent review and any required repairs are in progress. |
+| `needs-human` | `bf3c05` | Human input, a decision, or final approval is required. |
+| `ready-for-agent` | `aa46ed` | Authorized and ready for the developer agent to work on. |
+
+Provisioning updates both the color and description of existing managed labels.
+
+Initial installations provision the payload's repositories; installations with
+access to all repositories enumerate the installation's repositories with
+pagination. Later additions provision only `repositories_added`. Removal and
+deletion events are ignored. Provisioning is repeatable, leaves unrelated
+labels alone, and ends without starting an agent session. Existing issue and
+review events pass through the script unchanged.
+
+To add another script handler, deploy its module in each relevant profile's
+`scripts/` directory and register it in `github_webhook.py`. Extend the route's
+`events` and `filters` when admitting additional events; the dispatcher only
+sees events that pass those checks.
+
+The owner-to-installation-ID mapping must be configured before deliveries can
+be admitted. For a new account, add the installation ID to the appropriate
+profile's vault mapping, deploy, then redeliver the installation event from the
+GitHub App's recent deliveries. Existing installations can also redeliver an
+installation or repository-addition event to provision labels after rollout.
+The scripts are managed by Ansible in each profile's `scripts/` directory.
+
+Hermes allows 300 seconds for a route script. A failed or timed-out script is
+logged and acknowledged as ignored by Hermes, so GitHub will not automatically
+retry it. Inspect the gateway logs and redeliver after resolving the failure;
+already provisioned labels can safely be processed again. Large installations
+may need repository-addition deliveries in smaller batches to fit this limit.
+
 The apps' own webhooks do not require the repository **Webhooks** permission;
 that permission is for managing repository webhooks. Grant additional
 permissions only for explicitly needed work, such as editing GitHub Actions

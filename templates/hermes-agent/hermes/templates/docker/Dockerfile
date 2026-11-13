@@ -13,6 +13,9 @@ RUN apt-get update && \
     git -C /opt/hermes/plugins/github-app checkout --quiet "${HERMES_GITHUB_APP_REV}" && \
     /usr/bin/python3 -m venv /opt/github-app && \
     /opt/github-app/bin/pip install --no-cache-dir /opt/hermes/plugins/github-app && \
+    # Webhook scripts run with Hermes's interpreter, separate from gh-app.
+    /opt/github-app/bin/pip --python /opt/hermes/.venv/bin/python install --no-cache-dir PyYAML && \
+    /opt/hermes/.venv/bin/python -c "import yaml" && \
     /opt/github-app/bin/gh-app --help && \
     /opt/github-app/bin/git-app --help
 

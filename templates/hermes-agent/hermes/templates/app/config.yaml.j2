@@ -12,11 +12,16 @@ platforms:
   webhook:
     enabled: {{ hermes_webhooks_enabled | bool }}
     extra:
+      # Label provisioning can touch multiple repositories in one installation.
+      script_timeout_seconds: 300
       routes:
         developer-github:
           profile: developer
           secret: {{ hermes_profile.developer.github.webhook.secret }}
+          script: github_webhook.py
           events:
+            - installation
+            - installation_repositories
             - issues
             - pull_request
             - pull_request_review
@@ -32,6 +37,16 @@ platforms:
                 ansible.builtin.to_json
               }}
             - any:
+                - all:
+                    - field: event
+                      equals: installation
+                    - field: action
+                      equals: created
+                - all:
+                    - field: event
+                      equals: installation_repositories
+                    - field: action
+                      equals: added
                 - all:
                     - field: event
                       in: [issues, pull_request]
@@ -78,7 +93,10 @@ platforms:
         reviewer-github:
           profile: reviewer
           secret: {{ hermes_profile.reviewer.github.webhook.secret}}
+          script: github_webhook.py
           events:
+            - installation
+            - installation_repositories
             - pull_request
           filters:
             - field: installation.id
@@ -90,8 +108,22 @@ platforms:
                 list |
                 ansible.builtin.to_json
               }}
-            - field: action
-              in: [opened, reopened, ready_for_review, synchronize]
+            - any:
+                - all:
+                    - field: event
+                      equals: installation
+                    - field: action
+                      equals: created
+                - all:
+                    - field: event
+                      equals: installation_repositories
+                    - field: action
+                      equals: added
+                - all:
+                    - field: event
+                      equals: pull_request
+                    - field: action
+                      in: [opened, reopened, ready_for_review, synchronize]
           coalesce:
             key: "{repository.full_name}#{number}"
             window_seconds: 45
