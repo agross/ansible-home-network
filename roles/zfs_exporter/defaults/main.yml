@@ -1,4 +1,4 @@
 # renovate: github-releases=pdf/zfs_exporter
-zfs_exporter_release_version: v2.5.1
+zfs_exporter_release_version: v2.5.2
 
 zfs_exporter_service: "{{ ansible_role_name }}.service"
