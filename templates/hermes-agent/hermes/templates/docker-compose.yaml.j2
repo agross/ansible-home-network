@@ -83,7 +83,7 @@ services:
       # MCP_LOG_LEVEL: DEBUG
 
   kodi-tracker:
-    image: nousresearch/hermes-agent:v0.23.1
+    image: nousresearch/hermes-agent:v0.23.2
     entrypoint: [python3, -u]
     command: /opt/data/profiles/the-dude/skills/personal/kodi-music-summary/scripts/stream.py
     user: "{{ hermes_uid }}:{{ hermes_gid }}"
