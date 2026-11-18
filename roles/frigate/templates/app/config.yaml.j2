@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://demo.frigate.video/api/config/schema.json
 
-# https://docs.frigate.video/configuration/reference
+# https://docs.frigate.video/configuration/advanced/reference/
 # https://www.reddit.com/r/frigate_nvr/comments/1ak5j2q/
 
 # Frigate reformats this files to single-quoted strings during startup. Follow
@@ -39,7 +39,10 @@ review:
 objects:
   track:
     - person
-    - cat
+    - animal
+  filters:
+    person:
+      threshold: 0.6
 
 logger:
   default: info
