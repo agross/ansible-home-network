@@ -63,6 +63,23 @@
     mode: "644"
     notify_: Restart frigate service
 
+- name: Download matching YOLOv9 detector plugin
+  become: true
+  ansible.builtin.get_url:
+    url: >-
+      https://raw.githubusercontent.com/dbro/frigate-detector-edgetpu-yolo9/{{ frigate_yolov9_release_version
+      }}/edgetpu_tfl.py
+    dest: >-
+      {{
+        frigate_root
+      }}/app/model_cache/edgetpu_tfl-{{
+        frigate_yolov9_release_version
+      }}.py
+    owner: 0
+    group: 0
+    mode: "644"
+  notify: Restart frigate service
+
 - name: Update docker-compose images
   ansible.builtin.import_tasks:
     file: docker-compose-update.yml
