@@ -62,7 +62,6 @@ CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_FOWNER CAP_NET_RAW
 CapabilityBoundingSet={{ borgmatic_systemd_capabilities }}
 {% endif %}
 
-
 # Lower CPU and I/O priority.
 Nice=19
 CPUSchedulingPolicy=batch
@@ -84,3 +83,7 @@ ExecStart=/usr/bin/systemd-inhibit --who=borgmatic \
                                    --why="Prevent interrupting scheduled backup" \
                                    /usr/local/bin/borgmatic --verbosity -2 \
                                                             --syslog-verbosity 1
+
+{% if borgmatic_systemd_timeout_start_sec is defined %}
+TimeoutStartSec={{ borgmatic_systemd_timeout_start_sec }}
+{% endif %}
