@@ -6,12 +6,18 @@ services:
       dockerfile: Dockerfile
     command: gateway run
     restart: unless-stopped
+    network_mode: service:dind
+    depends_on:
+      dind:
+        condition: service_healthy
+        restart: true
     {% if hermes_browser_tools_enabled %}
     shm_size: {{ hermes_shm_size }}
     {% endif %}
     environment:
       PUID: {{ hermes_uid }}
       PGID: {{ hermes_gid }}
+      DOCKER_HOST: unix:///run/hermes-agent/docker.sock
 
       {% if hermes_dashboard_enabled %}
       HERMES_DASHBOARD: true
@@ -28,7 +34,7 @@ services:
       {% endif %}
     volumes:
       - ./app:/opt/data
-      - /var/run/docker.sock:/var/run/docker.sock:z
+      - /run/hermes-agent:/run/hermes-agent:ro
     {% if hermes_dashboard_enabled or hermes_api_server_enabled or hermes_webhooks_enabled %}
     healthcheck:
       test:
@@ -52,6 +58,31 @@ services:
       retries: 3
       start_period: 30s
       start_interval: 2s
+    {% endif %}
+
+  dind:
+    image: docker:29.9.3-dind
+    privileged: true
+    restart: unless-stopped
+    # Listen on the shared Unix socket only. Use vfs on the LXC's ZFS storage.
+    command:
+      - dockerd
+      - --host=unix:///run/hermes-agent/docker.sock
+      - --group={{ hermes_gid }}
+      - --feature=containerd-snapshotter=false
+      - --storage-driver=vfs
+    volumes:
+      - /run/hermes-agent:/run/hermes-agent
+      - docker-data:/var/lib/docker
+      # Docker resolves bind mount paths in the daemon's filesystem.
+      - ./app:/opt/data
+    healthcheck:
+      test: [CMD, docker, --host=unix:///run/hermes-agent/docker.sock, info]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    {% if hermes_dashboard_enabled or hermes_api_server_enabled or hermes_webhooks_enabled %}
+    # The gateway shares this service's network namespace.
     ports:
       {% if hermes_dashboard_enabled %}
       # Web dashboard.
@@ -145,3 +176,6 @@ services:
       NEXTCLOUD_HOST: {{ hermes_profile.the_dude.nextcloud.trs.host }}
       NEXTCLOUD_USERNAME: {{ hermes_profile.the_dude.nextcloud.trs.username }}
       NEXTCLOUD_PASSWORD: {{ hermes_profile.the_dude.nextcloud.trs.password }}
+
+volumes:
+  docker-data:

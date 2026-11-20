@@ -6,6 +6,7 @@ OnFailure=unit-status-mail@%n.service
 
 [Service]
 WorkingDirectory={{ hermes_root }}
+RuntimeDirectory=hermes-agent
 
 ExecStartPre=/usr/bin/docker compose config
 ExecStart=/usr/bin/docker compose up
