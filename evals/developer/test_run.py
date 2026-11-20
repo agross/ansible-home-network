@@ -24,6 +24,8 @@ NAMES = {
     'informational_review_leaves_handoff_untouched',
     'already_satisfied_request_creates_no_duplicate_repair',
     'stale_ci_does_not_complete_human_handoff',
+    'maintainer_pr_comment_repairs_and_acknowledges_comment',
+    'read_only_pr_comment_leaves_state_untouched',
 }
 
 
@@ -70,7 +72,10 @@ class FixtureTests(unittest.TestCase):
     def authorize(self):
         self.gh('pr', 'view', '42', '--repo', 'example/project', '--json', 'author,body,labels,headRefOid')
         self.gh('api', 'users/developer%5Bbot%5D')
-        self.gh('api', 'repos/example/project/pulls/42/reviews/500')
+        if 'comment' in self.case['evidence']:
+            self.gh('api', 'repos/example/project/issues/comments/900')
+        else:
+            self.gh('api', 'repos/example/project/pulls/42/reviews/500')
         self.gh('api', 'repos/example/project/collaborators/maintainer/permission')
 
     def repair(self, clear_label=True, destination=None):
@@ -95,7 +100,7 @@ class FixtureTests(unittest.TestCase):
         return assess(self.case, state, events, fixture.git('rev-parse', 'HEAD'),
                       fixture.git('branch', '--show-current'), bool(fixture.git('status', '--porcelain')), refs)
 
-    def test_extension_preserves_eight_scenarios_and_hides_expected_results(self):
+    def test_extension_resolves_scenarios_and_hides_expected_results(self):
         self.assertEqual(set(CASES), NAMES)
         for case in CASES.values():
             with self.subTest(case=case['name']):
@@ -108,6 +113,14 @@ class FixtureTests(unittest.TestCase):
                 schema = resolved['checks'][1]['configuration']['schema']
                 self.assertEqual(schema['properties']['outcome']['enum'], case['expected']['outcomes'])
                 self.assertEqual(schema['properties']['ci_clearance'], {'const': False})
+
+    def test_pr_comment_repair_requires_comment_acknowledgement(self):
+        self.prepare('maintainer_pr_comment_repairs_and_acknowledges_comment')
+        self.repair()
+        self.assertEqual(self.errors(), ['repair did not acknowledge the triggering comment'])
+        self.gh('api', 'repos/example/project/issues/comments/900/reactions',
+                '--method', 'POST', '--raw-field', 'content=eyes')
+        self.assertEqual(self.errors(), [])
 
     def test_read_only_commands_preserve_noop_state(self):
         self.prepare('unauthorized_review_leaves_state_untouched')

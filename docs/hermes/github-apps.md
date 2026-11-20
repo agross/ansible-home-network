@@ -43,7 +43,7 @@ separate installations and credentials.
 | Checks | Read-only | Read-only | Inspect check runs and results. |
 | Commit statuses | Read-only | Read-only | Inspect commit status results. |
 | Contents | Read and write | Read-only | Clone and read code; the developer also pushes branches. |
-| Issues | Read and write | Read and write | Read issues and comments; manage issue/PR labels and opening-post reactions. The developer also assigns the PR to the issue author. |
+| Issues | Read and write | Read and write | Read issues and comments, manage issue/PR labels and reactions. The developer also assigns the PR to the issue author. |
 | Metadata | Read-only | Read-only | Repository metadata; GitHub grants this automatically. |
 | Pull requests | Read and write | Read and write | Read PRs and feedback; the developer creates and updates PRs, and the reviewer submits reviews. |
 | Workflows | Read and write **if needed** | No access | The developer needs this additional permission when work modifies files in `.github/workflows`. |
@@ -63,13 +63,14 @@ these events:
 | Reviewer | Pull request | Pull requests read, already covered above. |
 
 The developer route handles `labeled` actions for issues and PRs, new human
-comments on issues, and `submitted` pull request reviews. For an issue comment,
-the developer re-fetches the issue and comment, checks `ready-for-agent` is
-still present, and verifies the commenter has repository write or admin access.
+comments on issues and designated open PRs, and `submitted` pull request reviews.
+For a comment, the developer re-fetches the issue or PR and the triggering
+comment, checks `ready-for-agent` is still present, and verifies the commenter
+has current repository write or admin access. The developer acknowledges
+accepted PR conversation requests on the triggering comment.
 The reviewer route handles `opened`, `reopened`, `ready_for_review`, and
-`synchronize` pull request actions. A
-PR conversation comment alone does not trigger the developer route. Each route
-also filters on its configured installation IDs.
+`synchronize` pull request actions. Each route also filters on its configured
+installation IDs.
 
 Both routes also accept `installation.created` and
 `installation_repositories.added`. GitHub delivers these events to Apps

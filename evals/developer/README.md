@@ -18,7 +18,7 @@ npm ci --ignore-scripts
 python3 -m unittest discover --start-directory evals/developer --pattern 'test_*.py' --verbose
 ```
 
-Prepare all eight cases without model calls:
+Prepare all cases without model calls:
 
 ```sh
 python3 evals/run.py developer --dry --output-dir /tmp/developer-sevro-preparation-001
@@ -56,7 +56,7 @@ are mapped to `.fixture/profiles` solely inside this test repository.
 
 Fixture executables precede host tools on `PATH`:
 
-- `gh-app` serves synthetic PRs, reviews, author permissions, bot identities,
+- `gh-app` serves synthetic PRs, reviews, conversation comments, author permissions, bot identities,
   reactions, labels, assignments, and CI state. Mutations update the fake forge
   and append ordered operation records.
 - `git-app` resolves synthetic HTTPS repository URLs to disposable local Git
@@ -99,6 +99,8 @@ claim. Real Hermes integration remains a separate validation step.
 | `informational_review_leaves_handoff_untouched` | Informational review changes no state. |
 | `already_satisfied_request_creates_no_duplicate_repair` | Already-implemented feedback produces no duplicate edit or push. |
 | `stale_ci_does_not_complete_human_handoff` | Earlier passing CI does not authorize assignment while current-head CI is pending. |
+| `maintainer_pr_comment_repairs_and_acknowledges_comment` | Fetches the exact comment and verifies write access before acknowledging it with eyes, then repairs the PR while retaining designation. |
+| `read_only_pr_comment_leaves_state_untouched` | A read-only commenter cannot activate work through older authorized feedback. |
 
 The pending-CI case permits a blocked route or an incomplete clean-handoff route;
 both must withhold CI clearance, assignment, and publication. Classification

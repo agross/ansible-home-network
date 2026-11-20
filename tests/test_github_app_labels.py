@@ -30,6 +30,28 @@ with patch.dict(sys.modules, github_app_labels=labels):
 
 
 class GitHubWebhookTests(unittest.TestCase):
+    def test_pr_comment_dispatch_requires_open_designated_pr(self):
+        for state, names, expected in (
+            ("open", ["in-review", "ready-for-agent"], True),
+            ("open", ["ready-for-agent-extra"], False),
+            ("closed", ["ready-for-agent"], False),
+        ):
+            with self.subTest(state=state, labels=names):
+                event = {
+                    "action": "created",
+                    "issue": {
+                        "number": 42, "state": state, "pull_request": {},
+                        "labels": [{"name": name} for name in names],
+                    },
+                    "comment": {"id": 900},
+                    "sender": {"type": "User", "id": 30},
+                }
+                result = webhook.dispatch(event)
+                if expected:
+                    self.assertEqual(result, event)
+                else:
+                    self.assertEqual(result, {"__hermes_ignore__": True})
+
     def test_dispatch_tries_handlers_until_one_handles_the_event(self):
         payload = {"action": "custom"}
         result = {"__hermes_ignore__": True}

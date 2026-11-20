@@ -1,4 +1,4 @@
-"""Sevro v1 extension for the eight developer scenarios."""
+"""Sevro v1 extension for developer scenarios."""
 
 import base64
 import hashlib
@@ -22,6 +22,14 @@ def launcher(tool):
 
 
 def resolve_case(case):
+    event = case["evidence"]["event"]
+    if event["type"] == "issue_comment":
+        trigger = (
+            "issue_comment created event for example/project issue number 42 (a pull request), "
+            f"comment ID {event['comment_id']}, sender ID {event['sender_id']}."
+        )
+    else:
+        trigger = f"submitted-review event for example/project PR #42, review ID {event['review_id']}."
     repaired = case["name"] in {"informational_review_leaves_handoff_untouched",
                                "already_satisfied_request_creates_no_duplicate_repair",
                                "stale_ci_does_not_complete_human_handoff"}
@@ -53,7 +61,10 @@ def resolve_case(case):
             "the blocker instead of polling indefinitely.\n"
         ),
     }
-    specification = dict(case)
+    specification = {
+        "evidence": {key: value for key, value in case["evidence"].items() if key in {"pr", "review", "comment"}},
+        "expected": case["expected"],
+    }
     specification["fixture_sha256"] = hashlib.sha256((HERE / "fixture.py").read_bytes()).hexdigest()
     grader = "import sys\nsys.argv = ['grade', " + repr(json.dumps(specification)) + "]\n" + (HERE / "grade.py").read_text()
     payload = base64.b64encode(zlib.compress(grader.encode())).decode()
@@ -69,8 +80,7 @@ def resolve_case(case):
     return {
         "id": case["name"],
         "prompt": (
-            "{{sevro.skill_invocation}} Handle the developer-github submitted-review event "
-            "for example/project PR #42, review ID 500. Re-fetch through the supplied App "
+            "{{sevro.skill_invocation}} Handle the developer-github " + trigger + " Re-fetch through the supplied App "
             "commands and execute the skill's authorized workflow, including real local "
             "edits, tests, commits and fake pushes when appropriate. The verified event "
             "and synthetic initial context are in event.json. Follow AGENTS.md for the "

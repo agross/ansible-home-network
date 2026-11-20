@@ -627,5 +627,171 @@
         "clean_handoff"
       ]
     }
+  },
+  {
+    "name": "maintainer_pr_comment_repairs_and_acknowledges_comment",
+    "evidence": {
+      "event": {
+        "type": "issue_comment",
+        "action": "created",
+        "issue_number": 42,
+        "comment_id": 900,
+        "sender_id": 30
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 40,
+          "type": "User",
+          "login": "author"
+        },
+        "body": "Handle invalid API input. Closes #7.",
+        "labels": [
+          "ready-for-agent",
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "code_observation": "Empty input currently returns HTTP 500; the requested change is not implemented.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      },
+      "comment": {
+        "id": 900,
+        "author": {
+          "id": 30,
+          "type": "User",
+          "login": "maintainer"
+        },
+        "author_permission_on_base": "write",
+        "body": "Please return HTTP 400 for an empty input, with a regression test."
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "repair"
+      ]
+    }
+  },
+  {
+    "name": "read_only_pr_comment_leaves_state_untouched",
+    "evidence": {
+      "event": {
+        "type": "issue_comment",
+        "action": "created",
+        "issue_number": 42,
+        "comment_id": 900,
+        "sender_id": 40
+      },
+      "pr": {
+        "number": 42,
+        "state": "open",
+        "base_repository": "example/project",
+        "creator": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "body": "<!-- hermes-origin: developer -->\n<!-- hermes-issue: example/project#7 -->",
+        "labels": [
+          "ready-for-agent",
+          "needs-human"
+        ],
+        "head_repository": "example/project",
+        "head_branch": "codex/issue-7-fix",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "trusted_profile_bot_accounts": {
+        "developer": {
+          "id": 10,
+          "type": "Bot",
+          "login": "developer[bot]"
+        },
+        "reviewer": {
+          "id": 20,
+          "type": "Bot",
+          "login": "reviewer[bot]"
+        }
+      },
+      "code_observation": "Empty input currently returns HTTP 500; the requested change is not implemented.",
+      "scope": "Handle invalid API input with a client error; accepted contract includes HTTP 400 for empty input.",
+      "other_feedback": [
+        {
+          "id": 499,
+          "author": {
+            "id": 30,
+            "type": "User",
+            "login": "maintainer"
+          },
+          "author_permission_on_base": "write",
+          "body": "Please correct the empty-input response.",
+          "state": "COMMENT"
+        }
+      ],
+      "open_review_threads": [],
+      "workspace": {
+        "clean": true,
+        "task_owned": true,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "local_only_commits": []
+      },
+      "head_app_access": {
+        "identity": "developer[bot]",
+        "installation_available": true,
+        "contents": "write"
+      },
+      "ci": "pending",
+      "reviewer_policy": {
+        "skip_if_label_present": "needs-human",
+        "sets_label_after_review_starts": "in-review"
+      },
+      "comment": {
+        "id": 900,
+        "author": {
+          "id": 40,
+          "type": "User",
+          "login": "reader"
+        },
+        "author_permission_on_base": "read",
+        "body": "Please return HTTP 400 for an empty input, with a regression test."
+      }
+    },
+    "expected": {
+      "outcomes": [
+        "no_op"
+      ]
+    }
   }
 ]

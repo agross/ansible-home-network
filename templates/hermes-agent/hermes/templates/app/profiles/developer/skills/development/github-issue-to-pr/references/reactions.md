@@ -1,4 +1,17 @@
-# Opening-post reactions
+# Reactions
+
+For an accepted PR conversation comment that triggers repair, add an
+👀 (`eyes`) reaction to that verified comment before starting work:
+
+```sh
+gh-app --repo OWNER/REPO -- api --method POST repos/OWNER/REPO/issues/comments/COMMENT_ID/reactions --raw-field content=eyes
+```
+
+An existing reaction from this App counts as success. Keep the comment reaction
+as acknowledgement after repair. Skip opening-post reaction writes and cleanup
+for this event. Report a reaction failure and continue authorized work.
+
+## Opening-post reactions for other triggers
 
 After the selected issue or PR passes the parent skill's authorization gate and has
 authorized actionable work (repair or clean handoff for a PR), add an

@@ -27,9 +27,8 @@ When an issue still has `ready-for-agent`, a new comment by a human with
 repository write or admin access can resume work without removing and readding
 the label. The developer re-fetches the issue and comment, checks the comment's
 author against the event sender, and verifies the author's current repository
-permission before acting. Bot comments and PR conversation comments do not
-trigger this issue-comment path. Enable the GitHub App's Issue comment event
-subscription for delivery.
+permission before acting. Issue and PR conversation comments share the GitHub
+App's Issue comment event subscription. The developer route ignores bot comments.
 
 ## Verification
 
@@ -47,15 +46,14 @@ observed red/green evidence when applicable, acceptance coverage, published
 commit identity, and required-check evidence. Missing or stale checks block
 completion; CI clearance remains separate from independent reviewer approval.
 
-Skill deployment preserves existing files with `force: false`. Updating these
-repository templates does not replace an existing live `SKILL.md`; reconcile
-the existing developer skill with this version when rolling out the change.
+Deployment overwrites the managed developer skill and references under
+`skills/development/`. Other skill paths preserve existing files.
 
 Focused Sevro operation evals and fixture checks are documented in
 [`evals/developer`](../../evals/developer/README.md). They execute the skill through
 an isolated Codex surrogate with fake GitHub App commands and local Git remotes.
-They retain all eight authorization, repair, and CI scenarios, but do not verify
-live Hermes execution, GitHub authentication, or webhook delivery.
+They cover authorization, repair, comment acknowledgement, and CI. Live Hermes
+execution, GitHub authentication, and webhook delivery require separate checks.
 
 Reviewer findings are handed back by the submitted review event. The reviewer
 does not add `ready-for-agent` to developer-origin PRs, avoiding a second
@@ -78,11 +76,13 @@ review of the updated head even when repair resumes after a prior human handoff.
 
 ## Handing an existing PR to the developer
 
-1. Put the requested corrections in a GitHub pull request review or review
-   comments, then apply `ready-for-agent` to the PR. The label is the explicit
-   developer handoff for a PR without verified developer provenance. If it is
-   already present, applying it again does not create a new label event; submit
-   a PR review to trigger the feedback route, or remove and reapply the label.
+1. On an open PR that already carries `ready-for-agent`, post the requested
+   corrections as a conversation comment. A new comment from a human with
+   current write or admin access to the base repository can resume work while
+   the label stays set. Hermes adds 👀 to the specific comment when it accepts
+   the request. For an initial label handoff, post the feedback before applying
+   `ready-for-agent`. Submitted PR reviews also trigger the feedback route
+   under the existing review authorization rules.
 2. The developer re-fetches the PR, confirms the designation remains present,
    reads submitted reviews, issue comments, and open review threads. The
    reviewer owns the `in-review` transition. Concrete requests from verified

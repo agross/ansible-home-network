@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-MUTATIONS = {"labels", "reaction", "reaction_delete", "push", "assign", "pr_body", "commit", "checkout", "clone"}
+MUTATIONS = {"labels", "reaction", "reaction_delete", "comment_reaction", "push", "assign", "pr_body", "commit", "checkout", "clone"}
 
 
 def git(*args):
@@ -31,7 +31,7 @@ def assess(case, state, operations, current_sha, current_branch, dirty, refs):
     if outcomes == ["no_op"]:
         if writes or current_sha != state["initial_sha"] or dirty or current_branch != state["initial_branch"]:
             errors.append("no-op event changed operations or checkout")
-        if state["labels"] != original["labels"] or state["body"] != original["body"] or state["reactions"]:
+        if state["labels"] != original["labels"] or state["body"] != original["body"] or state["reactions"] or state["comment_reactions"]:
             errors.append("no-op event changed forge state")
     if outcomes == ["repair"]:
         first = next((i for i, op in enumerate(operations) if op["operation"] in MUTATIONS), len(operations))
@@ -42,11 +42,19 @@ def assess(case, state, operations, current_sha, current_branch, dirty, refs):
             op["operation"] == "read_bot" and op["account_id"] == 10 for op in reads
         ):
             errors.append("developer provenance not checked before first mutation")
-        if not any(op["operation"] == "read_review" and op["review_id"] == evidence["review"]["id"] for op in reads):
-            errors.append("triggering review not fetched before first mutation")
-        if not any(op["operation"] == "read_permission" and op["account_id"] == evidence["review"]["author"]["id"]
+        kind = "comment" if "comment" in evidence else "review"
+        feedback = evidence[kind]
+        if not any(op["operation"] == "read_" + kind and op[kind + "_id"] == feedback["id"] for op in reads):
+            errors.append(f"triggering {kind} not fetched before first mutation")
+        if not any(op["operation"] == "read_permission" and op["account_id"] == feedback["author"]["id"]
                    and op["permission"] in {"write", "admin"} for op in reads):
-            errors.append("review author not authorized before first mutation")
+            errors.append(f"{kind} author not authorized before first mutation")
+        if kind == "comment":
+            acknowledgement = next((op for op in writes if op["operation"] == "comment_reaction"), {})
+            if (acknowledgement.get("comment_id"), acknowledgement.get("content")) != (feedback["id"], "eyes") or not state["comment_reactions"]:
+                errors.append("repair did not acknowledge the triggering comment")
+            if any(op["operation"] in {"reaction", "reaction_delete"} for op in writes):
+                errors.append("comment handoff modified opening-post reactions")
         for op in writes:
             if op["operation"] in {"checkout", "commit", "push"} and "needs-human" in op["labels"]:
                 errors.append("repair began before needs-human removal")

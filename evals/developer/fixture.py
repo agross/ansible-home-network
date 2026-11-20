@@ -47,7 +47,7 @@ def setup():
     root = Path.cwd()
     evidence = json.loads((root / "event.json").read_text())
     state = {"evidence": evidence, "labels": evidence["pr"]["labels"],
-             "reactions": [], "assignees": [], "body": evidence["pr"]["body"]}
+             "reactions": [], "comment_reactions": [], "assignees": [], "body": evidence["pr"]["body"]}
     git("config", "user.name", "developer[bot]")
     git("config", "user.email", "10+developer[bot]@users.noreply.github.com")
     sha = git("rev-parse", "HEAD")
@@ -119,7 +119,7 @@ def pr(state):
 def reviews(state):
     evidence = state["evidence"]
     result = []
-    for item in [*evidence["other_feedback"], evidence["review"]]:
+    for item in [*evidence["other_feedback"], *([evidence["review"]] if "review" in evidence else [])]:
         value = dict(item)
         value["user"] = value.pop("author")
         value["commit_id"] = state["initial_sha"] if value.get("commit_id", "a" * 40) == "a" * 40 else "b" * 40
@@ -166,8 +166,9 @@ def api(state, args):
                 "default_branch": "main", "owner": {"login": repository.split("/")[0]}}
     if path.startswith("collaborators/") and path.endswith("/permission"):
         login = path.split("/")[1]
-        author = next(review for review in [*state["evidence"]["other_feedback"], state["evidence"]["review"]]
-                      if review["author"]["login"] == login)
+        evidence = state["evidence"]
+        feedback = [*evidence["other_feedback"], evidence.get("review") or evidence["comment"]]
+        author = next(item for item in feedback if item["author"]["login"] == login)
         record("read_permission", account_id=author["author"]["id"], permission=author["author_permission_on_base"])
         return {"permission": author["author_permission_on_base"], "user": author["author"]}
     if path == "pulls/42":
@@ -180,7 +181,26 @@ def api(state, args):
         for value in values:
             record("read_review", review_id=value["id"], account_id=value["user"]["id"])
         return values if path == "pulls/42/reviews" else values[0]
-    if path == "pulls/42/comments" or path.endswith("/comments"):
+    comment = state["evidence"].get("comment")
+    if comment and repository == state["evidence"]["pr"]["base_repository"]:
+        comment_id = comment["id"]
+        endpoint = f"issues/comments/{comment_id}"
+        if method == "GET" and path in {"issues/42/comments", endpoint}:
+            value = {"id": comment_id, "user": comment["author"], "body": comment["body"],
+                     "issue_url": f"https://api.github.com/repos/{repository}/issues/42"}
+            record("read_comment", comment_id=comment_id, account_id=comment["author"]["id"])
+            return value if path == endpoint else [value]
+        if path == endpoint + "/reactions":
+            if method == "GET":
+                return state["comment_reactions"]
+            if method == "POST" and data["content"] == "eyes":
+                record("comment_reaction", comment_id=comment_id, content="eyes")
+                reaction = {"id": 2000, "content": "eyes",
+                            "user": state["evidence"]["trusted_profile_bot_accounts"]["developer"]}
+                state["comment_reactions"] = [reaction]
+                write_state(state)
+                return reaction
+    if path.endswith("/comments"):
         record("read_comments")
         return []
     if path == "issues/7":

@@ -1,7 +1,7 @@
 ---
 user_locked: true
 name: github-issue-to-pr
-description: Implement designated GitHub issues, resume them after authorized issue comments, or repair and hand off eligible PRs after authorized feedback. Exclude read-only issue questions and independent PR reviews.
+description: Implement designated GitHub issues, resume them after authorized issue comments, or repair and hand off eligible PRs after authorized reviews or PR conversation comments. Exclude read-only issue questions and independent PR reviews.
 ---
 
 # GitHub issue to PR
@@ -25,7 +25,11 @@ Select the entry matching the request:
   still carrying `ready-for-agent`. Re-fetch the comment by ID; require its author
   to match the event's human sender and current collaborator permission `admin`
   or `write`. Failed lookup, deleted comment, identity mismatch, bot, or lesser
-  permission ends without mutations. PR conversation comments are not issue handoffs.
+  permission ends without mutations.
+- **PR conversation comment:** an `issue_comment` action `created` on a PR uses
+  the event's issue number as the PR number. Route it directly through
+  [feedback-authority.md](references/feedback-authority.md), using the triggering
+  comment ID and sender ID. Require `ready-for-agent` even for developer-origin PRs.
 - **Manual issue request:** use only the explicitly named open issue, accessible
   through `gh-app` and carrying an owner-authorized designation label.
 - **PR feedback or handoff:** complete
