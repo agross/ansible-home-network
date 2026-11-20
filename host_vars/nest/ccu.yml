@@ -1,4 +1,0 @@
-ccu_network_interface: "{{ interfaces.lan.device }}"
-
-ccu_required_packages:
-  - linux-headers-amd64

@@ -1,0 +1,65 @@
+- name: Prepare the boot disk of the existing OpenCCU Lite VM
+  delegate_to: "{{ openccu_lite_guest.host }}"
+  become: true
+  vars:
+    openccu_lite_guest: "{{ hostvars[inventory_hostname].proxmox }}"
+    openccu_lite_disk: "{{ openccu_lite_guest.scsi.scsi0 }}"
+    openccu_lite_vm: "{{ openccu_lite_vm_info.proxmox_vms[0] }}"
+    openccu_lite_vm_config: "{{ openccu_lite_vm.config }}"
+  block:
+    - name: Read the OpenCCU Lite VM and its configuration
+      community.proxmox.proxmox_vm_info:
+        node: "{{ openccu_lite_guest.host }}"
+        type: qemu
+        vmid: "{{ openccu_lite_guest.id }}"
+        config: pending
+      register: openccu_lite_vm_info
+
+    - name: Check that the VM was created by the Proxmox role
+      ansible.builtin.assert:
+        that:
+          - openccu_lite_vm_info.proxmox_vms | length == 1
+          - openccu_lite_vm.name == inventory_hostname
+          - openccu_lite_disk.import | default(false)
+        fail_msg: >-
+          Define scsi0 with import enabled and create {{ inventory_hostname }}
+          with the vm tag before importing the appliance.
+
+    - name: Import the appliance into the empty boot disk slot
+      when:
+        - not ansible_check_mode
+        - openccu_lite_vm_config.scsi0 is not defined
+      ansible.builtin.import_tasks: provision/import-ova.yml
+
+    - name: Set the appliance boot order
+      when:
+        - not ansible_check_mode
+        - openccu_lite_vm_config.scsi0 is not defined or
+          (openccu_lite_vm_config.boot | default('')) != openccu_lite_boot_order
+      community.proxmox.proxmox_kvm:
+        node: "{{ openccu_lite_vm.node }}"
+        vmid: "{{ openccu_lite_guest.id }}"
+        digest: "{{ openccu_lite_vm_config.digest if openccu_lite_vm_config.scsi0 is defined else omit }}"
+        boot: "{{ openccu_lite_boot_order }}"
+        update: true
+      vars:
+        openccu_lite_boot_order: "{{ openccu_lite_guest.boot | default('order=scsi0') }}"
+
+    - name: Size the appliance disk
+      when:
+        - not ansible_check_mode
+        - openccu_lite_vm_config.scsi0 is not defined or
+          (
+            openccu_lite_vm_config.scsi0 |
+            ansible.builtin.regex_findall('(?:^|,)size=([^,]+)') |
+            first |
+            ansible.builtin.human_to_bytes
+          ) < (
+            openccu_lite_disk.size | int * 1024 ** 3
+          )
+      community.proxmox.proxmox_disk:
+        vmid: "{{ openccu_lite_guest.id }}"
+        disk: scsi0
+        size: "{{ openccu_lite_disk.size }}G"
+        state: resized
+      register: openccu_lite_disk_resize

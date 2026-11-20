@@ -1,0 +1,53 @@
+- name: Check that the appliance has no firmware operation in progress
+  ansible.builtin.assert:
+    that:
+      - openccu_lite_firmware.json.busy is none
+      - not (openccu_lite_firmware.json.staged.recovery_armed | default(false))
+    fail_msg: A firmware operation is already in progress. Wait for it to finish before retrying.
+
+- name: Download the pinned firmware release
+  when: openccu_lite_firmware.json.staged.version | default('') != openccu_lite_version
+  ansible.builtin.uri:
+    url: "{{ openccu_lite_update_url }}/download"
+    method: POST
+    body_format: json
+    body:
+      version: "{{ openccu_lite_version }}"
+    timeout: 900
+  no_log: true
+  changed_when: true
+
+- name: Wait until the requested firmware is staged
+  ansible.builtin.uri:
+    url: "{{ openccu_lite_update_url }}"
+  register: openccu_lite_staging
+  no_log: true
+  until:
+    - (openccu_lite_staging.json.staged.version | default('')) == openccu_lite_version
+    - (openccu_lite_staging.json.busy | default(true)) is none
+  retries: "{{ openccu_lite_update_poll_retries }}"
+  delay: "{{ openccu_lite_update_poll_interval }}"
+
+- name: Install the staged firmware through recovery
+  ansible.builtin.uri:
+    url: "{{ openccu_lite_update_url }}/install"
+    method: POST
+  register: openccu_lite_install
+  no_log: true
+  failed_when: >-
+    openccu_lite_install.status != 200 or
+    not (openccu_lite_install.json.armed | default(false)) or
+    not (openccu_lite_install.json.rebooting | default(false))
+  changed_when: true
+
+- name: Wait for the appliance to report the requested firmware
+  ansible.builtin.uri:
+    url: "{{ openccu_lite_update_url }}"
+    timeout: "{{ openccu_lite_update_poll_interval }}"
+  register: openccu_lite_rebooted
+  no_log: true
+  until:
+    - openccu_lite_rebooted.status == 200
+    - (openccu_lite_rebooted.json.running.lite | default('')) == openccu_lite_version
+  retries: "{{ openccu_lite_update_poll_retries }}"
+  delay: "{{ openccu_lite_update_poll_interval }}"

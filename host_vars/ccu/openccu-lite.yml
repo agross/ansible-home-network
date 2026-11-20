@@ -1,0 +1,1 @@
+openccu_lite_api_token: "{{ vault_openccu_lite_api_token }}"

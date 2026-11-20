@@ -1,0 +1,59 @@
+- name: Check that the VM is stopped before importing its boot disk
+  ansible.builtin.assert:
+    that: openccu_lite_vm.status == 'stopped'
+    fail_msg: Stop the VM before importing its boot disk.
+
+- name: Download and extract the appliance for import
+  block:
+    - name: Create temporary directory for the OVA
+      ansible.builtin.tempfile:
+        state: directory
+        path: /var/tmp
+        prefix: openccu-lite-
+      register: openccu_lite_import_directory
+
+    - name: Download the OVA and verify its published SHA-256
+      ansible.builtin.import_tasks:
+        file: github-release.yml
+      vars:
+        url: "{{ openccu_lite_releases_url }}"
+        release: "{{ openccu_lite_release }}"
+        asset_name_regex: "^{{ openccu_lite_ova_name | ansible.builtin.regex_escape }}$"
+        asset_checksum: "sha256:{{ github_asset_url }}.sha256"
+        dest: "{{ openccu_lite_import_directory.path }}/{{ openccu_lite_ova_name }}"
+        mode: "600"
+
+    - name: Extract the OVA
+      ansible.builtin.unarchive:
+        src: "{{ openccu_lite_import_directory.path }}/{{ openccu_lite_ova_name }}"
+        dest: "{{ openccu_lite_import_directory.path }}"
+        remote_src: true
+
+    - name: Locate the appliance disk in the OVA
+      ansible.builtin.find:
+        paths: "{{ openccu_lite_import_directory.path }}"
+        patterns: "*.vmdk"
+      register: openccu_lite_ova_disks
+
+    - name: Check that the OVA contains exactly one VMDK
+      ansible.builtin.assert:
+        that: openccu_lite_ova_disks.matched == 1
+
+    - name: Import the appliance disk into the existing VM
+      community.proxmox.proxmox_disk:
+        vmid: "{{ openccu_lite_guest.id }}"
+        disk: scsi0
+        storage: "{{ openccu_lite_disk.storage }}"
+        import_from: "{{ openccu_lite_ova_disks.files[0].path }}"
+        discard: "{{ 'on' if openccu_lite_disk.discard | default(false) else omit }}"
+        iothread: "{{ openccu_lite_disk.iothread | default(omit) }}"
+        ssd: "{{ openccu_lite_disk.ssd | default(omit) }}"
+        backup: "{{ openccu_lite_disk.backup | default(omit) }}"
+        state: present
+        timeout: 900
+  always:
+    - name: Remove temporary OVA files
+      when: openccu_lite_import_directory.path is defined
+      ansible.builtin.file:
+        path: "{{ openccu_lite_import_directory.path }}"
+        state: absent

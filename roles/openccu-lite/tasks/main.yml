@@ -1,0 +1,9 @@
+- name: Inspect the VM and import its boot disk if needed
+  ansible.builtin.import_tasks: provision/provision.yml
+
+- name: Manage firmware on an already provisioned appliance
+  when:
+    - openccu_lite_vm_info.proxmox_vms[0].config.scsi0 is defined
+    # The appliance grows its filesystem during boot after a disk resize.
+    - openccu_lite_disk_resize is not changed
+  ansible.builtin.include_tasks: update/firmware.yml

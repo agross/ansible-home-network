@@ -33,6 +33,7 @@
       become: true
       ansible.builtin.get_url:
         url: "{{ github_asset_url }}"
+        checksum: "{{ asset_checksum | default(omit) }}"
         headers: "{{ github_release_request_headers | default(omit) }}"
         dest: "{{ dest }}"
         owner: 0

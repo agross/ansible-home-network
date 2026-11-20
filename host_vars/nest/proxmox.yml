@@ -19,7 +19,5 @@ proxmox:
       iothread: true
       ssd: true
   usb:
-    # HomeMatic HB-RF-USB-2.
-    usb0: host=10c4:8c07
     # Sonoff Zigbee stick.
-    usb1: host=10c4:ea60
+    usb0: host=10c4:ea60

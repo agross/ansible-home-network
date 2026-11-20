@@ -60,12 +60,19 @@
       tags: cockpit
     - role: mqtt
       tags: mqtt
-    - role: ccu
-      tags: ccu
     - role: iobroker
       tags: iobroker
     - role: logger
       tags: logger
+
+- name: OpenCCU Lite appliance
+  hosts: ccu
+  gather_facts: false
+  roles:
+    - role: openccu-lite
+      tags:
+        - ccu
+        - openccu-lite
 
 - name: Hosted services on tanker
   hosts: tanker

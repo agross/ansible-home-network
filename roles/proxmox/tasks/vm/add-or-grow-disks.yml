@@ -1,4 +1,5 @@
 - name: Add disks to guest VM
+  when: not (item.1.value.import | default(false))
   community.proxmox.proxmox_disk:
     vmid: "{{ item.0.kvm.id | mandatory }}"
     storage: "{{ item.1.value.storage }}"
@@ -50,6 +51,7 @@
       }}
 
 - name: Grow existing disk of guest VM
+  when: not (item.1.value.import | default(false))
   community.proxmox.proxmox_disk:
     vmid: "{{ item.0.kvm.id | mandatory }}"
     disk: "{{ item.1.key }}"

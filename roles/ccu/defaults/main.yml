@@ -1,9 +1,0 @@
-ccu_root: /data/ccu
-
-# This should be set to true if a transceiver on the GPIO pins is used:
-# - HM-MOD-RPI-PCB or
-# - RPI-RF-MOD
-ccu_gpio_header_transceiver: false
-
-# OpenCCU's own init timeout is ~20 seconds, takes ~5 seconds if successful.
-ccu_rf_watchdog_timeout_seconds: 40

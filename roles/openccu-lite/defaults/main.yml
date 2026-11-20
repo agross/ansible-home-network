@@ -1,0 +1,11 @@
+# renovate: github-releases=openccu-lite/openccu-lite versioning=semver
+openccu_lite_release: v2.0.0-beta.10
+openccu_lite_version: "{{ openccu_lite_release | ansible.builtin.regex_replace('^v', '') }}"
+
+openccu_lite_ova_name: "openccu-lite-x86_64-ova-{{ openccu_lite_version }}.ova"
+openccu_lite_releases_url: https://api.github.com/repos/openccu-lite/openccu-lite/releases
+
+openccu_lite_api_url: "https://{{ inventory_hostname }}.{{ network.domain }}"
+openccu_lite_update_url: "{{ openccu_lite_api_url }}/api/system/v1/system-update"
+openccu_lite_update_poll_interval: 10
+openccu_lite_update_poll_retries: 90

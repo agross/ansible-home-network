@@ -25,7 +25,7 @@
     memory: "{{ guest.kvm.memory | ansible.builtin.mandatory }}"
     bios: "{{ guest.kvm.bios | default('ovmf') }}"
     efidisk0: "{{ efidisk0 }}"
-    boot: "{{ guest.kvm.boot | default('order=scsi0;ide0') }}"
+    boot: "{{ omit if guest.kvm.scsi.scsi0.import | default(false) else guest.kvm.boot | default('order=scsi0;ide0') }}"
     sockets: "{{ guest.kvm.sockets | default(1) }}"
     cores: "{{ guest.kvm.cores | ansible.builtin.mandatory }}"
     numa_enabled: "{{ guest.kvm.numa_enabled | default(false) }}"
@@ -65,7 +65,7 @@
       }}
     scsi_stringified_yaml: |
       ---
-      {% for dev, settings in (guest.kvm.scsi | default({})).items() %}
+      {% for dev, settings in (guest.kvm.scsi | default({})).items() if not (settings.import | default(false)) %}
       {{ dev }}: {{
         settings.storage
       }}:{{

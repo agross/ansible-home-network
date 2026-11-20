@@ -1,0 +1,26 @@
+proxmox:
+  host: pve-home
+  type: kvm
+  id: 106
+  tags:
+    - service
+  startup: order=200
+  bios: seabios
+  cores: 2
+  memory: 2048
+  net:
+    net0: virtio,bridge=vmbr0,firewall=1
+  efi_disk:
+    storage: local-zfs
+  scsi:
+    scsi0:
+      # Start out with an empty disk.
+      import: true
+      storage: local-zfs
+      size: 8
+      discard: true
+      iothread: true
+      ssd: true
+  usb:
+    # HomeMatic HB-RF-USB-2.
+    usb0: host=10c4:8c07

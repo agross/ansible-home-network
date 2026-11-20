@@ -1,0 +1,27 @@
+- name: Manage firmware through the OpenCCU Lite API
+  delegate_to: localhost
+  become: false
+  module_defaults:
+    ansible.builtin.uri:
+      headers:
+        Authorization: "Bearer {{ openccu_lite_api_token | ansible.builtin.mandatory }}"
+      follow_redirects: none
+      use_netrc: false
+  block:
+    - name: Read current firmware status
+      ansible.builtin.uri:
+        url: "{{ openccu_lite_update_url }}"
+      register: openccu_lite_firmware
+      no_log: true
+      check_mode: false
+
+    - name: Check that the appliance reports its OpenCCU Lite version
+      ansible.builtin.assert:
+        that: openccu_lite_firmware.json.running.lite | default('') | length > 0
+        fail_msg: The firmware API did not report an OpenCCU Lite version.
+
+    - name: Update firmware when the running version differs
+      when:
+        - not ansible_check_mode
+        - openccu_lite_firmware.json.running.lite != openccu_lite_version
+      ansible.builtin.import_tasks: update/update.yml
