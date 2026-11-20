@@ -101,6 +101,12 @@
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"
         mode: "600"
+      app/profiles/*/skills/development/**/*:
+        owner: "{{ hermes_uid }}"
+        group: "{{ hermes_gid }}"
+        mode: "700"
+        # These skills have `user_locked: true`.
+        force: true
       app/profiles/*/skills/**/*:
         owner: "{{ hermes_uid }}"
         group: "{{ hermes_gid }}"

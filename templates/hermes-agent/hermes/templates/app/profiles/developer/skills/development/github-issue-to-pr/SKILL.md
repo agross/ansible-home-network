@@ -1,4 +1,5 @@
 ---
+user_locked: true
 name: github-issue-to-pr
 description: Implement designated GitHub issues, resume them after authorized issue comments, or repair and hand off eligible PRs after authorized feedback. Exclude read-only issue questions and independent PR reviews.
 ---

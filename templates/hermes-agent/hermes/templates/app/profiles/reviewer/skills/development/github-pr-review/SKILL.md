@@ -1,4 +1,5 @@
 ---
+user_locked: true
 name: github-pr-review
 description: Review a GitHub PR selected by the reviewer webhook or recover its unfinished finalization. Includes all PR authors; excludes implementation and ordinary manual review requests.
 ---
