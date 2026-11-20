@@ -28,6 +28,25 @@ For new behavior and reproducible bug fixes, work in successive red/green slices
 4. Only after green, refactor if useful and rerun affected checks, or begin the
    next behavior slice. Preserve the ordered red/green evidence for the PR.
 
+For NuGet lock-file findings, validate the affected projects at the bound PR head
+with `dotnet restore --locked-mode --no-http-cache`, using the repository's pinned
+SDK, configured sources, and a fresh package cache. A passing locked restore is
+sufficient. Report the command and tested SHA as evidence for reviewer
+reassessment. If the head advances, repeat validation at the new head. If NuGet
+reports a lock-file mismatch, use the repository's NuGet regeneration workflow
+and rerun locked restore. Do not compute or compare hashes separately, or edit
+lock-file hashes by hand.
+
+For dependency-upgrade compile failures, use the affected public project build as the focused regression boundary: capture the specific compiler error before the minimal compatibility edit, then rerun the identical build after it. Do not add unrelated runtime tests merely to simulate a compiler regression.
+
+If a locally installed .NET SDK aborts because ICU is unavailable, first check for a compatible cached ICU installation and supply its library directory through process-local `LD_LIBRARY_PATH`. Disable core dumps for retry commands. Do not change application globalization settings or use invariant mode as evidence of normal runtime behavior; an SDK startup failure is not the compiler-regression red result.
+
+When .NET tests cannot launch because the target runtime is missing, install the matching runtime into the profile-local SDK cache rather than changing repository target frameworks or using major-version roll-forward as acceptance evidence.
+
+When billing-date tests fail only at UTC/local-date boundaries, inspect the repository's timezone expectations and rerun with the documented timezone supplied process-locally. Report both results; do not alter application or test expectations to fit the host timezone.
+
+When container-backed integration tests fail with Docker exit 125, diagnose the daemon-side bind-source path using a harmless scratch-directory mount before attributing the failure to product code. A reachable Docker socket does not imply that the daemon can see the agent's filesystem. Reproduce the same named failures on an isolated unchanged-head checkout, keep financial fixture output out of logs, and distinguish the local environment gap from final-head CI results; never weaken tests to accommodate the mount mismatch.
+
 Tests must exercise the real behavior and assert an observable result; avoid
 private implementation details, assertions that repeat the production algorithm,
 or mocks replacing the subject under test. A test added after implementation

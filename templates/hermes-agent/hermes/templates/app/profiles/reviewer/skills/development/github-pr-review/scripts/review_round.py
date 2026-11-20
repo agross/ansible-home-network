@@ -58,7 +58,7 @@ class Round:
         return values[0] if values else None
 
     def identity(self):
-        status = subprocess.run(["hermes-github-app", "status", "--repo", self.repository, "--format", "json"], capture_output=True, text=True)
+        status = subprocess.run(["hermes-github-app", "status", "--repo", self.repository], capture_output=True, text=True)
         if status.returncode:
             raise Halt("blocked", "Reviewer App identity or repository access failed")
         authenticated = json.loads(status.stdout).get("app", {}).get("slug")

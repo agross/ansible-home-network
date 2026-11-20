@@ -62,5 +62,12 @@ when present, replace the lifecycle label with `needs-human`, and report evidenc
 
 After a repair or handoff, complete PR reaction cleanup in
 [reactions.md](reactions.md). Immediately before reporting, re-fetch PR state,
-head SHA, labels, and assignees. Distinguish a concurrent merge or other external
-transition from this role's actions.
+head SHA, labels, and assignees. If the PR became closed or its remote head
+branch disappeared, fetch `state`, `merged`, `merged_at`, `closed_at`, and
+`merged_by.login` through `gh-app ... api repos/OWNER/REPO/pulls/NUMBER` before
+classifying the outcome. A missing branch alone does not establish publication
+failure: a concurrent merge can delete it. Report the last verified published
+SHA separately from the final remote-branch state, attribute any verified merge
+to the external actor, and stop further repair or assignment writes rather than
+recreating the branch or reopening the PR. Distinguish this external completion
+from the developer's own incomplete handoff and verification gaps.

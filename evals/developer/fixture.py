@@ -190,6 +190,9 @@ def api(state, args):
     if path == "issues/42" and method == "GET":
         record("read_pr", creator_id=state["evidence"]["pr"]["creator"]["id"])
         return pr(state)
+    if path == "issues/42/labels" and method == "GET":
+        record("read_labels")
+        return [{"name": label} for label in state["labels"]]
     if path in {"issues/42", "issues/42/labels"} and method in {"PATCH", "PUT", "POST"}:
         labels(state, data["labels"])
         return pr(state)

@@ -46,6 +46,18 @@ work. Before an authorized PR repair, remove and verify absence of `needs-human`
 Retain designation and reviewer-set `in-review`. Clean handoff follows
 [pr-feedback.md](references/pr-feedback.md) without reopening repair.
 
+## Check repository publication prerequisites
+
+Read applicable `AGENTS.md` and linked repository policy before implementation,
+and reconcile commit/push approval requirements with the verified handoff. Do
+not defer this check until after preparing a repair: a publication restriction
+can change the deliverable. Distinguish authorization to edit from authorization
+to publish where repository policy explicitly separates them. If additional
+approval is genuinely required, identify the exact missing authorization and
+preserve any local work; do not imply that a locally passing repair was delivered.
+Do not request redundant approval when the verified request already satisfies
+the repository's rule.
+
 ## Acknowledge authorized work
 
 After authorization, follow [reactions.md](references/reactions.md) before

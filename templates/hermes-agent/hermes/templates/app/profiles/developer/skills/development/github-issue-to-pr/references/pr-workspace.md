@@ -28,7 +28,9 @@ refresh the binding and reconcile feedback before editing.
 ## Preserve the checkout and local commits
 
 Inspect `git status --short`, the current branch, and local history relative to
-the fetched PR head. A clean working tree does not establish that local commits
+the fetched PR head. For a newly created `clone --no-checkout`, populate a new
+task branch before interpreting apparent tracked-file deletions as local work;
+the empty worktree is intentional in that clone mode. A clean working tree does not establish that local commits
 are published or belong to this task. Reuse a checkout only if it is clean,
 belongs to this repair, and its HEAD equals the fetched PR SHA.
 
