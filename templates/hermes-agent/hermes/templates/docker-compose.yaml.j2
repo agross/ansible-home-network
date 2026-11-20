@@ -61,7 +61,7 @@ services:
     {% endif %}
 
   dind:
-    image: docker:29.9.3-dind
+    image: docker:29.10.0-dind
     privileged: true
     restart: unless-stopped
     # Listen on the shared Unix socket only. Use vfs on the LXC's ZFS storage.
