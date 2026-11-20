@@ -62,6 +62,18 @@ Apply its provenance check before linked-issue mutations or developer delegation
    still-actionable threads open and report them; an outdated diff location or
    passing suite alone does not prove the correction. Incomplete evidence blocks
    the dependent conclusion.
+
+   For new or existing NuGet `packages.lock.json` `contentHash` findings, require
+   a NuGet locked restore that reports a content mismatch (NU1403), or compare
+   the locked value with NuGet's computed content hash for the exact package ID,
+   resolved version, and configured source. Use a fresh package cache when
+   checking the source. NuGet excludes signature data from its content hash for
+   signed packages. A raw `.nupkg` SHA-512 or `.nupkg.sha512` value alone cannot
+   establish a mismatch. If the only evidence is a raw archive hash, do not
+   publish or carry forward the claim as actionable. If verification cannot be
+   completed, report that limitation without asserting a mismatch.
+   See [NuGet's explanation of signed package content hashes](https://github.com/NuGet/Home/issues/10787).
+
 3. Stage findings and thread decisions locally. Existing actionable threads count
    toward the result without posting duplicates. For new findings, record evidence,
    impact, minimal correction, and an objective completion criterion. Inline
