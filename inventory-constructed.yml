@@ -49,9 +49,6 @@ groups:
     inventory_hostname is match("agent-") and
     not inventory_hostname is search("docker")
 
-  kubes: >-
-    inventory_hostname is match("kube-")
-
   gateway: >-
     inventory_hostname is match("gateway-")
 

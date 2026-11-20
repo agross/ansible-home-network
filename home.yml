@@ -23,14 +23,6 @@
   vars:
     playbook_hosts: home:&docker
 
-- name: Configure Kubernetes
-  hosts: kubes
-  become: true
-  gather_facts: false
-  roles:
-    - role: k3s
-      tags: k3s
-
 - name: Gateway configuration
   hosts: gateway-home
   become: true
