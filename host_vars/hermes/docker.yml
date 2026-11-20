@@ -1,0 +1,12 @@
+# Let host pruning continue if the nested daemon is unavailable.
+docker_image_prune_pre:
+  - >-
+    -/usr/bin/docker --host unix:///run/hermes-agent/docker.sock
+    image prune --all --force
+    --filter until={{ docker_image_prune_keep_days * 24 | int }}h
+
+docker_buildx_prune_pre:
+  - >-
+    -/usr/bin/docker --host unix:///run/hermes-agent/docker.sock
+    buildx prune --all --force
+    --filter until={{ docker_buildx_prune_keep_days * 24 | int }}h

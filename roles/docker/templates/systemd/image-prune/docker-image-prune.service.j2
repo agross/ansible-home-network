@@ -7,6 +7,9 @@ OnFailure=unit-status-mail@%n.service
 [Service]
 Type=oneshot
 
+{% for command in docker_image_prune_pre %}
+ExecStartPre={{ command }}
+{% endfor %}
 ExecStart=/usr/bin/docker image \
                           prune \
                           --all \
