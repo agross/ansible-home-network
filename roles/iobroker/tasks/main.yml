@@ -33,6 +33,22 @@
         owner: 1000
         group: 1000
         mode: "755"
+
+- name: Copy host-specific templates
+  when: directory is ansible.builtin.directory
+  ansible.builtin.import_tasks: copy-templates.yml
+  vars:
+    directory: >-
+      {{ playbook_dir }}/templates/{{
+        ansible_role_name
+      }}/{{
+        inventory_hostname
+      }}/templates
+    target: "{{ iobroker_root }}"
+    notify_:
+      - Reload iobroker service
+      - Restart iobroker healthcheck timer
+    files:
       crunchfit/.env.j2:
         mode: "640"
 
