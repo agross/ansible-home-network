@@ -1,5 +1,5 @@
 # renovate: github-releases=openccu-lite/openccu-lite versioning=semver
-openccu_lite_release: v2.0.0-beta.10
+openccu_lite_release: v2.0.0-beta.11
 openccu_lite_version: "{{ openccu_lite_release | ansible.builtin.regex_replace('^v', '') }}"
 
 openccu_lite_ova_name: "openccu-lite-x86_64-ova-{{ openccu_lite_version }}.ova"
