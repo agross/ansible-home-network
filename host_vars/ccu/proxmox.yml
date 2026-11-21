@@ -5,7 +5,6 @@ proxmox:
   tags:
     - service
   startup: order=200
-  bios: seabios
   cores: 2
   memory: 2048
   net:
