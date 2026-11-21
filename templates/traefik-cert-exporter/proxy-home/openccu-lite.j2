@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+
+if [[ "${DOMAIN-}" != therightstuff.de ]]; then
+  exit
+fi
+
+ccu={{ hostvars.ccu.inventory_hostname | ansible.builtin.quote }}.{{ hostvars.ccu.network.domain | ansible.builtin.quote }}
+token={{ openccu_lite_certificate_token | ansible.builtin.mandatory | ansible.builtin.quote }}
+
+# The CCU can still be serving a self-signed or expired certificate.
+curl_status=0
+http_status=$(curl --insecure \
+                   --silent \
+                   --show-error \
+                   --noproxy '*' \
+                   --connect-timeout 10 \
+                   --max-time 60 \
+                   --request PUT \
+                   --header @<(printf 'Authorization: Bearer %s\n' "$token") \
+                   --form "certificate=@$CERT_LEAF" \
+                   --form "chain=@$CERT_INTERMEDIATE" \
+                   --form "key=@$CERT_KEY" \
+                   --output /dev/null \
+                   --write-out '%{http_code}' \
+                   "https://$ccu/api/system/v1/certificate/manual") || curl_status=$?
+
+if (( curl_status != 0 )) || [[ "$http_status" != 200 ]]; then
+  printf 'OpenCCU Lite certificate upload failed on %s (curl %s, HTTP %s)\n' \
+    "$ccu" "$curl_status" "$http_status" >&2
+  exit 1
+fi
+
+printf 'Updated OpenCCU Lite certificate on %s\n' "$ccu"
