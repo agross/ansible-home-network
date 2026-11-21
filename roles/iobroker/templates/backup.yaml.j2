@@ -18,6 +18,14 @@ source_directories: !retain
 # during borgmatic's execution. For each command hook, specify one of "before"
 # or "after", not both.
 commands:
+  {% if iobroker_openccu_lite_url | default('') | length > 0 %}
+  - before: configuration
+    when:
+      - create
+    run:
+      - {{ (iobroker_root ~ '/backup-openccu-lite') | ansible.builtin.to_json }}
+  {% endif %}
+
   - before: action
     when:
       - extract

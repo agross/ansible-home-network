@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# vim: set ft=jinja-shell ts=2 sw=2 et:
+
+set -euo pipefail
+umask 077
+
+token={{ iobroker_openccu_lite_backup_token | ansible.builtin.mandatory | ansible.builtin.quote }}
+
+cd -- {{ iobroker_root | ansible.builtin.quote }}
+
+temporary=$(mktemp -- .openccu-lite.XXXXXXXX)
+trap 'rm --force -- "$temporary"' EXIT
+
+url={{ (iobroker_openccu_lite_url ~ '/api/system/v1/backup') | ansible.builtin.quote }}
+
+response=$(curl --disable \
+                --silent \
+                --show-error \
+                --fail \
+                --proto '=https' \
+                --noproxy '*' \
+                --connect-timeout 10 \
+                --max-time 900 \
+                --header @<(printf 'Authorization: Bearer %s\n' "$token") \
+                --output "$temporary" \
+                --write-out '%{http_code} %{content_type} %header{content-disposition}' \
+                "$url")
+
+case "$response" in
+  '200 application/octet-stream attachment; filename="'*'.sbk"')
+    extension=sbk
+    ;;
+  '200 application/octet-stream attachment; filename="'*'.sbk.age"')
+    extension=sbk.age
+    ;;
+  *)
+    printf 'OpenCCU Lite returned an unexpected backup response (HTTP %s).\n' "${response%% *}" >&2
+    exit 1
+    ;;
+esac
+
+if [[ ! -s "$temporary" ]]; then
+  printf 'OpenCCU Lite returned an empty backup.\n' >&2
+  exit 1
+fi
+
+mv --force --no-target-directory -- "$temporary" "backups/openccu-lite.$extension"

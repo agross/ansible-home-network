@@ -19,3 +19,14 @@ Renovate tracks `openccu_lite_release`. It selects the OVA for the initial
 import and the requested firmware version for later API updates. The role reuses
 an already staged copy of the requested firmware and verifies the running
 version after installation.
+
+## Backups on Nest
+
+Create a separate API token with the `backup` scope. Store it as
+`vault_iobroker_openccu_lite_backup_token` in
+`host_vars/nest/iobroker.vault.yml`. Nest needs to trust the appliance's
+HTTPS certificate.
+
+Before Borgmatic creates the ioBroker archive, it exports the appliance's
+backup to `/data/iobroker/backups/openccu-lite.sbk` (or `.sbk.age` if
+backup encryption is enabled). Restore this file through OpenCCU Lite.

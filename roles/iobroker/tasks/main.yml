@@ -51,6 +51,10 @@
     files:
       crunchfit/.env.j2:
         mode: "640"
+      backup-openccu-lite.j2:
+        owner: 0
+        group: 0
+        mode: "700"
 
 - name: Install SELinux packages
   when: ansible_facts.selinux.status != 'disabled'
