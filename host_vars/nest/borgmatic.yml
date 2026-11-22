@@ -1,1 +1,5 @@
 borgmatic_encryption_passphrase: "{{ vault_borgmatic_encryption_passphrase }}"
+
+# The OpenCCU Lite hook runs as root, but Borgmatic's default capabilities
+# do not allow it to write to the ioBroker backup directory owned by UID 1000.
+borgmatic_systemd_capabilities: cap_dac_override
