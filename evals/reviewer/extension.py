@@ -21,6 +21,7 @@ def launcher(tool):
 
 
 def resolve_case(case):
+    issue_instructions = "" if case["name"].startswith("renovate_") else "Fetch the original issue through issues/7. "
     files = {"app.py": "def respond(text):\n    return 200 if text else 500\n",
              "test_app.py": "import unittest\nfrom app import respond\nclass ApiTests(unittest.TestCase):\n    def test_nonempty(self):\n        self.assertEqual(respond('hello'),200)\n",
              ".gitignore": "__pycache__/\n.fixture/profiles/*/review-locks/\n",
@@ -34,8 +35,8 @@ def resolve_case(case):
                 "to that mapped absolute path. Only configured slugs developer and reviewer exist. "
                 "No real GitHub requests or authenticated Git transport are needed: local source and Git history "
                 "are present. Fetch changed-file pages through gh-app api repos/example/project/pulls/42/files "
-                "for each assessment attempt; those are authoritative PR-diff inputs. Fetch the original "
-                "issue through issues/7. Run python3 -m unittest discover --pattern 'test_app.py' --verbose "
+                "for each assessment attempt; those are authoritative PR-diff inputs. "
+                f"{issue_instructions}Run python3 -m unittest discover --pattern 'test_app.py' --verbose "
                 "when checking behavior. Use temporary files outside tracked source for plans. "
                 "Do not modify .git/fixture-tools, .git/fixture-bin or .git/fake-forge directly. "
                 "Some APIs deliberately expose races or transient failures; obey the skill's guards. "

@@ -170,6 +170,10 @@ def api(state, endpoint, method, data):
             thread["isResolved"] = True
             save(state)
             return {"data": {"resolveReviewThread": {"thread": {"id": identifier, "isResolved": True}}}}
+        if "closingIssuesReferences" in data["query"]:
+            record(state, "read_closing_issues")
+            return {"data": {"repository": {"pullRequest": {"closingIssuesReferences": {
+                "nodes": pr(state)["closingIssuesReferences"]}}}}}
         record(state, "read_threads")
         return {"data": {"repository": {"pullRequest": {"reviewThreads": {
             "nodes": state["threads"], "pageInfo": {"hasNextPage": False, "endCursor": None}}}}}}
