@@ -1,7 +1,7 @@
 # Reviewer operation evals
 
-Sevro **1.1.2** owns isolated host execution, trials, grading, and retained
-artifacts. Root `package.json` and lockfile pin that release. The shared
+Sevro owns isolated host execution, trials, grading, and retained artifacts.
+The root `package.json` and lockfile pin its version. The shared
 [`../run.py`](../run.py) selects scenarios and invokes the root Sevro executable.
 
 ## Install and run

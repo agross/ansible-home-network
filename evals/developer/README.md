@@ -1,7 +1,7 @@
 # Developer skill operation evals
 
-Sevro **1.1.2** owns host isolation, trials, grading, and retained evidence. The
-root `package.json` and lockfile pin that release. The shared
+Sevro owns host isolation, trials, grading, and retained evidence. The
+root `package.json` and lockfile pin its version. The shared
 [`../run.py`](../run.py) selects scenarios and invokes the root Sevro executable.
 The eight original scenario IDs, input evidence, and permitted outcomes remain
 in `cases.json`.
