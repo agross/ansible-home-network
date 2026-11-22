@@ -8,7 +8,7 @@
     "eval": "python3 evals/run.py"
   },
   "devDependencies": {
-    "@bjoernrochel/sevro": "1.2.0"
+    "@bjoernrochel/sevro": "1.2.1"
   },
   "engines": {
     "node": ">=24.13.0"
