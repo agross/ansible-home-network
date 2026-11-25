@@ -61,6 +61,8 @@ proxmox_kernel_cmdline:
   - boot=zfs
   - video=800x600
   - panic=60
+  - console=ttyS0,115200n8
+  - console=tty0
 
 zfs_datasets:
   rpool/_reservation:
