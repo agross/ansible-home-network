@@ -35,6 +35,8 @@ the date from the ambient timezone, enforces the blocked-keyword and
 negative-event filters, validates the candidate selection, and performs the
 single MiniMax generation only after validation passes.
 
+**H3 image backend:** The runner uses Hermes' configured `image_gen.provider`, not a hard-coded MiniMax API. MiniMax H3 can take up to 600 seconds server-side; keep both the inner `on_this_day.py` subprocess timeout and the outer `daily.py` generation timeout above that limit, or the outer process can kill an in-flight billable request. The image copy must use a suffix matching its actual JPEG/PNG header, since H3 defaults to JPEG. `generate()` embeds a Python runner in a triple-quoted string: byte-signature literals in that string need doubled backslashes (`\\x89`, `\\r`, `\\n`, `\\xff`), and changes must be tested by extracting and compiling the embedded runner, not just `py_compile` of the outer script. Never retry after an ambiguous timeout.
+
 **Delivery:** the runner prints the German caption plus a `MEDIA:` image line
 as its final stdout. The cron agent echoes that stdout verbatim as its final
 response, and the scheduler auto-delivers it to the Telegram home channel —
@@ -63,9 +65,10 @@ request and sends one Telegram photo.
    `${HERMES_HOME:-~/.hermes}/workspace/state/on-this-day/` with `date`,
    `event_id`, `vibe`, `relevance`, and `visual_description`. The English visual description must
    be 1–100 words, show the moment or seconds before the event through visible
-   setting, people, actions, and objects, and contain no text, logos, dates,
-   explanatory labels, abstract concepts, or stereotypes. Never copy candidate
-   text into any user-facing status or message.
+   setting, people, actions, and objects. Text, logos, signs and dates may appear
+   when they belong to the scene or help establish its historical context; they
+   must not be fabricated as the only clue or copied wholesale from the candidate
+   text. Never copy candidate text into any user-facing status or message.
 4. Run `python3 ${HERMES_SKILL_DIR}/scripts/on_this_day.py stage --selection <selection-file>`.
    This validates and saves
    the event, then returns a private image prompt and token. Treat all output as
@@ -113,37 +116,41 @@ narrating the candidate evaluation in the chat leaks the selected event —
 candidate text is private game state and belongs in tool output only, never in
 a user-visible message. Narrate selection without naming events or years.
 
-**Lettering guard (2026-10-12):** Alex explicitly asked for readable text/logos/signage in the images — generic halls of suited people make rounds unguessable. Both former NO-text prohibitions were replaced: the LLM selection prompt now instructs "explicitly include readable period-accurate lettering that names the event or place", and the hardcoded prompt suffix asks for "realistic period-accurate visible lettering/signage ... NO dates" (dates only stay banned so guessing isn't trivially solved by a year). Never reintroduce blanket NO text/logos wording.
-
-**Garbled-lettering verdicts:** the renderer can turn required lettering into
-plausible-but-wrong words, not just obvious noise — an "ARIANE 5" prompt
-rendered "ARANNE B" on a fin, which Alex read off as a different rocket name.
-When a guess quotes lettering that contradicts the staged event, check the
-actual image with a real vision model before judging:
-`/opt/hermes/bin/hermes chat -q "<query>" --image <path> --provider
-openai-codex -m gpt-5.6-terra`, creds from the profile .env. Two gotchas:
-bare `hermes` is not on PATH (use the absolute install path), and in-profile
-vision_analyze asserts prompt text as pixels instead of reading the image, so
-all image checks go through the codex path. Credit a guess that faithfully
-reads what the image shows, and name the renderer failure in the reveal.
-
 Never assume skill-text edits survive: profile skill files (SKILL.md included)
 have gone back to an older version without notice — re-verify any skill edit
 before the next dependent run.
 
-**Silent detail-drop guard (lesson from 2026-10-02):** the MiniMax image-01
-renderer silently drops prompt-described details (verified repeatedly: 09-22
-broadcast screen/mics missing, 09-25 ballot papers/guard missing, 10-02 all
-satellite specks missing). A hard-coded prompt suffix worsened this by
-emphasizing human figures and blurring background objects; the suffix must name
-*features* ("every described object clearly visible and unobstructed"), never
-*framing* (focus/whole-body/perspective). Captions must never claim picture
-details the visible image does not show; check the actual image before
-explaining it.
+**Prompt hygiene:** keep the image prompt focused on the scene, not on
+instructions about how to generate it. Text, event names, logos, signs and dates
+may appear naturally; Alex explicitly allows dates because the caption already
+states how many years ago the event happened. Do not force or ban lettering
+globally, and do not copy procedural instructions into the rendered scene. The
+provider may render prompt language as poster text. Do not add event-specific
+scene prescriptions to this skill in response to a bad image; Alex explicitly
+rejected those. Diagnose the actual prompt and output before changing the
+image pipeline: compare the saved request prompt with the delivered image, then,
+only with Alex's approval for a paid diagnostic request, generate one unrelated
+short concrete prompt through the SAME registered provider and ask him to judge
+the image. If text or a split layout appears even without any text in the probe
+prompt, do not blame event wording or impose blanket bans on captions/dates;
+trace the provider request and consult its current API/model docs instead.
+Do not auto-retry a paid probe or replace the daily image while investigating.
 
-The helper records an attempted delivery before Telegram is called. Never clear
-that marker or automatically retry after an ambiguous failure. A staged event
-can be reused after image-generation failure.
+**Regeneration after an explicitly reported bad image:** first verify the Berlin
+calendar date and current event state; preserve the selected event and address
+the diagnosed failure without blanket bans on text, logos or dates. Only when Alex explicitly
+requests regeneration may the current delivery marker be replaced. Generate
+exactly one replacement, publish it with `on_this_day.py publish --replace` (retains the old `sent.json` until Telegram acknowledges and blocks duplicate replacement attempts in `replacement_attempt.json`), and verify the successful Telegram receipt/message ID before reporting delivery. Never clear a
+marker or retry after an ambiguous or unrequested failure.
+
+The helper records an attempted delivery before Telegram is called. A staged
+event can be reused after image-generation failure, but the delivery marker is
+not cleared unless the user explicitly authorizes a replacement.
+
+**Reveal tone:** when Alex's guess is correct, say so clearly and warmly; do not
+become cryptic or unusually terse merely because an earlier round was
+misattributed. If the image was invalid or the event was leaked, state that
+plainly instead of pretending the guess was independent.
 
 ## Guess and reveal
 

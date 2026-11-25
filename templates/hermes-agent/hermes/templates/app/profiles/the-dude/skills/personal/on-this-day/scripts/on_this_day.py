@@ -107,8 +107,7 @@ def image_request(event):
     return {'status': 'image_required', 'image_token': event['image_token'],
             'prompt': 'MODERN DIGITAL ILLUSTRATION: ' + event['image_prompt'] +
             ', every described object clearly visible and unobstructed, warm bright lighting, '
-            'contemporary art aesthetic, realistic period-accurate visible lettering/signage naming the '
-            'event or place where such signage would naturally appear, NO dates'}
+            'contemporary art aesthetic'}
 
 
 def stage(state, selection):
@@ -180,11 +179,19 @@ if not payload.get('success'):
 source = payload.get('image')
 if not isinstance(source, str) or not source:
     raise RuntimeError('Hermes image generation returned no image.')
-destination = output_dir / f'on-this-day-{uuid.uuid4().hex}.png'
+destination = output_dir / f'on-this-day-{uuid.uuid4().hex}.jpg'
 if source.startswith(('https://', 'http://')):
     urllib.request.urlretrieve(source, destination)
 else:
     shutil.copyfile(source, destination)
+header = destination.read_bytes()[:8]
+if header.startswith(b'\\x89PNG\\r\\n\\x1a\\n'):
+    corrected = destination.with_suffix('.png')
+    destination.rename(corrected)
+    destination = corrected
+elif not header.startswith(b'\\xff\\xd8\\xff'):
+    destination.unlink(missing_ok=True)
+    raise RuntimeError('Hermes image generation returned neither JPEG nor PNG.')
 print(json.dumps({'paths': [str(destination)], 'partial': False}))
 '''
     result = subprocess.run(
@@ -192,16 +199,21 @@ print(json.dumps({'paths': [str(destination)], 'partial': False}))
         check=True,
         capture_output=True,
         text=True,
-        timeout=600,
+        timeout=780,
         env=profile_env(),
     )
     return json.loads(result.stdout)
 
 
-def publish(state, image_path, image_token, dry_run=False):
+def publish(state, image_path, image_token, dry_run=False, replace=False):
     sent = read(state / 'sent.json')
     if sent and sent.get('date') == today():
-        return {'status': 'already_attempted'}
+        if not (replace and sent.get('status') == 'sent'):
+            return {'status': 'already_attempted'}
+    if replace:
+        previous_replacement = read(state / 'replacement_attempt.json')
+        if previous_replacement and previous_replacement.get('date') == today():
+            return {'status': 'already_attempted'}
     event = read(state / 'event.json')
     if not event or event.get('date') != today() or event.get('image_token') != image_token:
         raise ValueError('Image must match the current staged event token and Berlin date.')
@@ -212,11 +224,17 @@ def publish(state, image_path, image_token, dry_run=False):
     if dry_run:
         return {'status': 'dry_run'}
     delivery = {'date': event['date'], 'status': 'attempted'}
-    write(state / 'sent.json', delivery)
+    if replace:
+        write(state / 'replacement_attempt.json', delivery)
+    else:
+        write(state / 'sent.json', delivery)
     caption = f"Guten Morgen! Was geschah heute vor {event['years_ago']} Jahren? Errätst du, was als Nächstes passierte?"
     receipt = telegram(path, caption, os.environ.get('ONTHISDAY_CHAT_ID', '755375788'))
     delivery.update(receipt)
     delivery['status'] = 'sent'
+    if replace:
+        delivery['previous_telegram_message_id'] = sent.get('telegram_message_id')
+        write(state / 'replacement_attempt.json', delivery)
     write(state / 'sent.json', delivery)
     return {'status': 'sent', **receipt}
 
@@ -231,6 +249,7 @@ def main():
     parser.add_argument('--prompt-file', type=Path)
     parser.add_argument('--output-dir', type=Path)
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--replace', action='store_true', help='Explicitly replace a successfully sent image today')
     args = parser.parse_args()
     args.state_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
     with (args.state_dir / 'run.lock').open('a') as lock:
@@ -254,7 +273,7 @@ def main():
         else:
             if args.image is None or not args.image_token:
                 parser.error('publish requires --image and --image-token')
-            result = publish(args.state_dir, args.image, args.image_token, args.dry_run)
+            result = publish(args.state_dir, args.image, args.image_token, args.dry_run, args.replace)
         print(json.dumps(result, ensure_ascii=False))
 
 

@@ -47,15 +47,17 @@ fallback_providers:
 
 plugins:
   enabled:
+    - minimax-h3
     - minimax-image
     - web-exa
 
 image_gen:
-  provider: minimax
+  provider: minimax-h3
   minimax:
     api: https://api.minimax.io
     key_env: MINIMAX_API_KEY
     model: image-01
+  model: MiniMax-H3-Image
 
 dashboard:
   show_token_analytics: true

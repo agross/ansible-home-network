@@ -1,0 +1,7 @@
+name: minimax-h3
+version: 1.0.0
+description: "MiniMax H3 Image backend for Hermes (port of the H3 API routing from OpenClaw PR #196627)."
+author: the-dude
+kind: backend
+requires_env:
+  - MINIMAX_API_KEY

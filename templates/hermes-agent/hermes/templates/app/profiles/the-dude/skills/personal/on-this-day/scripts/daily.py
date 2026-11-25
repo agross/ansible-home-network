@@ -143,8 +143,6 @@ def pick_event(events):
             "when the event is positive or neutral, relevant to a German tech-savvy adult, "
             "and can be shown through specific people, actions, setting and objects seconds before it happened. "
             "Return ONLY null if it is negative, unsuitable, or cannot yield concrete visual clues. "
-            "If the historical event is identifiable by signage, banners, flags, plaques or lettering on objects "
-            "in the scene, explicitly include readable period-accurate lettering that names the event or place. "
             f"Event: {candidate['year']}: {candidate['text']}"
         )
         out, rc = llm(prompt)
@@ -218,7 +216,7 @@ def main():
 
     outdir = state / 'images'
     gen = run_py([str(SKILL_DIR / 'scripts/on_this_day.py'), 'generate',
-                  '--prompt-file', str(pf), '--output-dir', str(outdir)], timeout=380)
+                  '--prompt-file', str(pf), '--output-dir', str(outdir)], timeout=820)
     try:
         gd = json.loads(gen.stdout)
     except Exception:
