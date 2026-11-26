@@ -2,11 +2,11 @@
 
 model:
   provider: opencode-go
-  default: gemini-4-argon
+  default: glm-5.3-flash
 
 fallback_providers:
   - provider: opencode-go
-    model: glm-5.3-flash
+    model: gemini-4-argon
   # docker exec -it hermes-agent-app-1 hermes --profile reviewer auth
   - provider: openai-codex
     model: openai-codex/gpt-5.6-terra
