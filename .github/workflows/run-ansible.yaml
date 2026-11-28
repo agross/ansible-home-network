@@ -90,8 +90,6 @@ jobs:
           ansible-galaxy collection \
                          install \
                          --requirements-file requirements.yml
-        env:
-          ANSIBLE_COLLECTIONS_ON_ANSIBLE_VERSION_MISMATCH: ignore
 
       - name: Gather facts
         run: |
